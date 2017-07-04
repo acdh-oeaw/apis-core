@@ -1,0 +1,8 @@
+{% extends "entities/generic_list.html" %}
+{% block Titel %}See all Persons{% endblock %}
+{% block list_title %}All Persons{% endblock %}
+{% block create_button %}
+        <div>
+            <a class="btn btn-primary btn-lg" href="{% url 'entities:person_create' %}">create new Person</a>
+        </div>
+{% endblock %}

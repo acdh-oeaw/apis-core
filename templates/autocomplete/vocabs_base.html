@@ -1,0 +1,9 @@
+<div class="autocomplete-ort">
+{% autoescape on %}
+{% for choice in choices %}
+<span id="vocabs_{{ forloop.counter }}" class="block autocomp_span" replace-text="{{ choice.name }}" data-value="{{ choice.pk }} ">
+    <b>{{ choice.name|safe }}</b>&nbsp;{% if choice.score %}({{choice.score}}){% endif %}{% if choice.descr %}:&nbsp;{{choice.descr|safe}}{% endif %}  
+</span>
+{% endfor %}
+{% endautoescape %}
+</div>

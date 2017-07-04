@@ -1,0 +1,8 @@
+{% extends "entities/generic_list.html" %}
+{% block Titel %}See all Events{% endblock %}
+{% block list_title %}All Events{% endblock %}
+{% block create_button %}
+        <div>
+            <a class="btn btn-primary btn-lg" href="{% url 'entities:event_create' %}">create new Event</a>
+        </div>
+{% endblock %}

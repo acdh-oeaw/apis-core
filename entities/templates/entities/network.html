@@ -1,0 +1,217 @@
+{% extends "webpage/base.html" %}
+{% load staticfiles %}
+{% block scriptHeader %}
+
+
+<script src="{% static 'javascripts/linkurious/src/sigma.core.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/conrad.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/utils/sigma.utils.js' %}"></script>
+
+<script src="{% static 'javascripts/linkurious/src/utils/sigma.polyfills.js' %}"></script>
+
+<script src="{% static 'javascripts/linkurious/src/sigma.settings.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/classes/sigma.classes.dispatcher.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/classes/sigma.classes.configurable.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/classes/sigma.classes.graph.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/classes/sigma.classes.camera.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/classes/sigma.classes.quad.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/captors/sigma.captors.mouse.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/captors/sigma.captors.touch.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/sigma.renderers.canvas.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/sigma.renderers.webgl.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/sigma.renderers.svg.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/sigma.renderers.def.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/webgl/sigma.webgl.nodes.def.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/webgl/sigma.webgl.nodes.fast.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/webgl/sigma.webgl.edges.def.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/webgl/sigma.webgl.edges.fast.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/webgl/sigma.webgl.edges.arrow.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/canvas/sigma.canvas.labels.def.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/canvas/sigma.canvas.hovers.def.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/canvas/sigma.canvas.nodes.def.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/canvas/sigma.canvas.edges.def.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/canvas/sigma.canvas.edges.curve.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/canvas/sigma.canvas.edges.arrow.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/canvas/sigma.canvas.edges.curvedArrow.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/canvas/sigma.canvas.edgehovers.def.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/canvas/sigma.canvas.edgehovers.curve.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/canvas/sigma.canvas.edgehovers.arrow.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/canvas/sigma.canvas.extremities.def.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/svg/sigma.svg.utils.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/svg/sigma.svg.nodes.def.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/svg/sigma.svg.edges.def.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/svg/sigma.svg.edges.curve.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/svg/sigma.svg.edges.curvedArrow.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/svg/sigma.svg.labels.def.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/renderers/svg/sigma.svg.hovers.def.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/middlewares/sigma.middlewares.rescale.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/middlewares/sigma.middlewares.copy.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/misc/sigma.misc.animation.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/misc/sigma.misc.bindEvents.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/misc/sigma.misc.bindDOMEvents.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/src/misc/sigma.misc.drawHovers.js' %}"></script>
+<!-- END SIGMA IMPORTS -->
+<script src="{% static 'javascripts/linkurious/plugins/sigma.parsers.json/sigma.parsers.json.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/plugins/sigma.parsers.gexf/sigma.parsers.gexf.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/plugins/sigma.plugins.animate/sigma.plugins.animate.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/plugins/sigma.layouts.forceLink/worker.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/plugins/sigma.layouts.forceLink/supervisor.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/plugins/sigma.plugins.animate/sigma.plugins.animate.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/plugins/sigma.layouts.fruchtermanReingold/sigma.layout.fruchtermanReingold.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/plugins/sigma.plugins.tooltips/sigma.plugins.tooltips.js' %}"></script>
+<script src="{% static 'javascripts/linkurious/plugins/sigma.exporters.json/sigma.exporters.json.js' %}"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.8.1/mustache.min.js"></script>
+<style type="text/css">
+
+      #graph-container {
+      height: 1000px;
+    }
+
+    ul.dropdown-menu {
+      z-index: 2000;
+    }
+    
+    .sigma-tooltip {
+      max-width: 240px;
+      max-height: 280px;
+      background-color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      border-radius: 6px;
+    }
+    .sigma-tooltip-header {
+      font-variant: small-caps;
+      font-size: 120%;
+      color: #437356;
+      border-bottom: 1px solid #aac789;
+      padding: 10px;
+    }
+    .sigma-tooltip-body {
+      padding: 10px;
+    }
+    .sigma-tooltip-body th {
+      color: #999;
+      text-align: left;
+    }
+    .sigma-tooltip-footer {
+      padding: 10px;
+      border-top: 1px solid #aac789;
+    }
+    .sigma-tooltip > .arrow {
+      border-width: 10px;
+      position: absolute;
+      display: block;
+      width: 0;
+      height: 0;
+      border-color: transparent;
+      border-style: solid;
+    }
+    .sigma-tooltip.top {
+      margin-top: -12px;
+    }
+    .sigma-tooltip.top > .arrow {
+      left: 50%;
+      bottom: -10px;
+      margin-left: -10px;
+      border-top-color: rgb(249, 247, 237);
+      border-bottom-width: 0;
+    }
+    .sigma-tooltip.bottom {
+      margin-top: 12px;
+    }
+    .sigma-tooltip.bottom > .arrow {
+      left: 50%;
+      top: -10px;
+      margin-left: -10px;
+      border-bottom-color: rgb(249, 247, 237);
+      border-top-width: 0;
+    }
+    .sigma-tooltip.left {
+      margin-left: -12px;
+    }
+    .sigma-tooltip.left > .arrow {
+      top: 50%;
+      right: -10px;
+      margin-top: -10px;
+      border-left-color: rgb(249, 247, 237);
+      border-right-width: 0;
+    }
+    .sigma-tooltip.right {
+      margin-left: 12px;
+    }
+    .sigma-tooltip.right > .arrow {
+      top: 50%;
+      left: -10px;
+      margin-top: -10px;
+      border-right-color: rgb(249, 247, 237);
+      border-left-width: 0;
+    }
+    </style>
+{% endblock %}
+{% block content %}
+<div id="container">
+  <div id="graph-container"></div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+{{block.super}}
+<script type="text/javascript">
+sigma.parsers.json('{% url 'entities:getNetJsonList' %}', {
+  container: 'graph-container',
+}, function(s) {
+    
+  s.graph.nodes().forEach(function (n) {
+        
+      n.x = Math.random();
+      n.y = Math.random();
+      n.size = 10*(1-1/s.graph.degree(n.id));
+      if (n.type === 'person') {
+        n.color = '#5FB404';
+      } else {
+        n.color = '#B40404';
+      }
+   
+  });
+  s.refresh();
+
+ var config = {
+  node: [{
+    show: 'clickNode',
+    cssClass: 'sigma-tooltip',
+    position: 'top',
+    //autoadjust: true,
+    renderer: function(node) {
+      // The function context is s.graph
+      // Returns an HTML string:
+      return node.tooltip;
+      // Returns a DOM Element:
+      //var el = document.createElement('div');
+      //return el.innerHTML = Mustache.render(template, node);
+    }
+  }],
+};
+// Instanciate the tooltips plugin with a Mustache renderer for node tooltips:
+var tooltips = sigma.plugins.tooltips(s, s.renderers[0], config);
+
+  var frListener = sigma.layouts.fruchtermanReingold.configure(s, {
+  iterations: 500,
+  easing: 'quadraticInOut',
+  duration: 800
+});
+
+// Bind the events:
+frListener.bind('start stop interpolate', function(e) {
+  console.log(e.type);
+});
+
+s.settings({
+  minNodeSize: 5,
+  maxNodeSize: 15,
+});
+
+// Start the Fruchterman-Reingold algorithm:
+sigma.layouts.fruchtermanReingold.start(s);
+});
+</script>
+{% endblock %}

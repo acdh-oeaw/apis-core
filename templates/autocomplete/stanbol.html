@@ -1,0 +1,35 @@
+<div class="autocomplete-ort">
+{% for choice in choices %}
+    <script>console.log({{ choice|safe }})</script>
+<span id="auto_{{ choice.ac_type }}_{{ forloop.counter }}" class="block autocomp_span {{ choice.source }}" replace-text="{{ choice.name }}" data-value="{{ choice.uri }}" style="white-space: normal">
+    <b>{{ choice.name }}</b>&nbsp;<small>{{ choice.source }}</small>{% if choice.score %}&nbsp;[{{choice.score}}]{% endif %}{% if choice.dateOfBirth %}&nbsp;
+    ({{ choice.dateOfBirth|date:'d. F Y' }}{% if choice.dateOfDeath %}-{{ choice.dateOfDeath|date:'d. F Y' }}{% endif %}){% endif %}{% if choice.descr %}:&nbsp;{{choice.descr|safe}}{% endif %}
+</span>
+{% if choice.lat %}
+<script>
+        
+            $('#auto_{{ choice.ac_type }}_{{ forloop.counter }}').tooltipster({
+                functionReady: function(origin, content) {
+                    if ($('#tooltip_map_{{ choice.ac_type }}_{{ forloop.counter }}').children().length == 0){
+                    var map = L.map("tooltip_map_{{ choice.ac_type }}_{{ forloop.counter }}", {
+                    center: [51.505, -0.09],
+                    zoom: 5,
+                    zoomControl: false});
+                    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+                    maxZoom: 18,
+                    id: 'mapbox.light',
+                    accessToken: 'pk.eyJ1Ijoic2VubmllcmVyIiwiYSI6ImNpbHk1YWV0bDAwZnB2dW01d2l1Y3phdmkifQ.OljQLEhqeAygai2y6VoSwQ'
+                }).addTo(map);
+                    console.log({{choice.lat}});
+                    L.marker([{{choice.lat}}, {{choice.long}}]).addTo(map);
+                    map.setView([{{choice.lat}}, {{choice.long}}], 8);}},
+                content: $('<div id="tooltip_map_{{ choice.ac_type }}_{{ forloop.counter }}" style="height:300px; width:300px"></div>'),
+                position: 'left',
+                
+            });
+
+    </script>
+{% endif %}
+
+{% endfor %}
+</div>

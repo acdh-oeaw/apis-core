@@ -1,0 +1,8 @@
+{% extends "entities/generic_list.html" %}
+{% block Titel %}See all Works{% endblock %}
+{% block list_title %}All Works{% endblock %}
+{% block create_button %}
+        <div>
+            <a class="btn btn-primary btn-lg" href="{% url 'entities:work_create' %}">create new Work</a>
+        </div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% load apis_helpers %}
+<div class="autocomplete-addrelation">
+{% for choice in choices %}
+{% with choice|content_type as ctype %}
+<span style="white-space: normal" data-cont="{{ctype.pk}}" data-value={{choice.pk}} class="block autocomp_span">
+   <small>{{ctype}}:</small>&nbsp;<b>{{ choice }}</b> 
+</span>
+{% endwith %}
+{% endfor %}
+</div>

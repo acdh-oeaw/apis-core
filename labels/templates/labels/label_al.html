@@ -1,0 +1,13 @@
+{% load autocomplete_light_tags %}
+
+<div class="autocomplete-label">
+{% for choice in choices %}
+<span class="block autocomp_span" replace-text="{{ choice.ref_name }}" data-value="{{ choice.isoID }}">
+
+    <b>{{ choice.ref_name }}</b>|{{choice.isoID}}
+
+    
+</span>
+
+{% endfor %}
+</div>

@@ -1,0 +1,33 @@
+{% extends "webpage/base.html" %}
+{% block Titel %} See all Labels {% endblock %}
+{% block content %}
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h1>All Labels</h1>
+		<div>
+			<a class="btn btn-primary btn-lg" href="{% url 'labels:label_create' %}">create new Label</a>
+		</div>
+	</div>
+	<div class="panel-body">
+		{% if object_list %}
+		<table class="table table-striped">
+			<thead>
+				<th>Label</th>
+				<th>Language</th>
+				<th>ISO 639-3</th>
+			</thead>
+			<tbody>
+			{% for object in object_list %}
+				<tr>
+					<td><a href="{% url 'labels:label_edit' pk=object.id %}">{{ object.label }}</a></td>
+					<td>{{ object.language }}</td>
+					<td>{{ object.isoCode }}</a></td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+		{% endif %}
+	</div>
+</div>
+{% endblock %}

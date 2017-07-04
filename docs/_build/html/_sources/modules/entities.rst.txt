@@ -1,0 +1,16 @@
+.. _entities-models:
+Entities
+========
+In the entities app all 5 core entites - Person, Place, Institution, Event and Work are saved.
+
+Models
+------
+
+.. automodule:: entities.models
+    :members:
+
+Views
+-----
+
+.. automodule:: entities.views
+    :members:

@@ -1,0 +1,19 @@
+<div class="autocomplete-ort">
+{% autoescape on %}
+{% for choice in choices %}
+<span id="autovocab_{{ choice.ac_type }}_{{ forloop.counter }}" class="block autocomp_span" replace-text="{{ choice.label }}" data-value="{{ choice.pk }} ">
+    {{ choice.label }}
+</span>
+{% if choice.description %}
+<script>
+            $('#autovocab_{{ choice.ac_type }}_{{ forloop.counter }}').tooltipster({
+                content: "{{ choice.description }}",
+                position: 'left',
+                
+            });
+
+    </script>
+{% endif %}
+{% endfor %}
+{% endautoescape %}
+</div>

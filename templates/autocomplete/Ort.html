@@ -1,0 +1,10 @@
+<div class="autocomplete-ort">
+{% for choice in choices %}
+<span class="block autocomp_span" replace-text="{{ choice.name }}" data-value="{{ choice.uri }}">
+
+    <b>{{ choice.name }}</b>&nbsp;({{choice.score}}){% if choice.descr %}:&nbsp;{{choice.descr|safe}}{% endif %}
+
+    
+</span>
+{% endfor %}
+</div>

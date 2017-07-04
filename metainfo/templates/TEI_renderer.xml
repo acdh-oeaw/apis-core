@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="http://www.tei-c.org/release/xml/tei/custom/schema/relaxng/tei_all.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+  <teiHeader>
+    <fileDesc>
+      <titleStmt>
+        <title type="main">Donnerstag, der 23. April 1970</title>
+        <title type="sub">Tagebuch Josef Staribacher: Digitale Edition</title>
+        <author>Josef Staribacher</author>
+        <respStmt>
+          <resp>TEI Encoding</resp>
+          <persName>Gustav Graf</persName>
+        </respStmt>
+      </titleStmt>
+      <publicationStmt>
+        <p>Internal use only</p>
+      </publicationStmt>
+      <sourceDesc>
+        <msDesc>
+          <msIdentifier>
+            <institution>Kreisky Archiv</institution>
+            <collection>Nachlass Joseph Staribacher</collection>
+            <idno type="signature">Band01_1970-04-23</idno>
+          </msIdentifier>
+        </msDesc>
+      </sourceDesc>
+    </fileDesc>ckent llane
+      
+    <revisionDesc>
+      <change type="creation" when="2016-02-23">exported as basic TEI from corrected tesseract output.</change></revisionDesc>
+      <revisionDesc>
+      <change type="creation" when="2016-02-23">{{renderer_context.request.user}}</change></revisionDesc>
+  </teiHeader>
+  {% for txt in data.results %}
+  <text xml:base="{{ txt.text_id }}">
+    <body>
+      {{txt.text | safe}}
+    </body>
+    <back/>
+  </text>
+  {% endfor %}
+</TEI>

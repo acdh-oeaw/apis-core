@@ -1,0 +1,331 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ResolveAbbreviations &mdash; APIS 0.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
+    <link rel="top" title="APIS 0.1 documentation" href="../index.html"/>
+        <link rel="up" title="Internal API" href="../internal_api.html"/>
+        <link rel="next" title="User documentation" href="../user_documentation.html"/>
+        <link rel="prev" title="Highlighter" href="highlighter.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> APIS
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_model.html">Data Model</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../internal_api.html">Internal API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="metainfo.html">Metainfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="entities.html">Entities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="relations.html">Relations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vocabularies.html">Vocabularies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="highlighter.html">Highlighter</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">ResolveAbbreviations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#genericrdfparser">GenericRDFParser</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user_documentation.html">User documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">APIS</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../internal_api.html">Internal API</a> &raquo;</li>
+        
+      <li>ResolveAbbreviations</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/modules/helper_functions.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="resolveabbreviations">
+<h1>ResolveAbbreviations<a class="headerlink" href="#resolveabbreviations" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="genericrdfparser">
+<h1>GenericRDFParser<a class="headerlink" href="#genericrdfparser" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="helper_functions.RDFparsers.GenericRDFParser">
+<em class="property">class </em><code class="descclassname">helper_functions.RDFparsers.</code><code class="descname">GenericRDFParser</code><span class="sig-paren">(</span><em>uri</em>, <em>kind</em>, <em>app_label_entities=’entities’</em>, <em>app_label_relations=’relations’</em>, <em>app_label_vocabularies=’vocabularies’</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helper_functions/RDFparsers.html#GenericRDFParser"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helper_functions.RDFparsers.GenericRDFParser" title="Permalink to this definition">¶</a></dt>
+<dd><p>A generic class for parsing RDFs to the APIS data model and save
+objects to the db.</p>
+<p>Attributes:</p>
+<ul class="simple">
+<li>self.objct: (object) the object created by the parser</li>
+<li>self.labels: (list) list of labels created by the parser (only saved when self.save() is called)</li>
+<li>self.related_objcts: (list) list of related objects (relations) (only saved when self.save() is called)</li>
+<li>self.kind: (string) kind of entity of the object (Persion, Place, Institution, Work, Event)</li>
+<li>self.uri: (string) uri provided when initializing the object</li>
+<li>self.saved: (boolean) indicates whether the object was saved to the db</li>
+<li>self.created: (boolean) indicates whether the object was created</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>uri</strong> – (url) Uri to parse the object from (<a class="reference external" href="http://test.at">http://test.at</a>). The uri must start with a base url mentioned in the RDF parser settings file.</li>
+<li><strong>kind</strong> – (string) Kind of entity (Person, Place, Institution, Work, Event)</li>
+<li><strong>app_label_entities</strong> – (string) Name of the Django app that contains the entities that we create.</li>
+<li><strong>app_label_relations</strong> – (string) Name of the Django app that contains the relations for the merging process.</li>
+<li><strong>app_label_vocabularies</strong> – (string) Name of the Django app that contains the vocabularies defining the entities and relations.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="helper_functions.RDFparsers.GenericRDFParser.get_or_create">
+<code class="descname">get_or_create</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helper_functions/RDFparsers.html#GenericRDFParser.get_or_create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helper_functions.RDFparsers.GenericRDFParser.get_or_create" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Returns the parsed object. Saves it to the db when needed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="helper_functions.RDFparsers.GenericRDFParser.merge">
+<code class="descname">merge</code><span class="sig-paren">(</span><em>m_obj</em>, <em>app_label_relations=’relations’</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helper_functions/RDFparsers.html#GenericRDFParser.merge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helper_functions.RDFparsers.GenericRDFParser.merge" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>m_obj</strong> – the object to merge with (must be an django model object instance)</li>
+<li><strong>app_label_relations</strong> – (string) the label of the Django app that contains the relations</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">django object saved to db or False if nothing was saved</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="helper_functions.RDFparsers.GenericRDFParser.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helper_functions/RDFparsers.html#GenericRDFParser.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helper_functions.RDFparsers.GenericRDFParser.save" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">django object saved to db or False if nothing was saved</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../user_documentation.html" class="btn btn-neutral float-right" title="User documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="highlighter.html" class="btn btn-neutral" title="Highlighter" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Matthias Schlögl.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+*.ipynb
+*.pyc
+
+*.sqlite3
+
+data/
+migrations/
+static_dir/
+
+downloads/
+
+/webpage
+/apis/settings

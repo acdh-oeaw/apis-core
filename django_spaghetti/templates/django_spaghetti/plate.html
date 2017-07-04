@@ -1,0 +1,45 @@
+{% load staticfiles %}
+{% block scriptHeader %}
+<script src="{% static 'webpage/libraries/vis/4.7.0/vis.min.js' %}"></script>
+<link href="{% static 'webpage/libraries/vis/4.7.0/vis.min.css' %}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+<h1>The application's Data Model</h1>
+<p><a href="{% url 'webpage:start' %}">back</a></p>
+<div id="visualization"></div>
+
+<script>
+  var nodes = new vis.DataSet(
+      {{ meatballs|safe }}
+  );
+
+  var edges = new vis.DataSet(
+      {{ spaghetti|safe }}
+  );
+
+  var data = {
+    nodes: nodes,
+    edges: edges
+  };
+
+  var container = document.getElementById('visualization');
+  var options = {
+    "edges": {
+      "smooth": {
+        "type": "cubicBezier",
+        "roundness": 0.55
+      }
+    },
+  
+    "layout": {
+        hierarchical: {
+            sortMethod: 'hubsize',
+            direction:'LR'
+        }
+    },
+
+  };
+
+  var timeline = new vis.Network(container, data, options);
+
+</script>
