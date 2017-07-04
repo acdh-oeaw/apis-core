@@ -1,5 +1,6 @@
 *.ipynb
 *.pyc
+*.idea
 
 *.sqlite3
 
