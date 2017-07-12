@@ -99,7 +99,7 @@
 <li class="toctree-l2"><a class="reference internal" href="metainfo.html">Metainfo</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Entities</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#module-entities.models">Models</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#views">Views</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-entities.views">Views</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="relations.html">Relations</a></li>
@@ -208,8 +208,39 @@
 <dd></dd></dl>
 
 </div>
-<div class="section" id="views">
-<h2>Views<a class="headerlink" href="#views" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-entities.views">
+<span id="views"></span><h2>Views<a class="headerlink" href="#module-entities.views" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="entities.views.getGeoJson">
+<code class="descclassname">entities.views.</code><code class="descname">getGeoJson</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/entities/views.html#getGeoJson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entities.views.getGeoJson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to retrieve GeoJsons for single objects</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="entities.views.getGeoJsonList">
+<code class="descclassname">entities.views.</code><code class="descname">getGeoJsonList</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/entities/views.html#getGeoJsonList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entities.views.getGeoJsonList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to retrieve a list of GeoJsons. To generate the list the kind of connection
+and the connected entity is needed</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="entities.views.getNetJsonList">
+<code class="descclassname">entities.views.</code><code class="descname">getNetJsonList</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/entities/views.html#getNetJsonList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entities.views.getNetJsonList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to retrieve a Json to draw a network</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="entities.views.getNetJsonListInstitution">
+<code class="descclassname">entities.views.</code><code class="descname">getNetJsonListInstitution</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/entities/views.html#getNetJsonListInstitution"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entities.views.getNetJsonListInstitution" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to retrieve a Json to draw a network</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="entities.views.resolve_ambigue_place">
+<code class="descclassname">entities.views.</code><code class="descname">resolve_ambigue_place</code><span class="sig-paren">(</span><em>request</em>, <em>pk</em>, <em>uri</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/entities/views.html#resolve_ambigue_place"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#entities.views.resolve_ambigue_place" title="Permalink to this definition">¶</a></dt>
+<dd><p>Only used to resolve place names.</p>
+</dd></dl>
+
 </div>
 </div>
 

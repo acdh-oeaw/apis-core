@@ -31,9 +31,8 @@ from relations.tables import (PersonInstitutionTable, PersonPersonTable, PersonP
 from metainfo.models import Uri, UriCandidate, TempEntityClass, Text
 from apis.settings.base import BASE_DIR
 from helper_functions.stanbolQueries import retrieve_obj
-from helper_functions.parseSearch import generic_search
 from helper_functions.highlighter import highlight_text
-from helper_functions.RDFparsers import geonamesPlaceCL, GenericRDFParser
+from helper_functions.RDFparsers import GenericRDFParser
 from labels.models import Label
 from .tables import PersonTable, PlaceTable, InstitutionTable, EventTable, WorkTable
 from .filters import PersonListFilter, PlaceListFilter, InstitutionListFilter, EventListFilter, WorkListFilter
@@ -384,33 +383,6 @@ class InstitutionDelete(DeleteView):
 #
 ############################################################################
 ############################################################################
-
-
-@method_decorator(login_required, name='dispatch')
-class PlaceListViewOld(generic.ListView):  #deprecated
-    model = Place
-    template_name = 'entities/place_list.html'
-    context_object_name = 'object_list'
-    paginate_by = 25
-
-    def get_context_data(self, **kwargs):
-        context = super(PlaceListView, self).get_context_data(**kwargs)
-        q = self.request.GET.get("search")
-        context['search'] = q
-        if q:
-            sf = SearchForm(initial={'search': q})
-        else:
-            sf = SearchForm()
-        context['SearchForm'] = sf
-        return context
-
-    def get_queryset(self):
-        if self.request.GET.get("search"):
-            queryset = generic_search(self.request, Place, ['name', 'status'], query_param='search')
-            return queryset
-        else:
-            return Place.objects.order_by('name')
-
 
 @method_decorator(login_required, name='dispatch')
 class PlaceListView(GenericListView):

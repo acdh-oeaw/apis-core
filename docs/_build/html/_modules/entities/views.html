@@ -192,9 +192,8 @@
 <span class="kn">from</span> <span class="nn">metainfo.models</span> <span class="k">import</span> <span class="n">Uri</span><span class="p">,</span> <span class="n">UriCandidate</span><span class="p">,</span> <span class="n">TempEntityClass</span><span class="p">,</span> <span class="n">Text</span>
 <span class="kn">from</span> <span class="nn">apis.settings.base</span> <span class="k">import</span> <span class="n">BASE_DIR</span>
 <span class="kn">from</span> <span class="nn">helper_functions.stanbolQueries</span> <span class="k">import</span> <span class="n">retrieve_obj</span>
-<span class="kn">from</span> <span class="nn">helper_functions.parseSearch</span> <span class="k">import</span> <span class="n">generic_search</span>
 <span class="kn">from</span> <span class="nn">helper_functions.highlighter</span> <span class="k">import</span> <span class="n">highlight_text</span>
-<span class="kn">from</span> <span class="nn">helper_functions.RDFparsers</span> <span class="k">import</span> <span class="n">geonamesPlaceCL</span><span class="p">,</span> <span class="n">GenericRDFParser</span>
+<span class="kn">from</span> <span class="nn">helper_functions.RDFparsers</span> <span class="k">import</span> <span class="n">GenericRDFParser</span>
 <span class="kn">from</span> <span class="nn">labels.models</span> <span class="k">import</span> <span class="n">Label</span>
 <span class="kn">from</span> <span class="nn">.tables</span> <span class="k">import</span> <span class="n">PersonTable</span><span class="p">,</span> <span class="n">PlaceTable</span><span class="p">,</span> <span class="n">InstitutionTable</span><span class="p">,</span> <span class="n">EventTable</span><span class="p">,</span> <span class="n">WorkTable</span>
 <span class="kn">from</span> <span class="nn">.filters</span> <span class="k">import</span> <span class="n">PersonListFilter</span><span class="p">,</span> <span class="n">PlaceListFilter</span><span class="p">,</span> <span class="n">InstitutionListFilter</span><span class="p">,</span> <span class="n">EventListFilter</span><span class="p">,</span> <span class="n">WorkListFilter</span>
@@ -545,33 +544,6 @@
 <span class="c1">#</span>
 <span class="c1">############################################################################</span>
 <span class="c1">############################################################################</span>
-
-
-<span class="nd">@method_decorator</span><span class="p">(</span><span class="n">login_required</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;dispatch&#39;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">PlaceListViewOld</span><span class="p">(</span><span class="n">generic</span><span class="o">.</span><span class="n">ListView</span><span class="p">):</span>  <span class="c1">#deprecated</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">Place</span>
-    <span class="n">template_name</span> <span class="o">=</span> <span class="s1">&#39;entities/place_list.html&#39;</span>
-    <span class="n">context_object_name</span> <span class="o">=</span> <span class="s1">&#39;object_list&#39;</span>
-    <span class="n">paginate_by</span> <span class="o">=</span> <span class="mi">25</span>
-
-    <span class="k">def</span> <span class="nf">get_context_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">context</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">PlaceListView</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_context_data</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;search&quot;</span><span class="p">)</span>
-        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;search&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">q</span>
-        <span class="k">if</span> <span class="n">q</span><span class="p">:</span>
-            <span class="n">sf</span> <span class="o">=</span> <span class="n">SearchForm</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;search&#39;</span><span class="p">:</span> <span class="n">q</span><span class="p">})</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">sf</span> <span class="o">=</span> <span class="n">SearchForm</span><span class="p">()</span>
-        <span class="n">context</span><span class="p">[</span><span class="s1">&#39;SearchForm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sf</span>
-        <span class="k">return</span> <span class="n">context</span>
-
-    <span class="k">def</span> <span class="nf">get_queryset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;search&quot;</span><span class="p">):</span>
-            <span class="n">queryset</span> <span class="o">=</span> <span class="n">generic_search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">request</span><span class="p">,</span> <span class="n">Place</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;status&#39;</span><span class="p">],</span> <span class="n">query_param</span><span class="o">=</span><span class="s1">&#39;search&#39;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">queryset</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">Place</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">)</span>
-
 
 <span class="nd">@method_decorator</span><span class="p">(</span><span class="n">login_required</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;dispatch&#39;</span><span class="p">)</span>
 <span class="k">class</span> <span class="nc">PlaceListView</span><span class="p">(</span><span class="n">GenericListView</span><span class="p">):</span>

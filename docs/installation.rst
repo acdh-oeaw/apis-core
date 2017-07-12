@@ -20,19 +20,19 @@ We use the system in several different projects. To allow for high configurabili
 to split the system in several git submodules:
 
 * apis-core: the main application code
-* apis-PROJECTNAME-settings: The settings folder of the various projects. These contain not only the app settings (e.g.
+* apis-PROJECTNAME-settings (for the main system used in apis project we omit the PROJECTNAME in the repo names): The settings folder of the various projects. These contain not only the app settings (e.g.
   db user, db password etc.) but also the settings for the autocompletes and the RDF parsers.
 * apis-PROJECTNAME-webpage: The webpage app of the respective project. Seperating these base templates and javascripts
   from the rest of the app allows us to give every project its very own look.
 
 If you want to get a basic running system that you can work from, you can clone apis-apis and initialize the submodules::
 
-    git clone --recursive https://github.com/acdh-oeaw/apis-apis.git
+    git clone --recursive https://github.com/acdh-oeaw/apis.git
 
 After that you need to set two symlinks::
 
     cd apisapp/apis
-    ln -s ../../apis-apis-settings settings
+    ln -s ../../apis-settings settings
     cd ..
     ln -s ../apis-webpage webpage
 

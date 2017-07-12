@@ -195,14 +195,16 @@ class NetJsonViewSet(viewsets.ViewSet):
                 kind_ids.extend(ids_b)
                 kind_ids_res.extend(ids_b)
             q_dict['relation_type_id__in'] = kind_ids_res
-        if len(request.data['start_date']) > 0:
-            start_date_d = datetime.strptime(request.data['start_date'], '%d.%m.%Y')
-            print(start_date_d)
-            q_dict['end_date__gte'] = start_date_d
-        if len(request.data['end_date']) > 0:
-            end_date_d = datetime.strptime(request.data['end_date'], '%d.%m.%Y')
-            print(end_date_d)
-            q_dict['start_date__lte'] = end_date_d
+        if 'start_date' in request.data.keys():
+            if len(request.data['start_date']) > 0:
+                start_date_d = datetime.strptime(request.data['start_date'], '%d.%m.%Y')
+                print(start_date_d)
+                q_dict['end_date__gte'] = start_date_d
+        if 'end_date' in request.data.keys():
+            if len(request.data['end_date']) > 0:
+                end_date_d = datetime.strptime(request.data['end_date'], '%d.%m.%Y')
+                print(end_date_d)
+                q_dict['start_date__lte'] = end_date_d
         if annotation_proj:
             annProj_filter = {'ann_proj': annotation_proj}
             if not ann_include_all:
