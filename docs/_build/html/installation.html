@@ -256,7 +256,17 @@ We suggest <code class="docutils literal"><span class="pre">server.py</span></co
 <div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">python manage.py createsuperuser</span>
 </pre></div>
 </div>
-<p>answer the questions and you should be good to go:</p>
+<p>answer the questions and change to the static directory to download javascript libraries:</p>
+<p>If you havent installed NPM and bower yet you need to run:</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">sudo apt-get install npm</span>
+<span class="go">npm install -g bower</span>
+</pre></div>
+</div>
+<p>If you have already installed bower you can proceed with installing the javascript libraries directly:</p>
+<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">cd webpage/static/webpage/libraries</span>
+<span class="go">bower install</span>
+</pre></div>
+</div>
 <div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">python manage.py runserver</span>
 </pre></div>
 </div>

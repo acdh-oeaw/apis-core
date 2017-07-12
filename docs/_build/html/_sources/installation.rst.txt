@@ -103,7 +103,21 @@ and create a superuser:
 
     python manage.py createsuperuser
 
-answer the questions and you should be good to go:
+answer the questions and change to the static directory to download javascript libraries:
+
+If you havent installed NPM and bower yet you need to run:
+
+.. code-block:: console
+
+    sudo apt-get install npm
+    npm install -g bower
+
+If you have already installed bower you can proceed with installing the javascript libraries directly:
+
+.. code-block:: console
+
+    cd webpage/static/webpage/libraries
+    bower install
 
 .. code-block:: console
 
