@@ -14,7 +14,14 @@ configured in a settings file.
 APIS comes also with a built in highlighter. The highlighter is configured via the built in admin backend and allows
 to annotate texts with entities and/or relations between entities.
 
+
+Installation
+------------
+
+The installation process is described in the apis-core docs_.
+
 .. _ÖBL: http://www.biographien.ac.at
 .. _SKOS: https://en.wikipedia.org/wiki/Simple_Knowledge_Organization_System
 .. _Stanbol: https://stanbol.apache.org/
 .. _RDFs: https://en.wikipedia.org/wiki/Resource_Description_Framework
+.. _docs: https://acdh-oeaw.github.io/apis-core/
