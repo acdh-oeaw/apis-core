@@ -29,6 +29,10 @@ If you want to get a basic running system that you can work from, you can clone 
 
     git clone --recursive https://github.com/acdh-oeaw/apis.git
 
+And to update the submodules to the latest commit::
+
+    git submodule foreach git pull origin master
+
 After that you need to set two symlinks::
 
     cd apisapp/apis

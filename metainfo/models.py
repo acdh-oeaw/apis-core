@@ -124,7 +124,7 @@ class Collection(models.Model):
     description = models.TextField(blank=True)
     collection_type = models.ForeignKey(CollectionType, blank=True, null=True)
     groups_allowed = models.ManyToManyField(Group)
-    #parent_class = models.ForeignKey('self', blank=True, null=True)
+    parent_class = models.ForeignKey('self', blank=True, null=True)
 
     def __str__(self):
         return self.name
