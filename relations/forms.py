@@ -1583,6 +1583,123 @@ class PersonPersonHighlighterForm(PersonPersonForm):
         return self.cleaned_data['HL_text_id'][5:]
 
 
+class PlaceWorkHighlighterForm(PlaceWorkForm):
+    HL_start = forms.IntegerField(widget=forms.HiddenInput)
+    HL_end = forms.IntegerField(widget=forms.HiddenInput)
+    HL_text_id = forms.CharField(widget=forms.HiddenInput)
+
+    def __init__(self, *args, **kwargs):
+        #self.request = kwargs.pop('request', False)
+        super(PlaceWorkHighlighterForm, self).__init__(*args, **kwargs)
+        self.helper.layout.pop(-1)
+        self.helper.layout.extend([
+            'HL_start',
+            'HL_end',
+            'HL_text_id',
+            Accordion(
+                 AccordionGroup(
+                     'Notes and References',
+                     'notes',
+                     'references',
+                     active=False,
+                     css_id="placeWorkHL_notes_refs"))])
+
+    def save(self, site_instance, instance=None, commit=True):
+        cd = self.cleaned_data
+        x = super(PlaceWorkHighlighterForm, self).save(site_instance, commit=True)
+        txt = Text.objects.get(pk=cd['HL_text_id'][5:])
+        a = Annotation(
+            start=cd['HL_start'],
+            end=cd['HL_end'],
+            text=txt,
+            user_added=self.request.user,
+            annotation_project_id=int(self.request.session.get('annotation_project', 1)))
+        a.save()
+        a.entity_link.add(x)
+        return x
+
+    def get_text_id(self):
+        return self.cleaned_data['HL_text_id'][5:]
+
+
+class PersonWorkHighlighterForm(PersonWorkForm):
+    HL_start = forms.IntegerField(widget=forms.HiddenInput)
+    HL_end = forms.IntegerField(widget=forms.HiddenInput)
+    HL_text_id = forms.CharField(widget=forms.HiddenInput)
+
+    def __init__(self, *args, **kwargs):
+        #self.request = kwargs.pop('request', False)
+        super(PersonWorkHighlighterForm, self).__init__(*args, **kwargs)
+        self.helper.layout.pop(-1)
+        self.helper.layout.extend([
+            'HL_start',
+            'HL_end',
+            'HL_text_id',
+            Accordion(
+                 AccordionGroup(
+                     'Notes and References',
+                     'notes',
+                     'references',
+                     active=False,
+                     css_id="personWorkHL_notes_refs"))])
+
+    def save(self, site_instance, instance=None, commit=True):
+        cd = self.cleaned_data
+        x = super(PersonWorkHighlighterForm, self).save(site_instance, commit=True)
+        txt = Text.objects.get(pk=cd['HL_text_id'][5:])
+        a = Annotation(
+            start=cd['HL_start'],
+            end=cd['HL_end'],
+            text=txt,
+            user_added=self.request.user,
+            annotation_project_id=int(self.request.session.get('annotation_project', 1)))
+        a.save()
+        a.entity_link.add(x)
+        return x
+
+    def get_text_id(self):
+        return self.cleaned_data['HL_text_id'][5:]
+
+
+class InstitutionWorkHighlighterForm(InstitutionWorkForm):
+    HL_start = forms.IntegerField(widget=forms.HiddenInput)
+    HL_end = forms.IntegerField(widget=forms.HiddenInput)
+    HL_text_id = forms.CharField(widget=forms.HiddenInput)
+
+    def __init__(self, *args, **kwargs):
+        #self.request = kwargs.pop('request', False)
+        super(InstitutionWorkHighlighterForm, self).__init__(*args, **kwargs)
+        self.helper.layout.pop(-1)
+        self.helper.layout.extend([
+            'HL_start',
+            'HL_end',
+            'HL_text_id',
+            Accordion(
+                 AccordionGroup(
+                     'Notes and References',
+                     'notes',
+                     'references',
+                     active=False,
+                     css_id="institutionWorkHL_notes_refs"))])
+
+    def save(self, site_instance, instance=None, commit=True):
+        cd = self.cleaned_data
+        x = super(InstitutionWorkHighlighterForm, self).save(site_instance, commit=True)
+        txt = Text.objects.get(pk=cd['HL_text_id'][5:])
+        a = Annotation(
+            start=cd['HL_start'],
+            end=cd['HL_end'],
+            text=txt,
+            user_added=self.request.user,
+            annotation_project_id=int(self.request.session.get('annotation_project', 1)))
+        a.save()
+        a.entity_link.add(x)
+        return x
+
+    def get_text_id(self):
+        return self.cleaned_data['HL_text_id'][5:]
+
+
 class AddRelationHighlighterBaseForm(forms.Form):
     HL_start = forms.IntegerField(widget=forms.HiddenInput)
     HL_end = forms.IntegerField(widget=forms.HiddenInput)
