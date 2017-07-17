@@ -89,6 +89,10 @@ class PersonPerson(TempEntityClass):
 
         :return: Dict with object properties
         """
+        if self.related_personA.first_name is None:
+            self.related_personA.first_name = '-'
+        if self.related_personB.first_name is None:
+            self.related_personB.first_name = '-'
         result = {
             'relation_pk': self.pk,
             'relation_type': self.relation_type.name,
@@ -145,6 +149,9 @@ class PersonPlace(TempEntityClass):
 
         :return: Dict with object properties
         """
+
+        if self.related_person.first_name is None:
+            self.related_person.first_name = '-'
         result = {
             'relation_pk': self.pk,
             'relation_type': self.relation_type.name,
@@ -177,6 +184,9 @@ class PersonInstitution(TempEntityClass):
             self.related_person, self.relation_type, self.related_institution)
 
     def get_web_object(self):
+
+        if self.related_person.first_name is None:
+            self.related_person.first_name = '-'
         result = {
             'relation_pk': self.pk,
             'relation_type': self.relation_type.name,
@@ -208,6 +218,9 @@ class PersonEvent(TempEntityClass):
         return "{} ({}) {}".format(self.related_person, self.relation_type, self.related_event)
 
     def get_web_object(self):
+
+        if self.related_person.first_name is None:
+            self.related_person.first_name = '-'
         result = {
             'relation_pk': self.pk,
             'relation_type': self.relation_type.name,
@@ -239,6 +252,9 @@ class PersonWork(TempEntityClass):
         return "{} ({}) {}".format(self.related_person, self.relation_type, self.related_work)
 
     def get_web_object(self):
+
+        if self.related_person.first_name is None:
+            self.related_person.first_name = '-'
         result = {
             'relation_pk': self.pk,
             'relation_type': self.relation_type.name,
