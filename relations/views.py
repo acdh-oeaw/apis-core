@@ -260,6 +260,27 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
                             persPers,
                             prefix='PP-')
                 call_function = 'HighlForm_response'
+            elif tab == 'PersonWorkHighlighter':
+                tab = 'PersonWork'
+                table_html = PersonWorkTable(
+                    PersonWork.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
+                    prefix='PWRK-',
+                    entity=entity_type_str)
+                call_function = 'HighlForm_response'
+            elif tab == 'PlaceWorkHighlighter':
+                tab = 'PlaceWork'
+                table_html = PlaceWorkTable(
+                    PlaceWork.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
+                    prefix='PLWRK-',
+                    entity=entity_type_str)
+                call_function = 'HighlForm_response'
+            elif tab == 'InstitutionWorkHighlighter':
+                tab = 'InstitutionWork'
+                table_html = InstitutionWorkTable(
+                    InstitutionWork.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
+                    prefix='IWRK-',
+                    entity=entity_type_str)
+                call_function = 'HighlForm_response'
             elif tab == 'AddRelationHighlighterPerson' or tab == 'PlaceHighlighter' or tab == 'PersonHighlighter':
                 table_html = None
                 right_panel = False
