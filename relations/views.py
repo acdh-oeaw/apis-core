@@ -15,7 +15,8 @@ from .forms import (PersonPlaceForm, PersonPersonForm, PersonInstitutionForm,
                     PersonInstitutionHighlighterForm, PersonPersonHighlighterForm,
                     AddRelationHighlighterPersonForm, PersonEventForm, InstitutionEventForm, PlaceEventForm,
                     EventLabelForm, PersonWorkForm, InstitutionWorkForm, PlaceWorkForm, EventWorkForm,
-                    EntityLabelForm, PlacePlaceForm
+                    EntityLabelForm, PlacePlaceForm, PersonWorkHighlighterForm, InstitutionWorkHighlighterForm,
+                    PlaceWorkHighlighterForm
                     )
 from entities.forms import (PlaceHighlighterForm, PersonHighlighterForm)
 from highlighter.models import Annotation
