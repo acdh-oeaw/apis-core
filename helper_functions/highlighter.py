@@ -37,7 +37,6 @@ def highlight_text(*args, **kwargs):
             lst_annot.append([an, ])
         t_start = an.start
         t_end = an.end
-    #print(lst_annot)
     if len(lst_annot) == 0:
         return obj.text
     html_return = obj.text[:lst_annot[0][0].start]
@@ -57,6 +56,8 @@ def highlight_text(*args, **kwargs):
             html_return += start_span + obj.text[start:end] + '</mark>'
         lst_end = end
     html_return += obj.text[end:]
+    if obj.text[0] == '\n':
+        html_return = '-'+html_return[1:]
     return html_return
 
 
