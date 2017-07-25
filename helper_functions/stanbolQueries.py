@@ -4,6 +4,10 @@ from apis.settings.NER_settings import StbGeoQuerySettings, autocomp_settings
 
 
 def decide_score_stanbol(results, dec_diff):
+    if type(results) == dict:
+        return results
+    if len(results) == 1:
+        return results[0]
     difference = dec_diff
     val1 = results[0]['http://stanbol.apache.org/ontology/entityhub/query#score'][0]['value']
     val2 = results[1]['http://stanbol.apache.org/ontology/entityhub/query#score'][0]['value']
@@ -116,3 +120,28 @@ def retrieve_obj(uri):
         return r.json()
     else:
         return False
+
+
+def query_geonames_chains(q, chains=['http://enrich.acdh.oeaw.ac.at/entityhub/site/geoNames_S_P_A/find'],
+                          rest_feature=['A', 'P'], dec_diff=5):
+    results = []
+    ids = []
+    headers = {'Content-Type': 'application/json'}
+    for chain in chains:
+        data = {'limit': 100, 'name': q,
+                'ldpath': """name = <http://www.geonames.org/ontology#name>;
+                \nfeatureClass = <http://www.geonames.org/ontology#featureClass>;\n"""}
+        r = requests.get(chain, params=data, headers=headers)
+        res = r.json()
+        for t in res['results']:
+            if t['id'] not in ids and t['featureClass'][0]['value'].split('#')[1] in rest_feature:
+                results.append(t)
+                ids.append(t['id'])
+    if len(results) > 0:
+        dec_st = decide_score_stanbol(results, dec_diff)
+        if dec_st:
+            return True, dec_st
+        else:
+            return False, results
+    else:
+        return False, False
