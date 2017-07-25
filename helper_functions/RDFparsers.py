@@ -51,6 +51,7 @@ class GenericRDFParser(object):
         """
         if not self.created:
             return False
+        self.objct.status = 'distinct'
         self.objct.save()
         def_coll, created = Collection.objects.get_or_create(name='Default import collection')
         self.objct.collection.add(def_coll)
