@@ -98,7 +98,7 @@ class PersonPlaceForm(forms.ModelForm):
             x.related_place = site_instance
             person = Person.get_or_create_uri(cd['person_uri'])
             if not person:
-                person = gndPerson(cd['person_uri'])
+                person = GenericRDFParser(cd['person_uri'], 'Person').get_or_create()
             x.related_person = person
         x.save()
         return x
@@ -188,14 +188,14 @@ class PersonPersonForm(forms.ModelForm):
                 if x.related_personA.uri_set.filter(uri=cd['person_uri']).count() == 0:
                     personA = Person.get_or_create_uri(cd['person_uri'])
                     if not personA:
-                        personA = gndPerson(cd['person_uri'])
+                        personA = GenericRDFParser(cd['person_uri'], 'Person').get_or_create()
                     x.related_personA = personA
         else:
             x = super(PersonPersonForm, self).save(commit=False)
             x.related_personA = site_instance
             personB = Person.get_or_create_uri(cd['person_uri'])
             if not personB:
-                personB = gndPerson(cd['person_uri'])  # TODO: Function needs to be replaced with class
+                personB = GenericRDFParser(cd['person_uri'], 'Person').get_or_create()  # TODO: Function needs to be replaced with class
             x.related_personB = personB
         x.save()
         return x
@@ -275,13 +275,13 @@ class PersonInstitutionForm(forms.ModelForm):
             x.related_person = site_instance
             institution = Institution.get_or_create_uri(cd['institution_uri'])
             if not institution:
-                institution = gndInstitution(cd['institution_uri'])
+                institution = GenericRDFParser(cd['institution_uri'], 'Institution').get_or_create()
             x.related_institution = institution
         elif 'person' in cd.keys():
             x.related_institution = site_instance
             person = Person.get_or_create_uri(cd['person_uri'])
             if not person:
-                person = gndPerson(cd['person_uri'])
+                person = GenericRDFParser(cd['person_uri'], 'Person').get_or_create()
             x.related_person = person
         x.save()
         return x
@@ -389,7 +389,7 @@ class PersonEventForm(forms.ModelForm):
             x.related_event = site_instance
             person = Person.get_or_create_uri(cd['person_uri'])
             if not person:
-                person = GenericRDFParser(cd['person_uri']).get_or_create()
+                person = GenericRDFParser(cd['person_uri'], 'Person').get_or_create()
             x.related_person = person
         x.save()
         return x
@@ -487,13 +487,13 @@ class PersonWorkForm(forms.ModelForm):
             x.related_person = site_instance
             work = Work.get_or_create_uri(cd['work_uri'])
             if not work:
-                institution = gndInstitution(cd['institution_uri'])  # TODO: Create work entries for GND parser
+                work = GenericRDFParser(cd['work_uri'], 'Work')  # TODO: Create work entries for GND parser
             x.related_work = work
         elif 'person' in cd.keys():
             x.related_work = site_instance
             person = Person.get_or_create_uri(cd['person_uri'])
             if not person:
-                person = gndPerson(cd['person_uri'])
+                person = GenericRDFParser(cd['person_uri'], 'Person').get_or_create()
             x.related_person = person
         x.save()
         return x
@@ -597,7 +597,7 @@ class InstitutionPlaceForm(forms.ModelForm):
             x.related_place = site_instance
             institution = Institution.get_or_create_uri(cd['institution_uri'])
             if not institution:
-                institution = gndInstitution(cd['institution_uri'])
+                institution = GenericRDFParser(cd['institution_uri'], 'Institution').get_or_create()
             x.related_institution = institution
         x.save()
         return x
@@ -908,7 +908,7 @@ class InstitutionInstitutionForm(forms.ModelForm):
             x.related_institutionA = site_instance
             institutionB = Institution.get_or_create_uri(cd['institution_uri'])
             if not institutionB:
-                institutionB = gndInstitution(cd['institution_uri'])
+                institutionB = GenericRDFParser(['institution_uri'], 'Institution').get_or_create()
             x.related_institutionB = institutionB
         x.save()
         return x
@@ -988,7 +988,7 @@ class InstitutionPersonForm(forms.ModelForm):
             x.related_institution = site_instance
         person = Person.get_or_create_uri(cd['person_uri'])
         if not person:
-            person = gndPerson(cd['person_uri'])
+            person = GenericRDFParser(cd['person_uri'], 'Person').get_or_create()
         x.related_person = person
         x.save()
         return x
