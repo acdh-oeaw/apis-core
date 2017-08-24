@@ -173,6 +173,56 @@
             
   <div class="section" id="resolveabbreviations">
 <h1>ResolveAbbreviations<a class="headerlink" href="#resolveabbreviations" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="helper_functions.abbreviation_solver.ResolveAbbreviations">
+<em class="property">class </em><code class="descclassname">helper_functions.abbreviation_solver.</code><code class="descname">ResolveAbbreviations</code><span class="sig-paren">(</span><em>text=None</em>, <em>person=None</em>, <em>dictionaries=None</em>, <em>user=None</em>, <em>password=None</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helper_functions/abbreviation_solver.html#ResolveAbbreviations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helper_functions.abbreviation_solver.ResolveAbbreviations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Used to resolve abbreviations in German Texts. For resolving it uses several resources:</p>
+<ul class="simple">
+<li>A list of German words</li>
+<li>A list of common German abbreviations</li>
+<li>A list of abbreviations used in the Austrian Bibliographic Dictionary (ÖBL)</li>
+<li>and an API that allows to query the Austrian Media Corpus (<a class="reference external" href="http://www.oeaw.ac.at/acdh/de/amc">AMC</a>)</li>
+</ul>
+<p><em>Example:</em></p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">abbrev</span> <span class="o">=</span> <span class="n">ResolveAbbreviations</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s1">&#39;test text&#39;</span><span class="p">,</span> <span class="n">person</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Müller&#39;</span><span class="p">,</span> <span class="s1">&#39;Peter&#39;</span><span class="p">],</span> <span class="n">user</span><span class="o">=</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s1">&#39;pw&#39;</span><span class="p">)</span>
+<span class="n">resolved_text</span> <span class="o">=</span> <span class="n">abbrev</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span><span class="n">always_amc</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>text</strong> (<em>str</em>) – The text that should be processed (unicode string)</li>
+<li><strong>person</strong> (<em>list</em>) – List of names of the Person (used to create possible abbreviations of the Person names)</li>
+<li><strong>dictionaries</strong> (<em>str</em><em> or </em><em>tuple</em><em> or </em><em>list</em>) – Dictionary that should be used additionally</li>
+<li><strong>user</strong> (<em>str</em>) – User for the sketch engine</li>
+<li><strong>password</strong> (<em>str</em>) – Password for the sketch engine</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="helper_functions.abbreviation_solver.ResolveAbbreviations.resolve">
+<code class="descname">resolve</code><span class="sig-paren">(</span><em>always_amc=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/helper_functions/abbreviation_solver.html#ResolveAbbreviations.resolve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#helper_functions.abbreviation_solver.ResolveAbbreviations.resolve" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resolve function. Resolves the abbreviation in the text given in the __init__ function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>always_amc</strong> – <em>(Boolean)</em> Specifies whether to also use the AMC for unambiguous abbreviations. Defaults to False.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Resolved text.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">string</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 <div class="section" id="genericrdfparser">
 <h1>GenericRDFParser<a class="headerlink" href="#genericrdfparser" title="Permalink to this headline">¶</a></h1>
