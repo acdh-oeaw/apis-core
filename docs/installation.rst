@@ -37,14 +37,14 @@ And to update the submodules to the latest commit::
 
 After that you need to set two symlinks::
 
-    cd apisapp/apis
+    cd apis-core/apis
     ln -s ../../apis-settings settings
     cd ..
     ln -s ../apis-webpage webpage
 
 To set the two symlinks in Windows, run the following commands (run cmd in admin mode):
 
-    cd apisapp\apis
+    cd apis-core\apis
     mklink /D settings ..\..\apis-settings
     cd ..
     mklink /D webpage ..\apis-webpage
@@ -57,13 +57,13 @@ Installation
 
 Change to the directory you have downloaded APIS to and install the needed Python packages::
 
-    cd apisapp
+    cd apis-core
     pip install -r requirements.txt
 
-Next you need to create a file called copy the ``APIS_directory/apisapp/apis/settings/dummysettings.py`` file to another name.
+Next you need to create a file called copy the ``APIS_directory/apis-core/apis/settings/dummysettings.py`` file to another name.
 We suggest ``server.py``::
 
-    cp APIS_directory/apisapp/apis/settings/dummysettings.py APIS_directory/apisapp/apis/settings/server.py
+    cp APIS_directory/apis-core/apis/settings/dummysettings.py APIS_directory/apis-core/apis/settings/server.py
 
 Edit ``server.py`` to your needs. E.g. if you intend to use Mysql it should look something like::
 
@@ -145,18 +145,21 @@ Installation on Windows
 
 Change to the directory you have downloaded APIS to and install the needed Python packages
 In the command prompt that pops up after the activation of the virtualenv, change directory to where you have downloaded apis (eg. to apis-core) and install the modules in requirements.txt
+
 .. code-block:: console
 
     pip install -r requirements.txt
 
 If you encounter problems while installing the packages in the requirements.txt file, remove the ones that cause the problem (from the requirements.txt file), and download the .whl file of the problematic module from the following site: http://www.lfd.uci.edu/~gohlke/pythonlibs/ (choosing the correct version: your python version must be equal to the number after cp in the name of the .whl file, and your operating system 32-bit/64-bit with the end of the file name.)
 
-Install the missing module by running the following command in the prompt from where your .whl file resides::
+Install the missing module by running the following command in the prompt from where your .whl file resides:
+
 .. code-block:: console
 
     pip install name_of_the_whl_file
 
-Install numpy+mkl, download the wheel file from the link above and install with the command::
+Install numpy+mkl, download the wheel file from the link above and install with the command:
+
 .. code-block:: console
 
     pip install name_of_the_whl_file
@@ -269,16 +272,16 @@ do so. Our apche virtualhost config looks something like:
       ServerName server_name
       ServerAlias server_alias #alias names if needed
       DocumentRoot /var/www/html #document root of your installation
-      WSGIDaemonProcess apis.eos.arz.oeaw.ac.at user=#1025 group=#1025 python-path=/var/www/html/
-      WSGIProcessGroup apis.eos.arz.oeaw.ac.at user=#1025 group=#1025 python-path=/var/www/html/
-      WSGIScriptAlias / /var/www/html/apisapp/apis/wsgi.py
+      WSGIDaemonProcess YOUR_URL user=#1025 group=#1025 python-path=/var/www/html/
+      WSGIProcessGroup YOUR_URL user=#1025 group=#1025 python-path=/var/www/html/
+      WSGIScriptAlias / /var/www/html/apis-core/apis/wsgi.py
       <Directory /var/www/html>
         Require all granted
         AllowOverride All
         Options All granted
       </Directory>
-      Alias /static /var/www/html/apisapp/static_dir #static directories to server via Apache
-      Alias /downloads /var/www/html/apisapp/downloads
+      Alias /static /var/www/html/apis-core/static_dir #static directories to server via Apache
+      Alias /downloads /var/www/html/apis-core/downloads
    </VirtualHost>
 
 If the database is connected and the virtualhost is configured you are good to go:

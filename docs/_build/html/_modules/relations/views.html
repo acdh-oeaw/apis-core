@@ -176,7 +176,8 @@
                     <span class="n">PersonInstitutionHighlighterForm</span><span class="p">,</span> <span class="n">PersonPersonHighlighterForm</span><span class="p">,</span>
                     <span class="n">AddRelationHighlighterPersonForm</span><span class="p">,</span> <span class="n">PersonEventForm</span><span class="p">,</span> <span class="n">InstitutionEventForm</span><span class="p">,</span> <span class="n">PlaceEventForm</span><span class="p">,</span>
                     <span class="n">EventLabelForm</span><span class="p">,</span> <span class="n">PersonWorkForm</span><span class="p">,</span> <span class="n">InstitutionWorkForm</span><span class="p">,</span> <span class="n">PlaceWorkForm</span><span class="p">,</span> <span class="n">EventWorkForm</span><span class="p">,</span>
-                    <span class="n">EntityLabelForm</span><span class="p">,</span> <span class="n">PlacePlaceForm</span>
+                    <span class="n">EntityLabelForm</span><span class="p">,</span> <span class="n">PlacePlaceForm</span><span class="p">,</span> <span class="n">PersonWorkHighlighterForm</span><span class="p">,</span> <span class="n">InstitutionWorkHighlighterForm</span><span class="p">,</span>
+                    <span class="n">PlaceWorkHighlighterForm</span>
                     <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">entities.forms</span> <span class="k">import</span> <span class="p">(</span><span class="n">PlaceHighlighterForm</span><span class="p">,</span> <span class="n">PersonHighlighterForm</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">highlighter.models</span> <span class="k">import</span> <span class="n">Annotation</span>
@@ -218,6 +219,9 @@
                     <span class="s1">&#39;PersonEventForm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">PersonEvent</span><span class="p">,</span> <span class="n">Person</span><span class="p">,</span> <span class="n">Event</span><span class="p">],</span>
                     <span class="s1">&#39;PersonWorkForm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">PersonWork</span><span class="p">,</span> <span class="n">Person</span><span class="p">,</span> <span class="n">Work</span><span class="p">],</span>
                     <span class="s1">&#39;PersonInstitutionHighlighterForm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">PersonInstitution</span><span class="p">,</span> <span class="n">Person</span><span class="p">,</span> <span class="n">Institution</span><span class="p">],</span>
+                    <span class="s1">&#39;PersonWorkHighlighterForm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">PersonWork</span><span class="p">,</span> <span class="n">Person</span><span class="p">,</span> <span class="n">Work</span><span class="p">],</span>
+                    <span class="s1">&#39;PlaceWorkHighlighterForm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">PlaceWork</span><span class="p">,</span> <span class="n">Place</span><span class="p">,</span> <span class="n">Work</span><span class="p">],</span>
+                    <span class="s1">&#39;InstitutionWorkHighlighterForm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">InstitutionWork</span><span class="p">,</span> <span class="n">Institution</span><span class="p">,</span> <span class="n">Work</span><span class="p">],</span>
                     <span class="s1">&#39;InstitutionPlaceForm&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">InstitutionPlace</span><span class="p">,</span> <span class="n">Institution</span><span class="p">,</span> <span class="n">Place</span><span class="p">],</span>
                     <span class="s1">&#39;InstitutionInstitutionForm&#39;</span><span class="p">:</span> <span class="p">[</span>
                         <span class="n">InstitutionInstitution</span><span class="p">,</span>
@@ -416,6 +420,27 @@
                 <span class="n">table_html</span> <span class="o">=</span> <span class="n">PersonPersonTable</span><span class="p">(</span>
                             <span class="n">persPers</span><span class="p">,</span>
                             <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;PP-&#39;</span><span class="p">)</span>
+                <span class="n">call_function</span> <span class="o">=</span> <span class="s1">&#39;HighlForm_response&#39;</span>
+            <span class="k">elif</span> <span class="n">tab</span> <span class="o">==</span> <span class="s1">&#39;PersonWorkHighlighter&#39;</span><span class="p">:</span>
+                <span class="n">tab</span> <span class="o">=</span> <span class="s1">&#39;PersonWork&#39;</span>
+                <span class="n">table_html</span> <span class="o">=</span> <span class="n">PersonWorkTable</span><span class="p">(</span>
+                    <span class="n">PersonWork</span><span class="o">.</span><span class="n">annotation_links</span><span class="o">.</span><span class="n">filter_ann_proj</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">tab_query</span><span class="p">),</span>
+                    <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;PWRK-&#39;</span><span class="p">,</span>
+                    <span class="n">entity</span><span class="o">=</span><span class="n">entity_type_str</span><span class="p">)</span>
+                <span class="n">call_function</span> <span class="o">=</span> <span class="s1">&#39;HighlForm_response&#39;</span>
+            <span class="k">elif</span> <span class="n">tab</span> <span class="o">==</span> <span class="s1">&#39;PlaceWorkHighlighter&#39;</span><span class="p">:</span>
+                <span class="n">tab</span> <span class="o">=</span> <span class="s1">&#39;PlaceWork&#39;</span>
+                <span class="n">table_html</span> <span class="o">=</span> <span class="n">PlaceWorkTable</span><span class="p">(</span>
+                    <span class="n">PlaceWork</span><span class="o">.</span><span class="n">annotation_links</span><span class="o">.</span><span class="n">filter_ann_proj</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">tab_query</span><span class="p">),</span>
+                    <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;PLWRK-&#39;</span><span class="p">,</span>
+                    <span class="n">entity</span><span class="o">=</span><span class="n">entity_type_str</span><span class="p">)</span>
+                <span class="n">call_function</span> <span class="o">=</span> <span class="s1">&#39;HighlForm_response&#39;</span>
+            <span class="k">elif</span> <span class="n">tab</span> <span class="o">==</span> <span class="s1">&#39;InstitutionWorkHighlighter&#39;</span><span class="p">:</span>
+                <span class="n">tab</span> <span class="o">=</span> <span class="s1">&#39;InstitutionWork&#39;</span>
+                <span class="n">table_html</span> <span class="o">=</span> <span class="n">InstitutionWorkTable</span><span class="p">(</span>
+                    <span class="n">InstitutionWork</span><span class="o">.</span><span class="n">annotation_links</span><span class="o">.</span><span class="n">filter_ann_proj</span><span class="p">(</span><span class="n">request</span><span class="o">=</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">tab_query</span><span class="p">),</span>
+                    <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;IWRK-&#39;</span><span class="p">,</span>
+                    <span class="n">entity</span><span class="o">=</span><span class="n">entity_type_str</span><span class="p">)</span>
                 <span class="n">call_function</span> <span class="o">=</span> <span class="s1">&#39;HighlForm_response&#39;</span>
             <span class="k">elif</span> <span class="n">tab</span> <span class="o">==</span> <span class="s1">&#39;AddRelationHighlighterPerson&#39;</span> <span class="ow">or</span> <span class="n">tab</span> <span class="o">==</span> <span class="s1">&#39;PlaceHighlighter&#39;</span> <span class="ow">or</span> <span class="n">tab</span> <span class="o">==</span> <span class="s1">&#39;PersonHighlighter&#39;</span><span class="p">:</span>
                 <span class="n">table_html</span> <span class="o">=</span> <span class="kc">None</span>

@@ -418,8 +418,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">pipeline</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">dictionaries_lst</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;/home/sennierer/apis-demo/data/Abkürzungsverzeichnis_APIS_ed_9_1_17.tsv&#39;</span><span class="p">),</span>
-        <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;/home/sennierer/apis-demo/data/abkuerzungen_edit.tsv&#39;</span><span class="p">)]</span>
+        <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;data/Abkürzungsverzeichnis_APIS_ed_9_1_17.tsv&#39;</span><span class="p">),</span>
+        <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;data/abkuerzungen_edit.tsv&#39;</span><span class="p">)]</span>
     <span class="n">stop_chars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;(&#39;</span><span class="p">,</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;;&#39;</span><span class="p">,</span> <span class="s1">&#39;!&#39;</span><span class="p">,</span> <span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;,&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">save_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resolve_all</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -657,7 +657,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
             <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">M</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">german_dic</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span>
-            <span class="s1">&#39;/home/sennierer/apis-demo/data/german.dic&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;data/german.dic&#39;</span><span class="p">,</span>
             <span class="s1">&#39;r&#39;</span><span class="p">,</span>
             <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;Latin 1&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
         <span class="c1">#self.german_dic_lower = [x.lower() for x in self.german_dic]</span>
