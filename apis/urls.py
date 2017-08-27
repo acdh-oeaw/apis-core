@@ -110,7 +110,7 @@ urlpatterns = [
     url(r'^api2/', include('entities.api_urls', namespace="api2")),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     #url(r'^api-schema/', schema_view),
-    url(r'^docs/(?P<path>.*)', login_required(serve), {'document_root': 'apisapp/docs/_build/html'}, 'docs'),
+    url(r'^docs/(?P<path>.*)', login_required(serve), {'document_root': 'apis-core/docs/_build/html'}, 'docs'),
     #url(r'^docs/', include('sphinxdoc.urls')),
     url(r'^compare/(?P<app>[a-z]+)/(?P<kind>[a-z]+)/(?P<pk>\d+)$', ReversionCompareView.as_view() )
 ]
