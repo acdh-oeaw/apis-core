@@ -325,6 +325,15 @@ var form2 = $.ApisNet.form_data_load.shift()
     download_network_data(form2);
 $.ApisNet.nodes_expand = new Array();
 };
+
+function expand_node(node_type, node_id){
+    if (typeof $.ApisNet.nodes_expand == 'undefined') {
+            $.ApisNet.nodes_expand = new Array();
+        };
+  $.ApisNet.nodes_expand.push([node_type, node_id]);
+  $.ApisNet.tooltip.close();
+  expand_nodes();
+};
 function add_file_list(data, s, xhr) {
     var file_name = data['file_name'].split('/')[2]
     if ($('#list_created_graphs').length) {
@@ -420,7 +429,9 @@ if (!$.ApisNet) {
     $.ApisNet.instance.settings({
   minNodeSize: 5,
   maxNodeSize: 15,
-    animationsTime: 4500
+    animationsTime: 4500,
+  skip_existing_nodes: true,
+  skip_existing_edges: true
 })
     sigma.layouts.configForceLink($.ApisNet.instance, {
       worker: true,
@@ -434,6 +445,7 @@ var config = {
         show: 'clickNode',
         cssClass: 'sigma-tooltip',
         position: 'top',
+        hide: 'outNode',
         renderer: function(node) {
           // The function context is s.graph
           // Returns an HTML string:
@@ -445,7 +457,7 @@ var config = {
       }],
     };
     // Instanciate the tooltips plugin with a Mustache renderer for node tooltips:
-    var tooltips = sigma.plugins.tooltips($.ApisNet.instance, $.ApisNet.instance.renderers[0], config);
+    $.ApisNet.tooltip = sigma.plugins.tooltips($.ApisNet.instance, $.ApisNet.instance.renderers[0], config);
 //$.ApisNet.instance.bind("rightClickNode", delete_nodes);
     $.ApisNet.instance.bind("rightClickNode", select_unselect_node);
 
