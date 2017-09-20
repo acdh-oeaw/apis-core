@@ -1257,7 +1257,7 @@ class PlacePlaceForm(forms.ModelForm):
         else:
             x = super(PlacePlaceForm, self).save(commit=False)
             x.related_placeA = site_instance
-            placeB = GenericRDFParser(cd['place_uri']).get_or_create()
+            placeB = GenericRDFParser(cd['place_uri'], 'Place').get_or_create()
             x.related_placeB = placeB
         x.save()
         return x
