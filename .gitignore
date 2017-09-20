@@ -14,3 +14,5 @@ downloads/
 /apis/settings
 
 bower_components/
+/custom_urls
+/teimporter

@@ -112,7 +112,7 @@ class Source(models.Model):
     def __str__(self):
         if self.author != "" and self.orig_filename != "":
             return "{}, stored by {}".format(
-                self.orig_filename, self.orig_filename)
+                self.orig_filename, self.author)
         else:
             return "(ID: {})".format(self.id)
 
@@ -141,9 +141,9 @@ class Text(models.Model):
 
     def __str__(self):
         if self.text != "":
-            return self.text
+            return "ID: {} - {}".format(self.id, self.text[:25])
         else:
-            return "(ID: {})".format(self.id)
+            return "ID: {}".format(self.id)
 
     def save(self, *args, **kwargs):
         if self.pk is not None:
