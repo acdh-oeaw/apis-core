@@ -70,7 +70,11 @@ def find_loc(lst, geonames_chains=False, dec_diff=5):
                 if len(res['results']) > 0:
                     results.extend(res['results'])
         if len(results) > 1:
-            return False, results
+            test = decide_score_stanbol(results, dec_diff=dec_diff)
+            if test:
+                return True, test
+            else:
+                return False, results
         elif len(results) == 1:
             return True, results
         else:
