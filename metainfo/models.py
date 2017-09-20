@@ -141,7 +141,7 @@ class Text(models.Model):
 
     def __str__(self):
         if self.text != "":
-            return self.text
+            return "{}".format(self.text)
         else:
             return "(ID: {})".format(self.id)
 
