@@ -44,14 +44,18 @@ def find_geonames2(ca, name, adm=None, **kwargs):
         print(r.content)
 
 
-def find_loc(lst, dec_diff=5):
+def find_loc(lst, geonames_chains=False, dec_diff=5):
     prev_elem = False
     t = False
+    if not geonames_chains:
+        geonames_chains = []
+        for c in autocomp_settings['Place']:
+            geonames_chains.append(c['url'])
     if len(lst) == 1:
         pl_selected_fields = StbGeoQuerySettings('place').selected
         headers = {'Content-Type': 'application/json'}
         results = []
-        for s in autocomp_settings['Place']:
+        for s in geonames_chains:
             ldpath = ""
             for d in pl_selected_fields:
                 ldpath += "{} = <{}>;\n".format(d.split('#')[-1], d)
@@ -60,7 +64,7 @@ def find_loc(lst, dec_diff=5):
                 'name': lst[0],
                 'ldpath': ldpath
             }
-            r = requests.get(s['url'], params=data, headers=headers)
+            r = requests.get(s, params=data, headers=headers)
             if r.status_code == 200:
                 res = r.json()
                 if len(res['results']) > 0:
@@ -130,7 +134,8 @@ def query_geonames_chains(q, chains=['http://enrich.acdh.oeaw.ac.at/entityhub/si
     for chain in chains:
         data = {'limit': 100, 'name': q,
                 'ldpath': """name = <http://www.geonames.org/ontology#name>;
-                \nfeatureClass = <http://www.geonames.org/ontology#featureClass>;\n"""}
+                \nfeatureClass = <http://www.geonames.org/ontology#featureClass>;\n
+                featureCode = <http://www.geonames.org/ontology#featureCode>;\n"""}
         r = requests.get(chain, params=data, headers=headers)
         res = r.json()
         for t in res['results']:
