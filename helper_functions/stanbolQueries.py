@@ -9,7 +9,7 @@ def decide_score_stanbol(results, dec_diff):
     if len(results) == 1:
         return results[0]
     res2 = [(r['http://stanbol.apache.org/ontology/entityhub/query#score'][0]['value'], r) for r in results]
-    res2.sort(key=lambda tup: tup[0])
+    res2.sort(key=lambda tup: tup[0], reverse=True)
     if res2[0][0] > res2[1][0] + dec_diff:
         return res2[0][1]
     else:
