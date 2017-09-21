@@ -16,3 +16,4 @@ downloads/
 bower_components/
 /custom_urls
 /teimporter
+/db.sqlite3-journal

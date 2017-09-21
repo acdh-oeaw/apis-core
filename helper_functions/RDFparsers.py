@@ -176,11 +176,11 @@ class GenericRDFParser(object):
         res_attrb = dict()
         labels = []
         related_objcts = []
-        test = exist(uri)
         uri = harmonize_geonames_id(uri)
         self.uri = uri
         self.kind = kind
         self.saved = False
+        test = exist(self.uri)
         if test[0] and not force:
             self.objct = test[1]
             self.created = False
