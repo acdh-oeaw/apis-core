@@ -24,6 +24,22 @@ from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
 
+
+def harmonize_geonames_id(uri):
+
+    """checks if a geonames Url points to geonames' rdf expression"""
+
+    if uri.startswith("http://www.geonames.org/"):
+        geo_id = "".join(re.findall(r'\d', uri))
+        return "http://sws.geonames.org/{}/".format(geo_id)
+
+    elif not uri.endswith('/'):
+        return "{}/".format(uri)
+
+    else:
+        return uri
+
+
 class GenericRDFParser(object):
     """A generic class for parsing RDFs to the APIS data model and save
     objects to the db.
@@ -161,6 +177,7 @@ class GenericRDFParser(object):
         labels = []
         related_objcts = []
         test = exist(uri)
+        uri = harmonize_geonames_id(uri)
         self.uri = uri
         self.kind = kind
         self.saved = False
