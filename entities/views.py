@@ -427,9 +427,9 @@ def place_edit(request, pk):
         else:
             return render(request, 'entities/place_create_generic.html', {
                 'entity_type': 'Place',
-            'form': form,
-            'form_text': form_text,
-            'instance': instance,
+                'form': form,
+                'form_text': form_text,
+                'instance': instance,
             })
     else:
         request = set_session_variables(request)
