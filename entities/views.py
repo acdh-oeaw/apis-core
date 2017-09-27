@@ -403,7 +403,7 @@ def place_create(request):
             form_text.save(entity)
             return redirect('entities:place_list')
         else:
-            return render(request, 'entities:place_create_generic.html', {
+            return render(request, 'entities/place_create_generic.html', {
                         'form': form,
                         'form_text': form_text})
     else:

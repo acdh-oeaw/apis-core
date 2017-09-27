@@ -127,6 +127,11 @@ class GenericRDFParser(object):
         for ann in m_obj.annotation_set.all():
             ann.entity_link.remove(m_obj)
             ann.entity_link.add(self.objct)
+        for txt in m_obj.text.all():
+            self.objct.text.add(txt)
+        if m_obj.source:
+            self.objct.source = m_obj.source
+            self.objct.save()
         m_obj.delete()
         return self.objct
 

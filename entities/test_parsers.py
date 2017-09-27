@@ -50,11 +50,14 @@ class RDFPersonParserTestCase(TestCase):
         print('lat: {}, lng: {}'.format(rel_death.related_place.lat, rel_death.related_place.lng))
 
     def test_merge_places(self):
+        txt = Text.objects.create(text='test text')
+        src = Source.objects.create(orig_id=24, pubinfo='test pub')
         pp = Place(name="Wien")
+        pp.source = src
         pp.save()
+        pp.text.add(txt)
         rel_type_birth = PersonPlaceRelation.objects.create(name='place of birth')
-        pers = Person(name="tesdt", first_name="test3")
-        pers.save()
+        pers = Person.objects.create(name="tesdt", first_name="test3")
         rel_1 = PersonPlace.objects.create(related_person=pers, relation_type=rel_type_birth, related_place=pp)
         ow = GenericRDFParser(self.uriGeon, 'Place')
         print('name: {}, lat: {}, long: {}, labels: {}'.format(ow.objct.name, ow.objct.lat, ow.objct.lng, ' / '.join(
@@ -65,6 +68,8 @@ class RDFPersonParserTestCase(TestCase):
         ow2 = ow.merge(pp)
         print(ow)
         print(ow2)
+        self.assertEqual(pp.source.pubinfo, ow.objct.source.pubinfo)
+        self.assertEqual(txt.text, ow.objct.text.all()[0].text)
         for x in PersonPlace.objects.all():
             self.assertEqual(x.related_place.pk, ow.objct.pk)
 
