@@ -103,7 +103,6 @@ urlpatterns = [
     url(r'highlighter/', include('highlighter.urls', namespace='highlighter')),
     url(r'relations/', include('relations.urls', namespace='relations')),
     url(r'^autocomplete/', include('autocomplete_light.urls')),
-    url(r'^datamodel/', include('django_spaghetti.urls', namespace="datamodel")),
     url(r'^api/', include(router.urls)),    #routers do not support namespaces out of the box
     url(r'^api2/', include('entities.api_urls', namespace="api2")),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
