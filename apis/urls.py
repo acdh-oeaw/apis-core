@@ -98,19 +98,18 @@ router.register(r'VocabNames', VocabNamesViewSet)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^', include('webpage.urls', namespace='webpage')),
-    url(r'^accounts/', include('registration.backends.simple.urls')),
     url(r'labels/', include('labels.urls', namespace='labels')),
     url(r'entities/', include('entities.urls', namespace='entities')),
     url(r'highlighter/', include('highlighter.urls', namespace='highlighter')),
     url(r'relations/', include('relations.urls', namespace='relations')),
     url(r'^autocomplete/', include('autocomplete_light.urls')),
-    url(r'^datamodel/', include('django_spaghetti.urls', namespace="datamodel")),
     url(r'^api/', include(router.urls)),    #routers do not support namespaces out of the box
     url(r'^api2/', include('entities.api_urls', namespace="api2")),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     #url(r'^api-schema/', schema_view),
     url(r'^docs/(?P<path>.*)', login_required(serve), {'document_root': 'apis-core/docs/_build/html'}, 'docs'),
     #url(r'^docs/', include('sphinxdoc.urls')),
-    url(r'^compare/(?P<app>[a-z]+)/(?P<kind>[a-z]+)/(?P<pk>\d+)$', ReversionCompareView.as_view() )
+    url(r'^compare/(?P<app>[a-z]+)/(?P<kind>[a-z]+)/(?P<pk>\d+)$', ReversionCompareView.as_view() ),
+    url(r'^', include('webpage.urls', namespace='webpage')),
+    url(r'^accounts/', include('registration.backends.simple.urls')),
 ]

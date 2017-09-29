@@ -403,7 +403,7 @@ def place_create(request):
             form_text.save(entity)
             return redirect('entities:place_list')
         else:
-            return render(request, 'entities:place_create_generic.html', {
+            return render(request, 'entities/place_create_generic.html', {
                         'form': form,
                         'form_text': form_text})
     else:
@@ -427,9 +427,9 @@ def place_edit(request, pk):
         else:
             return render(request, 'entities/place_create_generic.html', {
                 'entity_type': 'Place',
-            'form': form,
-            'form_text': form_text,
-            'instance': instance,
+                'form': form,
+                'form_text': form_text,
+                'instance': instance,
             })
     else:
         request = set_session_variables(request)
