@@ -543,7 +543,7 @@ class PersonWorkForm(forms.ModelForm):
             self.fields.pop('person')
             self.fields.pop('person_uri')
             if instance and instance.id:
-                self.fields['work'].initial = instance.related_institution.name
+                self.fields['work'].initial = instance.related_work.name
                 self.fields['work_uri'].initial = Uri.objects.filter(entity=instance.related_work)[0]
                 self.fields['relation_type'].widget = al.ChoiceWidget('VCPersonWorkReverseAutocomplete',
                                                                       extra_context={
