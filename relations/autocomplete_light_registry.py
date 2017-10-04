@@ -166,7 +166,7 @@ class AddRelationBaseAutocomplete(al.AutocompleteListTemplate):
         return choices
 
 
-class OrtAutocomplete(StanbolAutocompleteBase):
+class PlaceAutocomplete(StanbolAutocompleteBase):
     autocomplete_type = ['Place', ]
     autocomplete_type_model = [(Place, ['name', 'label__label'], ('Status: {}', ['status'])), ]
 
@@ -196,7 +196,7 @@ class AddRelationPersonHighlighterAutocomplete(AddRelationBaseAutocomplete):
     model2 = Person
 
 
-al.register(OrtAutocomplete)
+al.register(PlaceAutocomplete)
 al.register(InstitutionAutocomplete)
 al.register(PersonAutocomplete)
 al.register(EventAutocomplete)
