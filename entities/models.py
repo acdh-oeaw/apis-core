@@ -91,7 +91,10 @@ class Institution(TempEntityClass):
     homepage = models.URLField(blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        if self.name != "":
+            return self.name
+        else:
+            return "no name provided"
 
     def get_or_create_uri(uri):
         try:
@@ -111,7 +114,10 @@ class Event(TempEntityClass):
     kind = models.ForeignKey(EventType, blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        if self.name != "":
+            return self.name
+        else:
+            return "no name provided"
 
     def get_or_create_uri(uri):
         try:
@@ -129,7 +135,10 @@ class Work(TempEntityClass):
     kind = models.ForeignKey(WorkType, blank=True, null=True)
 
     def __str__(self):
-        return self.name
+        if self.name != "":
+            return self.name
+        else:
+            return "no name provided"
 
     def get_or_create_uri(uri):
         try:
