@@ -18,6 +18,7 @@ from .forms import (PersonPlaceForm, PersonPersonForm, PersonInstitutionForm,
                     EntityLabelForm, PlacePlaceForm, PersonWorkHighlighterForm, InstitutionWorkHighlighterForm,
                     PlaceWorkHighlighterForm
                     )
+from .forms2 import GenericRelationForm
 from entities.forms import (PlaceHighlighterForm, PersonHighlighterForm)
 from highlighter.models import Annotation
 from .models import (PersonPlace, PersonPerson, PersonInstitution, InstitutionPlace,
@@ -93,19 +94,25 @@ def get_form_ajax(request):
     ButtonText = request.POST.get('ButtonText')
     ObjectID = request.POST.get('ObjectID')
     entity_type_str = request.POST.get('entity_type')
-    print(entity_type_str)
-    entity_type = ContentType.objects.get(model=entity_type_str.lower()).model_class()
+    print('entity type: {}, FormName: {}'.format(entity_type_str, FormName[:-4].lower()))
+    entity_type_v1 = ContentType.objects.filter(model=FormName[:-4].lower())
 
     if FormName not in registered_forms.keys():
         raise Http404
 
     if ObjectID == 'false' or ObjectID is None or ObjectID == 'None':
         ObjectID = False
-        form = globals()[FormName](entity_type=entity_type)
+        form_dict = {'entity_type': entity_type_str}
     else:
         d = registered_forms[FormName][0].objects.get(pk=ObjectID)
-        form = globals()[FormName](instance=d, siteID=SiteID, entity_type=entity_type)
-    tab = re.match(r'(.*)Form', FormName).group(1)
+        form_dict = {'instance': d, 'siteID': SiteID, 'entity_type': entity_type_str}
+    if entity_type_v1.count() > 0:
+        entity_type = entity_type_v1[0].model_class()
+        form_dict['relation_form'] = FormName[:-4]
+        form = GenericRelationForm(**form_dict)
+    else:
+        form = globals()[FormName](**form_dict)
+    tab = FormName[:-4]
 
     data = {'tab': tab, 'form': render_to_string("_ajax_form.html", {
                 "entity_type": entity_type_str,
@@ -132,12 +139,19 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
     else:
         instance_id = ObjectID
     entity_type_str = entity_type
-    entity_type = globals()[entity_type]  # TODO: Use Django entity type instead
+    entity_type = ContentType.objects.get(model=entity_type.lower()).model_class()
+    #relation_form = ContentType.objects.get(model=kind_form[:-4].lower())
+    form_dict = {'data': request.POST,
+                 'entity_type': entity_type,
+                 'request': request}
     try:
-        form = globals()[kind_form](
-            data=request.POST,
-            entity_type=entity_type,
-            request=request)
+        test_form = ContentType.objects.filter(model=kind_form[:-4].lower(), app_label='relations')
+        if test_form.count() > 0:
+            relation_form = test_form[0].model_class()
+            form_dict['relation_form'] = relation_form
+            form = GenericRelationForm(**form_dict)
+        else:
+            form = globals()[kind_form](**form_dict)
         call_function = 'EntityRelationForm_response'
         tab = re.match(r'(.*)Form', kind_form).group(1)
         if form.is_valid():

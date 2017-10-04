@@ -37,6 +37,8 @@ from labels.models import Label
 from .tables import PersonTable, PlaceTable, InstitutionTable, EventTable, WorkTable
 from .filters import PersonListFilter, PlaceListFilter, InstitutionListFilter, EventListFilter, WorkListFilter
 from highlighter.forms import SelectAnnotationProject, SelectAnnotatorAgreement
+from relations.forms2 import GenericRelationForm
+
 
 import json
 
