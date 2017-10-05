@@ -7,10 +7,12 @@ from crispy_forms.layout import Layout
 from crispy_forms.bootstrap import Accordion, AccordionGroup
 import autocomplete_light.shortcuts as al
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import Q
 
 from metainfo.models import TempEntityClass, Uri, Text
 from helper_functions.RDFparsers import GenericRDFParser
 from highlighter.models import Annotation
+from relations.tables import *
 
 
 class GenericRelationForm(forms.ModelForm):
@@ -73,6 +75,26 @@ class GenericRelationForm(forms.ModelForm):
         :return: ID of text that was highlighted
         """
         return self.cleaned_data['HL_text_id'][5:]
+
+    def get_html_table(self, entity_type, request, site_instance, form_match):
+        table = globals()[self.relation_form.__name__+'Table']
+        prefix = re.match(r'([A-Z][a-z])[^A-Z]*([A-Z][a-z])', self.relation_form.__name__)
+        prefix = prefix.group(1)+prefix.group(2)+'-'
+        if form_match.group(1) == form_match.group(2):
+            list_rel = []
+            dic_a = {'related_'+entity_type.lower()+'A': site_instance}
+            dic_b = {'related_' + entity_type.lower() + 'B': site_instance}
+            for x in self.relation_form.annotation_links.filter_ann_proj(request=request).filter(
+                            Q(**dic_a) | Q(**dic_b)):
+                list_rel.append(x.get_table_dict(site_instance))
+            print('list_rel: {}'.format(list_rel))
+            table_html = table(list_rel, prefix=prefix)
+        else:
+            tab_query = {'related_'+entity_type.lower(): site_instance}
+            table_html = table(self.relation_form.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
+                               entity=entity_type,
+                               prefix=prefix)
+        return table_html
 
     def __init__(self, siteID=None, highlighter=False, *args, **kwargs):
         """

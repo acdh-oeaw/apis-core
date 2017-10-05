@@ -90,13 +90,16 @@ def get_form_ajax(request):
     '''Returns forms rendered in html'''
 
     FormName = request.POST.get('FormName')
+    print('FormName: '.format(FormName))
     SiteID = request.POST.get('SiteID')
     ButtonText = request.POST.get('ButtonText')
     ObjectID = request.POST.get('ObjectID')
     entity_type_str = request.POST.get('entity_type')
-    form_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+)(Highlighter)?Form', FormName)
-    entity_type_v1 = ContentType.objects.filter(model='{}{}'.format(form_match.group(1), form_match.group(2)).lower())
-
+    if FormName:
+        form_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+)(Highlighter)?Form', FormName)
+        entity_type_v1 = ContentType.objects.filter(model='{}{}'.format(form_match.group(1), form_match.group(2)).lower())
+    else:
+        entity_type_v1 = ContentType.objects.none()
     if FormName not in registered_forms.keys():
         raise Http404
 
@@ -141,25 +144,27 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
         instance_id = ObjectID
     entity_type_str = entity_type
     entity_type = ContentType.objects.get(model=entity_type.lower()).model_class()
-    #relation_form = ContentType.objects.get(model=kind_form[:-4].lower())
     form_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+)(Highlighter)?Form', kind_form)
     form_dict = {'data': request.POST,
                  'entity_type': entity_type,
                  'request': request}
     try:
         test_form_relations = ContentType.objects.filter(
-            model='{}{}'.format(form_match.group(1), form_match.group(2)).lower(),
+            model='{}{}'.format(form_match.group(1).lower(), form_match.group(2)).lower(),
             app_label='relations')
+        tab = re.match(r'(.*)Form', kind_form).group(1)
+        call_function = 'EntityRelationForm_response'
         if test_form_relations.count() > 0:
             relation_form = test_form_relations[0].model_class()
             form_dict['relation_form'] = relation_form
             if form_match.group(3) == 'Highlighter':
+                print('found highlighter')
                 form_dict['highlighter'] = True
+                tab = form_match.group(1)+form_match.group(2)
+                call_function = 'HighlForm_response'
             form = GenericRelationForm(**form_dict)
         else:
             form = globals()[kind_form](**form_dict)
-        call_function = 'EntityRelationForm_response'
-        tab = re.match(r'(.*)Form', kind_form).group(1)
         if form.is_valid():
             site_instance = entity_type.objects.get(pk=SiteID)
             set_ann_proj = request.session.get('annotation_project', 1)
@@ -172,39 +177,16 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
             else:
                 instance = form.save(site_instance=site_instance)
             right_panel = True
-            if 'Highlighter' in tab:
+            if test_form_relations.count() > 0:
+                table_html = form.get_html_table(entity_type_str, request, site_instance, form_match)
+            if 'Highlighter' in tab or form_match.group(3) == 'Highlighter':
                 hl_text = {
                     'text': highlight_text(form.get_text_id(),
                                            users_show=users_show,
                                            set_ann_proj=set_ann_proj,
                                            types=entity_types_highlighter).strip(),
                     'id': form.get_text_id()}
-            if tab == 'PersonPlace':
-                table_html = PersonPlaceTable(
-                    PersonPlace.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
-                        prefix='PPL-',
-                        entity=entity_type_str)
-            elif tab == 'InstitutionPlace':
-                table_html = InstitutionPlaceTable(
-                        InstitutionPlace.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
-                        prefix='IPL-',
-                        entity=entity_type_str)
-            elif tab == 'InstitutionEvent':
-                table_html = InstitutionEventTable(
-                        InstitutionEvent.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
-                        prefix='IEV-',
-                        entity=entity_type_str)
-            elif tab == 'PersonEvent':
-                table_html = PersonEventTable(
-                        PersonEvent.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
-                        prefix='PEV-',
-                        entity=entity_type_str)
-            elif tab == 'PersonInstitution':
-                table_html = PersonInstitutionTable(
-                        PersonInstitution.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
-                        prefix='PI-',
-                        entity=entity_type_str)
-            elif tab == 'PersonLabel':
+            if tab == 'PersonLabel':
                 table_html = EntityLabelTable(
                         site_instance.label_set.all(),
                         prefix='PL-')
@@ -212,59 +194,13 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
                 table_html = EntityLabelTable(
                         site_instance.label_set.all(),
                         prefix='IL-')
-            elif tab == 'PlaceEvent':
-                table_html = PlaceEventTable(
-                        PlaceEvent.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
-                        prefix='PLEV-',
-                        entity=entity_type_str)
-            elif tab == 'PersonWork':
-                table_html = PersonWorkTable(
-                        PersonWork.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
-                        prefix='PWRK-',
-                        entity=entity_type_str)
-            elif tab == 'InstitutionWork':
-                table_html = InstitutionWorkTable(
-                        InstitutionWork.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
-                        prefix='IWRK-',
-                        entity=entity_type_str)
-            elif tab == 'PlaceWork':
-                table_html = PlaceWorkTable(
-                        PlaceWork.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
-                        prefix='PLWRK-',
-                        entity=entity_type_str)
-            elif tab == 'EventWork':
-                table_html = EventWorkTable(
-                        EventWork.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
-                        prefix='EWRK-',
-                        entity=entity_type_str)
             elif tab == 'PersonResolveUri':
                 table_html = EntityUriTable(
                     Uri.objects.filter(entity=site_instance),
                     prefix = 'PURI-'
                 )
-            elif tab == 'PersonPerson':
-                persPers = []
-                for x in PersonPerson.annotation_links.filter_ann_proj(request=request).filter(Q(related_personA=site_instance) | Q(related_personB=site_instance)):
-                    persPers.append(x.get_table_dict(site_instance))
-                table_html = PersonPersonTable(persPers, prefix='PP-')
-            elif tab == 'PlacePlace':
-                placePlace = []
-                for x in PlacePlace.annotation_links.filter_ann_proj(request=request).filter(
-                                Q(related_placeA=site_instance) | Q(related_placeB=site_instance)):
-                    placePlace.append(x.get_table_dict(site_instance))
-                table_html = PlacePlaceTable(placePlace, prefix='PP-')
-            elif tab == 'InstitutionInstitution':
-                instInst = []
-                for x in InstitutionInstitution.annotation_links.filter_ann_proj(request=request).filter(Q(related_institutionA=site_instance) | Q(related_institutionB=site_instance)):
-                    instInst.append(x.get_table_dict(site_instance))
-                table_html = InstitutionInstitutionTable(instInst, prefix='II-')
             elif tab == 'PersonPlaceHighlighter':
-                tab = 'PersonPlace'
-                table_html = PersonPlaceTable(
-                    PersonPlace.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
-                    prefix='PPL-',
-                    entity=entity_type_str)
-                call_function = 'HighlForm_response'
+                pass
             elif tab == 'PersonInstitutionHighlighter':
                 tab = 'PersonInstitution'
                 table_html = PersonInstitutionTable(
@@ -314,6 +250,7 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
                 table_html2 = table_html.as_html(request)
             else:
                 table_html2 = None
+            print(table_html)
             data = {'test': True, 'tab': tab, 'call_function': call_function,
                     'instance': instance2,
                     'table_html': table_html2,
