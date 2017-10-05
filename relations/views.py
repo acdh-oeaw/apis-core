@@ -145,9 +145,9 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
                  'entity_type': entity_type,
                  'request': request}
     try:
-        test_form = ContentType.objects.filter(model=kind_form[:-4].lower(), app_label='relations')
-        if test_form.count() > 0:
-            relation_form = test_form[0].model_class()
+        test_form_relations = ContentType.objects.filter(model=kind_form[:-4].lower(), app_label='relations')
+        if test_form_relations.count() > 0:
+            relation_form = test_form_relations[0].model_class()
             form_dict['relation_form'] = relation_form
             form = GenericRelationForm(**form_dict)
         else:

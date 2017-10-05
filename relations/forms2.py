@@ -23,6 +23,13 @@ class GenericRelationForm(forms.ModelForm):
         }
 
     def save(self, site_instance, instance=None, commit=True):
+        """
+        Save function of the GenericRelationForm.
+        :param site_instance (object): Instance where the form is used on
+        :param instance (int): PK of the relation that is saved
+        :param commit (boolean): Whether to already commit the save.
+        :return (object): instance of relation
+        """
         cd = self.cleaned_data
         if instance:
             x = self.relation_form.objects.get(pk=instance)
@@ -39,10 +46,18 @@ class GenericRelationForm(forms.ModelForm):
         if not t1:
             t1 = GenericRDFParser(cd['target_uri'], self.rel_accessor[0]).get_or_create()
         setattr(x, self.rel_accessor[2], t1)
-        x.save()
+        if commit:
+            x.save()
         return x
 
     def __init__(self, siteID=None, *args, **kwargs):
+        """
+        Generic Form for relations.
+        :param siteID: ID of the entity the form is used on
+        :param entity_type (object or str): Entity type of the entity the form is used on
+        :param relation_form (object or str): Type of relation form.
+        :param instance (object): instance of relation.
+        """
         entity_type = kwargs.pop('entity_type')
         if type(entity_type) != str:
             entity_type = entity_type.__name__
@@ -57,7 +72,6 @@ class GenericRelationForm(forms.ModelForm):
         self.helper.form_class = '{}Form'.format(str(self.relation_form))
         self.helper.form_tag = False
         lst_src_target = re.findall('[A-Z][^A-Z]*', self.relation_form.__name__)
-        print(lst_src_target, entity_type)
         if lst_src_target[0] == lst_src_target[1]:
             if instance and instance.id:
                 if getattr(instance, 'related_{}A_id'.format(lst_src_target[0].lower())) == int(siteID):
@@ -111,7 +125,6 @@ class GenericRelationForm(forms.ModelForm):
                 extra_context={'values': [instance.relation_type.pk],
                                'choices': auto_choices})
 
-        print('ent type: {}'.format(entity_type))
         self.helper.layout = Layout(
             'relation_type',
             'target',
