@@ -94,8 +94,8 @@ def get_form_ajax(request):
     ButtonText = request.POST.get('ButtonText')
     ObjectID = request.POST.get('ObjectID')
     entity_type_str = request.POST.get('entity_type')
-    print('entity type: {}, FormName: {}'.format(entity_type_str, FormName[:-4].lower()))
-    entity_type_v1 = ContentType.objects.filter(model=FormName[:-4].lower())
+    form_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+)(Highlighter)?Form', FormName)
+    entity_type_v1 = ContentType.objects.filter(model='{}{}'.format(form_match.group(1), form_match.group(2)).lower())
 
     if FormName not in registered_forms.keys():
         raise Http404
@@ -107,8 +107,9 @@ def get_form_ajax(request):
         d = registered_forms[FormName][0].objects.get(pk=ObjectID)
         form_dict = {'instance': d, 'siteID': SiteID, 'entity_type': entity_type_str}
     if entity_type_v1.count() > 0:
-        entity_type = entity_type_v1[0].model_class()
-        form_dict['relation_form'] = FormName[:-4]
+        form_dict['relation_form'] = '{}{}'.format(form_match.group(1), form_match.group(2))
+        if form_match.group(3) == 'Highlighter':
+            form_dict['highlighter'] = True
         form = GenericRelationForm(**form_dict)
     else:
         form = globals()[FormName](**form_dict)
@@ -141,14 +142,19 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
     entity_type_str = entity_type
     entity_type = ContentType.objects.get(model=entity_type.lower()).model_class()
     #relation_form = ContentType.objects.get(model=kind_form[:-4].lower())
+    form_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+)(Highlighter)?Form', kind_form)
     form_dict = {'data': request.POST,
                  'entity_type': entity_type,
                  'request': request}
     try:
-        test_form_relations = ContentType.objects.filter(model=kind_form[:-4].lower(), app_label='relations')
+        test_form_relations = ContentType.objects.filter(
+            model='{}{}'.format(form_match.group(1), form_match.group(2)).lower(),
+            app_label='relations')
         if test_form_relations.count() > 0:
             relation_form = test_form_relations[0].model_class()
             form_dict['relation_form'] = relation_form
+            if form_match.group(3) == 'Highlighter':
+                form_dict['highlighter'] = True
             form = GenericRelationForm(**form_dict)
         else:
             form = globals()[kind_form](**form_dict)

@@ -8,8 +8,9 @@ from crispy_forms.bootstrap import Accordion, AccordionGroup
 import autocomplete_light.shortcuts as al
 from django.utils.translation import ugettext_lazy as _
 
-from metainfo.models import TempEntityClass, Uri
+from metainfo.models import TempEntityClass, Uri, Text
 from helper_functions.RDFparsers import GenericRDFParser
+from highlighter.models import Annotation
 
 
 class GenericRelationForm(forms.ModelForm):
@@ -25,10 +26,14 @@ class GenericRelationForm(forms.ModelForm):
     def save(self, site_instance, instance=None, commit=True):
         """
         Save function of the GenericRelationForm.
-        :param site_instance (object): Instance where the form is used on
-        :param instance (int): PK of the relation that is saved
-        :param commit (boolean): Whether to already commit the save.
-        :return (object): instance of relation
+        :param site_instance: Instance where the form is used on
+        :param instance: PK of the relation that is saved
+        :param commit: Whether to already commit the save.
+        :type site_instance: object
+        :type instance: int
+        :type commit: bool
+        :rtype: object
+        :return: instance of relation
         """
         cd = self.cleaned_data
         if instance:
@@ -48,16 +53,44 @@ class GenericRelationForm(forms.ModelForm):
         setattr(x, self.rel_accessor[2], t1)
         if commit:
             x.save()
+        if self.highlighter:
+            if not commit:
+                x.save()
+            txt = Text.objects.get(pk=cd['HL_text_id'][5:])
+            a = Annotation(
+                start=cd['HL_start'],
+                end=cd['HL_end'],
+                text=txt,
+                user_added=self.request.user,
+                annotation_project_id=int(self.request.session.get('annotation_project', 1)))
+            a.save()
+            a.entity_link.add(x)
         return x
 
-    def __init__(self, siteID=None, *args, **kwargs):
+    def get_text_id(self):
+        """
+        Function to retrieve the highlighted text.
+        :return: ID of text that was highlighted
+        """
+        return self.cleaned_data['HL_text_id'][5:]
+
+    def __init__(self, siteID=None, highlighter=False, *args, **kwargs):
         """
         Generic Form for relations.
         :param siteID: ID of the entity the form is used on
-        :param entity_type (object or str): Entity type of the entity the form is used on
-        :param relation_form (object or str): Type of relation form.
-        :param instance (object): instance of relation.
+        :param entity_type: Entity type of the entity the form is used on
+        :param relation_form: Type of relation form.
+        :param instance: instance of relation.
+        :param highlighter: whether the form is used in the highlighter
+        :type siteID: int
+        :type entity_type: object or int
+        :type relation_form: object or int
+        :type instance: object
+        :type highlighter: bool
         """
+
+        css_notes = 'LS'
+        self.highlighter = highlighter
         entity_type = kwargs.pop('entity_type')
         if type(entity_type) != str:
             entity_type = entity_type.__name__
@@ -124,6 +157,8 @@ class GenericRelationForm(forms.ModelForm):
                 auto_acc,
                 extra_context={'values': [instance.relation_type.pk],
                                'choices': auto_choices})
+        if highlighter:
+            css_notes = 'HL'
 
         self.helper.layout = Layout(
             'relation_type',
@@ -137,4 +172,13 @@ class GenericRelationForm(forms.ModelForm):
                     'notes',
                     'references',
                     active=False,
-                    css_id="{}_notes_refs".format(self.relation_form.__name__))))
+                    css_id="{}_{}_notes_refs".format(self.relation_form.__name__, css_notes))))
+
+        if highlighter:
+            self.fields['HL_start'] = forms.IntegerField(widget=forms.HiddenInput)
+            self.fields['HL_end'] = forms.IntegerField(widget=forms.HiddenInput)
+            self.fields['HL_text_id'] = forms.CharField(widget=forms.HiddenInput)
+            self.helper.layout.extend([
+                'HL_start',
+                'HL_end',
+                'HL_text_id'])
