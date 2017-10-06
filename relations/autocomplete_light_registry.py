@@ -51,7 +51,6 @@ class StanbolAutocompleteBase(al.AutocompleteListTemplate):
         elif obj[1] == 'gndLong':
             if lst1 is not None:
                 try:
-                    print(re.search('Point \( [+-]([0-9\.]+) [+-]([0-9\.]+)', lst1[key][0]['value']).group(1))
                     return re.search('Point \( [+-]([0-9\.]+) [+-]([0-9\.]+)', lst1[key][0]['value']).group(1)
                 except:
                     print('extract fails')
@@ -107,7 +106,6 @@ class StanbolAutocompleteBase(al.AutocompleteListTemplate):
                     choices.append({'name': 'Connection to Stanbol failed'})
                     continue
                 for x in res['results']:
-                    print(x)
                     f = dict()
                     name = x['name'][0]['value']
                     score = str(x[ac_settings['score']][0]['value'])

@@ -9,7 +9,7 @@ import autocomplete_light.shortcuts as al
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 
-from metainfo.models import TempEntityClass, Uri, Text
+from metainfo.models import TempEntityClass, Text
 from helper_functions.RDFparsers import GenericRDFParser
 from highlighter.models import Annotation
 from relations.tables import *

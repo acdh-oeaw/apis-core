@@ -90,7 +90,6 @@ def get_form_ajax(request):
     '''Returns forms rendered in html'''
 
     FormName = request.POST.get('FormName')
-    print('FormName: '.format(FormName))
     SiteID = request.POST.get('SiteID')
     ButtonText = request.POST.get('ButtonText')
     ObjectID = request.POST.get('ObjectID')
@@ -158,7 +157,6 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
             relation_form = test_form_relations[0].model_class()
             form_dict['relation_form'] = relation_form
             if form_match.group(3) == 'Highlighter':
-                print('found highlighter')
                 form_dict['highlighter'] = True
                 tab = form_match.group(1)+form_match.group(2)
                 call_function = 'HighlForm_response'
@@ -171,7 +169,6 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
             entity_types_highlighter = request.session.get('entity_types_highlighter')
             users_show = request.session.get('users_show_highlighter', None)
             hl_text = None
-            tab_query = {'related_'+entity_type_str.lower(): site_instance}
             if ObjectID:
                 instance = form.save(instance=ObjectID, site_instance=site_instance)
             else:
@@ -199,44 +196,7 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
                     Uri.objects.filter(entity=site_instance),
                     prefix = 'PURI-'
                 )
-            elif tab == 'PersonPlaceHighlighter':
-                pass
-            elif tab == 'PersonInstitutionHighlighter':
-                tab = 'PersonInstitution'
-                table_html = PersonInstitutionTable(
-                        PersonInstitution.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
-                        prefix='PI-',
-                        entity=entity_type_str)
-                call_function = 'HighlForm_response'
-            elif tab == 'PersonPersonHighlighter':
-                persPers = []
-                for x in PersonPerson.annotation_links.filter_ann_proj(request=request).filter(Q(related_personA=site_instance) | Q(related_personB=site_instance)):
-                    persPers.append(x.get_table_dict(site_instance))
-                table_html = PersonPersonTable(
-                            persPers,
-                            prefix='PP-')
-                call_function = 'HighlForm_response'
-            elif tab == 'PersonWorkHighlighter':
-                tab = 'PersonWork'
-                table_html = PersonWorkTable(
-                    PersonWork.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
-                    prefix='PWRK-',
-                    entity=entity_type_str)
-                call_function = 'HighlForm_response'
-            elif tab == 'PlaceWorkHighlighter':
-                tab = 'PlaceWork'
-                table_html = PlaceWorkTable(
-                    PlaceWork.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
-                    prefix='PLWRK-',
-                    entity=entity_type_str)
-                call_function = 'HighlForm_response'
-            elif tab == 'InstitutionWorkHighlighter':
-                tab = 'InstitutionWork'
-                table_html = InstitutionWorkTable(
-                    InstitutionWork.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
-                    prefix='IWRK-',
-                    entity=entity_type_str)
-                call_function = 'HighlForm_response'
+
             elif tab == 'AddRelationHighlighterPerson' or tab == 'PlaceHighlighter' or tab == 'PersonHighlighter':
                 table_html = None
                 right_panel = False
@@ -250,7 +210,6 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
                 table_html2 = table_html.as_html(request)
             else:
                 table_html2 = None
-            print(table_html)
             data = {'test': True, 'tab': tab, 'call_function': call_function,
                     'instance': instance2,
                     'table_html': table_html2,
