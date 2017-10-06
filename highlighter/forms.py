@@ -1,5 +1,5 @@
 from django import forms
-import autocomplete_light.shortcuts as al
+#import autocomplete_light.shortcuts as al
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout
 from crispy_forms.layout import Submit
@@ -7,31 +7,17 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth.models import User, Group
 from django.db.models.fields import BLANK_CHOICE_DASH
 
-from relations.forms import PersonPlaceForm, PersonInstitutionForm
+#from relations.forms import PersonPlaceForm, PersonInstitutionForm
 from metainfo.models import Collection
 from .models import AnnotationProject
 from vocabularies.models import TextType
 
 
-class PersonPlaceFormHighlighter(PersonPlaceForm):
-
-    def __init__(self, *args, **kwargs):
-        super(PersonPlaceFormHighlighter, self).__init__(*args, **kwargs)
-        self.fields['HL_start'] = forms.IntegerField(widget=forms.HiddenInput)
-        self.fields['HL_end'] = forms.IntegerField(widget=forms.HiddenInput)
-
-
-class PersonInstitutionFormHighlighter(PersonInstitutionForm):
-
-    def __init__(self, *args, **kwargs):
-        super(PersonInstitutionFormHighlighter, self).__init__(*args, **kwargs)
-        self.fields['HL_start'] = forms.IntegerField(widget=forms.HiddenInput)
-        self.fields['HL_end'] = forms.IntegerField(widget=forms.HiddenInput)
-
 
 class LinkHighlighterForm(forms.Form):
 
-    relation = forms.CharField(label='Relation', widget=al.TextWidget('PersonAutocomplete'))
+    #relation = forms.CharField(label='Relation', widget=al.TextWidget('PersonAutocomplete'))
+    relation = forms.CharField(label='Relation')
 
 
 class SelectAnnotationProject(forms.Form):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django import forms
 from django.core.urlresolvers import reverse_lazy
-from autocomplete_light import shortcuts as al
+#from autocomplete_light import shortcuts as al
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from crispy_forms.layout import Layout
@@ -31,7 +31,7 @@ class SearchForm(forms.Form):
         return helper
 
 
-class PersonForm(al.ModelForm):
+class PersonForm(forms.ModelForm):
 
     class Meta:
         model = Person
@@ -287,7 +287,8 @@ class FullTextForm(forms.Form):
 
 
 class PersonResolveUriForm(forms.Form):
-    person = forms.CharField(label=False, widget=al.TextWidget('PersonAutocomplete'))
+    #person = forms.CharField(label=False, widget=al.TextWidget('PersonAutocomplete'))
+    person = forms.CharField(label=False)
     person_uri = forms.CharField(required=False, widget=forms.HiddenInput())
 
     def save(self, site_instance, instance=None, commit=True):
@@ -354,7 +355,8 @@ class BaseEntityHighlighterForm(forms.Form):
 
 class PersonHighlighterForm(BaseEntityHighlighterForm):
 
-    person = forms.CharField(label='Person', widget=al.TextWidget('PersonAutocomplete'))
+    #person = forms.CharField(label='Person', widget=al.TextWidget('PersonAutocomplete'))
+    person = forms.CharField(label='Person')
     person_uri = forms.CharField(required=False, widget=forms.HiddenInput())
 
     def save(self, *args, **kwargs):
@@ -382,7 +384,8 @@ class PersonHighlighterForm(BaseEntityHighlighterForm):
 
 
 class PlaceHighlighterForm(BaseEntityHighlighterForm):
-    place = forms.CharField(label='Place', widget=al.TextWidget('OrtAutocomplete'))
+    #place = forms.CharField(label='Place', widget=al.TextWidget('OrtAutocomplete'))
+    place = forms.CharField(label='Place')
     place_uri = forms.CharField(required=False, widget=forms.HiddenInput())
 
     def save(self, *args, **kwargs):
@@ -426,11 +429,11 @@ class NetworkVizFilterForm(forms.Form):
                ('EventEvent', 'Event Event'),
                ('WorkWork', 'Work Work'))
     select_relation = forms.ChoiceField(choices=choices)
-    search_source = forms.CharField(widget=al.ChoiceWidget('DB_PersonAutocomplete'), required=False)
-    #search_source = forms.CharField(required=False)
-    select_kind = forms.CharField(widget=al.ChoiceWidget('VCPersonPlaceAutocomplete'), required=False)
-    #search_target = forms.CharField(required=False)
-    search_target = forms.CharField(widget=al.ChoiceWidget('DB_PlaceAutocomplete'), required=False)
+    #search_source = forms.CharField(widget=al.ChoiceWidget('DB_PersonAutocomplete'), required=False)
+    search_source = forms.CharField(required=False)
+    #select_kind = forms.CharField(widget=al.ChoiceWidget('VCPersonPlaceAutocomplete'), required=False)
+    search_target = forms.CharField(required=False)
+    #search_target = forms.CharField(widget=al.ChoiceWidget('DB_PlaceAutocomplete'), required=False)
     ann_include_all = forms.BooleanField(required=False, label='Include general relations',
                                         help_text="""Not all relations are connected to an annotation.\
                                         If checked relations that are not attached to an annotation are include.\

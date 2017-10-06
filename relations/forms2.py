@@ -5,9 +5,10 @@ from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout
 from crispy_forms.bootstrap import Accordion, AccordionGroup
-import autocomplete_light.shortcuts as al
+#import autocomplete_light.shortcuts as al
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
+from dal import autocomplete
 
 from metainfo.models import TempEntityClass, Text
 from helper_functions.RDFparsers import GenericRDFParser
@@ -141,27 +142,26 @@ class GenericRelationForm(forms.ModelForm):
                 self.rel_accessor = (lst_src_target[1], True,
                                      'related_{}B'.format(lst_src_target[1].lower()),
                                      'related_{}A'.format(lst_src_target[0].lower()))
-            self.fields['relation_type'].widget = al.ChoiceWidget(
-                'VC{}{}Autocomplete'.format(lst_src_target[0], lst_src_target[1]))
-            self.fields['target'] = forms.CharField(label=lst_src_target[1],
-                                                    widget=al.TextWidget('{}Autocomplete'.format(lst_src_target[1])))
+            # self.fields['relation_type'].widget = al.ChoiceWidget(
+            #     'VC{}{}Autocomplete'.format(lst_src_target[0], lst_src_target[1]))
+            self.fields['target'] = forms.CharField(label=lst_src_target[1], widget=autocomplete.ModelSelect2(url='autocomplete/place'))
             self.fields['target_uri'] = forms.CharField(required=False, widget=forms.HiddenInput())
         elif entity_type == lst_src_target[0]:
             self.rel_accessor = (lst_src_target[1], True,
                                  'related_{}'.format(lst_src_target[1].lower()),
                                  'related_{}'.format(lst_src_target[0].lower()))
-            self.fields['relation_type'].widget = al.ChoiceWidget('VC{}{}Autocomplete'.format(lst_src_target[0], lst_src_target[1]))
-            self.fields['target'] = forms.CharField(label=lst_src_target[1],
-                                                    widget=al.TextWidget('{}Autocomplete'.format(lst_src_target[1])))
+            # self.fields['relation_type'].widget = al.ChoiceWidget('VC{}{}Autocomplete'.format(lst_src_target[0], lst_src_target[1]))
+            # self.fields['target'] = forms.CharField(label=lst_src_target[1],
+            #                                         widget=al.TextWidget('{}Autocomplete'.format(lst_src_target[1])))
             self.fields['target_uri'] = forms.CharField(required=False, widget=forms.HiddenInput())
         elif entity_type == lst_src_target[1]:
             self.rel_accessor = (lst_src_target[0], False,
                                  'related_{}'.format(lst_src_target[0].lower()),
                                  'related_{}'.format(lst_src_target[1].lower()))
-            self.fields['relation_type'].widget = al.ChoiceWidget(
-                'VC{}{}ReverseAutocomplete'.format(lst_src_target[0], lst_src_target[1]))
-            self.fields['target'] = forms.CharField(label=lst_src_target[0],
-                                                    widget=al.TextWidget('{}Autocomplete'.format(lst_src_target[0])))
+            # self.fields['relation_type'].widget = al.ChoiceWidget(
+            #     'VC{}{}ReverseAutocomplete'.format(lst_src_target[0], lst_src_target[1]))
+            # self.fields['target'] = forms.CharField(label=lst_src_target[0],
+            #                                         widget=al.TextWidget('{}Autocomplete'.format(lst_src_target[0])))
             self.fields['target_uri'] = forms.CharField(required=False, widget=forms.HiddenInput())
         else:
             print('no hit rel_accessor')
@@ -175,10 +175,10 @@ class GenericRelationForm(forms.ModelForm):
             else:
                 auto_acc = 'VC{}{}ReverseAutocomplete'.format(lst_src_target[0], lst_src_target[1])
                 auto_choices = [instance.relation_type.label_reverse]
-            self.fields['relation_type'].widget = al.ChoiceWidget(
-                auto_acc,
-                extra_context={'values': [instance.relation_type.pk],
-                               'choices': auto_choices})
+            # self.fields['relation_type'].widget = al.ChoiceWidget(
+            #     auto_acc,
+            #     extra_context={'values': [instance.relation_type.pk],
+            #                    'choices': auto_choices})
         if highlighter:
             css_notes = 'HL'
 

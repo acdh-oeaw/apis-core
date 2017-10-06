@@ -9,15 +9,6 @@ from django_tables2 import RequestConfig
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 
-from .forms import (PersonPlaceForm, PersonPersonForm, PersonInstitutionForm,
-                    InstitutionPlaceForm, InstitutionInstitutionForm, InstitutionPersonForm,
-                    InstitutionLabelForm, PersonLabelForm, PersonPlaceHighlighterForm,
-                    PersonInstitutionHighlighterForm, PersonPersonHighlighterForm,
-                    AddRelationHighlighterPersonForm, PersonEventForm, InstitutionEventForm, PlaceEventForm,
-                    EventLabelForm, PersonWorkForm, InstitutionWorkForm, PlaceWorkForm, EventWorkForm,
-                    EntityLabelForm, PlacePlaceForm, PersonWorkHighlighterForm, InstitutionWorkHighlighterForm,
-                    PlaceWorkHighlighterForm
-                    )
 from .forms2 import GenericRelationForm
 from entities.forms import (PlaceHighlighterForm, PersonHighlighterForm)
 from highlighter.models import Annotation
