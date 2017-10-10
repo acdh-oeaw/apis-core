@@ -29,7 +29,7 @@ from highlighter.api_views import (
     HighlighterHighlightTextViewSet, HighlighterVocabularyAPIViewSet, HighlighterAnnotationViewSet
 )
 from entities.views import ReversionCompareView
-from entities.autocomplete3 import GenericEntitiesAutocomplete
+from entities.autocomplete3 import GenericEntitiesAutocomplete, GenericVocabulariesAutocomplete
 #from autocomplete_light import shortcuts as al
 #al.autodiscover()
 
@@ -104,9 +104,12 @@ urlpatterns = [
     url(r'highlighter/', include('highlighter.urls', namespace='highlighter')),
     url(r'relations/', include('relations.urls', namespace='relations')),
     #url(r'^autocomplete/', include('autocomplete_light.urls')),
-    url(r'^autocomplete/(?P<entity>[a-zA-Z0-9-]+)/$',
+    url(r'^autocomplete/entities/(?P<entity>[a-zA-Z0-9-]+)/$',
         GenericEntitiesAutocomplete.as_view(),
         name='generic_entities_autocomplete'),
+    url(r'^autocomplete/vocabularies/(?P<vocab>[a-zA-Z0-9-]+)/(?P<direct>[a-zA-Z0-9-]+)/$',
+        GenericVocabulariesAutocomplete.as_view(),
+        name='generic_vocabularies_autocomplete'),
     url(r'^api/', include(router.urls)),    #routers do not support namespaces out of the box
     url(r'^api2/', include('entities.api_urls', namespace="api2")),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),

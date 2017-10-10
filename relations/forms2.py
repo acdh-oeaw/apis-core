@@ -9,6 +9,7 @@ from crispy_forms.bootstrap import Accordion, AccordionGroup
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 from dal import autocomplete
+from django.core.validators import URLValidator
 
 from metainfo.models import TempEntityClass, Text
 from helper_functions.RDFparsers import GenericRDFParser
@@ -50,9 +51,9 @@ class GenericRelationForm(forms.ModelForm):
         x.references = cd['references']
         setattr(x, self.rel_accessor[3], site_instance)
         target = ContentType.objects.get(app_label='entities', model=self.rel_accessor[0].lower()).model_class()
-        t1 = target.get_or_create_uri(cd['target_uri'])
+        t1 = target.get_or_create_uri(cd['target'])
         if not t1:
-            t1 = GenericRDFParser(cd['target_uri'], self.rel_accessor[0]).get_or_create()
+            t1 = GenericRDFParser(cd['target'], self.rel_accessor[0]).get_or_create()
         setattr(x, self.rel_accessor[2], t1)
         if commit:
             x.save()
@@ -68,6 +69,7 @@ class GenericRelationForm(forms.ModelForm):
                 annotation_project_id=int(self.request.session.get('annotation_project', 1)))
             a.save()
             a.entity_link.add(x)
+        print('saved: {}'.format(x))
         return x
 
     def get_text_id(self):
@@ -111,7 +113,9 @@ class GenericRelationForm(forms.ModelForm):
         :type instance: object
         :type highlighter: bool
         """
-
+        attrs = {'data-placeholder': 'Type to get suggestions',
+                 'data-minimum-input-length': 3,
+                 'data-html': True}
         css_notes = 'LS'
         self.highlighter = highlighter
         entity_type = kwargs.pop('entity_type')
@@ -142,39 +146,75 @@ class GenericRelationForm(forms.ModelForm):
                 self.rel_accessor = (lst_src_target[1], True,
                                      'related_{}B'.format(lst_src_target[1].lower()),
                                      'related_{}A'.format(lst_src_target[0].lower()))
-            # self.fields['relation_type'].widget = al.ChoiceWidget(
-            #     'VC{}{}Autocomplete'.format(lst_src_target[0], lst_src_target[1]))
-            self.fields['target'] = forms.CharField(label=lst_src_target[1], widget=autocomplete.ModelSelect2(url='autocomplete/place'))
-            self.fields['target_uri'] = forms.CharField(required=False, widget=forms.HiddenInput())
+            self.fields['relation_type'] = autocomplete.Select2ListCreateChoiceField(
+                label='Relation type',
+                widget=autocomplete.ListSelect2(
+                    url='/autocomplete/vocabularies/{}{}relation/normal'.format(
+                        lst_src_target[0].lower(), lst_src_target[1].lower()),
+                    attrs=attrs))
+            self.fields['target'] = autocomplete.Select2ListCreateChoiceField(
+                label=lst_src_target[1],
+                widget=autocomplete.ListSelect2(
+                    url='/autocomplete/entities/{}'.format(lst_src_target[1].lower()),
+                    attrs=attrs),
+                validators=[URLValidator])
+            #self.fields['target_uri'] = forms.CharField(required=False, widget=forms.HiddenInput())
         elif entity_type == lst_src_target[0]:
             self.rel_accessor = (lst_src_target[1], True,
                                  'related_{}'.format(lst_src_target[1].lower()),
                                  'related_{}'.format(lst_src_target[0].lower()))
-            # self.fields['relation_type'].widget = al.ChoiceWidget('VC{}{}Autocomplete'.format(lst_src_target[0], lst_src_target[1]))
-            # self.fields['target'] = forms.CharField(label=lst_src_target[1],
-            #                                         widget=al.TextWidget('{}Autocomplete'.format(lst_src_target[1])))
-            self.fields['target_uri'] = forms.CharField(required=False, widget=forms.HiddenInput())
+            self.fields['relation_type'] = autocomplete.Select2ListCreateChoiceField(
+                label='Relation type',
+                widget=autocomplete.ListSelect2(
+                    url='/autocomplete/vocabularies/{}{}relation/normal'.format(
+                        lst_src_target[0].lower(), lst_src_target[1].lower()),
+                    attrs=attrs))
+            self.fields['target'] = autocomplete.Select2ListCreateChoiceField(
+                label=lst_src_target[1],
+                widget=autocomplete.ListSelect2(
+                    url='/autocomplete/entities/{}'.format(lst_src_target[1].lower()),
+                    attrs=attrs),
+                validators=[URLValidator])
         elif entity_type == lst_src_target[1]:
             self.rel_accessor = (lst_src_target[0], False,
                                  'related_{}'.format(lst_src_target[0].lower()),
                                  'related_{}'.format(lst_src_target[1].lower()))
-            # self.fields['relation_type'].widget = al.ChoiceWidget(
-            #     'VC{}{}ReverseAutocomplete'.format(lst_src_target[0], lst_src_target[1]))
-            # self.fields['target'] = forms.CharField(label=lst_src_target[0],
-            #                                         widget=al.TextWidget('{}Autocomplete'.format(lst_src_target[0])))
-            self.fields['target_uri'] = forms.CharField(required=False, widget=forms.HiddenInput())
+            self.fields['relation_type'] = autocomplete.Select2ListCreateChoiceField(
+                label='Relation type',
+                widget=autocomplete.ListSelect2(
+                    url='/autocomplete/vocabularies/{}{}relation/reverse'.format(
+                        lst_src_target[0].lower(), lst_src_target[1].lower()),
+                    attrs=attrs))
+            self.fields['target'] = autocomplete.Select2ListCreateChoiceField(
+                label=lst_src_target[1],
+                widget=autocomplete.ListSelect2(
+                    url='/autocomplete/entities/{}'.format(lst_src_target[0].lower()),
+                    attrs=attrs),
+                validators=[URLValidator])
+            #self.fields['target_uri'] = forms.CharField(required=False, widget=forms.HiddenInput())
         else:
             print('no hit rel_accessor')
+        self.fields['target'].initial = ('Wien')
         if instance and instance.id:
-            self.fields['target'].initial = str(getattr(instance, self.rel_accessor[2]))
-            self.fields['target_uri'].initial = Uri.objects.filter(
-                entity=getattr(instance, self.rel_accessor[2]))[0]
+            self.fields['target'].choices = [
+                (str(Uri.objects.filter(entity=getattr(instance, self.rel_accessor[2]))[0]),
+                 str(getattr(instance, self.rel_accessor[2])))]
+            self.fields['target'].initial = (str(Uri.objects.filter(entity=getattr(instance, self.rel_accessor[2]))[0]),
+                                             str(getattr(instance, self.rel_accessor[2])))
             if self.rel_accessor[1]:
-                auto_acc = 'VC{}{}Autocomplete'.format(lst_src_target[0], lst_src_target[1])
-                auto_choices = [instance.relation_type.label]
+                self.fields['relation_type'].choices = [(instance.relation_type.id,
+                                                         instance.relation_type.label)]
+                self.fields['relation_type'].initial = (instance.relation_type.id, instance.relation_type.label)
             else:
-                auto_acc = 'VC{}{}ReverseAutocomplete'.format(lst_src_target[0], lst_src_target[1])
-                auto_choices = [instance.relation_type.label_reverse]
+                self.fields['relation_type'].choices = [(instance.relation_type.id,
+                                                         instance.relation_type.label_reverse)]
+                self.fields['relation_type'].initial = (instance.relation_type.id, instance.relation_type.label_reverse)
+                # if self.rel_accessor[1]:
+            #     auto_acc = 'VC{}{}Autocomplete'.format(lst_src_target[0], lst_src_target[1])
+            #     auto_choices = [instance.relation_type.label]
+            # else:
+            #     auto_acc = 'VC{}{}ReverseAutocomplete'.format(lst_src_target[0], lst_src_target[1])
+            #     auto_choices = [instance.relation_type.label_reverse]
             # self.fields['relation_type'].widget = al.ChoiceWidget(
             #     auto_acc,
             #     extra_context={'values': [instance.relation_type.pk],
@@ -185,7 +225,6 @@ class GenericRelationForm(forms.ModelForm):
         self.helper.layout = Layout(
             'relation_type',
             'target',
-            'target_uri',
             'start_date_written',
             'end_date_written',
             Accordion(
