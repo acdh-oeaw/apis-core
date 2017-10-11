@@ -303,6 +303,7 @@ function highlight_detail(event) {
             interactive: true,
             trigger: 'click',
             multiple: true,
+            zIndex: 999,
             theme: 'tooltipster-light',
             functionBefore: function(instance, helper) {
                 $.ApisHigh.tt_instance_detail = instance
@@ -311,7 +312,7 @@ function highlight_detail(event) {
                 $.ApisHigh.tt_instance_detail.content(html);
             },
             functionPosition: function(instance, helper, position){
-                position.size.height = 'auto'
+                position.size.height = 'auto';
                 return position
             }
 
@@ -377,6 +378,7 @@ $(document).ready(function() {
             interactive: true,
             trigger: 'manual',
             multiple: true,
+            zIndex: 999,
             theme: 'tooltipster-light',
             functionBefore: function(instance, helper) {
 
@@ -389,6 +391,7 @@ $(document).ready(function() {
             },
             functionPosition: function(instance, helper, position){
                 position.size.height = 'auto';
+                position.size.width = 'auto';
                 return position
             }
 
