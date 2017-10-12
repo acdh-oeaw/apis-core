@@ -11,6 +11,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from .forms2 import GenericRelationForm
 from entities.forms import (PlaceHighlighterForm, PersonHighlighterForm)
+from .forms import PersonLabelForm
 from highlighter.models import Annotation
 from .models import (PersonPlace, PersonPerson, PersonInstitution, InstitutionPlace,
                      InstitutionInstitution, PlacePlace, PersonEvent, InstitutionEvent, PlaceEvent, PersonWork,
@@ -25,6 +26,8 @@ from entities.models import Person, Institution, Place, Event, Work
 from entities.forms import PersonResolveUriForm
 from labels.models import Label
 from helper_functions.highlighter import highlight_text
+from django.views.decorators.csrf import csrf_exempt
+
 
 import json, re
 from copy import deepcopy
@@ -81,12 +84,13 @@ def get_form_ajax(request):
     '''Returns forms rendered in html'''
 
     FormName = request.POST.get('FormName')
+    print(FormName)
     SiteID = request.POST.get('SiteID')
     ButtonText = request.POST.get('ButtonText')
     ObjectID = request.POST.get('ObjectID')
     entity_type_str = request.POST.get('entity_type')
-    if FormName:
-        form_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+)(Highlighter)?Form', FormName)
+    form_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+)(Highlighter)?Form', FormName)
+    if FormName and form_match:
         entity_type_v1 = ContentType.objects.filter(model='{}{}'.format(form_match.group(1), form_match.group(2)).lower())
     else:
         entity_type_v1 = ContentType.objects.none()
@@ -211,14 +215,14 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
                 call_function = 'HighlForm_response'
             data = {'test': False, 'call_function': call_function,
                     'DivID': 'div_'+kind_form+instance_id,
-                    'form': render_to_string("_ajax_form.html", {
+                    'form': render_to_string("_ajax_form.html", context={
                         "entity_type": entity_type_str,
                         "form": form, 'type1': kind_form, 'url2': 'save_ajax_'+kind_form,
                         'button_text': button_text, 'ObjectID': ObjectID, 'SiteID': SiteID},
-                        context_instance=RequestContext(request))}
+                        request=request)}
 
     except Exception as e:
         print('Error in save method')
         print(e)
-        data = {'test': False, 'error': json.dumps(e)}
+        data = {'test': False, 'error': json.dumps(str(e))}
     return HttpResponse(json.dumps(data), content_type='application/json')

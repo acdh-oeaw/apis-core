@@ -14,13 +14,15 @@
 </script>
 
 <div class="panel panel-default panel-fixed">
-<div class="panel-heading"><h2>{% block list_title %}List{% endblock %}</h2></div>
+<div class="panel-heading"><h2>{% block list_title %}{{entity|title}}{% endblock %}</h2></div>
 <div class="panel-body">
     <div class="row">
         <div class="col-md-4">
             <div id="filter-container">
                 {% block create_button %}
-
+                <div>
+                    <a class="btn btn-primary btn-lg" href="/entities/entity/{{entity}}/create">create new {{entity}}</a>
+                </div>
                 {% endblock %}
             <hr/>
                 {% load django_tables2 crispy_forms_tags %}
@@ -87,7 +89,6 @@
 {% endblock table %}
 
 {% block pagination.allpages %}
-
 <ul class="pagination">
 <div>
 {% with table.page.object_list|length as count %}
@@ -157,7 +158,13 @@ Page {{ current }} of {{ total }}
 
 </ul>
 {% endblock pagination.allpages %}
-
+<div id="download_buttons">
+        {% for format in table.export_formats %}
+            <a href="{% querystring '_export'=format %}">
+                download  <code>.{{ format }}</code>
+            </a>
+        {% endfor %}
+    </div>
 </div>
     </div>
 </div>

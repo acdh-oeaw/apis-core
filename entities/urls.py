@@ -1,7 +1,9 @@
 from django.conf.urls import url
-from . import views
+from . import views, views2
 
 urlpatterns = [
+url(r'^entity/(?P<entity>[a-z]+)/(?P<pk>[0-9]+)/edit$', views2.GenericEntitiesView.as_view(), name='generic_entities_view'),
+url(r'^entity/(?P<entity>[a-z]+)/list/$', views.GenericListViewNew.as_view(), name='generic_entities_list'),
 url(r'^person/list/$', views.PersonListView.as_view(), name='person_list'),
 url(r'^person/create/$', views.person_create, name='person_create'),
 url(r'^person/edit/(?P<pk>[0-9]+)$', views.person_edit, name='person_edit'),

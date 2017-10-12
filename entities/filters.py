@@ -2,6 +2,7 @@ import django_filters
 from .models import Person, Place, Institution, Event, Work
 from django.db.models import Q
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 
 
 django_filters.filters.LOOKUP_TYPES = [
@@ -21,6 +22,48 @@ django_filters.filters.LOOKUP_TYPES = [
 ]
 
 alternate_names = getattr(settings, "APIS_ALTERNATE_NAMES", ['alternative name'])
+
+
+def get_generic_list_filter(entity):
+    class GenericListFilter(django_filters.FilterSet):
+        def name_label_filter(self, queryset, name, value):
+            """
+            Filter for including the alternative names in the names search. The types of labels included in the query are
+            currently hardcoded in a list.
+
+            :param queryset: queryset that the filters are applied on
+            :param name: name of the attribute to filter on (not used as label types are hardcoded)
+            :param value: value for the filter
+            :return: filtered queryset
+            """
+            return queryset.filter(Q(name__icontains=value) |
+                                   Q(label__label__icontains=value,
+                                     label__label_type__name__in=alternate_names)).distinct()
+
+        class Meta:
+            model = ContentType.objects.get(app_label='entities', model=entity.lower()).model_class()
+            if 'list_filters' in settings.APIS_ENTITIES[entity.title()]:
+                fields = [x[0] for x in settings.APIS_ENTITIES[entity.title()]['list_filters']]
+            else:
+                exclude = ('MetaInfo',
+                           'collection',
+                           'references',
+                           'notes',
+                           'review',
+                           'start_date',
+                           'end_date',
+                           'source',
+                           'tempentityclass_ptr',
+                           'id')
+
+        def __init__(self, *args, **kwargs):
+            super(GenericListFilter, self).__init__(*args, **kwargs)
+            print(self.filters['name'].lookup_expr)
+            for f in settings.APIS_ENTITIES[entity.title()]['list_filters']:
+                for ff in f[1].keys():
+                    setattr(self.filters[f[0]], ff, f[1][ff])
+    return GenericListFilter
+
 
 class PersonListFilter(django_filters.FilterSet):
     FILTER_CHOICES = (('', 'any'), ('male', 'male'), ('female', 'female'))

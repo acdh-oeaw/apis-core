@@ -16,10 +16,11 @@ from django_tables2 import SingleTableView
 from django_tables2 import RequestConfig
 from reversion_compare.views import HistoryCompareDetailView
 import reversion
+from django_tables2.export.views import ExportMixin
 
 from .models import Person, Place, Institution, Event, Work
 from .forms import (PersonForm, PlaceForm, InstitutionForm, EventForm, FullTextForm, SearchForm,
-                    WorkForm, GenericFilterFormHelper, NetworkVizFilterForm, PersonResolveUriForm)
+                    WorkForm, GenericFilterFormHelper, NetworkVizFilterForm, PersonResolveUriForm, get_entities_form)
 from relations.models import (PersonPerson, PersonInstitution, PersonEvent,
                               PersonPlace, InstitutionEvent, InstitutionPlace, InstitutionInstitution, PlacePlace,
                               PlaceEvent, PersonWork, InstitutionWork, PlaceWork, EventWork)
@@ -34,8 +35,9 @@ from helper_functions.stanbolQueries import retrieve_obj
 from helper_functions.highlighter import highlight_text
 from helper_functions.RDFparsers import GenericRDFParser
 from labels.models import Label
-from .tables import PersonTable, PlaceTable, InstitutionTable, EventTable, WorkTable
-from .filters import PersonListFilter, PlaceListFilter, InstitutionListFilter, EventListFilter, WorkListFilter
+from .tables import PersonTable, PlaceTable, InstitutionTable, EventTable, WorkTable, get_entities_table
+from .filters import PersonListFilter, PlaceListFilter, InstitutionListFilter, EventListFilter, WorkListFilter, \
+    get_generic_list_filter
 from highlighter.forms import SelectAnnotationProject, SelectAnnotatorAgreement
 from relations.forms2 import GenericRelationForm
 
@@ -56,7 +58,6 @@ def set_session_variables(request):
     ann_proj_pk = request.GET.get('project', None)
     types = request.GET.getlist('types', None)
     users_show = request.GET.getlist('users_show', None)
-    print(users_show)
     if types:
         request.session['entity_types_highlighter'] = types
     if users_show:
@@ -91,6 +92,7 @@ def get_highlighted_texts(request, instance):
 ############################################################################
 ############################################################################
 
+
 class GenericListView(SingleTableView):
     filter_class = None
     formhelper_class = None
@@ -114,6 +116,40 @@ class GenericListView(SingleTableView):
         context[self.context_filter_name] = self.filter
         return context
 
+    def __init__(self, *args, **kwargs):
+        super(GenericListView, self).__init__(*args, **kwargs)
+        print('Kwargs: {}'.format(self.request))
+
+
+class GenericListViewNew(ExportMixin, SingleTableView):
+    formhelper_class = GenericFilterFormHelper
+    context_filter_name = 'filter'
+    paginate_by = 25
+    template_name = 'entities/generic_list.html'
+
+    def get_queryset(self, **kwargs):
+        self.entity = self.kwargs.get('entity')
+        qs = ContentType.objects.get(app_label='entities', model=self.entity.lower()).model_class().objects.all()
+        print(qs)
+        self.filter = get_generic_list_filter(self.entity.title())(self.request.GET, queryset=qs)
+        self.filter.form.helper = self.formhelper_class()
+        return self.filter.qs
+
+    def get_table(self, **kwargs):
+        self.table_class = get_entities_table(self.entity.title())
+        table = super(GenericListViewNew, self).get_table()
+        print(table)
+        RequestConfig(self.request, paginate={
+            'page': 1, 'per_page': self.paginate_by}).configure(table)
+        return table
+
+    def get_context_data(self, **kwargs):
+        context = super(GenericListViewNew, self).get_context_data()
+        context[self.context_filter_name] = self.filter
+        context['entity'] = self.entity
+        return context
+
+
 ############################################################################
 ############################################################################
 #
@@ -136,9 +172,10 @@ class PersonListViewOld(generic.ListView):  # deprecated
 @method_decorator(login_required, name='dispatch')
 class PersonListView(GenericListView):
     model = Person
-    table_class = PersonTable
+    table_class = get_entities_table('Person')
     template_name = 'entities/person_list_generic.html'
-    filter_class = PersonListFilter
+    #filter_class = PersonListFilter
+    filter_class = get_generic_list_filter('Person')
     formhelper_class = GenericFilterFormHelper
 
 
@@ -224,6 +261,8 @@ def person_edit(request, pk):
             ('Work', tb_work, 'PersonWork', tb_work_open),
             ('Label', tb_label, 'PersonLabel', tb_label_open)]
         form = PersonForm(instance=instance)
+        #form = get_entities_form('Person')
+        #form = form(instance=instance)
         form_text = FullTextForm(entity='Person', instance=instance)
         form_ann_agreement = SelectAnnotatorAgreement()
         return render(request, 'entities/person_create_generic.html', {
@@ -387,11 +426,12 @@ class InstitutionDelete(DeleteView):
 ############################################################################
 
 @method_decorator(login_required, name='dispatch')
-class PlaceListView(GenericListView):
+class PlaceListView(ExportMixin, GenericListView):
     model = Place
-    table_class = PlaceTable
+    table_class = get_entities_table('Place')
     template_name = 'entities/place_list_generic.html'
-    filter_class = PlaceListFilter
+    #filter_class = PlaceListFilter
+    filter_class = get_generic_list_filter('Place')
     formhelper_class = GenericFilterFormHelper
 
 

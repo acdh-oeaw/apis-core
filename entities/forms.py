@@ -9,6 +9,7 @@ from crispy_forms.bootstrap import Accordion, AccordionGroup
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.db.models.fields import BLANK_CHOICE_DASH
+from django.contrib.contenttypes.models import ContentType
 
 from .models import Person, Place, Institution, Event, Work
 from vocabularies.models import TextType
@@ -29,6 +30,40 @@ class SearchForm(forms.Form):
         helper.add_input(Submit('fieldn', 'search'))
         helper.form_method = 'GET'
         return helper
+
+
+def get_entities_form(entity):
+    class GenericEntitiesForm(forms.ModelForm):
+        class Meta:
+            model = ContentType.objects.get(app_label='entities', model=entity.lower()).model_class()
+            exclude = ['start_date', 'end_date', 'text', 'source']
+
+        def __init__(self, *args, **kwargs):
+            super(GenericEntitiesForm, self).__init__(*args, **kwargs)
+            self.helper = FormHelper()
+            self.helper.form_class = entity.title()+'Form'
+            self.helper.form_tag = False
+            self.helper.help_text_inline = True
+            acc_grp1 = AccordionGroup('Metadata {}'.format(entity.title()))
+            acc_grp2 = AccordionGroup(
+                        'MetaInfo',
+                        'collection',
+                        'references',
+                        'notes',
+                        'review')
+            for f in self.fields.keys():
+                if f not in acc_grp2:
+                    acc_grp1.append(f)
+            self.helper.layout = Layout(
+                Accordion(
+                    acc_grp1,
+                    acc_grp2
+                    )
+            )
+            self.fields['status'].required = False
+            self.fields['start_date_written'].required = False
+            self.fields['end_date_written'].required = False
+    return GenericEntitiesForm
 
 
 class PersonForm(forms.ModelForm):

@@ -1,6 +1,32 @@
 import django_tables2 as tables
 from django_tables2.utils import A
 from .models import Person, Place, Institution, Event, Work
+from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
+
+
+def get_entities_table(entity):
+    class GenericEntitiesTable(tables.Table):
+        name = tables.LinkColumn('entities:generic_entities_view', args=[entity.lower(), A('pk')])
+        export_formats = ['csv', 'json', 'xls', 'xlsx']
+
+        class Meta:
+            model = ContentType.objects.get(app_label='entities', model=entity.lower()).model_class()
+            if 'table_fields' in settings.APIS_ENTITIES[entity.title()]:
+                fields = settings.APIS_ENTITIES[entity.title()]['table_fields']
+            else:
+                exclude = ('MetaInfo',
+                           'collection',
+                           'references',
+                           'notes',
+                           'review',
+                           'start_date',
+                           'end_date',
+                           'source',
+                           'tempentityclass_ptr',
+                           'id')
+            attrs = {"class": "table table-hover table-striped table-condensed"}
+    return GenericEntitiesTable
 
 
 class PersonTable(tables.Table):
