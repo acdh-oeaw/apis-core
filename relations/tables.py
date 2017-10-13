@@ -1,4 +1,5 @@
 import django_tables2 as tables
+from django.contrib.contenttypes.models import ContentType
 from django_tables2.utils import A
 
 from .models import (PersonInstitution, PersonPlace, PersonPerson, PersonEvent, InstitutionEvent, PlaceEvent,
@@ -8,6 +9,46 @@ from metainfo.models import Uri
 
 
 empty_text_default = 'There are currently no relations'
+
+
+def get_generic_relations_table(relation, entity):
+    print('table call: {} {}'.format(relation, entity))
+    ct = ContentType.objects.get(app_label='relations', model=relation.lower())
+    name = ct.name.split()
+    if name[0] == name[1]:
+        rel_ent = name[0]
+    else:
+        if name[1].lower() == entity.lower():
+            rel_ent = name[0]
+            rel_type = 'label_reverse'
+        else:
+            rel_ent = name[1]
+            rel_type = 'label'
+
+    class GenericRelationsTable(tables.Table):
+
+        class Meta:
+            empty_text = empty_text_default
+            model = ct.model_class()
+            fields = ['start_date', 'end_date']
+            attrs = {
+                "class": "table table-hover table-striped table-condensed",
+                "id": name[0].title()[:2]+name[1].title()[:2]+"_conn"}
+
+        def __init__(self, *args, entity='None', **kwargs):
+            self.base_columns['delete'] = tables.TemplateColumn(template_name='delete_button_generic_ajax_form.html')
+            self.base_columns['related_'+rel_ent.lower()] = tables.LinkColumn(
+                'entities:{}_edit'.format(rel_ent.lower()), args=[A('related_{}.pk'.format(rel_ent.lower()))])
+            if name[0] == name[1]:
+                self.base_columns['relation_type'] = tables.Column()
+            else:
+                self.base_columns['relation_type'] = tables.Column(
+                    verbose_name='relation type', accessor='relation_type.{}'.format(rel_type))
+            self.base_columns['edit'] = tables.TemplateColumn(template_name='edit_button_generic_ajax_form.html')
+            super(GenericRelationsTable, self).__init__(*args, **kwargs)
+            self.sequence = ('delete', 'start_date', 'end_date', 'relation_type', 'related_' + rel_ent.lower(), 'edit')
+    return GenericRelationsTable
+
 
 
 class PersonInstitutionTable(tables.Table):

@@ -1,0 +1,2 @@
+{% load apis_helpers %}
+<button type='button' class='btn btn-primary btn-sm reledit' onclick=GetFormAjax("{{ record|content_type}}Form","{{ record.pk}}")>Edit</button>

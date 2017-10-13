@@ -80,7 +80,9 @@ class GenericRelationForm(forms.ModelForm):
         return self.cleaned_data['HL_text_id'][5:]
 
     def get_html_table(self, entity_type, request, site_instance, form_match):
-        table = globals()[self.relation_form.__name__+'Table']
+        #table = globals()[self.relation_form.__name__+'Table']
+        print('table function called')
+        table = get_generic_relations_table(self.relation_form.__name__, entity_type)
         prefix = re.match(r'([A-Z][a-z])[^A-Z]*([A-Z][a-z])', self.relation_form.__name__)
         prefix = prefix.group(1)+prefix.group(2)+'-'
         if form_match.group(1) == form_match.group(2):

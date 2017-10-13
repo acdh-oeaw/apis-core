@@ -44,6 +44,8 @@ from copy import deepcopy
 # test for class-ignoring _ajax_form-functions
 ######################################################
 
+
+
 # Model-classes must be registered together with their ModelForm-classes
 registered_forms = {'PersonPlaceForm': [PersonPlace, Person, Place],
                     'PersonPlaceHighlighterForm': [PersonPlace, Person, Place],
