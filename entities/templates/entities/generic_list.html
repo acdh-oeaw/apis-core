@@ -1,6 +1,6 @@
 {% extends "webpage/base.html" %}
 {% load i18n %}
-{% block Titel %} See all ... {% endblock %}
+{% block Titel %} See all {{entity|title}} {% endblock %}
 {% block content %}
 <script type="text/javascript">
     $(document).ready(function() {
@@ -14,7 +14,7 @@
 </script>
 
 <div class="panel panel-default panel-fixed">
-<div class="panel-heading"><h2>{% block list_title %}{{entity|title}}{% endblock %}</h2></div>
+<div class="panel-heading"><h2>{% block list_title %}{{entity|title}} list{% endblock %}</h2></div>
 <div class="panel-body">
     <div class="row">
         <div class="col-md-4">
@@ -89,71 +89,74 @@
 {% endblock table %}
 
 {% block pagination.allpages %}
-<ul class="pagination">
+<ul class="pagination" style="width: 100%;">
 <div>
 {% with table.page.object_list|length as count %}
 <p>Page total: {{ count }}</p>
 {% endwith %}
 </div>
-
-
+<div id="pagination_nav" style="display: flex">
+{% if table.page.has_previous %}
+  {% block pagination.previous %}
+    <ul class="pager" style="margin: auto; flex-grow: 1">
+  <li class="previous">
+    <a href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}" style="border-radius: 0px;">{% trans "Previous" %}</a>
+  </li>
+    </ul>
+  {% endblock pagination.previous %}
+  {% endif %}
 
   {% if table.paginator.page_range|length > 15 %}
-  <div class="form-group">
+  <div class="form-group" style="margin: auto; flex-grow: 1">
     <label for="goto">Go to page</label>
-      <select class="form-control" id="goto" onchange="javascript:location.href = this.value;">
+      <select class="form-control" id="goto" onchange="javascript:location.href = this.value;" style="width: auto">
           {% for p in table.paginator.page_range %}
               <option value="{% querystring table.prefixed_page_field=p %}">{{ p }}</option>
           {% endfor %}
       </select>
-
-
-
   </div>
-
 <!--Page # of total -->
-{% if table.page.has_previous or table.page.has_next %}
+
+
+  {% else %}
+
+
+
+
+  {% for p in table.paginator.page_range %}
+  {% if p == table.page.number %}
+    <ul class="pager" style="margin: auto; flex-grow: 1">
+  <li><a href="{% querystring table.prefixed_page_field=p %}" style="background-color:#008cba; color: #ffffff; border-radius: 0px;"> {{ p }}</a>
+  </li>
+    </ul>
+   {% else %}
+    <ul class="pager" style="margin: auto; flex-grow: 1">
+  <li>
+    <a href="{% querystring table.prefixed_page_field=p %}" style="border-radius: 0px;"> {{ p }}</a>
+  </li>
+    </ul>
+  {% endif %}
+  {% endfor %}
+
+
+  {% endif %}
+    {% if table.page.has_next %}
+  {% block pagination.next %}
+    <ul class="pager" style="margin: auto; flex-grow: 1">
+    <li class="next">
+    <a href="{% querystring table.prefixed_page_field=table.page.next_page_number %}" style="border-radius: 0px;">{% trans "Next" %}</a>
+    </li>
+    </ul>
+  {% endblock pagination.next %}
+  {% endif %}
+</div>
+    {% if table.page.has_previous or table.page.has_next %}
 {% block pagination.cardinality %}
 {% blocktrans with table.page.number as current and table.paginator.num_pages as total %}
 Page {{ current }} of {{ total }}
 {% endblocktrans %}
 {% endblock pagination.cardinality %}
 {% endif %}
-
-
-  {% else %}
-
-
-  {% if table.page.has_previous %}
-  {% block pagination.previous %}
-  <li class="previous">
-    <a href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}" style="border-radius: 0px;">{% trans "Previous" %}</a>
-  </li>
-  {% endblock pagination.previous %}
-  {% endif %}
-
-  {% for p in table.paginator.page_range %}
-  {% if p == table.page.number %}
-  <li><a href="{% querystring table.prefixed_page_field=p %}" style="background-color:#008cba; color: #ffffff; border-radius: 0px;"> {{ p }}</a>
-  </li>
-   {% else %}
-  <li>
-    <a href="{% querystring table.prefixed_page_field=p %}" style="border-radius: 0px;"> {{ p }}</a>
-  </li>
-  {% endif %}
-  {% endfor %}
-
-
-  {% if table.page.has_next %}
-  {% block pagination.next %}
-    <li class="next">
-    <a href="{% querystring table.prefixed_page_field=table.page.next_page_number %}" style="border-radius: 0px;">{% trans "Next" %}</a>
-    </li>
-  {% endblock pagination.next %}
-  {% endif %}
-
-
-  {% endif %}
 
 
 </ul>

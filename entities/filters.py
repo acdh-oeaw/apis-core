@@ -21,8 +21,6 @@ django_filters.filters.LOOKUP_TYPES = [
     ('not_contains', 'Does not contain'),
 ]
 
-alternate_names = getattr(settings, "APIS_ALTERNATE_NAMES", ['alternative name'])
-
 
 def get_generic_list_filter(entity):
     class GenericListFilter(django_filters.FilterSet):
@@ -36,13 +34,14 @@ def get_generic_list_filter(entity):
             :param value: value for the filter
             :return: filtered queryset
             """
+            alternate_names = getattr(settings, "APIS_ALTERNATE_NAMES", ['alternative name'])
             return queryset.filter(Q(name__icontains=value) |
                                    Q(label__label__icontains=value,
                                      label__label_type__name__in=alternate_names)).distinct()
 
         class Meta:
             model = ContentType.objects.get(app_label='entities', model=entity.lower()).model_class()
-            if 'list_filters' in settings.APIS_ENTITIES[entity.title()]:
+            if 'list_filters' in settings.APIS_ENTITIES[entity.title()].keys():
                 fields = [x[0] for x in settings.APIS_ENTITIES[entity.title()]['list_filters']]
             else:
                 exclude = ('MetaInfo',
@@ -50,18 +49,21 @@ def get_generic_list_filter(entity):
                            'references',
                            'notes',
                            'review',
-                           'start_date',
-                           'end_date',
+                           'start_date_written',
+                           'end_date_written',
                            'source',
                            'tempentityclass_ptr',
-                           'id')
+                           'id',
+                           'annotation_set_relation',
+                           'text')
 
         def __init__(self, *args, **kwargs):
             super(GenericListFilter, self).__init__(*args, **kwargs)
-            print(self.filters['name'].lookup_expr)
-            for f in settings.APIS_ENTITIES[entity.title()]['list_filters']:
-                for ff in f[1].keys():
-                    setattr(self.filters[f[0]], ff, f[1][ff])
+            if 'list_filters' in settings.APIS_ENTITIES[entity.title()].keys():
+                for f in settings.APIS_ENTITIES[entity.title()]['list_filters']:
+                    print(self.filters[f[0]].filter)
+                    for ff in f[1].keys():
+                        setattr(self.filters[f[0]], ff, f[1][ff])
     return GenericListFilter
 
 
