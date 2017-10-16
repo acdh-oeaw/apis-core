@@ -86,6 +86,7 @@ class GenericRelationForm(forms.ModelForm):
         prefix = re.match(r'([A-Z][a-z])[^A-Z]*([A-Z][a-z])', self.relation_form.__name__)
         prefix = prefix.group(1)+prefix.group(2)+'-'
         if form_match.group(1) == form_match.group(2):
+            print('went through same')
             list_rel = []
             dic_a = {'related_'+entity_type.lower()+'A': site_instance}
             dic_b = {'related_' + entity_type.lower() + 'B': site_instance}
@@ -134,6 +135,7 @@ class GenericRelationForm(forms.ModelForm):
         self.helper.form_class = '{}Form'.format(str(self.relation_form))
         self.helper.form_tag = False
         lst_src_target = re.findall('[A-Z][^A-Z]*', self.relation_form.__name__)
+        print(entity_type)
         if lst_src_target[0] == lst_src_target[1]:
             if instance and instance.id:
                 if getattr(instance, 'related_{}A_id'.format(lst_src_target[0].lower())) == int(siteID):
@@ -161,7 +163,7 @@ class GenericRelationForm(forms.ModelForm):
                     attrs=attrs),
                 validators=[URLValidator])
             #self.fields['target_uri'] = forms.CharField(required=False, widget=forms.HiddenInput())
-        elif entity_type == lst_src_target[0]:
+        elif entity_type == lst_src_target[0].lower():
             self.rel_accessor = (lst_src_target[1], True,
                                  'related_{}'.format(lst_src_target[1].lower()),
                                  'related_{}'.format(lst_src_target[0].lower()))
@@ -177,7 +179,7 @@ class GenericRelationForm(forms.ModelForm):
                     url='/autocomplete/entities/{}'.format(lst_src_target[1].lower()),
                     attrs=attrs),
                 validators=[URLValidator])
-        elif entity_type == lst_src_target[1]:
+        elif entity_type == lst_src_target[1].lower():
             self.rel_accessor = (lst_src_target[0], False,
                                  'related_{}'.format(lst_src_target[0].lower()),
                                  'related_{}'.format(lst_src_target[1].lower()))
@@ -196,7 +198,6 @@ class GenericRelationForm(forms.ModelForm):
             #self.fields['target_uri'] = forms.CharField(required=False, widget=forms.HiddenInput())
         else:
             print('no hit rel_accessor')
-        self.fields['target'].initial = ('Wien')
         if instance and instance.id:
             self.fields['target'].choices = [
                 (str(Uri.objects.filter(entity=getattr(instance, self.rel_accessor[2]))[0]),

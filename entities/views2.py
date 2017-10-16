@@ -1,12 +1,19 @@
 from django.db.models import Q
+from django.http import HttpResponse
+from django.template import Context
+from django.template.loader import select_template
+from django.urls import reverse
 from django.views import View
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import render, redirect, get_object_or_404
+from django_tables2 import RequestConfig
+from guardian.core import ObjectPermissionChecker
 from reversion.models import Version
 
 from entities.views import get_highlighted_texts
 from labels.models import Label
 from metainfo.models import Uri
+from relations.tables import get_generic_relations_table, EntityLabelTable
 from .forms import get_entities_form, FullTextForm
 from highlighter.forms import SelectAnnotatorAgreement
 
@@ -36,27 +43,31 @@ class GenericEntitiesView(View):
         relations = ContentType.objects.filter(app_label='relations', model__icontains=entity)
         side_bar = []
         for rel in relations:
-            match = re.match(r'([A-Z][a-z]*)([A-Z][a-z]*)', str(rel))
-            if match.group(1) == match.group(2):
+            print(str(rel))
+            match = str(rel).split()
+            prefix = "{}{}-".format(match[0].title()[:2], match[1].title()[:2])
+            table = get_generic_relations_table(''.join(match), entity)
+            title_panel = ''
+            if match[0] == match[1]:
+                title_panel = entity.title()
                 dict_1 = {'related_' + entity.lower() + 'A': instance}
                 dict_2 = {'related_' + entity.lower() + 'B': instance}
                 object_pre = rel.model_class().annotation_links.filter_ann_proj(request=request).filter(
                     Q(**dict_1) | Q(**dict_2))
-                object = []
+                objects = []
                 for x in object_pre:
-                    object.append(x.get_table_dict(instance))
-                prefix = "{}{}-".format(match.group(1)[:2], match.group(2)[:2])
-                tb_object = PersonPersonTable(object_person, prefix=prefix)
-                tb_object_open = request.GET.get(prefix+'page', None)
-                RequestConfig(request, paginate={"per_page": 10}).configure(tb_person)
-        right_panel = [
-            ('Uri', tb_uri, 'PersonResolveUri', tb_uri_open),
-            ('Person', tb_person, 'PersonPerson', tb_person_open),
-            ('Institution', tb_institution, 'PersonInstitution', tb_institution_open),
-            ('Place', tb_place, 'PersonPlace', tb_place_open),
-            ('Event', tb_event, 'PersonEvent', tb_event_open),
-            ('Work', tb_work, 'PersonWork', tb_work_open),
-            ('Label', tb_label, 'PersonLabel', tb_label_open)]
+                    objects.append(x.get_table_dict(instance))
+            else:
+                if match[0].lower() == entity.lower():
+                    title_panel = match[1].title()
+                else:
+                    title_panel = match[0].title()
+                dict_1 = {'related_' + entity.lower(): instance}
+                objects = list(rel.model_class().annotation_links.filter_ann_proj(request=request).filter(**dict_1))
+            tb_object = table(objects, prefix=prefix)
+            tb_object_open = request.GET.get(prefix + 'page', None)
+            RequestConfig(request, paginate={"per_page": 10}).configure(tb_object)
+            side_bar.append((title_panel, tb_object, ''.join([x.title() for x in match]), tb_object_open))
         form = get_entities_form(entity.title())
         form = form(instance=instance)
         form_text = FullTextForm(entity.title(), instance=instance)
@@ -67,18 +78,46 @@ class GenericEntitiesView(View):
         object_labels = Label.objects.filter(temp_entity=instance)
         tb_label = EntityLabelTable(object_labels, prefix=entity.title()[:2]+'L-')
         tb_label_open = request.GET.get('PL-page', None)
+        side_bar.append(('Label', tb_label, 'PersonLabel', tb_label_open))
         RequestConfig(request, paginate={"per_page": 10}).configure(tb_label)
-        return render(request, 'entities/person_create_generic.html', {
-            'entity_type': entity.title(),
+        perm = ObjectPermissionChecker(request.user)
+        permissions = {'change': perm.has_perm('change_'.format(entity), instance),
+                       'delete': perm.has_perm('delete_'.format(entity), instance),
+                       'create': request.user.has_perm('entities.add_{}'.format(entity))}
+        template = select_template(['entities/{}_create_generic.html'.format(entity),
+                                    'entities/entity_create_generic.html'])
+        return HttpResponse(template.render(request=request, context={
+            'entity_type': entity,
             'form': form,
             'form_text': form_text,
             'instance': instance,
-            'right_panel': right_panel,
+            'right_panel': side_bar,
             'object_revisions': object_revisions,
             'object_texts': object_texts,
             'object_lod': object_lod,
             'ann_proj_form': ann_proj_form,
-            'form_ann_agreement': form_ann_agreement})
+            'form_ann_agreement': form_ann_agreement,
+            'permissions': permissions}))
 
-    #def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
+        entity = kwargs['entity']
+        pk = kwargs['pk']
+        entity_model = ContentType.objects.get(app_label='entities', model=entity).model_class()
+        instance = get_object_or_404(entity_model, pk=pk)
+        form = get_entities_form(entity.title())
+        form = form(request.POST, instance=instance)
+        form_text = FullTextForm(request.POST, entity=entity.title())
+        if form.is_valid() and form_text.is_valid():
+            entity_2 = form.save()
+            form_text.save(entity_2)
+            return redirect(reverse('entities:generic_entities_view', kwargs={
+                'pk': pk, 'entity': entity
+            }))
+        else:
+            template = select_template(['entities/{}_create_generic.html'.format(entity),
+                                        'entities/entity_create_generic.html'])
+            return HttpResponse(template.render(request=request, context={
+                'form': form,
+                'form_text': form_text,
+                'instance': instance}))
 

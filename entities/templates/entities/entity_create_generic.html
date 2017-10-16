@@ -1,6 +1,10 @@
 {% extends "webpage/base.html" %}
 {% block scriptHeader %}
 {% endblock %}
+{% block Titel %}Create a Person{% endblock %}
+{% load guardian_tags %}
+{% load crispy_forms_tags %}
+
 {% block content %}
 {% load crispy_forms_tags %}
 {% load django_tables2 %}
@@ -30,7 +34,23 @@
                       </div>
                 	{% crispy form %}
                     {% block editbuttons %}
-                    {% endblock editbuttons %}
+    {% if instance %}
+    {% if "delete" in permissions %}
+        <a class ="btn btn-danger btn-primary" href="{% url 'entities:'|add:entity_type|add:'_delete' pk=instance.id %}">delete</a>
+    {% endif %}
+    {% if "change" in permissions %}
+    <input class="btn btn-primary" type="submit" value="modify" />
+    {% endif %}
+        {% else %}
+        {% if "create" in permissions %}
+        <input class="btn btn-primary" type="submit" value="create" />
+            {% endif %}
+    {% endif %}
+    {% if instance %}
+    <button class="compare_tooltip btn btn-default" data-tooltip='{"app":"entities","kind":"{{entity_type|lower}}","pk":"{{ instance.pk }}"}'>Revisions</button>
+    {% endif %}
+
+{% endblock editbuttons %}
                 </form>
                 {% block linkedOpenData %}
                 {% if object_lod %}
@@ -468,4 +488,43 @@ function unbind_ann_agreement_form() {
     <script type="text/javascript">
 
     </script>
+<script type="text/javascript">
+function check_perms_relation(){
+    {% if instance %}
+    {% get_obj_perms request.user for instance as "instance_perms" %}
+    {% if "change_{{entity_type}}" in instance_perms %}
+    return true
+    {% else %}
+    return false
+    {% endif %}
+    {% endif %}
+}
+</script>
+{% if instance %}
+{% get_obj_perms request.user for instance as "instance_perms" %}
+{% if "change_person" in instance_perms %}
+<script type="text/javascript">
+
+    $(function(){
+        {% for obj in right_panel %}
+        GetFormAjax("{{obj.2|add:'Form'}}");
+        //unbind_ajax_forms();
+        {% endfor %}
+    })
+</script>
+<script type="text/javascript">
+    init_apis_highlighter(1, {{instance.pk}})
+    $('body').on("click", 'mark.highlight', highlight_detail)
+</script>
+{% else %}
+<script type="text/javascript">
+$(function(){
+    $('.reldelete').addClass("disabled");
+    $('.reldelete').prop("disabled", true);
+    $('.reledit').addClass("disabled");
+    $('.reledit').prop("disabled", true);
+})
+</script>
+{% endif %}
+{% endif %}
 {% endblock %}
