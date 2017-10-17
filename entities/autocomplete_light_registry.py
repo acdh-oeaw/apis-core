@@ -13,6 +13,7 @@ class TitleAutocomplete(al.AutocompleteModelBase):
 
 al.register(Title, TitleAutocomplete)
 
+
 class ProfessionTypeAutocomplete(al.AutocompleteModelBase):
 	search_fields=['name']
 	model = ProfessionType

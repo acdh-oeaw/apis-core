@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from dal import autocomplete
 from django import forms
 from django.core.urlresolvers import reverse_lazy
 #from autocomplete_light import shortcuts as al
@@ -448,26 +449,11 @@ class PlaceHighlighterForm(BaseEntityHighlighterForm):
 
 
 class NetworkVizFilterForm(forms.Form):
-    choices = (('PersonPlace', 'Person Place'),
-               ('PersonInstitution', 'Person Institution'),
-               ('PersonEvent', 'Person Event'),
-               ('PersonWork', 'Person Work'),
-               ('PersonPerson', 'Person Person'),
-               ('InstitutionPlace', 'Institution Place'),
-               ('InstitutionEvent', 'Institution Event'),
-               ('InstitutionWork', 'Institution Work'),
-               ('InstitutionInstitution', 'Institution Institution'),
-               ('PlaceEvent', 'Place Event'),
-               ('PlaceWork', 'Place Work'),
-               ('PlacePlace', 'Place Place'),
-               ('EventWork', 'Event Work'),
-               ('EventEvent', 'Event Event'),
-               ('WorkWork', 'Work Work'))
-    select_relation = forms.ChoiceField(choices=choices)
+    #select_relation = forms.ChoiceField(choices=choices)
     #search_source = forms.CharField(widget=al.ChoiceWidget('DB_PersonAutocomplete'), required=False)
-    search_source = forms.CharField(required=False)
+    #search_source = forms.CharField(required=False)
     #select_kind = forms.CharField(widget=al.ChoiceWidget('VCPersonPlaceAutocomplete'), required=False)
-    search_target = forms.CharField(required=False)
+    #search_target = forms.CharField(required=False)
     #search_target = forms.CharField(widget=al.ChoiceWidget('DB_PlaceAutocomplete'), required=False)
     ann_include_all = forms.BooleanField(required=False, label='Include general relations',
                                         help_text="""Not all relations are connected to an annotation.\
@@ -483,7 +469,35 @@ class NetworkVizFilterForm(forms.Form):
                                    'data-date-format': 'dd.mm.yyyy'}))
 
     def __init__(self, *args, **kwargs):
+        attrs = {'data-placeholder': 'Type to get suggestions',
+                 'data-minimum-input-length': 3,
+                 'data-html': True,}
         super(NetworkVizFilterForm, self).__init__(*args, **kwargs)
+        self.fields['select_relation'] = forms.ChoiceField(
+            label='Relation type',
+            choices=list(('-'.join(x.name.split()), x.name) for x in ContentType.objects.filter(app_label='relations')),
+            help_text="Include only relations related to this annotation project \
+            (See the include general relations checkbox)")
+        self.fields['select_relation'].initial = ('person-place', 'person place')
+        self.fields['search_source'] = autocomplete.Select2ListCreateChoiceField(
+                                        label='Search source',
+                                        widget=autocomplete.ListSelect2(
+                                            url=reverse('generic_network_entities_autocomplete',
+                                                        kwargs={'entity': 'person'}),
+                                            attrs=attrs))
+        self.fields['search_target'] = autocomplete.Select2ListCreateChoiceField(
+                                        label='Search target',
+                                        widget=autocomplete.ListSelect2(
+                                            url=reverse('generic_network_entities_autocomplete',
+                                                        kwargs={'entity': 'place'}),
+                                            attrs=attrs))
+        self.fields['select_kind'] = autocomplete.Select2ListCreateChoiceField(
+                                        label='Select kind',
+                                        widget=autocomplete.ListSelect2(
+                                            url=reverse('generic_vocabularies_autocomplete',
+                                                        kwargs={'vocab': 'personplacerelation',
+                                                                'direct': 'normal'}),
+                                            attrs=attrs))
         self.fields['annotation_proj'] = forms.ChoiceField(
             label='Annotation Project',
             choices=BLANK_CHOICE_DASH + list((x.pk, x.name) for x in AnnotationProject.objects.all()),

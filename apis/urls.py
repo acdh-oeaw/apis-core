@@ -29,7 +29,8 @@ from highlighter.api_views import (
     HighlighterHighlightTextViewSet, HighlighterVocabularyAPIViewSet, HighlighterAnnotationViewSet
 )
 from entities.views import ReversionCompareView
-from entities.autocomplete3 import GenericEntitiesAutocomplete, GenericVocabulariesAutocomplete
+from entities.autocomplete3 import (GenericEntitiesAutocomplete,
+                                    GenericVocabulariesAutocomplete, GenericNetworkEntitiesAutocomplete)
 #from autocomplete_light import shortcuts as al
 #al.autodiscover()
 
@@ -107,6 +108,9 @@ urlpatterns = [
     url(r'^autocomplete/entities/(?P<entity>[a-zA-Z0-9-]+)/$',
         GenericEntitiesAutocomplete.as_view(),
         name='generic_entities_autocomplete'),
+    url(r'^autocomplete/network/entities/(?P<entity>[a-zA-Z0-9-]+)/$',
+        GenericNetworkEntitiesAutocomplete.as_view(),
+        name='generic_network_entities_autocomplete'),
     url(r'^autocomplete/vocabularies/(?P<vocab>[a-zA-Z0-9-]+)/(?P<direct>[a-zA-Z0-9-]+)/$',
         GenericVocabulariesAutocomplete.as_view(),
         name='generic_vocabularies_autocomplete'),

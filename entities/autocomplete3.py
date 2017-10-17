@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from entities.models import Place, Person, Institution, Event, Work
-from metainfo.models import Uri
+from metainfo.models import Uri, Collection
 from apis.settings.NER_settings import autocomp_settings as ac_settings
 from django.conf import settings
 
@@ -106,7 +106,6 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
 class GenericVocabulariesAutocomplete(autocomplete.Select2ListView):
     def get(self, request, *args, **kwargs):
         vocab = self.kwargs['vocab']
-        print(vocab)
         direct = self.kwargs['direct']
         q = self.q
         vocab_model = ContentType.objects.get(app_label='vocabularies', model=vocab).model_class()
@@ -118,4 +117,21 @@ class GenericVocabulariesAutocomplete(autocomplete.Select2ListView):
                 Q(name__icontains=q) | Q(name_reverse__icontains=q))]
         return http.HttpResponse(json.dumps({
             'results': choices + []
+        }), content_type='application/json')
+
+
+class GenericNetworkEntitiesAutocomplete(autocomplete.Select2ListView):
+    def get(self, request, *args, **kwargs):
+        entity = self.kwargs['entity']
+        q = self.q
+        if q.startswith('cl:'):
+            res = Collection.objects.filter(name__icontains=q[3:])
+            results = [{'id': 'cl:'+str(x.pk), 'text': x.name} for x in res]
+        else:
+            ent_model = ContentType.objects.get(app_label='entities', model=entity).model_class()
+            arg_list = [Q(**{x + '__icontains': q}) for x in settings.APIS_ENTITIES[entity.title()]['search']]
+            res = ent_model.objects.filter(reduce(operator.or_, arg_list)).distinct()
+            results = [{'id': x.pk, 'text': str(x)} for x in res]
+        return http.HttpResponse(json.dumps({
+            'results': results
         }), content_type='application/json')

@@ -1,10 +1,9 @@
 {% extends "webpage/base.html" %}
 {% load staticfiles %}
+{% load static %}
 {% load crispy_forms_tags %}
 {% block scriptHeader %}
 {{ block.super }}
-    {% include 'autocomplete_light/static.html' %}
-
 <script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/sigma.core.js' %}"></script>
 <script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/conrad.js' %}"></script>
 <script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/utils/sigma.utils.js' %}"></script>
@@ -464,19 +463,37 @@ var config = {
 
 };
 $('#id_select_relation').on("change", function(){
-    var new_val = '/autocomplete/VC'+$(this).val()+'Autocomplete/'
-    $('#id_select_kind-autocomplete').yourlabsAutocomplete('destroy');
-    $('#id_select_kind-autocomplete').yourlabsAutocomplete({'url': new_val, 'minimumCharacters': 2});
-    var match_types = /([A-Z]+[a-z]+)([A-Z]+[a-z]+)/g
-    var match_new_2 = match_types.exec($(this).val())[1]
-    var new_val_source = '/autocomplete/DB_'+match_new_2+'Autocomplete/'
-    $('#id_search_source-autocomplete').yourlabsAutocomplete('destroy');
-    $('#id_search_source-autocomplete').yourlabsAutocomplete({'url': new_val_source, 'minimumCharacters': 2});
-    var match_types2 = /([A-Z]+[a-z]+)([A-Z]+[a-z]+)/g
-    var match_new_3 = match_types2.exec($(this).val())[2]
-    var new_val_target = '/autocomplete/DB_'+match_new_3+'Autocomplete/'
-    $('#id_search_target-autocomplete').yourlabsAutocomplete('destroy');
-    $('#id_search_target-autocomplete').yourlabsAutocomplete({'url': new_val_target, 'minimumCharacters': 2});
+    var list_ent = $(this).val().split('-')
+    console.log(list_ent);
+    //$('#id_select_kind-autocomplete').yourlabsAutocomplete('destroy');
+    //$('#id_select_kind-autocomplete').yourlabsAutocomplete({'url': new_val, 'minimumCharacters': 2});
+
+    $('#id_search_source').select2('destroy');
+    $('#id_search_source').select2({
+          ajax: {
+            url: '/autocomplete/network/entities/'+list_ent[0],
+            dataType: 'json'
+            // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+          }
+        });
+    $('#id_search_target').select2('destroy');
+    $('#id_search_target').select2({
+          ajax: {
+            url: '/autocomplete/network/entities/'+list_ent[1],
+            dataType: 'json'
+            // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+          }
+        });
+    $('#id_select_kind').select2('destroy');
+    $('#id_select_kind').select2({
+          ajax: {
+            url: '/autocomplete/vocabularies/'+list_ent[0]+list_ent[1]+'relation/normal',
+            dataType: 'json'
+            // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+          }
+        });
+    //$('#id_search_target-autocomplete').yourlabsAutocomplete('destroy');
+    //$('#id_search_target-autocomplete').yourlabsAutocomplete({'url': new_val_target, 'minimumCharacters': 2});
 })
 })
 </script>
