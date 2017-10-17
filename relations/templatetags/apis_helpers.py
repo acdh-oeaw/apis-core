@@ -10,7 +10,7 @@ def content_type(obj):
     if type(obj) == dict:
         for x in obj.keys():
             if x.startswith('related_'):
-                nl = [x.split('_')[1]*2]
+                nl = [x.split('_')[1], x.split('_')[1]]
     else:
         nl = ContentType.objects.get_for_model(obj).name.split()
     return ''.join([x.title() for x in nl])

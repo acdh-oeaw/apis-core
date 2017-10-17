@@ -130,7 +130,6 @@ class GenericListViewNew(ExportMixin, SingleTableView):
     def get_queryset(self, **kwargs):
         self.entity = self.kwargs.get('entity')
         qs = ContentType.objects.get(app_label='entities', model=self.entity.lower()).model_class().objects.all()
-        print(qs)
         self.filter = get_generic_list_filter(self.entity.title())(self.request.GET, queryset=qs)
         self.filter.form.helper = self.formhelper_class()
         return self.filter.qs

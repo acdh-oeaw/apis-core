@@ -20,7 +20,7 @@ from highlighter.forms import SelectAnnotatorAgreement
 import re
 
 
-class GenericEntitiesView(View):
+class GenericEntitiesEditView(View):
     @staticmethod
     def set_session_variables(request):
         ann_proj_pk = request.GET.get('project', None)
@@ -110,7 +110,7 @@ class GenericEntitiesView(View):
         if form.is_valid() and form_text.is_valid():
             entity_2 = form.save()
             form_text.save(entity_2)
-            return redirect(reverse('entities:generic_entities_view', kwargs={
+            return redirect(reverse('entities:generic_entities_edit_view', kwargs={
                 'pk': pk, 'entity': entity
             }))
         else:
@@ -121,3 +121,56 @@ class GenericEntitiesView(View):
                 'form_text': form_text,
                 'instance': instance}))
 
+def person_create(request):
+    if request.method == "POST":
+        form = PersonForm(request.POST)
+        form_text = FullTextForm(request.POST, entity='Person')
+        if form.is_valid() and form_text.is_valid():
+            entity = form.save()
+            form_text.save(entity)
+            return redirect('entities:person_list')
+        else:
+            return render(request, 'entities/person_create_generic.html', {
+                    'form': form,
+                    'form_text': form_text})
+    else:
+        form = PersonForm()
+        form_text = FullTextForm(entity='Person')
+        return render(request, 'entities/person_create_generic.html', {
+                'form': form,
+                'form_text': form_text})
+
+
+class GenericEntitiesCreateView(View):
+    def get(self, request, *args, **kwargs):
+        entity = kwargs['entity']
+        form = get_entities_form(entity.title())
+        form = form()
+        form_text = FullTextForm(entity=entity.title())
+        permissions = {'create': request.user.has_perm('entities.add_{}'.format(entity))}
+        template = select_template(['entities/{}_create_generic.html'.format(entity),
+                                    'entities/entity_create_generic.html'])
+        return HttpResponse(template.render(request=request, context={
+            'permissions': permissions,
+            'form': form,
+            'form_text': form_text}))
+
+    def post(self, request, *args, **kwargs):
+        entity = kwargs['entity']
+        form = get_entities_form(entity.title())
+        form = form(request.POST)
+        form_text = FullTextForm(request.POST, entity=entity.title())
+        if form.is_valid() and form_text.is_valid():
+            entity_2 = form.save()
+            form_text.save(entity_2)
+            return redirect(reverse('entities:generic_entities_edit_view', kwargs={
+                'pk': entity_2.pk, 'entity': entity
+            }))
+        else:
+            permissions = {'create': request.user.has_perm('entities.add_{}'.format(entity))}
+            template = select_template(['entities/{}_create_generic.html'.format(entity),
+                                        'entities/entity_create_generic.html'])
+            return HttpResponse(template.render(request=request, context={
+                'permissions': permissions,
+                'form': form,
+                'form_text': form_text}))

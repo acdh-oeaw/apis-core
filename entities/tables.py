@@ -7,7 +7,7 @@ from django.conf import settings
 
 def get_entities_table(entity):
     class GenericEntitiesTable(tables.Table):
-        name = tables.LinkColumn('entities:generic_entities_view', args=[entity.lower(), A('pk')])
+        name = tables.LinkColumn('entities:generic_entities_edit_view', args=[entity.lower(), A('pk')])
         export_formats = ['csv', 'json', 'xls', 'xlsx']
 
         class Meta:

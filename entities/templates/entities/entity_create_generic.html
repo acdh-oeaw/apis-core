@@ -45,11 +45,10 @@
         {% if "create" in permissions %}
         <input class="btn btn-primary" type="submit" value="create" />
             {% endif %}
-    {% endif %}
+                    {% endif %}
     {% if instance %}
     <button class="compare_tooltip btn btn-default" data-tooltip='{"app":"entities","kind":"{{entity_type|lower}}","pk":"{{ instance.pk }}"}'>Revisions</button>
     {% endif %}
-
 {% endblock editbuttons %}
                 </form>
                 {% block linkedOpenData %}
@@ -149,7 +148,11 @@
         $.ajax({
                 type: 'POST',
                 url: '{% url 'relations:get_form_ajax' %}',
-                data: {'FormName':FormName,'SiteID':{{instance.pk}},'ObjectID':ObjectID,'ButtonText':ButtonText, 'entity_type': '{{entity_type}}'},
+            beforeSend: function(request) {
+              var csrftoken = getCookie('csrftoken');
+    request.setRequestHeader("X-CSRFToken", csrftoken);
+  },
+            data: {'FormName':FormName,'SiteID':{{instance.pk}},'ObjectID':ObjectID,'ButtonText':ButtonText, 'entity_type': '{{entity_type}}'},
                 success: function(data) {
                     // update our tooltip content with our returned data and cache it
                     $('#tab_'+data.tab).find('div:eq(1)').remove();
@@ -175,12 +178,15 @@
                 $.ApisHigh.tt_instance_detail.content(response.form);
             } }
         } else {
+            console.log('test did not fail');
              $('#tab_'+response.tab).find('div').remove();
              $('#tab_'+response.tab).append(response.table_html);
              initiate_compare_tooltip();
              {% if instance %}
              if (check_perms_relation()){
              if (response.right_panel) {
+                 console.log('fetching form');
+                 console.log(response.tab+'Form');
              GetFormAjax(response.tab+'Form');}
              if ($.ApisHigh.tt_instance_detail["__state"] == 'stable') {
                 $.ApisHigh.tt_instance_detail.close()
@@ -491,8 +497,7 @@ function unbind_ann_agreement_form() {
 <script type="text/javascript">
 function check_perms_relation(){
     {% if instance %}
-    {% get_obj_perms request.user for instance as "instance_perms" %}
-    {% if "change_{{entity_type}}" in instance_perms %}
+    {% if "change" in permissions %}
     return true
     {% else %}
     return false
@@ -500,31 +505,26 @@ function check_perms_relation(){
     {% endif %}
 }
 </script>
-{% if instance %}
-{% get_obj_perms request.user for instance as "instance_perms" %}
-{% if "change_person" in instance_perms %}
 <script type="text/javascript">
-
-    $(function(){
+ function activate_editing(){
         {% for obj in right_panel %}
         GetFormAjax("{{obj.2|add:'Form'}}");
         //unbind_ajax_forms();
         {% endfor %}
-    })
-</script>
-<script type="text/javascript">
     init_apis_highlighter(1, {{instance.pk}})
-    $('body').on("click", 'mark.highlight', highlight_detail)
-</script>
-{% else %}
-<script type="text/javascript">
-$(function(){
+    $('body').on("click", 'mark.highlight', highlight_detail)};
+ function deactivate_editing(){
     $('.reldelete').addClass("disabled");
     $('.reldelete').prop("disabled", true);
     $('.reledit').addClass("disabled");
     $('.reledit').prop("disabled", true);
-})
+ };
+{% if instance %}
+{% if permissions.change %}
+activate_editing();
+{% else %}
+deactivate_editing();
+{% endif %}
+{% endif %}
 </script>
-{% endif %}
-{% endif %}
 {% endblock %}

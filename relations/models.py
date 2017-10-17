@@ -116,7 +116,7 @@ class PersonPerson(TempEntityClass):
             rel_pers = self.related_personA
             rel_type = self.relation_type.name_reverse
         result = {
-            'relation_pk': self.pk,
+            'pk': self.pk,
             'relation_type': rel_type,
             'related_person': rel_pers,
             'start_date': self.start_date,

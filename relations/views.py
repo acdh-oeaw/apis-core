@@ -93,7 +93,9 @@ def get_form_ajax(request):
     entity_type_str = request.POST.get('entity_type')
     form_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+)(Highlighter)?Form', FormName)
     if FormName and form_match:
-        entity_type_v1 = ContentType.objects.filter(model='{}{}'.format(form_match.group(1), form_match.group(2)).lower())
+        entity_type_v1 = ContentType.objects.filter(
+            model='{}{}'.format(form_match.group(1).lower(), form_match.group(2)).lower(),
+            app_label='relations')
     else:
         entity_type_v1 = ContentType.objects.none()
     if FormName not in registered_forms.keys():
@@ -144,87 +146,87 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
     form_dict = {'data': request.POST,
                  'entity_type': entity_type,
                  'request': request}
-    try:
-        test_form_relations = ContentType.objects.filter(
-            model='{}{}'.format(form_match.group(1).lower(), form_match.group(2)).lower(),
-            app_label='relations')
-        tab = re.match(r'(.*)Form', kind_form).group(1)
-        call_function = 'EntityRelationForm_response'
+
+    test_form_relations = ContentType.objects.filter(
+        model='{}{}'.format(form_match.group(1).lower(), form_match.group(2)).lower(),
+        app_label='relations')
+    tab = re.match(r'(.*)Form', kind_form).group(1)
+    call_function = 'EntityRelationForm_response'
+    if test_form_relations.count() > 0:
+        relation_form = test_form_relations[0].model_class()
+        form_dict['relation_form'] = relation_form
+        if form_match.group(3) == 'Highlighter':
+            form_dict['highlighter'] = True
+            tab = form_match.group(1)+form_match.group(2)
+            call_function = 'HighlForm_response'
+        form = GenericRelationForm(**form_dict)
+    else:
+        form = globals()[kind_form](**form_dict)
+    if form.is_valid():
+        site_instance = entity_type.objects.get(pk=SiteID)
+        set_ann_proj = request.session.get('annotation_project', 1)
+        entity_types_highlighter = request.session.get('entity_types_highlighter')
+        users_show = request.session.get('users_show_highlighter', None)
+        hl_text = None
+        if ObjectID:
+            instance = form.save(instance=ObjectID, site_instance=site_instance)
+        else:
+            instance = form.save(site_instance=site_instance)
+        right_panel = True
         if test_form_relations.count() > 0:
-            relation_form = test_form_relations[0].model_class()
-            form_dict['relation_form'] = relation_form
-            if form_match.group(3) == 'Highlighter':
-                form_dict['highlighter'] = True
-                tab = form_match.group(1)+form_match.group(2)
-                call_function = 'HighlForm_response'
-            form = GenericRelationForm(**form_dict)
-        else:
-            form = globals()[kind_form](**form_dict)
-        if form.is_valid():
-            site_instance = entity_type.objects.get(pk=SiteID)
-            set_ann_proj = request.session.get('annotation_project', 1)
-            entity_types_highlighter = request.session.get('entity_types_highlighter')
-            users_show = request.session.get('users_show_highlighter', None)
-            hl_text = None
-            if ObjectID:
-                instance = form.save(instance=ObjectID, site_instance=site_instance)
-            else:
-                instance = form.save(site_instance=site_instance)
-            right_panel = True
-            if test_form_relations.count() > 0:
-                table_html = form.get_html_table(entity_type_str, request, site_instance, form_match)
-            if 'Highlighter' in tab or form_match.group(3) == 'Highlighter':
-                hl_text = {
-                    'text': highlight_text(form.get_text_id(),
-                                           users_show=users_show,
-                                           set_ann_proj=set_ann_proj,
-                                           types=entity_types_highlighter).strip(),
-                    'id': form.get_text_id()}
-            if tab == 'PersonLabel':
-                table_html = EntityLabelTable(
-                        site_instance.label_set.all(),
-                        prefix='PL-')
-            elif tab == 'InstitutionLabel':
-                table_html = EntityLabelTable(
-                        site_instance.label_set.all(),
-                        prefix='IL-')
-            elif tab == 'PersonResolveUri':
-                table_html = EntityUriTable(
-                    Uri.objects.filter(entity=site_instance),
-                    prefix = 'PURI-'
-                )
+            table_html = form.get_html_table(entity_type_str, request, site_instance, form_match)
+        if 'Highlighter' in tab or form_match.group(3) == 'Highlighter':
+            hl_text = {
+                'text': highlight_text(form.get_text_id(),
+                                       users_show=users_show,
+                                       set_ann_proj=set_ann_proj,
+                                       types=entity_types_highlighter).strip(),
+                'id': form.get_text_id()}
+        if tab == 'PersonLabel':
+            table_html = EntityLabelTable(
+                    site_instance.label_set.all(),
+                    prefix='PL-')
+        elif tab == 'InstitutionLabel':
+            table_html = EntityLabelTable(
+                    site_instance.label_set.all(),
+                    prefix='IL-')
+        elif tab == 'PersonResolveUri':
+            table_html = EntityUriTable(
+                Uri.objects.filter(entity=site_instance),
+                prefix = 'PURI-'
+            )
 
-            elif tab == 'AddRelationHighlighterPerson' or tab == 'PlaceHighlighter' or tab == 'PersonHighlighter':
-                table_html = None
-                right_panel = False
-                call_function = 'PAddRelation_response'
-                instance = None
-            if instance:
-                instance2 = instance.get_web_object()
-            else:
-                instance2 = None
-            if table_html:
-                table_html2 = table_html.as_html(request)
-            else:
-                table_html2 = None
-            data = {'test': True, 'tab': tab, 'call_function': call_function,
-                    'instance': instance2,
-                    'table_html': table_html2,
-                    'text': hl_text,
-                    'right_panel': right_panel}
+        elif tab == 'AddRelationHighlighterPerson' or tab == 'PlaceHighlighter' or tab == 'PersonHighlighter':
+            table_html = None
+            right_panel = False
+            call_function = 'PAddRelation_response'
+            instance = None
+        if instance:
+            instance2 = instance.get_web_object()
         else:
-            if 'Highlighter' in tab:
-                call_function = 'HighlForm_response'
-            data = {'test': False, 'call_function': call_function,
-                    'DivID': 'div_'+kind_form+instance_id,
-                    'form': render_to_string("_ajax_form.html", context={
-                        "entity_type": entity_type_str,
-                        "form": form, 'type1': kind_form, 'url2': 'save_ajax_'+kind_form,
-                        'button_text': button_text, 'ObjectID': ObjectID, 'SiteID': SiteID},
-                        request=request)}
+            instance2 = None
+        if table_html:
+            table_html2 = table_html.as_html(request)
+        else:
+            table_html2 = None
+        data = {'test': True, 'tab': tab, 'call_function': call_function,
+                'instance': instance2,
+                'table_html': table_html2,
+                'text': hl_text,
+                'right_panel': right_panel}
+    else:
+        if 'Highlighter' in tab:
+            call_function = 'HighlForm_response'
+        data = {'test': False, 'call_function': call_function,
+                'DivID': 'div_'+kind_form+instance_id,
+                'form': render_to_string("_ajax_form.html", context={
+                    "entity_type": entity_type_str,
+                    "form": form, 'type1': kind_form, 'url2': 'save_ajax_'+kind_form,
+                    'button_text': button_text, 'ObjectID': ObjectID, 'SiteID': SiteID},
+                    request=request)}
 
-    except Exception as e:
-        print('Error in save method')
-        print(e)
-        data = {'test': False, 'error': json.dumps(str(e))}
+    # except Exception as e:
+    #     print('Error in save method')
+    #     print(e)
+    #     data = {'test': False, 'error': json.dumps(str(e))}
     return HttpResponse(json.dumps(data), content_type='application/json')

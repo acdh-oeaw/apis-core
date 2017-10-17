@@ -163,7 +163,7 @@ class GenericRelationForm(forms.ModelForm):
                     attrs=attrs),
                 validators=[URLValidator])
             #self.fields['target_uri'] = forms.CharField(required=False, widget=forms.HiddenInput())
-        elif entity_type == lst_src_target[0].lower():
+        elif entity_type.lower() == lst_src_target[0].lower():
             self.rel_accessor = (lst_src_target[1], True,
                                  'related_{}'.format(lst_src_target[1].lower()),
                                  'related_{}'.format(lst_src_target[0].lower()))
@@ -179,7 +179,7 @@ class GenericRelationForm(forms.ModelForm):
                     url='/autocomplete/entities/{}'.format(lst_src_target[1].lower()),
                     attrs=attrs),
                 validators=[URLValidator])
-        elif entity_type == lst_src_target[1].lower():
+        elif entity_type.lower() == lst_src_target[1].lower():
             self.rel_accessor = (lst_src_target[0], False,
                                  'related_{}'.format(lst_src_target[0].lower()),
                                  'related_{}'.format(lst_src_target[1].lower()))
