@@ -92,7 +92,7 @@ def get_highlighted_texts(request, instance):
 ############################################################################
 ############################################################################
 
-
+@method_decorator(login_required, name='dispatch')
 class GenericListView(SingleTableView):
     filter_class = None
     formhelper_class = None
@@ -121,6 +121,7 @@ class GenericListView(SingleTableView):
         print('Kwargs: {}'.format(self.request))
 
 
+@method_decorator(login_required, name='dispatch')
 class GenericListViewNew(ExportMixin, SingleTableView):
     formhelper_class = GenericFilterFormHelper
     context_filter_name = 'filter'
