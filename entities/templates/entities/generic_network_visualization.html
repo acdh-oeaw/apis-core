@@ -444,7 +444,7 @@ var config = {
         show: 'clickNode',
         cssClass: 'sigma-tooltip',
         position: 'top',
-        hide: 'outNode',
+        hide: 'clickStage',
         renderer: function(node) {
           // The function context is s.graph
           // Returns an HTML string:
@@ -459,7 +459,6 @@ var config = {
     $.ApisNet.tooltip = sigma.plugins.tooltips($.ApisNet.instance, $.ApisNet.instance.renderers[0], config);
 //$.ApisNet.instance.bind("rightClickNode", delete_nodes);
     $.ApisNet.instance.bind("rightClickNode", select_unselect_node);
-
 
 };
 $('#id_select_relation').on("change", function(){

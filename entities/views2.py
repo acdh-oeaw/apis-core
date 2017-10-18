@@ -1,11 +1,13 @@
+from django.contrib.auth.decorators import login_required
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import Context
 from django.template.loader import select_template
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.contrib.contenttypes.models import ContentType
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import redirect, get_object_or_404
 from django_tables2 import RequestConfig
 from guardian.core import ObjectPermissionChecker
 from reversion.models import Version
@@ -17,9 +19,8 @@ from relations.tables import get_generic_relations_table, EntityLabelTable
 from .forms import get_entities_form, FullTextForm
 from highlighter.forms import SelectAnnotatorAgreement
 
-import re
 
-
+@method_decorator(login_required, name='dispatch')
 class GenericEntitiesEditView(View):
     @staticmethod
     def set_session_variables(request):
@@ -121,26 +122,20 @@ class GenericEntitiesEditView(View):
                 'form_text': form_text,
                 'instance': instance}))
 
-def person_create(request):
-    if request.method == "POST":
-        form = PersonForm(request.POST)
-        form_text = FullTextForm(request.POST, entity='Person')
-        if form.is_valid() and form_text.is_valid():
-            entity = form.save()
-            form_text.save(entity)
-            return redirect('entities:person_list')
+    def delete(self, request, *args, **kwargs):
+        entity = kwargs['entity']
+        pk = kwargs['pk']
+        entity_model = ContentType.objects.get(app_label='entities', model=entity).model_class()
+        instance = get_object_or_404(entity_model, pk=pk)
+        checker = ObjectPermissionChecker(request.user)
+        if checker.has_perm('delete_{}'.format(entity.lower()), instance):
+            instance.delete()
+            return HttpResponseRedirect(reverse())
         else:
-            return render(request, 'entities/person_create_generic.html', {
-                    'form': form,
-                    'form_text': form_text})
-    else:
-        form = PersonForm()
-        form_text = FullTextForm(entity='Person')
-        return render(request, 'entities/person_create_generic.html', {
-                'form': form,
-                'form_text': form_text})
+            raise Http404  # or return HttpResponse('404_url')
 
 
+@method_decorator(login_required, name='dispatch')
 class GenericEntitiesCreateView(View):
     def get(self, request, *args, **kwargs):
         entity = kwargs['entity']

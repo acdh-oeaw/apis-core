@@ -38,7 +38,8 @@ def get_generic_relations_table(relation, entity):
         def __init__(self, *args, entity='None', **kwargs):
             self.base_columns['delete'] = tables.TemplateColumn(template_name='delete_button_generic_ajax_form.html')
             self.base_columns['related_'+rel_ent.lower()] = tables.LinkColumn(
-                'entities:{}_edit'.format(rel_ent.lower()), args=[A('related_{}.pk'.format(rel_ent.lower()))])
+                'entities:generic_entities_edit_view', args=[rel_ent.lower(),
+                                                             A('related_{}.pk'.format(rel_ent.lower()))])
             if name[0] == name[1]:
                 self.base_columns['relation_type'] = tables.Column()
             else:

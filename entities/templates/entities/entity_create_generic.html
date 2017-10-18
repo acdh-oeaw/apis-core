@@ -8,7 +8,7 @@
 {% block content %}
 {% load crispy_forms_tags %}
 {% load django_tables2 %}
-<div class="row">
+<div class="row" xmlns="http://www.w3.org/1999/html">
     <div class="col-md-5">
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -36,7 +36,7 @@
                     {% block editbuttons %}
     {% if instance %}
     {% if "delete" in permissions %}
-        <a class ="btn btn-danger btn-primary" href="{% url 'entities:'|add:entity_type|add:'_delete' pk=instance.id %}">delete</a>
+                    <input class ="btn btn-danger btn-primary" type="submit" value="delete" />
     {% endif %}
     {% if "change" in permissions %}
     <input class="btn btn-primary" type="submit" value="modify" />
@@ -159,7 +159,6 @@
                     $('#tab_'+data.tab).append(data.form);
                     $(".form.ajax_form").unbind()
                     unbind_ajax_forms();
-                    captureAutocompleteEvent('autocomplete-ort-uri');
 
                 },
                 error: function(error) {
@@ -198,7 +197,6 @@
         };
         unbind_ajax_forms();
         unbind_compare_forms();
-        captureAutocompleteEvent('autocomplete-ort-uri');
     }
 </script>
     <script type="text/javascript">
@@ -207,7 +205,6 @@
             $.ApisHigh.tt_instance.content(response.form);
             $(".form.ajax_form").unbind()
             unbind_ajax_forms();
-            captureAutocompleteEvent('autocomplete-ort-uri');
         } else {
              $('#tab_'+response.tab+' div.table-container').remove();
              $('#tab_'+response.tab).prepend(response.table_html);
@@ -227,7 +224,6 @@
             $.ApisHigh.tt_instance.content(response.form);
             $(".form.ajax_form").unbind()
             unbind_ajax_forms();
-            captureAutocompleteEvent('autocomplete-ort-uri');
         } else {
              $('#htxt_'+response.text.id).html($.parseHTML(response.text.text))
              $.ApisHigh.tt_instance.close()
@@ -248,6 +244,10 @@
         $.ajax({
                 type: 'POST',
                 url: '{% url 'relations:get_form_ajax' %}',
+                beforeSend: function(request) {
+                  var csrftoken = getCookie('csrftoken');
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                  },
                 data: {'FormName':FormName,'SiteID':{{instance.pk}},'ObjectID':ObjectID,'ButtonText':ButtonText, 'entity_type': '{{entity_type}}'},
                 success: function(data) {
                     try {
@@ -260,7 +260,6 @@
                         }
                     $(".form.ajax_form").unbind()
                     unbind_ajax_forms();
-                    captureAutocompleteEvent('autocomplete-ort-uri');
                     $('#id_HL_start').val($.ApisHigh.selected_text.start);
                     $('#id_HL_end').val($.ApisHigh.selected_text.end);
                     $('#id_HL_text_id').val($.ApisHigh.selected_text.id);
@@ -347,40 +346,7 @@ function highlight_detail(event) {
     event.stopPropagation();
 }
 </script>
-<script type='text/javascript'>
-function captureAutocompleteEvent(inputClass) {
 
-$('input.'+inputClass).bind('selectChoice', function(e, choice, autocomplete) {
-    //console.log($(this).parents('.updHighl').attr("id"));
-
-    var id_1 = $(this).attr('id');
-    //var re_1 = /(.+)-name/g;
-    var id_2 = id_1+'_uri';
-    $(this).parents('.form-group').parent().find('#'+id_2).val(choice.attr('data-value'));
-    $(this).val(choice.attr('replace-text'));
-    
-});
-$('input.choicewidget').bind('selectChoice', function(e, choice, autocomplete) {
-    
-    $(this).css('display','none')
-    $( "span.remove" ).click(function( event ) {
-     $(this).parents('div').find('input').css('display','block')
-    $(this).parent().remove()
-    event.stopPropagation();
-  // Do something
-});
-    
-});
-$( "span.remove" ).click(function( event ) {
-     $(this).parents('div').find('input').css('display','block')
-    $(this).parent().remove()
-    event.stopPropagation();
-  // Do something
-});
-}
-
-
-</script>
 <script type='text/javascript'>
 $(document).ready(function() {
     $('body').on('change keyup', '#id_relation',function() {

@@ -108,7 +108,8 @@ class NetJsonNodeSerializer(serializers.BaseSerializer):
 
     def to_representation(self, obj):
         ent_obj = obj.__class__.__name__
-        ent_url = reverse_lazy('entities:{}_edit'.format(ent_obj.lower()), kwargs={'pk': str(obj.pk)})
+        ent_url = reverse_lazy('entities:generic_entities_edit_view', kwargs={'pk': str(obj.pk),
+                                                                              'entity': ent_obj.lower()})
         tt = """<div class='arrow'></div>
             <div class='sigma-tooltip-header'>{}</div>
             <div class='sigma-tooltip-body'>

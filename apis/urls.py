@@ -31,11 +31,6 @@ from highlighter.api_views import (
 from entities.views import ReversionCompareView
 from entities.autocomplete3 import (GenericEntitiesAutocomplete,
                                     GenericVocabulariesAutocomplete, GenericNetworkEntitiesAutocomplete)
-#from autocomplete_light import shortcuts as al
-#al.autodiscover()
-
-
-#schema_view = get_swagger_view(title='Apis API')
 
 router = routers.DefaultRouter()
 router.register(r'tempentity', TempEntityClassViewSet)

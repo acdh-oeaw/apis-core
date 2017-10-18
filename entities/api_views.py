@@ -162,15 +162,14 @@ class NetJsonViewSet(viewsets.ViewSet):
         if 'search_source' in request.data.keys():
             source = request.data['search_source']
             if source.startswith('cl:'):
-                print(int(source[3:]))
-                print(source)
                 if q_list is not None:
-                    q_list.append(Q(**{'collection__id': int(source[3:])}))
+                    q_list.append(Q(**{rel_a+'__collection__id': int(source[3:])})
+                                  | Q(**{rel_b+'__collection__id': int(source[3:])}))
                 else:
                     q_dict[rel_a+'__collection__id'] = int(source[3:])
             else:
                 if q_list is not None:
-                    q_list.append(Q(**{rel_a + '_id': int(source)})|Q(**{rel_b + '_id': int(source)}))
+                    q_list.append(Q(**{rel_a + '_id': int(source)}) | Q(**{rel_b + '_id': int(source)}))
                 else:
                     q_dict[rel_a + '_id'] = int(source)
         elif'search_source-autocomplete' in request.data.keys():
@@ -180,8 +179,14 @@ class NetJsonViewSet(viewsets.ViewSet):
             else:
                 q_dict[rel_a + '__name__icontains'] = source
         if 'search_target' in request.data.keys():
-            if len(request.data['search_target']) > 0:
-                target = request.data['search_target']
+            target = request.data['search_target']
+            if target.startswith('cl:'):
+                if q_list is not None:
+                    q_list.append(Q(**{rel_b+'__collection__id': int(target[3:])})
+                                  | Q(**{rel_a+'__collection__id': int(target[3:])}))
+                else:
+                    q_dict[rel_b+'__collection__id'] = int(target[3:])
+            else:
                 if q_list is not None:
                     q_list.append(Q(**{rel_a + '_id': int(target)}) | Q(**{rel_b + '_id': int(target)}))
                 else:

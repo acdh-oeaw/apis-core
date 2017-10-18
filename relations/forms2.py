@@ -135,7 +135,6 @@ class GenericRelationForm(forms.ModelForm):
         self.helper.form_class = '{}Form'.format(str(self.relation_form))
         self.helper.form_tag = False
         lst_src_target = re.findall('[A-Z][^A-Z]*', self.relation_form.__name__)
-        print(entity_type)
         if lst_src_target[0] == lst_src_target[1]:
             if instance and instance.id:
                 if getattr(instance, 'related_{}A_id'.format(lst_src_target[0].lower())) == int(siteID):
@@ -162,7 +161,6 @@ class GenericRelationForm(forms.ModelForm):
                     url='/autocomplete/entities/{}'.format(lst_src_target[1].lower()),
                     attrs=attrs),
                 validators=[URLValidator])
-            #self.fields['target_uri'] = forms.CharField(required=False, widget=forms.HiddenInput())
         elif entity_type.lower() == lst_src_target[0].lower():
             self.rel_accessor = (lst_src_target[1], True,
                                  'related_{}'.format(lst_src_target[1].lower()),
@@ -195,7 +193,6 @@ class GenericRelationForm(forms.ModelForm):
                     url='/autocomplete/entities/{}'.format(lst_src_target[0].lower()),
                     attrs=attrs),
                 validators=[URLValidator])
-            #self.fields['target_uri'] = forms.CharField(required=False, widget=forms.HiddenInput())
         else:
             print('no hit rel_accessor')
         if instance and instance.id:
@@ -212,16 +209,6 @@ class GenericRelationForm(forms.ModelForm):
                 self.fields['relation_type'].choices = [(instance.relation_type.id,
                                                          instance.relation_type.label_reverse)]
                 self.fields['relation_type'].initial = (instance.relation_type.id, instance.relation_type.label_reverse)
-                # if self.rel_accessor[1]:
-            #     auto_acc = 'VC{}{}Autocomplete'.format(lst_src_target[0], lst_src_target[1])
-            #     auto_choices = [instance.relation_type.label]
-            # else:
-            #     auto_acc = 'VC{}{}ReverseAutocomplete'.format(lst_src_target[0], lst_src_target[1])
-            #     auto_choices = [instance.relation_type.label_reverse]
-            # self.fields['relation_type'].widget = al.ChoiceWidget(
-            #     auto_acc,
-            #     extra_context={'values': [instance.relation_type.pk],
-            #                    'choices': auto_choices})
         if highlighter:
             css_notes = 'HL'
 
