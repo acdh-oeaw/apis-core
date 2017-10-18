@@ -66,7 +66,7 @@ $(function(){
     {% if instance %}
     {% get_obj_perms request.user for instance as "instance_perms" %}
     {% if "delete_event" in instance_perms %}
-        <a class ="btn btn-danger btn-primary" href="{% url 'entities:event_delete' pk=instance.id %}">delete</a>
+        <input class="btn btn-danger btn-primary" type="submit" value="delete" />
     {% endif %}
     {% if "change_event" in instance_perms %}
     <input class="btn btn-primary" type="submit" value="modify" />
