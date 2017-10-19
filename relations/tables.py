@@ -51,7 +51,6 @@ def get_generic_relations_table(relation, entity):
     return GenericRelationsTable
 
 
-
 class PersonInstitutionTable(tables.Table):
     delete = tables.TemplateColumn(template_name='delete_button_persInstitution_ajax_form.html')
     related_institution = tables.LinkColumn('entities:institution_edit', args=[A('related_institution.pk')])

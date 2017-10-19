@@ -35,9 +35,47 @@ def get_generic_list_filter(entity):
             :return: filtered queryset
             """
             alternate_names = getattr(settings, "APIS_ALTERNATE_NAMES", ['alternative name'])
-            return queryset.filter(Q(name__icontains=value) |
-                                   Q(label__label__icontains=value,
-                                     label__label_type__name__in=alternate_names)).distinct()
+            res = []
+            orig_value = value
+            for n in ['name', 'label__label']:
+                value = orig_value
+                f = '{}__'.format(n)
+                if value.startswith('"') and value.endswith('"'):
+                    value = value[1:-1]
+                else:
+                    f += 'i'
+                if value.startswith('*') and value.endswith('*'):
+                    f += 'contains'
+                    value = value[1:-1]
+                elif value.startswith('*'):
+                    f += 'endswith'
+                    value = value[1:]
+                elif value.endswith('*'):
+                    f += 'startswith'
+                    value = value[:-1]
+                else:
+                    f += 'exact'
+                res.append(Q(**{f: value}))
+            return queryset.filter(res[0] | res[1], label__label_type__name__in=alternate_names).distinct()
+
+        def wildcard_filter(self, queryset, name, value):
+            f = '{}__'.format(name)
+            if value.startswith('"') and value.endswith('"'):
+                value = value[1:-1]
+            else:
+                f += 'i'
+            if value.startswith('*') and value.endswith('*'):
+                f += 'contains'
+                value = value[1:-1]
+            elif value.startswith('*'):
+                f += 'endswith'
+                value = value[1:]
+            elif value.endswith('*'):
+                f += 'startswith'
+                value = value[:-1]
+            else:
+                f += 'exact'
+            return queryset.filter(**{f: value})
 
         class Meta:
             model = ContentType.objects.get(app_label='entities', model=entity.lower()).model_class()
@@ -61,9 +99,11 @@ def get_generic_list_filter(entity):
             super(GenericListFilter, self).__init__(*args, **kwargs)
             if 'list_filters' in settings.APIS_ENTITIES[entity.title()].keys():
                 for f in settings.APIS_ENTITIES[entity.title()]['list_filters']:
-                    print(self.filters[f[0]].filter)
+                    print(self.filters[f[0]].widget.__class__)
+                    #self.filters[f[0]].widget.__class__ = 'form-control'
                     for ff in f[1].keys():
                         setattr(self.filters[f[0]], ff, f[1][ff])
+
     return GenericListFilter
 
 
