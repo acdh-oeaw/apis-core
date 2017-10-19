@@ -55,7 +55,10 @@ def get_generic_list_filter(entity):
                     value = value[:-1]
                 else:
                     f += 'exact'
-                res.append(Q(**{f: value, 'label__label_type__name__in': alternate_names}))
+                if n == 'label__label':
+                    res.append(Q(**{f: value, 'label__label_type__name__in': alternate_names}))
+                else:
+                    res.append(Q(**{f: value}))
             return queryset.filter(res[0] | res[1] ).distinct()
 
         def wildcard_filter(self, queryset, name, value):
