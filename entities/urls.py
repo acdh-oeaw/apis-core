@@ -6,6 +6,8 @@ url(r'^entity/(?P<entity>[a-z]+)/(?P<pk>[0-9]+)/edit$', views2.GenericEntitiesEd
     name='generic_entities_edit_view'),
 url(r'^entity/(?P<entity>[a-z]+)/create$', views2.GenericEntitiesCreateView.as_view(),
     name='generic_entities_create_view'),
+url(r'^entity/(?P<entity>[a-z]+)/(?P<pk>[0-9]+)/delete$', views2.GenericEntitiesDeleteView.as_view(),
+    name='generic_entities_delete_view'),
 url(r'^entity/(?P<entity>[a-z]+)/list/$', views.GenericListViewNew.as_view(), name='generic_entities_list'),
 url(r'^place/geojson/$', views.getGeoJson, name='getGeoJson'),
 url(r'^place/geojson/list/$', views.getGeoJsonList, name='getGeoJsonList'),

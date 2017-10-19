@@ -3,11 +3,12 @@ from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import Context
 from django.template.loader import select_template
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import redirect, get_object_or_404
+from django.views.generic import DeleteView
 from django_tables2 import RequestConfig
 from guardian.core import ObjectPermissionChecker
 from reversion.models import Version
@@ -82,8 +83,8 @@ class GenericEntitiesEditView(View):
         side_bar.append(('Label', tb_label, 'PersonLabel', tb_label_open))
         RequestConfig(request, paginate={"per_page": 10}).configure(tb_label)
         perm = ObjectPermissionChecker(request.user)
-        permissions = {'change': perm.has_perm('change_'.format(entity), instance),
-                       'delete': perm.has_perm('delete_'.format(entity), instance),
+        permissions = {'change': perm.has_perm('change_{}'.format(entity), instance),
+                       'delete': perm.has_perm('delete_{}'.format(entity), instance),
                        'create': request.user.has_perm('entities.add_{}'.format(entity))}
         template = select_template(['entities/{}_create_generic.html'.format(entity),
                                     'entities/entity_create_generic.html'])
@@ -122,18 +123,6 @@ class GenericEntitiesEditView(View):
                 'form_text': form_text,
                 'instance': instance}))
 
-    def delete(self, request, *args, **kwargs):
-        entity = kwargs['entity']
-        pk = kwargs['pk']
-        entity_model = ContentType.objects.get(app_label='entities', model=entity).model_class()
-        instance = get_object_or_404(entity_model, pk=pk)
-        checker = ObjectPermissionChecker(request.user)
-        if checker.has_perm('delete_{}'.format(entity.lower()), instance):
-            instance.delete()
-            return HttpResponseRedirect(reverse())
-        else:
-            raise Http404  # or return HttpResponse('404_url')
-
 
 @method_decorator(login_required, name='dispatch')
 class GenericEntitiesCreateView(View):
@@ -169,3 +158,15 @@ class GenericEntitiesCreateView(View):
                 'permissions': permissions,
                 'form': form,
                 'form_text': form_text}))
+
+
+@method_decorator(login_required, name='dispatch')
+class GenericEntitiesDeleteView(DeleteView):
+    model = ContentType.objects.get(app_label='metainfo', model='tempentityclass').model_class()
+    template_name = 'webpage/confirm_delete.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        entity = kwargs['entity']
+        self.success_url = reverse('entities:generic_entities_list', kwargs={'entity': entity})
+        return super(GenericEntitiesDeleteView, self).dispatch(request, *args, **kwargs)
+
