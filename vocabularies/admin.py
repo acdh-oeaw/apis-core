@@ -7,7 +7,8 @@ from .models import (
     InstitutionInstitutionRelation, TextType, InstitutionPlaceRelation,
     PlacePlaceRelation, VocabsUri, CollectionType,
     InstitutionEventRelation, PlaceEventRelation, PersonWorkRelation,
-    InstitutionWorkRelation, PlaceWorkRelation, EventWorkRelation, WorkType
+    InstitutionWorkRelation, PlaceWorkRelation, EventWorkRelation, WorkType,
+    WorkWorkRelation
     )
 
 
@@ -63,6 +64,7 @@ admin.site.register(PersonWorkRelation, BaseAdminVocabularies)
 admin.site.register(InstitutionWorkRelation, BaseAdminVocabularies)
 admin.site.register(PlaceWorkRelation, BaseAdminVocabularies)
 admin.site.register(EventWorkRelation, BaseAdminVocabularies)
+admin.site.register(WorkWorkRelation, BaseAdminVocabularies)
 admin.site.register(WorkType, BaseAdminVocabularies)
 
 admin.site.register(CollectionType)

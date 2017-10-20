@@ -641,5 +641,40 @@ class WorkWork(TempEntityClass):
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
+    def get_table_dict(self, entity):
+        """Dict for the tabels in the html view
+
+        :param entity: Object of type :class:`entities.models.Place`; Used to determine which Place is the main antity
+            and which one the related.
+        :return:
+        """
+        if self.related_workA == entity:
+            rel_work = self.related_workB
+            rel_type = self.relation_type.name
+        elif self.related_workB == entity:
+            rel_work = self.related_workA
+            rel_type = self.relation_type.name_reverse
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': rel_type,
+            'related_work': rel_work,
+            'start_date': self.start_date,
+            'end_date': self.end_date}
+        return result
+
+    def get_web_object(self):
+        """Used in some html views.
+
+        :return: Dict with object properties
+        """
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': self.relation_type.name,
+            'related_workA': self.related_workA.name,
+            'related_workB': self.related_workB.name,
+            'start_date': self.start_date_written,
+            'end_date': self.end_date_written}
+        return result
+
     def __str__(self):
-        return "{} ({}) {}".format(self.related_work, self.relation_type, self.related_work)
+        return "{} ({}) {}".format(self.related_workA, self.relation_type, self.related_workB)
