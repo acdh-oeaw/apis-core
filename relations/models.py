@@ -637,11 +637,9 @@ class WorkWork(TempEntityClass):
     related_workA = models.ForeignKey(
         Work, blank=True, null=True, related_name="related_workA")
     related_workB = models.ForeignKey(
-        Event, blank=True, null=True, related_name="related_workB")
+        Work, blank=True, null=True, related_name="related_workB")
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
         return "{} ({}) {}".format(self.related_work, self.relation_type, self.related_work)
-
-

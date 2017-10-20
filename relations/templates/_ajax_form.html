@@ -1,0 +1,11 @@
+
+<div id="div_{{type1}}{{InstanceID}}">
+<form action="{% if ObjectID %}{% url 'relations:save_ajax_form' entity_type type1 SiteID ObjectID %}{% else %}{% url 'relations:save_ajax_form' entity_type type1 SiteID %}{% endif %}" enctype="multipart/form-data" method="post" id="form_{{type1}}" class="form ajax_form {{url2}}" data-replace="#message-form">
+    {% load crispy_forms_tags %}
+    {% crispy form form.helper %}
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-sm">{{button_text}}</button>
+    </div>
+   
+</form>
+</div>

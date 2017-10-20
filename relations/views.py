@@ -15,7 +15,7 @@ from .forms import PersonLabelForm
 from highlighter.models import Annotation
 from .models import (PersonPlace, PersonPerson, PersonInstitution, InstitutionPlace,
                      InstitutionInstitution, PlacePlace, PersonEvent, InstitutionEvent, PlaceEvent, PersonWork,
-                     InstitutionWork, PlaceWork, EventWork)
+                     InstitutionWork, PlaceWork, EventWork, WorkWork)
 from .tables import PersonInstitutionTable
 from relations.tables import (PersonInstitutionTable, PersonPersonTable, PersonPlaceTable,
                               EntityLabelTable, InstitutionPlaceTable, InstitutionInstitutionTable,
@@ -47,7 +47,8 @@ from copy import deepcopy
 
 
 # Model-classes must be registered together with their ModelForm-classes
-registered_forms = {'PersonPlaceForm': [PersonPlace, Person, Place],
+registered_forms = {'WorkWorkForm': [WorkWork, Work, Work],
+                    'PersonPlaceForm': [PersonPlace, Person, Place],
                     'PersonPlaceHighlighterForm': [PersonPlace, Person, Place],
                     'PersonPersonForm': [PersonPerson, Person, Person],
                     'PersonPersonHighlighterForm': [PersonPerson, Person, Person],
