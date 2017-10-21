@@ -36,8 +36,8 @@ def harmonize_geonames_id(uri):
     elif uri.startswith("http://geonames.org/"):
         geo_id = "".join(re.findall(r'\d', uri))
         return "http://sws.geonames.org/{}".format(geo_id)
-    elif uri.endswith('/'):
-        return uri[:-1]
+    # elif uri.endswith('/'):
+    #     return uri[:-1]
 
     else:
         return uri
