@@ -828,8 +828,10 @@ def getGeoJsonList(request):
             related_place__status='distinct').select_related('related_person', 'related_place', 'relation_type')
     lst_json = []
     for x in objects:
-        pers_url = reverse_lazy('entities:person_edit', kwargs={'pk': str(x.related_person.pk)})
-        place_url = reverse_lazy('entities:place_edit', kwargs={'pk': str(x.related_place.pk)})
+        pers_url = reverse_lazy('entities:generic_entities_edit_view', kwargs={'pk': str(x.related_person.pk),
+                                                                               'entity': 'person'})
+        place_url = reverse_lazy('entities:generic_entities_edit_view', kwargs={'pk': str(x.related_place.pk),
+                                                                                'entity': 'place'})
         r = {"geometry": {
                         "type": "Point",
                         "coordinates": [x.related_place.lng, x.related_place.lat]
