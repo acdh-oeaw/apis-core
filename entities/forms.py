@@ -7,6 +7,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from crispy_forms.layout import Layout
 from crispy_forms.bootstrap import Accordion, AccordionGroup
+from django.forms import ModelMultipleChoiceField
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.db.models.fields import BLANK_CHOICE_DASH
@@ -52,9 +53,27 @@ def get_entities_form(entity):
                         'references',
                         'notes',
                         'review')
+            attrs = {'data-placeholder': 'Type to get suggestions',
+                     'data-minimum-input-length': 3,
+                     'data-html': True}
             for f in self.fields.keys():
+                if type(self.fields[f]) == ModelMultipleChoiceField:
+                    v_name_p = str(self.fields[f].queryset.model.__name__)
+                    self.fields[f].widget = autocomplete.Select2Multiple(
+                        url=reverse('generic_vocabularies_autocomplete', kwargs={
+                            'vocab': v_name_p.lower(),
+                            'direct': 'normal'
+                        }),
+                        attrs=attrs)
+                    if self.instance:
+                        res = []
+                        for x in getattr(self.instance, f).all():
+                            res.append((x.pk, x.name))
+                        self.fields[f].choices = res
+                        self.fields[f].initial = res
                 if f not in acc_grp2:
                     acc_grp1.append(f)
+
             self.helper.layout = Layout(
                 Accordion(
                     acc_grp1,

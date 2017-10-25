@@ -80,20 +80,16 @@ class GenericRelationForm(forms.ModelForm):
         return self.cleaned_data['HL_text_id'][5:]
 
     def get_html_table(self, entity_type, request, site_instance, form_match):
-        #table = globals()[self.relation_form.__name__+'Table']
-        print('table function called')
         table = get_generic_relations_table(self.relation_form.__name__, entity_type)
         prefix = re.match(r'([A-Z][a-z])[^A-Z]*([A-Z][a-z])', self.relation_form.__name__)
         prefix = prefix.group(1)+prefix.group(2)+'-'
         if form_match.group(1) == form_match.group(2):
-            print('went through same')
             list_rel = []
             dic_a = {'related_'+entity_type.lower()+'A': site_instance}
             dic_b = {'related_' + entity_type.lower() + 'B': site_instance}
             for x in self.relation_form.annotation_links.filter_ann_proj(request=request).filter(
                             Q(**dic_a) | Q(**dic_b)):
                 list_rel.append(x.get_table_dict(site_instance))
-            print('list_rel: {}'.format(list_rel))
             table_html = table(list_rel, prefix=prefix)
         else:
             tab_query = {'related_'+entity_type.lower(): site_instance}
@@ -212,6 +208,7 @@ class GenericRelationForm(forms.ModelForm):
         if highlighter:
             css_notes = 'HL'
 
+        self.helper.include_media = False
         self.helper.layout = Layout(
             'relation_type',
             'target',

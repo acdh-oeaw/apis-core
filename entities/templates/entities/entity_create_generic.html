@@ -3,6 +3,7 @@
 {% endblock %}
 {% block Titel %}Create a Person{% endblock %}
 {% load guardian_tags %}
+{% load static %}
 {% load crispy_forms_tags %}
 
 {% block content %}
@@ -152,7 +153,6 @@
         if (ObjectID === undefined) {
         ObjectID = false;
         if ($.ApisForms[FormName+'_'+'{{entity_type}}']) {
-          console.log('got it');
           var new_data = $.ApisForms[FormName+'_'+'{{entity_type}}']
           new_data.form = new_data.form
               .replace('##ENT_PK##', {{instance.pk}});
@@ -163,7 +163,7 @@
         if (ButtonText === undefined) {
         ButtonText = 'create/modify';
         };
-        $.ajax({
+        return $.ajax({
                 type: 'POST',
                 url: '{% url 'relations:get_form_ajax' %}',
             beforeSend: function(request) {
@@ -253,12 +253,46 @@
 </script>
 <script type="text/javascript">
     function GetFormAjaxHighl(FormName, ObjectID, ButtonText) {
-        if (ObjectID === undefined) {
-        ObjectID = false;
+        console.log(event);
+        function add_form_highl(data, ajax) {
+            if (!ajax) {
+                console.log('adding fields');
+                var hidden_forms = '<input type=\"hidden\" name=\"HL_start\" id=\"id_HL_start\" /> <input type=\"hidden\" name=\"HL_end\" id=\"id_HL_end\" /> <input type=\"hidden\" name=\"HL_text_id\" id=\"id_HL_text_id\" />'
+                data.form = data.form.replace('<div class=\"form-actions\">', hidden_forms+'<div class=\"form-actions\">')
+            };
+            try {
+                if ($.ApisHigh.tt_instance["__state"] == 'stable') {
+                    $.ApisHigh.tt_instance.content(data.form);
+                    console.log('instance content')} else {
+                    $.ApisHigh.tt_instance_detail.content(data.form);
+                    };
+                    }
+                catch (err){
+                $.ApisHigh.tt_instance_detail.content(data.form)
+                    }
+                $(".form.ajax_form").unbind()
+                unbind_ajax_forms();
+
+                $('#id_HL_start').val($.ApisHigh.selected_text.start);
+                $('#id_HL_end').val($.ApisHigh.selected_text.end);
+                $('#id_HL_text_id').val($.ApisHigh.selected_text.id);
+                console.log('correct run');
         };
         if (ButtonText === undefined) {
         ButtonText = 'create/modify';
         };
+        if (ObjectID === undefined) {
+        ObjectID = false;
+        var FormName2 = FormName.replace('HighlighterForm', 'Form');
+        if ($.ApisForms[FormName2+'_'+'{{entity_type}}']) {
+          var new_data = $.extend(true, {}, $.ApisForms[FormName2+'_'+'{{entity_type}}']);
+          new_data.form = new_data.form
+              .replace(new RegExp('##ENT_PK##', 'g'), {{instance.pk}});
+          new_data.form = new_data.form
+              .replace(new RegExp(FormName2, 'g'), FormName);
+          add_form_highl(new_data, false);
+        };
+        } else {
         $.ajax({
                 type: 'POST',
                 url: '{% url 'relations:get_form_ajax' %}',
@@ -268,22 +302,10 @@
                   },
                 data: {'FormName':FormName,'SiteID':{{instance.pk}},'ObjectID':ObjectID,'ButtonText':ButtonText, 'entity_type': '{{entity_type}}'},
                 success: function(data) {
-                    try {
-                    if ($.ApisHigh.tt_instance["__state"] == 'stable') {
-                        $.ApisHigh.tt_instance.content(data.form) } else {
-                        $.ApisHigh.tt_instance_detail.content(data.form)
-                        };
-                        }
-                    catch (err){$.ApisHigh.tt_instance_detail.content(data.form)
-                        }
-                    $(".form.ajax_form").unbind()
-                    unbind_ajax_forms();
-                    $('#id_HL_start').val($.ApisHigh.selected_text.start);
-                    $('#id_HL_end').val($.ApisHigh.selected_text.end);
-                    $('#id_HL_text_id').val($.ApisHigh.selected_text.id);
+                    add_form_highl(data, true);
                 }
-            });
-    }
+            });}
+    };
 </script>
 <script type='text/javascript'>
     function DeleteTempEntity(pk, kind) {
@@ -367,6 +389,11 @@ function highlight_detail(event) {
 
 <script type='text/javascript'>
 $(document).ready(function() {
+    $("body").on("click", "a.con-menu-item", function(event){
+        event.stopPropagation();
+       var endpoint = $(this).data('endpoint');
+       GetFormAjaxHighl(endpoint);
+    });
     $('body').on('change keyup', '#id_relation',function() {
         $(this).yourlabsWidget().autocomplete.data = {
                 'instance_pk': {{instance.pk}},

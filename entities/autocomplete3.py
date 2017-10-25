@@ -17,6 +17,8 @@ from functools import reduce
 import dateutil.parser
 import re
 
+from vocabularies.models import VocabsBaseClass
+
 
 class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
 
@@ -110,8 +112,11 @@ class GenericVocabulariesAutocomplete(autocomplete.Select2ListView):
         q = self.q
         vocab_model = ContentType.objects.get(app_label='vocabularies', model=vocab).model_class()
         if direct == 'normal':
-            choices = [{'id': x.pk, 'text': x.label} for x in vocab_model.objects.filter(
-                Q(name__icontains=q) | Q(name_reverse__icontains=q))]
+            if vocab_model.__bases__[0] == VocabsBaseClass:
+                choices = [{'id': x.pk, 'text': x.name} for x in vocab_model.objects.filter(name__icontains=q)]
+            else:
+                choices = [{'id': x.pk, 'text': x.label} for x in vocab_model.objects.filter(
+                    Q(name__icontains=q) | Q(name_reverse__icontains=q))]
         elif direct == 'reverse':
             choices = [{'id': x.pk, 'text': x.label_reverse} for x in vocab_model.objects.filter(
                 Q(name__icontains=q) | Q(name_reverse__icontains=q))]
