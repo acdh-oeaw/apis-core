@@ -59,12 +59,13 @@ def get_entities_form(entity):
             for f in self.fields.keys():
                 if type(self.fields[f]) == ModelMultipleChoiceField:
                     v_name_p = str(self.fields[f].queryset.model.__name__)
-                    self.fields[f].widget = autocomplete.Select2Multiple(
-                        url=reverse('generic_vocabularies_autocomplete', kwargs={
-                            'vocab': v_name_p.lower(),
-                            'direct': 'normal'
-                        }),
-                        attrs=attrs)
+                    if ContentType.objects.get(model=v_name_p.lower()).app_label.lower() == 'vocabularies':
+                        self.fields[f].widget = autocomplete.Select2Multiple(
+                            url=reverse('generic_vocabularies_autocomplete', kwargs={
+                                'vocab': v_name_p.lower(),
+                                'direct': 'normal'
+                            }),
+                            attrs=attrs)
                     if self.instance:
                         res = []
                         for x in getattr(self.instance, f).all():

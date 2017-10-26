@@ -1,4 +1,8 @@
 import django_filters
+from dal import autocomplete
+from django.forms import ModelMultipleChoiceField
+from django.urls import reverse
+
 from .models import Person, Place, Institution, Event, Work
 from django.db.models import Q
 from django.conf import settings
@@ -99,13 +103,25 @@ def get_generic_list_filter(entity):
                            'text')
 
         def __init__(self, *args, **kwargs):
+            attrs = {'data-placeholder': 'Type to get suggestions',
+                     'data-minimum-input-length': 3,
+                     'data-html': True}
             super(GenericListFilter, self).__init__(*args, **kwargs)
             if 'list_filters' in settings.APIS_ENTITIES[entity.title()].keys():
                 for f in settings.APIS_ENTITIES[entity.title()]['list_filters']:
-                    print(self.filters[f[0]].widget.__class__)
-                    #self.filters[f[0]].widget.__class__ = 'form-control'
                     for ff in f[1].keys():
                         setattr(self.filters[f[0]], ff, f[1][ff])
+            for f in self.filters.keys():
+                if type(self.filters[f].field) == ModelMultipleChoiceField:
+                    v_name_p = str(self.filters[f].queryset.model.__name__)
+                    if ContentType.objects.get(model=v_name_p.lower()).app_label.lower() == 'vocabularies':
+                        self.filters[f].field.widget = autocomplete.Select2Multiple(
+                            url=reverse('generic_vocabularies_autocomplete', kwargs={
+                                'vocab': v_name_p.lower(),
+                                'direct': 'normal'
+                            }),
+                            attrs=attrs)
+
 
     return GenericListFilter
 
