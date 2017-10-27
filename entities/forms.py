@@ -68,8 +68,11 @@ def get_entities_form(entity):
                             attrs=attrs)
                     if self.instance:
                         res = []
-                        for x in getattr(self.instance, f).all():
-                            res.append((x.pk, x.name))
+                        try:
+                            for x in getattr(self.instance, f).all():
+                                res.append((x.pk, x.name))
+                        except ValueError:
+                            pass
                         self.fields[f].choices = res
                         self.fields[f].initial = res
                 if f not in acc_grp2:
@@ -82,6 +85,7 @@ def get_entities_form(entity):
                     )
             )
             self.fields['status'].required = False
+            self.fields['collection'].required = False
             self.fields['start_date_written'].required = False
             self.fields['end_date_written'].required = False
     return GenericEntitiesForm

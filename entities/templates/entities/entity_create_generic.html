@@ -1,5 +1,12 @@
 {% extends "webpage/base.html" %}
+{% load staticfiles %}
 {% block scriptHeader %}
+<link href="/static/autocomplete_light/vendor/select2/dist/css/select2.css" type="text/css" media="all" rel="stylesheet" />
+<link href="/static/autocomplete_light/select2.css" type="text/css" media="all" rel="stylesheet" />
+<script type="text/javascript" src="/static/autocomplete_light/jquery.init.js"></script>
+<script type="text/javascript" src="/static/autocomplete_light/autocomplete.init.js"></script>
+<script type="text/javascript" src="/static/autocomplete_light/vendor/select2/dist/js/select2.full.js"></script>
+<script type="text/javascript" src="/static/autocomplete_light/select2.js"></script>
 {% endblock %}
 {% block Titel %}Create a Person{% endblock %}
 {% load guardian_tags %}
@@ -79,7 +86,7 @@
             <div class="panel-heading">
                 <h3>related to</h3>
             </div>
-            <div class="panel-body"> 
+            <div class="panel-body">
                 <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
                 {% block additional_accordion %}
                 {% endblock %}
@@ -99,8 +106,8 @@
                         </div>
                     </div>
                     {% endfor %}
-                </div>   
-                </div>            
+                </div>
+                </div>
             </div>
         </div>
     </div>
@@ -208,7 +215,7 @@
              if ($.ApisHigh.tt_instance_detail["__state"] == 'stable') {
                 $.ApisHigh.tt_instance_detail.close()
              } else {
-             
+
              $('.reldelete').addClass('disabled')
              }}
              {% endif %}
@@ -316,7 +323,7 @@
             statusCode : {
                 204: function() {
                     if (kind=='HLAnnotation') {
-                        $('*[data-hl-ann-id="'+pk+'"]').contents().unwrap() 
+                        $('*[data-hl-ann-id="'+pk+'"]').contents().unwrap()
                     } else {
                     $('#tempEntity_'+pk).parents('tr').remove()
                 }
