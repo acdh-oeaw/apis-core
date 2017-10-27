@@ -135,6 +135,7 @@ class GenericEntitiesCreateView(View):
         template = select_template(['entities/{}_create_generic.html'.format(entity),
                                     'entities/entity_create_generic.html'])
         return HttpResponse(template.render(request=request, context={
+            'entity_type': entity,
             'permissions': permissions,
             'form': form,
             'form_text': form_text}))
@@ -169,4 +170,3 @@ class GenericEntitiesDeleteView(DeleteView):
         entity = kwargs['entity']
         self.success_url = reverse('entities:generic_entities_list', kwargs={'entity': entity})
         return super(GenericEntitiesDeleteView, self).dispatch(request, *args, **kwargs)
-
