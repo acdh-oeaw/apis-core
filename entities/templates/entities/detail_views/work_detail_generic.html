@@ -89,6 +89,15 @@
                             </div>
                         {% endif %}
                     {% endfor %}
+                    {% if object.work_depicted_by.all %}
+                        <legend>Images</legend>
+                        {% for x in object.work_depicted_by.all %}
+                            <li>
+                                {{ x }}
+                            </li>
+                        {% endfor %}
+                    {% endif %}
+
                 </div>
             </div>
             <div class="col-md-6">
@@ -123,7 +132,9 @@
                         </script>
                     </div>
                 {% else %}
-                    <legend>No text provided for this Work</legend>
+                    <div class="panel-body">
+                        <legend>No text provided for this Work</legend>
+                    </div>
                 {% endif %}
             </div>
         </div>
