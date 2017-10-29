@@ -29,7 +29,7 @@ class GenericEntitiesDetailView(View):
             print(str(rel))
             match = str(rel).split()
             prefix = "{}{}-".format(match[0].title()[:2], match[1].title()[:2])
-            table = get_generic_relations_table(''.join(match), entity)
+            table = get_generic_relations_table(''.join(match), entity, detail=True)
             title_panel = ''
             if match[0] == match[1]:
                 title_panel = entity.title()

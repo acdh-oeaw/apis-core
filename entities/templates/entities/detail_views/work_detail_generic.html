@@ -2,8 +2,10 @@
 {% load staticfiles %}
 {% load django_tables2 %}
 {% block Titel %} {{ object.id }} {% endblock %}
-{% block content %}
 
+{% block content %}
+<link rel="stylesheet" href="http://teic.github.io/CETEIcean/css/CETEIcean.css" media="screen" charset="utf-8">
+<script src="http://teic.github.io/CETEIcean/js/CETEI.js"></script>
 <div class="container">
     <div class="panel panel-default procustom-panel-create">
         <div class="panel-heading procustom-panel-heading">
@@ -35,58 +37,95 @@
                 </div>
             </div>
         </div>
-        <div class="panel-body">
-            <legend>General Info</legend>
-            <table class="table table-bordered table-hover">
-                <tr>
-                    <th>
-                        Titel
-                    </th>
-                    <td>
-                        {{ object.name }}
-                    </td>
-                </tr>
-                <tr>
-                    <th>
-                        Type
-                    </th>
-                    <td>
-                        {{ object.kind}}
-                    </td>
-                </tr>
-                {% if object.start_date or object.end_date %}
-                <tr>
-                    <th>
-                        Date
-                    </th>
-                    <td>
-                        {% if object.start_date %}
-                            <abbr title="{{ object.start_date_written }}">{{ object.start_date }}</abbr>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel-body">
+                    <legend>General Info</legend>
+                    <table class="table table-bordered table-hover">
+                        <tr>
+                            <th>
+                                Titel
+                            </th>
+                            <td>
+                                {{ object.name }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>
+                                Type
+                            </th>
+                            <td>
+                                {{ object.kind}}
+                            </td>
+                        </tr>
+                        {% if object.start_date or object.end_date %}
+                        <tr>
+                            <th>
+                                Date
+                            </th>
+                            <td>
+                                {% if object.start_date %}
+                                    <abbr title="{{ object.start_date_written }}">{{ object.start_date }}</abbr>
+                                {% endif %}
+                                {% if object.end_date %}
+                                    - <abbr title="{{ object.end_date_written }}">{{ object.end_date }}</abbr>
+                                {% endif %}
+                            </td>
+                        </tr>
                         {% endif %}
-                        {% if object.end_date %}
-                            - <abbr title="{{ object.end_date_written }}">{{ object.end_date }}</abbr>
+                    </table>
+                    <legend>Relations</legend>
+                    {% for obj in right_panel %}
+                        {% if obj.1.data|length > 0 %}
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title"> {{ obj.0 }}</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div id="tab_{{ obj.2 }}" class="panel-body">
+                                            {% render_table obj.1 %}
+                                    </div>
+                                </div>
+                            </div>
                         {% endif %}
-                    </td>
-                </tr>
-                {% endif %}
-            </table>
-            <legend>Relations</legend>
-            {% for obj in right_panel %}
-                <div class="panel panel-default">
-                    <div class="panel-heading" role="tab" id="heading{{forloop.counter}}">
-                        <h4 class="panel-title">
-                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{forloop.counter}}" aria-expanded="true" aria-controls="collapse{{forloop.counter}}">
-                                {{ obj.0 }}
-                            </a>
-                        </h4>
-                    </div>
-                    <div id="collapse{{forloop.counter}}" class="panel-collapse collapse{% if obj.3 %} in{% endif %}" role="tabpanel" aria-labelledby="heading{{forloop.counter}}">
-                        <div id="tab_{{ obj.2 }}" class="panel-body">
-                            {% render_table obj.1 %}
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
-            {% endfor %}
+            </div>
+            <div class="col-md-6">
+                {% if object.text.all %}
+                    <div class="panel-body">
+                        <legend>
+                            Text as TEI
+                        </legend>
+                        {% for x in object.text.all %}
+                        <div id="TEI">
+                            hansi
+                        </div>
+                            <div class="panel panel-default">
+                                <div class="panel-heading">
+                                    <h4 class="panel-title"> {{ x.kind }}</h4>
+                                </div>
+                                <div class="panel-body">
+                                    <div class="panel-body" id="sourctei">
+                                            {{ x.text }}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        <script>
+                            var CETEIcean = new CETEI();
+                            var teiString = $("#sourctei").text();
+                            CETEIcean.makeHTML5(teiString, function(data) {
+                                document.getElementById("TEI").innerHTML = "";
+                                document.getElementById("TEI").appendChild(data);
+                                CETEIcean.addStyle(document, data);
+                            });
+                        </script>
+                    </div>
+                {% else %}
+                    <legend>No text provided for this Work</legend>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
