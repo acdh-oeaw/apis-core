@@ -13,7 +13,7 @@ from entities.views import get_highlighted_texts
 from .models import Work
 from labels.models import Label
 from metainfo.models import Uri
-from relations.tables import get_generic_relations_table, EntityLabelTable
+from relations.tables import get_generic_relations_table, EntityLabelTable, EntityDetailViewLabelTable
 
 
 class GenericEntitiesDetailView(View):
@@ -56,11 +56,14 @@ class GenericEntitiesDetailView(View):
         object_lod = Uri.objects.filter(entity=instance)
         object_texts, ann_proj_form = get_highlighted_texts(request, instance)
         object_labels = Label.objects.filter(temp_entity=instance)
-        tb_label = EntityLabelTable(object_labels, prefix=entity.title()[:2]+'L-')
+        tb_label = EntityDetailViewLabelTable(object_labels, prefix=entity.title()[:2]+'L-')
         tb_label_open = request.GET.get('PL-page', None)
         side_bar.append(('Label', tb_label, 'PersonLabel', tb_label_open))
         RequestConfig(request, paginate={"per_page": 10}).configure(tb_label)
-        template = select_template(['entities/detail_views/{}_detail_generic.html'.format(entity)])
+        template = select_template([
+            'entities/detail_views/{}_detail_generic.html'.format(entity),
+            'entities/detail_views/entity_detail_generic.html'
+            ])
         return HttpResponse(template.render(
             request=request, context={
                 'entity_type': entity,

@@ -72,7 +72,7 @@ def get_generic_relations_table(relation, entity, detail=None):
 
             def __init__(self, *args, entity='None', **kwargs):
                 self.base_columns['related_'+rel_ent.lower()] = tables.LinkColumn(
-                    'entities:generic_entities_edit_view',
+                    'entities:generic_entities_detail_view',
                     args=[
                         rel_ent.lower(), A('related_{}.pk'.format(rel_ent.lower()))
                     ])
@@ -165,6 +165,20 @@ class PersonPersonTable(tables.Table):
                     'related_person')
 
 
+class EntityDetailViewLabelTable(tables.Table):
+    label2 = tables.Column(accessor='label')
+
+    class Meta:
+        empty_text = empty_text_default
+        model = Label
+        fields = ['isoCode_639_3', 'label_type']
+        sequence = ('label2', 'label_type', 'isoCode_639_3')
+        # add class="paleblue" to <table> tag
+        attrs = {"class": "table table-hover table-striped table-condensed",
+                "id": "PL_conn"}
+
+
+
 class EntityLabelTable(tables.Table):
     edit = tables.TemplateColumn(template_name='edit_button_persLabel_ajax_form.html')
     label2 = tables.Column(accessor='label')
@@ -177,6 +191,7 @@ class EntityLabelTable(tables.Table):
         # add class="paleblue" to <table> tag
         attrs = {"class": "table table-hover table-striped table-condensed",
                 "id": "PL_conn"}
+
 
 class PersonEventTable(tables.Table):
     delete = tables.TemplateColumn(template_name='delete_button_persEvent_ajax_form.html')
