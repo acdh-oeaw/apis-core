@@ -66,15 +66,15 @@ def get_entities_form(entity):
                                 'direct': 'normal'
                             }),
                             attrs=attrs)
-                    if self.instance:
-                        res = []
-                        try:
-                            for x in getattr(self.instance, f).all():
-                                res.append((x.pk, x.name))
-                        except ValueError:
-                            pass
-                        self.fields[f].choices = res
-                        self.fields[f].initial = res
+                        if self.instance:
+                            res = []
+                            try:
+                                for x in getattr(self.instance, f).all():
+                                    res.append((x.pk, x.name))
+                            except ValueError:
+                                pass
+                            self.fields[f].choices = res
+                            self.fields[f].initial = res
                 if f not in acc_grp2:
                     acc_grp1.append(f)
 
