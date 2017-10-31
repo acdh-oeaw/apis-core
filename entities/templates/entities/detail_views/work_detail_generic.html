@@ -4,8 +4,10 @@
 {% block Titel %} {{ object.id }} {% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="http://teic.github.io/CETEIcean/css/CETEIcean.css" media="screen" charset="utf-8">
-<script src="http://teic.github.io/CETEIcean/js/CETEI.js"></script>
+<!-- CETEI -->
+    <link rel="stylesheet" href="{% static 'webpage/css/cetei.css' %} "media="screen" charset="utf-8" />
+    <script type="text/javascript" src="{% static 'webpage/libraries/bower_components/CETEI/index.js' %}"></script>
+<!-- CETEI end-->
 <div class="container">
     <div class="panel panel-default procustom-panel-create">
         <div class="panel-heading procustom-panel-heading">
