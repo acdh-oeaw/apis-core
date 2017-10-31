@@ -19,7 +19,7 @@ from relations.tables import get_generic_relations_table, EntityLabelTable, Enti
 class GenericEntitiesDetailView(View):
 
     def get(self, request, *args, **kwargs):
-        entity = kwargs['entity']
+        entity = kwargs['entity'].lower()
         pk = kwargs['pk']
         entity_model = ContentType.objects.get(app_label='entities', model=entity).model_class()
         instance = get_object_or_404(entity_model, pk=pk)

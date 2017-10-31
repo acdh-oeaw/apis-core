@@ -72,7 +72,7 @@ class GenericEntitiesEditView(View):
             side_bar.append((title_panel, tb_object, ''.join([x.title() for x in match]), tb_object_open))
         form = get_entities_form(entity.title())
         form = form(instance=instance)
-        form_text = FullTextForm(entity.title(), instance=instance)
+        form_text = FullTextForm(entity=entity.title(), instance=instance)
         form_ann_agreement = SelectAnnotatorAgreement()
         object_revisions = Version.objects.get_for_object(instance)
         object_lod = Uri.objects.filter(entity=instance)
