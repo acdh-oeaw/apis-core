@@ -481,6 +481,7 @@ $('#id_select_relation').on("change", function(){
         });
     $('#id_search_target').select2('destroy');
     $('#id_search_target').select2({
+        allowClear: true,
           ajax: {
             url: '/autocomplete/network/entities/'+list_ent[1],
             dataType: 'json'
@@ -489,6 +490,7 @@ $('#id_select_relation').on("change", function(){
         });
     $('#id_select_kind').select2('destroy');
     $('#id_select_kind').select2({
+        allowClear: true,
           ajax: {
             url: '/autocomplete/vocabularies/'+list_ent[0]+list_ent[1]+'relation/normal',
             dataType: 'json'

@@ -99,7 +99,6 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                     descr = None
                 f['text'] = '<small>{}</small> <b>{}</b> ({}): {}'.format(source, name, score, descr)
                 choices.append(f)
-        #return choices
         return http.HttpResponse(json.dumps({
             'results': choices + []
         }), content_type='application/json')
