@@ -199,6 +199,10 @@ function download_network_data(formData) {
           type: 'POST',
           url: '{% url "NetJson-list" %}',
           data: formData,
+          beforeSend: function(request) {
+                  var csrftoken = getCookie('csrftoken');
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+            },
           success: function(data, s, xhr) {
               $.ApisNet.instance.graph.read(data);
               $.ApisNet.instance.graph.nodes().forEach(function (n) {
