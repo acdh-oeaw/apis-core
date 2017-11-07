@@ -310,12 +310,12 @@ for (i2 = 0; i2 < $.ApisNet.nodes_expand.length; i2++) {
     console.log(node_type);
     for (i = 0; i < $.ApisNet.relation_types.length; i++) {
         var formData = {};
-        if ($.ApisNet.relation_types[i].startsWith(node_type)) {
+        if ($.ApisNet.relation_types[i].startsWith(node_type.toLowerCase())) {
             formData.search_source = node_id;
             formData.select_relation = $.ApisNet.relation_types[i];
         }
         ;
-        if ($.ApisNet.relation_types[i].endsWith(node_type)) {
+        if ($.ApisNet.relation_types[i].endsWith(node_type.toLowerCase())) {
             formData.search_target = node_id;
             formData.select_relation = $.ApisNet.relation_types[i];
         }
