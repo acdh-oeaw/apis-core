@@ -100,7 +100,8 @@ class NetJsonEdgeSerializer(serializers.BaseSerializer):
         }
         r['data']['start_date'] = obj.start_date_written
         r['data']['end_date'] = obj.end_date_written
-        r['data']['relation_type'] = obj.relation_type.name,
+        r['data']['relation_type'] = obj.relation_type.name
+
         return r
 
 
@@ -139,4 +140,6 @@ class NetJsonNodeSerializer(serializers.BaseSerializer):
             r['data']['lon'] = obj.lng
         if ent_obj.lower() == 'person':
             r['data']['profession'] = [x.name for x in obj.profession.all()]
+            if obj.gender:
+                r['data']['gender'] = obj.gender
         return r
