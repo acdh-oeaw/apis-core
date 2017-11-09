@@ -331,6 +331,10 @@
         $.ajax({
             type: 'DELETE',
             url: url,
+            beforeSend: function(request) {
+                  var csrftoken = getCookie('csrftoken');
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+                  },
             statusCode : {
                 204: function() {
                     if (kind=='HLAnnotation') {
