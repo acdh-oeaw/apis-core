@@ -184,7 +184,7 @@ class GenericRelationForm(forms.ModelForm):
                         lst_src_target[0].lower(), lst_src_target[1].lower()),
                     attrs=attrs))
             self.fields['target'] = autocomplete.Select2ListCreateChoiceField(
-                label=lst_src_target[1],
+                label=lst_src_target[0],
                 widget=autocomplete.ListSelect2(
                     url='/autocomplete/entities/{}'.format(lst_src_target[0].lower()),
                     attrs=attrs),
