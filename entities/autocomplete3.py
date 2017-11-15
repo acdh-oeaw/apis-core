@@ -52,6 +52,8 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                 print('no match')
 
     def get(self, request, *args, **kwargs):
+        page_size = 20
+        offset = (int(self.request.GET.get('page', 1))-1)*page_size
         ac_type = self.kwargs['entity']
         choices = []
         headers = {'Content-Type': 'application/json'}
@@ -59,7 +61,11 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
         ent_model = ContentType.objects.get(app_label='entities', model=ac_type).model_class()
         arg_list = [Q(**{x+'__icontains': q}) for x in settings.APIS_ENTITIES[ac_type.title()]['search']]
         res = ent_model.objects.filter(reduce(operator.or_, arg_list)).distinct()
-        for r in res:
+        test_db = True
+        test_stanbol = False
+        test_stanbol_list = dict()
+        more = True
+        for r in res[offset:offset+page_size]:
             f = dict()
             try:
                 f['id'] = Uri.objects.filter(entity=r)[0].uri
@@ -67,14 +73,17 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                 continue
             f['text'] = '<small>db</small> {}'.format(str(r))
             choices.append(f)
+        if len(choices) < page_size:
+            test_db = False
         for y in ac_settings[ac_type.title()]:
             ldpath = ""
             for d in y['fields'].keys():
                 ldpath += "{} = <{}>;\n".format(d, y['fields'][d][0])
             data = {
-                'limit': 20,
+                'limit': page_size,
                 'name': q,
-                'ldpath': ldpath
+                'ldpath': ldpath,
+                'offset': offset
             }
             try:
                 r = requests.get(y['url'], params=data, headers=headers)
@@ -85,6 +94,10 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
             except:
                 choices.append({'name': 'Connection to Stanbol failed'})
                 continue
+            if len(res['results']) < page_size:
+                test_stanbol_list[y['url']] = False
+            else:
+                test_stanbol_list[y['url']] = True
             for x in res['results']:
                 f = dict()
                 name = x['name'][0]['value']
@@ -99,8 +112,14 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                     descr = None
                 f['text'] = '<small>{}</small> <b>{}</b> ({}): {}'.format(source, name, score, descr)
                 choices.append(f)
+        for k in test_stanbol_list.keys():
+            if test_stanbol_list[k]:
+                test_stanbol = True
+        if not test_db and not test_stanbol:
+            more = False
         return http.HttpResponse(json.dumps({
-            'results': choices + []
+            'results': choices + [],
+            'pagination': {'more': more}
         }), content_type='application/json')
 
 
