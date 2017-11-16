@@ -75,46 +75,49 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
             choices.append(f)
         if len(choices) < page_size:
             test_db = False
-        for y in ac_settings[ac_type.title()]:
-            ldpath = ""
-            for d in y['fields'].keys():
-                ldpath += "{} = <{}>;\n".format(d, y['fields'][d][0])
-            data = {
-                'limit': page_size,
-                'name': q,
-                'ldpath': ldpath,
-                'offset': offset
-            }
-            try:
-                r = requests.get(y['url'], params=data, headers=headers)
-                if r.status_code != 200:
+        if ac_type.title() in ac_settings.keys():
+            for y in ac_settings[ac_type.title()]:
+                ldpath = ""
+                for d in y['fields'].keys():
+                    ldpath += "{} = <{}>;\n".format(d, y['fields'][d][0])
+                data = {
+                    'limit': page_size,
+                    'name': q,
+                    'ldpath': ldpath,
+                    'offset': offset
+                }
+                try:
+                    r = requests.get(y['url'], params=data, headers=headers)
+                    if r.status_code != 200:
+                        choices.append({'name': 'Connection to Stanbol failed'})
+                        continue
+                    res = r.json()
+                except:
                     choices.append({'name': 'Connection to Stanbol failed'})
                     continue
-                res = r.json()
-            except:
-                choices.append({'name': 'Connection to Stanbol failed'})
-                continue
-            if len(res['results']) < page_size:
-                test_stanbol_list[y['url']] = False
-            else:
-                test_stanbol_list[y['url']] = True
-            for x in res['results']:
-                f = dict()
-                name = x['name'][0]['value']
-                score = str(x[ac_settings['score']][0]['value'])
-                id = x[ac_settings['uri']]
-                score = score
-                f['id'] = id
-                source = y['source']
-                if 'descr' in x.keys():
-                    descr = x['descr'][0]['value']
+                if len(res['results']) < page_size:
+                    test_stanbol_list[y['url']] = False
                 else:
-                    descr = None
-                f['text'] = '<small>{}</small> <b>{}</b> ({}): {}'.format(source, name, score, descr)
-                choices.append(f)
-        for k in test_stanbol_list.keys():
-            if test_stanbol_list[k]:
-                test_stanbol = True
+                    test_stanbol_list[y['url']] = True
+                for x in res['results']:
+                    f = dict()
+                    name = x['name'][0]['value']
+                    score = str(x[ac_settings['score']][0]['value'])
+                    id = x[ac_settings['uri']]
+                    score = score
+                    f['id'] = id
+                    source = y['source']
+                    if 'descr' in x.keys():
+                        descr = x['descr'][0]['value']
+                    else:
+                        descr = None
+                    f['text'] = '<small>{}</small> <b>{}</b> ({}): {}'.format(source, name, score, descr)
+                    choices.append(f)
+            for k in test_stanbol_list.keys():
+                if test_stanbol_list[k]:
+                    test_stanbol = True
+        else:
+            test_stanbol = False
         if not test_db and not test_stanbol:
             more = False
         return http.HttpResponse(json.dumps({

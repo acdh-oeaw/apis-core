@@ -1,15 +1,5 @@
 from django.contrib import admin
-
-from .models import (
-    ProfessionType, PlaceType, PersonPlaceRelation,
-    PersonPersonRelation, PersonInstitutionRelation, InstitutionType,
-    EventType, PersonEventRelation, Title, VocabsBaseClass, LabelType,
-    InstitutionInstitutionRelation, TextType, InstitutionPlaceRelation,
-    PlacePlaceRelation, VocabsUri, CollectionType,
-    InstitutionEventRelation, PlaceEventRelation, PersonWorkRelation,
-    InstitutionWorkRelation, PlaceWorkRelation, EventWorkRelation, WorkType,
-    WorkWorkRelation
-    )
+from django.apps import apps
 
 
 class BaseAdminVocabularies(admin.ModelAdmin):
@@ -43,28 +33,8 @@ class BaseAdminVocabularies(admin.ModelAdmin):
         return super(BaseAdminVocabularies, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-admin.site.register(ProfessionType, BaseAdminVocabularies)
-admin.site.register(PlaceType, BaseAdminVocabularies)
-admin.site.register(LabelType, BaseAdminVocabularies)
-admin.site.register(EventType, BaseAdminVocabularies)
-admin.site.register(Title, BaseAdminVocabularies)
-admin.site.register(InstitutionType, BaseAdminVocabularies)
-admin.site.register(PersonPlaceRelation, BaseAdminVocabularies)
-admin.site.register(PersonPersonRelation, BaseAdminVocabularies)
-admin.site.register(PersonInstitutionRelation, BaseAdminVocabularies)
-admin.site.register(PersonEventRelation, BaseAdminVocabularies)
-admin.site.register(InstitutionInstitutionRelation, BaseAdminVocabularies)
-admin.site.register(TextType, BaseAdminVocabularies)
-admin.site.register(InstitutionPlaceRelation, BaseAdminVocabularies)
-admin.site.register(PlacePlaceRelation, BaseAdminVocabularies)
-admin.site.register(VocabsUri, BaseAdminVocabularies)
-admin.site.register(InstitutionEventRelation, BaseAdminVocabularies)
-admin.site.register(PlaceEventRelation, BaseAdminVocabularies)
-admin.site.register(PersonWorkRelation, BaseAdminVocabularies)
-admin.site.register(InstitutionWorkRelation, BaseAdminVocabularies)
-admin.site.register(PlaceWorkRelation, BaseAdminVocabularies)
-admin.site.register(EventWorkRelation, BaseAdminVocabularies)
-admin.site.register(WorkWorkRelation, BaseAdminVocabularies)
-admin.site.register(WorkType, BaseAdminVocabularies)
+app = apps.get_app_config('vocabularies')
 
-admin.site.register(CollectionType)
+for model_name, model in app.models.items():
+    admin.site.register(model)
+

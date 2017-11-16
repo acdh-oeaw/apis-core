@@ -114,7 +114,8 @@ class GenericRelationForm(forms.ModelForm):
         """
         attrs = {'data-placeholder': 'Type to get suggestions',
                  'data-minimum-input-length': 3,
-                 'data-html': True}
+                 'data-html': True,
+                 'style': 'width: 100%'}
         css_notes = 'LS'
         self.highlighter = highlighter
         entity_type = kwargs.pop('entity_type')

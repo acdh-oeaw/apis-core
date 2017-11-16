@@ -99,13 +99,15 @@ def get_form_ajax(request):
             app_label='relations')
     else:
         entity_type_v1 = ContentType.objects.none()
-    if FormName not in registered_forms.keys():
-        raise Http404
-
     if ObjectID == 'false' or ObjectID is None or ObjectID == 'None':
         ObjectID = False
         form_dict = {'entity_type': entity_type_str}
+    elif entity_type_v1.count() > 0:
+        d = entity_type_v1[0].model_class().objects.get(pk=ObjectID)
+        form_dict = {'instance': d, 'siteID': SiteID, 'entity_type': entity_type_str}
     else:
+        if FormName not in registered_forms.keys():
+            raise Http404
         d = registered_forms[FormName][0].objects.get(pk=ObjectID)
         form_dict = {'instance': d, 'siteID': SiteID, 'entity_type': entity_type_str}
     if entity_type_v1.count() > 0:
