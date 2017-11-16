@@ -55,6 +55,7 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
         page_size = 20
         offset = (int(self.request.GET.get('page', 1))-1)*page_size
         ac_type = self.kwargs['entity']
+        db_include = self.kwargs.get('db_include', False)
         choices = []
         headers = {'Content-Type': 'application/json'}
         q = self.q
@@ -65,15 +66,18 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
         test_stanbol = False
         test_stanbol_list = dict()
         more = True
-        for r in res[offset:offset+page_size]:
-            f = dict()
-            try:
-                f['id'] = Uri.objects.filter(entity=r)[0].uri
-            except:
-                continue
-            f['text'] = '<small>db</small> {}'.format(str(r))
-            choices.append(f)
-        if len(choices) < page_size:
+        if not db_include:
+            for r in res[offset:offset+page_size]:
+                f = dict()
+                try:
+                    f['id'] = Uri.objects.filter(entity=r)[0].uri
+                except:
+                    continue
+                f['text'] = '<small>db</small> {}'.format(str(r))
+                choices.append(f)
+            if len(choices) < page_size:
+                test_db = False
+        else:
             test_db = False
         if ac_type.title() in ac_settings.keys():
             for y in ac_settings[ac_type.title()]:

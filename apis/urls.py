@@ -8,6 +8,7 @@ from entities.api_views import (
 from django.views.static import serve
 from django.contrib.auth.decorators import login_required
 #from rest_framework_swagger.views import get_swagger_view
+from entities.views2 import GenericEntitiesCreateStanbolView
 from metainfo.api_views import (
     CollectionViewSet, TextViewSet, SourceSerializerViewSet,
     UriSerializerViewSet, TempEntityClassViewSet)
@@ -103,6 +104,12 @@ urlpatterns = [
     url(r'^autocomplete/entities/(?P<entity>[a-zA-Z0-9-]+)/$',
         GenericEntitiesAutocomplete.as_view(),
         name='generic_entities_autocomplete'),
+    url(r'^autocomplete/entities/(?P<entity>[a-zA-Z0-9-]+)/(?P<db_include>[a-z]+)/$',
+        GenericEntitiesAutocomplete.as_view(),
+        name='generic_entities_autocomplete'),
+    url(r'^autocomplete/createstanbol/entities/(?P<entity>[a-zA-Z0-9-]+)/$',
+        GenericEntitiesCreateStanbolView.as_view(),
+        name='generic_entities_stanbol_create'),
     url(r'^autocomplete/network/entities/(?P<entity>[a-zA-Z0-9-]+)/$',
         GenericNetworkEntitiesAutocomplete.as_view(),
         name='generic_network_entities_autocomplete'),

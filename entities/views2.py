@@ -17,7 +17,7 @@ from entities.views import get_highlighted_texts
 from labels.models import Label
 from metainfo.models import Uri
 from relations.tables import get_generic_relations_table, EntityLabelTable
-from .forms import get_entities_form, FullTextForm
+from .forms import get_entities_form, FullTextForm, GenericEntitiesStanbolForm
 from highlighter.forms import SelectAnnotatorAgreement
 
 
@@ -148,6 +148,28 @@ class GenericEntitiesCreateView(View):
         if form.is_valid() and form_text.is_valid():
             entity_2 = form.save()
             form_text.save(entity_2)
+            return redirect(reverse('entities:generic_entities_edit_view', kwargs={
+                'pk': entity_2.pk, 'entity': entity
+            }))
+        else:
+            permissions = {'create': request.user.has_perm('entities.add_{}'.format(entity))}
+            template = select_template(['entities/{}_create_generic.html'.format(entity),
+                                        'entities/entity_create_generic.html'])
+            return HttpResponse(template.render(request=request, context={
+                'permissions': permissions,
+                'form': form,
+                'form_text': form_text}))
+
+
+@method_decorator(login_required, name='dispatch')
+class GenericEntitiesCreateStanbolView(View):
+
+    def post(self, request, *args, **kwargs):
+        entity = kwargs['entity']
+        form = GenericEntitiesStanbolForm(entity, request.POST)
+        #form = form(request.POST)
+        if form.is_valid():
+            entity_2 = form.save()
             return redirect(reverse('entities:generic_entities_edit_view', kwargs={
                 'pk': entity_2.pk, 'entity': entity
             }))

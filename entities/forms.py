@@ -12,6 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.contrib.contenttypes.models import ContentType
+from django.core.validators import URLValidator
 
 from .models import Person, Place, Institution, Event, Work
 from vocabularies.models import TextType
@@ -89,6 +90,30 @@ def get_entities_form(entity):
             self.fields['start_date_written'].required = False
             self.fields['end_date_written'].required = False
     return GenericEntitiesForm
+
+
+class GenericEntitiesStanbolForm(forms.Form):
+    def save(self, *args, **kwargs):
+        cd = self.cleaned_data
+        entity = GenericRDFParser(cd['entity'], self.entity.title()).get_or_create()
+        return entity
+
+    def __init__(self, entity, *args, **kwargs):
+        attrs = {'data-placeholder': 'Type to get suggestions',
+                 'data-minimum-input-length': 3,
+                 'data-html': True,
+                 'style': 'width: auto'}
+        super(GenericEntitiesStanbolForm, self).__init__(*args, **kwargs)
+        self.entity = entity
+        self.helper = FormHelper()
+        self.helper.form_action = reverse('generic_entities_stanbol_create', kwargs={'entity': entity})
+        self.helper.add_input(Submit('submit', 'Create'))
+        self.fields['entity'] = autocomplete.Select2ListCreateChoiceField(
+                label='Create {} from reference resources'.format(entity.title()),
+                widget=autocomplete.ListSelect2(
+                    url='/autocomplete/entities/{}/remove'.format(entity),
+                    attrs=attrs),
+                validators=[URLValidator])
 
 
 class PersonForm(forms.ModelForm):

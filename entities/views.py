@@ -21,7 +21,7 @@ from django_tables2.export.views import ExportMixin
 from .models import Person, Place, Institution, Event, Work
 from .forms import (PersonForm, PlaceForm, InstitutionForm, EventForm, FullTextForm, SearchForm,
                     WorkForm, GenericFilterFormHelper, NetworkVizFilterForm, PersonResolveUriForm,
-                    get_entities_form)
+                    get_entities_form, GenericEntitiesStanbolForm)
 from relations.models import (PersonPerson, PersonInstitution, PersonEvent,
                               PersonPlace, InstitutionEvent, InstitutionPlace,
                               InstitutionInstitution, PlacePlace, PlaceEvent, PersonWork,
@@ -155,6 +155,7 @@ class GenericListViewNew(ExportMixin, SingleTableView):
         context = super(GenericListViewNew, self).get_context_data()
         context[self.context_filter_name] = self.filter
         context['entity'] = self.entity
+        context['entity_create_stanbol'] = GenericEntitiesStanbolForm(self.entity)
         return context
 
 

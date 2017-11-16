@@ -123,7 +123,8 @@ class GenericRelationForm(forms.ModelForm):
             entity_type = entity_type.__name__
         self.relation_form = kwargs.pop('relation_form')
         if type(self.relation_form) == str:
-            self.relation_form = ContentType.objects.get(app_label='relations', model=self.relation_form.lower()).model_class()
+            self.relation_form = ContentType.objects.get(
+                app_label='relations', model=self.relation_form.lower()).model_class()
         self.request = kwargs.pop('request', False)
         super(GenericRelationForm, self).__init__(*args, **kwargs)
         instance = getattr(self, 'instance', None)

@@ -21,12 +21,13 @@
             <div id="filter-container">
                 {% block create_button %}
                 <div>
-                    <a class="btn btn-primary btn-lg" href="/entities/entity/{{entity}}/create">create new {{entity}}</a>
+                    <a class="btn btn-primary btn-small" href="/entities/entity/{{entity}}/create">create new {{entity}}</a>
                 </div>
+                <hr/>
+                {% load django_tables2 crispy_forms_tags %}
+                {% crispy entity_create_stanbol  entity_create_stanbol.helper %}
                 {% endblock %}
             <hr/>
-                {% load django_tables2 crispy_forms_tags %}
-
                 {% crispy filter.form filter.form.helper %}
             </div>
       </div>
