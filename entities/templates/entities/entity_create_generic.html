@@ -7,6 +7,8 @@
 <script type="text/javascript" src="/static/autocomplete_light/autocomplete.init.js"></script>
 <script type="text/javascript" src="/static/autocomplete_light/vendor/select2/dist/js/select2.full.js"></script>
 <script type="text/javascript" src="/static/autocomplete_light/select2.js"></script>
+<link rel="stylesheet" href="http://teic.github.io/CETEIcean/css/CETEIcean.css" media="screen" charset="utf-8">
+<script src="http://teic.github.io/CETEIcean/js/CETEI.js"></script>
 {% endblock %}
 {% block Titel %}Create a {{entity_type|title}}{% endblock %}
 {% load guardian_tags %}
@@ -143,7 +145,7 @@
 
 <div class="panel panel-default">
 <div class="panel-body">
-    <div class="txt {{txt.kind|slugify}}" id="htxt_{{txt.id}}">{{txt.text|safe}}</div>
+    <div class="txt {{txt.kind|slugify}} {% if txt.kind.description == 'TEIDoc' %}sourcetei{% endif %}" id="htxt_{{txt.id}}">{{txt.text}}</div>
 
     <div class="agreement" id="agrm_{{txt.id}}"></div>
 </div>
@@ -271,7 +273,6 @@
 </script>
 <script type="text/javascript">
     function GetFormAjaxHighl(FormName, ObjectID, ButtonText) {
-        console.log(event);
         function add_form_highl(data, ajax) {
             if (!ajax) {
                 console.log('adding fields');
@@ -521,5 +522,18 @@ activate_editing();
 deactivate_editing();
 {% endif %}
 {% endif %}
+</script>
+<script>
+    $('div.sourcetei').each(function(){
+        var CETEIcean = new CETEI();
+        var teiString = $(this).text();
+        console.log(teiString)
+        var teiElement = $(this);
+    CETEIcean.makeHTML5(teiString, function(data) {
+        //document.getElementById("TEI-{{x.id}}").innerHTML = "";
+        teiElement.html(data);
+        CETEIcean.addStyle(teiElement, data)
+    });
+    ;});
 </script>
 {% endblock %}

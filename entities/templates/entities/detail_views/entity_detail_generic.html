@@ -107,28 +107,33 @@
                             Text as TEI
                         </legend>
                         {% for x in object.text.all %}
-                        <div id="TEI">
-                            hansi
+                        {% if x.text|length > 0 %}
+                        <div id="TEI-{{x.id}}">
+                            empty
                         </div>
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <h4 class="panel-title"> {{ x.kind }}</h4>
                                 </div>
                                 <div class="panel-body">
-                                    <div class="panel-body" id="sourctei">
+                                    <div class="panel-body {% if x.kind.description == 'TEIDoc' %}sourcetei{% endif %}" data-origid="{{x.id}}" >
                                             {{ x.text }}
                                     </div>
                                 </div>
                             </div>
+                        {% endif %}
                         {% endfor %}
                         <script>
-                            var CETEIcean = new CETEI();
-                            var teiString = $("#sourctei").text();
+                            $('div.sourcetei').each(function(){
+                                var CETEIcean = new CETEI();
+                                var teiString = $(this).text();
+                                var teiElement = $('#TEI-'+$(this).data('origid'))
                             CETEIcean.makeHTML5(teiString, function(data) {
-                                document.getElementById("TEI").innerHTML = "";
-                                document.getElementById("TEI").appendChild(data);
-                                CETEIcean.addStyle(document, data);
+                                //document.getElementById("TEI-{{x.id}}").innerHTML = "";
+                                teiElement.html(data);
+                                CETEIcean.addStyle(teiElement, data)
                             });
+                            ;});
                         </script>
                     </div>
                 {% else %}
