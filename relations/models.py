@@ -4,14 +4,15 @@ import reversion
 from django.db.models import Q
 import operator
 
-from entities.models import Person, Place, Institution, Event, Work
+from entities.models import Person, Place, Institution, Event, Work, Coin
 from metainfo.models import TempEntityClass
 from vocabularies.models import (PersonPlaceRelation, PersonPersonRelation,
-    PersonInstitutionRelation, PersonEventRelation, PersonWorkRelation,
-    InstitutionInstitutionRelation, InstitutionPlaceRelation,
-    InstitutionEventRelation, PlacePlaceRelation, PlaceEventRelation,
-    PlaceWorkRelation, EventEventRelation, EventWorkRelation,
-    WorkWorkRelation, InstitutionWorkRelation)
+                                 PersonInstitutionRelation, PersonEventRelation, PersonWorkRelation,
+                                 InstitutionInstitutionRelation, InstitutionPlaceRelation,
+                                 InstitutionEventRelation, PlacePlaceRelation, PlaceEventRelation,
+                                 PlaceWorkRelation, EventEventRelation, EventWorkRelation,
+                                 WorkWorkRelation, InstitutionWorkRelation, PersonCoinRelation, InstitutionCoinRelation,
+                                 PlaceCoinRelation, WorkCoinRelation)
 
 
 #######################################################################
@@ -265,6 +266,44 @@ class PersonWork(TempEntityClass):
         return result
 
 
+@reversion.register(follow=['tempentityclass_ptr'])
+class PersonCoin(TempEntityClass):
+    """Defines and describes a relation between a Person and a Coin
+
+    :param int relation_type: Foreign Key to :class:`vocabularies.models.PersonCoinRelation`
+    :param int related_person: Foreign Key to :class:`entities.models.Person`
+    :param int related_place: Foreign Key to :class:`entities.models.Coin`
+    """
+
+    relation_type = models.ForeignKey(PersonCoinRelation, blank=True, null=True)
+    related_person = models.ForeignKey(
+        Person, blank=True, null=True)
+    related_coin = models.ForeignKey(
+        Coin, blank=True, null=True)
+    objects = models.Manager()
+    annotation_links = AnnotationRelationLinkManager()
+
+    def __str__(self):
+        return "{} ({}) {}".format(self.related_person, self.relation_type, self.related_coin)
+
+    def get_web_object(self):
+        """Used in some html views.
+
+        :return: Dict with object properties
+        """
+
+        if self.related_person.first_name is None:
+            self.related_person.first_name = '-'
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': self.relation_type.name,
+            'related_person': self.related_person.name + ', ' + self.related_person.first_name,
+            'related_coin': self.related_coin.name,
+            'start_date': self.start_date_written,
+            'end_date': self.end_date_written}
+        return result
+
+
 #######################################################################
 #
 #   Institution - ... - Relation
@@ -416,6 +455,38 @@ class InstitutionWork(TempEntityClass):
         return result
 
 
+@reversion.register(follow=['tempentityclass_ptr'])
+class InstitutionCoin(TempEntityClass):
+    """Describes a relation bewteen an Institution  and a Coin
+
+    :param int relation_type: Foreign Key to :class:`vocabularies.models.InstitutionCoinRelation`
+    :param int related_institution: Foreign Key to :class:`entities.models.Institution`
+    :param int related_place: Foreign Key to :class:`entities.models.Coin`
+    """
+
+    relation_type = models.ForeignKey(
+        InstitutionCoinRelation, blank=True, null=True)
+    related_institution = models.ForeignKey(
+        Institution, blank=True, null=True)
+    related_coin = models.ForeignKey(
+        Coin, blank=True, null=True)
+    objects = models.Manager()
+    annotation_links = AnnotationRelationLinkManager()
+
+    def __str__(self):
+        return "{} ({}) {}".format(
+            self.related_institution, self.relation_type, self.related_coin)
+
+    def get_web_object(self):
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': self.relation_type.name,
+            'related_institution': self.related_institution.name,
+            'related_coin': self.related_coin.name,
+            'start_date': self.start_date_written,
+            'end_date': self.end_date_written}
+        return result
+
 
 #######################################################################
 #
@@ -552,6 +623,41 @@ class PlaceWork(TempEntityClass):
         return result
 
 
+@reversion.register(follow=['tempentityclass_ptr'])
+class PlaceCoin(TempEntityClass):
+    """Describes a relation between an Place and an Event
+
+    :param int relation_type: Foreign Key to :class:`vocabularies.models.PlaceCointRelation`
+    :param int related_place: Foreign Key to :class:`entities.models.Place`
+    :param int related_event: Foreign Key to :class:`entities.models.Coin`
+    """
+
+    relation_type = models.ForeignKey(PlaceCoinRelation, blank=True, null=True)
+    related_place = models.ForeignKey(
+        Place, blank=True, null=True)
+    related_coin = models.ForeignKey(
+        Coin, blank=True, null=True)
+    objects = models.Manager()
+    annotation_links = AnnotationRelationLinkManager()
+
+    def __str__(self):
+        return "{} ({}) {}".format(
+            self.related_place, self.relation_type, self.related_coin)
+
+    def get_web_object(self):
+        """Function that returns a dict that is used in html views.
+
+        :return: dict of attributes
+        """
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': self.relation_type.name,
+            'related_place': self.related_place.name,
+            'related_coin': self.related_coin.name,
+            'start_date': self.start_date_written,
+            'end_date': self.end_date_written}
+        return result
+
 #######################################################################
 #
 #   Event - ... - Relation
@@ -678,3 +784,39 @@ class WorkWork(TempEntityClass):
 
     def __str__(self):
         return "{} ({}) {}".format(self.related_workA, self.relation_type, self.related_workB)
+
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class WorkCoin(TempEntityClass):
+    """Describes a relation between a Work and a Coin
+
+    :param int relation_type: Foreign Key to :class:`vocabularies.models.WorkCoinRelation`
+    :param int related_work: Foreign Key to :class:`entities.models.Work`
+    :param int related_coin: Foreign Key to :class:`entities.models.Coin`
+    """
+
+    relation_type = models.ForeignKey(WorkCoinRelation, blank=True, null=True)
+    related_work = models.ForeignKey(
+        Work, blank=True, null=True)
+    related_coin = models.ForeignKey(
+        Coin, blank=True, null=True)
+    objects = models.Manager()
+    annotation_links = AnnotationRelationLinkManager()
+
+    def __str__(self):
+        return "{} ({}) {}".format(
+            self.related_work, self.relation_type, self.related_coin)
+
+    def get_web_object(self):
+        """Function that returns a dict that is used in html views.
+
+        :return: dict of attributes
+        """
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': self.relation_type.name,
+            'related_work': self.related_work.name,
+            'related_coin': self.related_coin.name,
+            'start_date': self.start_date_written,
+            'end_date': self.end_date_written}
+        return result
