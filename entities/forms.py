@@ -62,7 +62,7 @@ def get_entities_form(entity):
                     v_name_p = str(self.fields[f].queryset.model.__name__)
                     if ContentType.objects.get(model=v_name_p.lower()).app_label.lower() == 'vocabularies':
                         self.fields[f].widget = autocomplete.Select2Multiple(
-                            url=reverse('generic_vocabularies_autocomplete', kwargs={
+                            url=reverse('vocabularies:generic_vocabularies_autocomplete', kwargs={
                                 'vocab': v_name_p.lower(),
                                 'direct': 'normal'
                             }),
@@ -106,12 +106,12 @@ class GenericEntitiesStanbolForm(forms.Form):
         super(GenericEntitiesStanbolForm, self).__init__(*args, **kwargs)
         self.entity = entity
         self.helper = FormHelper()
-        self.helper.form_action = reverse('generic_entities_stanbol_create', kwargs={'entity': entity})
+        self.helper.form_action = reverse('entities:generic_entities_stanbol_create', kwargs={'entity': entity})
         self.helper.add_input(Submit('submit', 'Create'))
         self.fields['entity'] = autocomplete.Select2ListCreateChoiceField(
                 label='Create {} from reference resources'.format(entity.title()),
                 widget=autocomplete.ListSelect2(
-                    url='/autocomplete/entities/{}/remove'.format(entity),
+                    url='/entities/autocomplete/{}/remove'.format(entity),
                     attrs=attrs),
                 validators=[URLValidator])
 

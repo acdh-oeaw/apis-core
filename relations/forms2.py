@@ -150,13 +150,13 @@ class GenericRelationForm(forms.ModelForm):
             self.fields['relation_type'] = autocomplete.Select2ListCreateChoiceField(
                 label='Relation type',
                 widget=autocomplete.ListSelect2(
-                    url='/autocomplete/vocabularies/{}{}relation/normal'.format(
+                    url='/vocabularies/autocomplete/{}{}relation/normal'.format(
                         lst_src_target[0].lower(), lst_src_target[1].lower()),
                     attrs=attrs))
             self.fields['target'] = autocomplete.Select2ListCreateChoiceField(
                 label=lst_src_target[1],
                 widget=autocomplete.ListSelect2(
-                    url='/autocomplete/entities/{}'.format(lst_src_target[1].lower()),
+                    url='/entities/autocomplete/{}'.format(lst_src_target[1].lower()),
                     attrs=attrs),
                 validators=[URLValidator])
         elif entity_type.lower() == lst_src_target[0].lower():
@@ -166,13 +166,13 @@ class GenericRelationForm(forms.ModelForm):
             self.fields['relation_type'] = autocomplete.Select2ListCreateChoiceField(
                 label='Relation type',
                 widget=autocomplete.ListSelect2(
-                    url='/autocomplete/vocabularies/{}{}relation/normal'.format(
+                    url='/vocabularies/autocomplete/{}{}relation/normal'.format(
                         lst_src_target[0].lower(), lst_src_target[1].lower()),
                     attrs=attrs))
             self.fields['target'] = autocomplete.Select2ListCreateChoiceField(
                 label=lst_src_target[1],
                 widget=autocomplete.ListSelect2(
-                    url='/autocomplete/entities/{}'.format(lst_src_target[1].lower()),
+                    url='/entities/autocomplete/{}'.format(lst_src_target[1].lower()),
                     attrs=attrs),
                 validators=[URLValidator])
         elif entity_type.lower() == lst_src_target[1].lower():
@@ -182,13 +182,13 @@ class GenericRelationForm(forms.ModelForm):
             self.fields['relation_type'] = autocomplete.Select2ListCreateChoiceField(
                 label='Relation type',
                 widget=autocomplete.ListSelect2(
-                    url='/autocomplete/vocabularies/{}{}relation/reverse'.format(
+                    url='/vocabularies/autocomplete/{}{}relation/reverse'.format(
                         lst_src_target[0].lower(), lst_src_target[1].lower()),
                     attrs=attrs))
             self.fields['target'] = autocomplete.Select2ListCreateChoiceField(
                 label=lst_src_target[0],
                 widget=autocomplete.ListSelect2(
-                    url='/autocomplete/entities/{}'.format(lst_src_target[0].lower()),
+                    url='/entities/autocomplete/{}'.format(lst_src_target[0].lower()),
                     attrs=attrs),
                 validators=[URLValidator])
         else:

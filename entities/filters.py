@@ -116,7 +116,7 @@ def get_generic_list_filter(entity):
                     v_name_p = str(self.filters[f].queryset.model.__name__)
                     if ContentType.objects.get(model=v_name_p.lower()).app_label.lower() == 'vocabularies':
                         self.filters[f].field.widget = autocomplete.Select2Multiple(
-                            url=reverse('generic_vocabularies_autocomplete', kwargs={
+                            url=reverse('vocabularies:generic_vocabularies_autocomplete', kwargs={
                                 'vocab': v_name_p.lower(),
                                 'direct': 'normal'
                             }),

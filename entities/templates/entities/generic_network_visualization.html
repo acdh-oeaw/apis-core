@@ -474,7 +474,7 @@ $('#id_select_relation').on("change", function(){
     $('#id_search_source').select2('destroy');
     $('#id_search_source').select2({
           ajax: {
-            url: '/autocomplete/network/entities/'+list_ent[0],
+            url: '/entities/autocomplete-network/'+list_ent[0],
             dataType: 'json'
             // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
           }
@@ -483,7 +483,7 @@ $('#id_select_relation').on("change", function(){
     $('#id_search_target').select2({
         allowClear: true,
           ajax: {
-            url: '/autocomplete/network/entities/'+list_ent[1],
+            url: '/entities/autocomplete-network/'+list_ent[1],
             dataType: 'json'
             // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
           }
@@ -492,7 +492,7 @@ $('#id_select_relation').on("change", function(){
     $('#id_select_kind').select2({
         allowClear: true,
           ajax: {
-            url: '/autocomplete/vocabularies/'+list_ent[0]+list_ent[1]+'relation/normal',
+            url: '/vocabularies/autocomplete/'+list_ent[0]+list_ent[1]+'relation/normal',
             dataType: 'json'
             // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
           }

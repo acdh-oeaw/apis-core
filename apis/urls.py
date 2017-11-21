@@ -8,7 +8,7 @@ from entities.api_views import (
 from django.views.static import serve
 from django.contrib.auth.decorators import login_required
 #from rest_framework_swagger.views import get_swagger_view
-from entities.views2 import GenericEntitiesCreateStanbolView
+#from entities.views2 import GenericEntitiesCreateStanbolView
 from metainfo.api_views import (
     CollectionViewSet, TextViewSet, SourceSerializerViewSet,
     UriSerializerViewSet, TempEntityClassViewSet)
@@ -29,9 +29,7 @@ from highlighter.api_views import (
     HighlighterProjectViewSet, HighlighterTextHighViewSet, HighlighterMenuEntryViewSet,
     HighlighterHighlightTextViewSet, HighlighterVocabularyAPIViewSet, HighlighterAnnotationViewSet
 )
-from entities.views import ReversionCompareView
-from entities.autocomplete3 import (GenericEntitiesAutocomplete,
-                                    GenericVocabulariesAutocomplete, GenericNetworkEntitiesAutocomplete)
+
 
 router = routers.DefaultRouter()
 router.register(r'tempentity', TempEntityClassViewSet)
@@ -100,29 +98,14 @@ urlpatterns = [
     url(r'entities/', include('entities.urls', namespace='entities')),
     url(r'highlighter/', include('highlighter.urls', namespace='highlighter')),
     url(r'relations/', include('relations.urls', namespace='relations')),
+    url(r'vocabularies/', include('vocabularies.urls', namespace='vocabularies')),
     #url(r'^autocomplete/', include('autocomplete_light.urls')),
-    url(r'^autocomplete/entities/(?P<entity>[a-zA-Z0-9-]+)/$',
-        GenericEntitiesAutocomplete.as_view(),
-        name='generic_entities_autocomplete'),
-    url(r'^autocomplete/entities/(?P<entity>[a-zA-Z0-9-]+)/(?P<db_include>[a-z]+)/$',
-        GenericEntitiesAutocomplete.as_view(),
-        name='generic_entities_autocomplete'),
-    url(r'^autocomplete/createstanbol/entities/(?P<entity>[a-zA-Z0-9-]+)/$',
-        GenericEntitiesCreateStanbolView.as_view(),
-        name='generic_entities_stanbol_create'),
-    url(r'^autocomplete/network/entities/(?P<entity>[a-zA-Z0-9-]+)/$',
-        GenericNetworkEntitiesAutocomplete.as_view(),
-        name='generic_network_entities_autocomplete'),
-    url(r'^autocomplete/vocabularies/(?P<vocab>[a-zA-Z0-9-]+)/(?P<direct>[a-zA-Z0-9-]+)/$',
-        GenericVocabulariesAutocomplete.as_view(),
-        name='generic_vocabularies_autocomplete'),
     url(r'^api/', include(router.urls)),    #routers do not support namespaces out of the box
     url(r'^api2/', include('entities.api_urls', namespace="api2")),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     #url(r'^api-schema/', schema_view),
     url(r'^docs/(?P<path>.*)', login_required(serve), {'document_root': 'apis-core/docs/_build/html'}, 'docs'),
     #url(r'^docs/', include('sphinxdoc.urls')),
-    url(r'^compare/(?P<app>[a-z]+)/(?P<kind>[a-z]+)/(?P<pk>\d+)$', ReversionCompareView.as_view() ),
     url(r'^', include('webpage.urls', namespace='webpage')),
     url(r'^accounts/', include('registration.backends.simple.urls')),
 ]
