@@ -531,19 +531,19 @@ class NetworkVizFilterForm(forms.Form):
         self.fields['search_source'] = autocomplete.Select2ListCreateChoiceField(
                                         label='Search source',
                                         widget=autocomplete.ListSelect2(
-                                            url=reverse('generic_network_entities_autocomplete',
+                                            url=reverse('entities:generic_network_entities_autocomplete',
                                                         kwargs={'entity': 'person'}),
                                             attrs=attrs))
         self.fields['search_target'] = autocomplete.Select2ListCreateChoiceField(
                                         label='Search target',
                                         widget=autocomplete.ListSelect2(
-                                            url=reverse('generic_network_entities_autocomplete',
+                                            url=reverse('entities:generic_network_entities_autocomplete',
                                                         kwargs={'entity': 'place'}),
                                             attrs=attrs))
         self.fields['select_kind'] = autocomplete.Select2ListCreateChoiceField(
                                         label='Select kind',
                                         widget=autocomplete.ListSelect2(
-                                            url=reverse('generic_vocabularies_autocomplete',
+                                            url=reverse('vocabularies:generic_vocabularies_autocomplete',
                                                         kwargs={'vocab': 'personplacerelation',
                                                                 'direct': 'normal'}),
                                             attrs=attrs))
