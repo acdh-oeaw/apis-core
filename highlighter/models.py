@@ -72,21 +72,26 @@ class Annotation(models.Model):
         'entities.Place',
         'entities.Event',
         'entities.Work',
+        'entities.Coin',
         'relations.PersonPerson',
         'relations.PersonPlace',
         'relations.PersonInstitution',
         'relations.PersonEvent',
         'relations.PersonWork',
+        'relations.PersonCoin',
         'relations.InstitutionPlace',
         'relations.InstitutionEvent',
         'relations.InstitutionWork',
         'relations.InstitutionInstitution',
+        'relations.InstitutionCoin',
         'relations.PlaceEvent',
         'relations.PlaceWork',
         'relations.PlacePlace',
+        'relations.PlaceCoin',
         'relations.EventWork',
         'relations.EventEvent',
-        'relations.WorkWork'
+        'relations.WorkWork',
+        'relations.WorkCoin'
     )  # generic field to store the relation object
     entity_candidate = models.ManyToManyField('metainfo.UriCandidate', blank=True)
     orig_string = models.CharField(max_length=255, blank=True, null=True)    # string originally highlighted
