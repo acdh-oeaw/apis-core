@@ -4,6 +4,10 @@ import reversion
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 from guardian.shortcuts import assign_perm, remove_perm
+from django.conf import settings
+from registration.backends.simple.views import RegistrationView
+from registration.signals import user_registered
+from django.contrib.auth.models import Group
 
 from metainfo.models import TempEntityClass, Uri, Text, Collection
 from labels.models import Label
@@ -214,3 +218,10 @@ def add_usergroup_collection(sender, instance, **kwargs):
                         z+'_'+y.__name__.lower(),
                         x,
                         y.objects.filter(collection=instance))
+
+
+@receiver(user_registered, sender=RegistrationView, dispatch_uid="add_registered_user_to_group")
+def add_user_to_group(sender, user, request, **kwargs):
+    user_group = getattr(settings, "APIS_AUTO_USERGROUP", None)
+    if user_group is not None:
+        user.groups.add(Group.objects.get(name=user_group))
