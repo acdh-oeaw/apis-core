@@ -376,7 +376,7 @@
         html += '<a class="list-group-item" onclick=DeleteTempEntity("'+ann_id+'","HLAnnotation")>Delete Annotation</a>'
         if (entity_type == 'relations') {
         html += '<a class="list-group-item" onclick=DeleteAnnTempEntity("'+ann_id+'","'+entity_class_rel+'","'+entity_pk_rel+'")>Delete Complete</a>'
-        html += '<a class="list-group-item" href="/entities/'+entity_class+'/edit/'+entity_pk+'">Goto entity</a>'
+        html += '<a class="list-group-item" href="/entities/entity/'+entity_class+'/'+entity_pk+'/edit">Goto entity</a>'
         if ($(this).data('entity-class')) {
         html += '<a class="list-group-item" onclick=GetFormAjaxHighl("'+$(this).data('entity-class')+'Form","'+entity_pk_rel+'")>Edit Entity</a>'}}
         if (entity_type == 'entities' && $(this).data('entity-class')){

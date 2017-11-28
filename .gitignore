@@ -3,6 +3,7 @@
 *.idea
 
 *.sqlite3
+*.mp4
 
 data/
 migrations/
