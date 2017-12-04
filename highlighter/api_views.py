@@ -5,6 +5,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 from django.contrib.contenttypes.models import ContentType
+import pickle
 
 from .models import Project, TextHigh, MenuEntry, VocabularyAPI, Annotation
 from .serializer import (
@@ -15,6 +16,8 @@ from .serializer import (
 from metainfo.models import Text
 from metainfo.api_renderers import TEIBaseRenderer
 from helper_functions.inter_annotator_agreement import InternalDataAgreement
+from helper_functions.dl_models import test_model
+
 
 
 
@@ -152,3 +155,15 @@ class ShowOverlappingHighlights(APIView):
                 left_offset_text, ann.get_html_markup(), txt.text[ann.start:ann.end], right_offset_text)
         res += '</ul>'
         return Response({'data': res})
+
+
+class TestDLModel(APIView):
+
+    def get(self, request, format=None):
+        model = request.query_params.get('model')
+        text = request.query_params.get('text')
+
+        res = test_model(model, text)
+        print(res)
+        return Response({'data': res})
+
