@@ -166,7 +166,7 @@ def train_model(col_pk, text_type_name, spc_ent_type, ann_proj_pk, user_pk, rela
 
 def test_model(model, sent):
     K.clear_session()
-    fileh = open('/var/wwww/apis-core/data/nlp_models/{}_vocab.obj'.format(model), 'rb')
+    fileh = open('/var/www/apis-core/data/nlp_models/{}_vocab.obj'.format(model), 'rb')
     lst_orth, lst_orth_dict, lst_labels, lst_labels_dict, lst_zero_label, lst_labels_dhae2 = pickle.load(fileh)
     model = keras.models.load_model('/var/www/apis-core/data/nlp_models/{}.h5'.format(model))
     result = []
