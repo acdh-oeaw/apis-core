@@ -168,7 +168,7 @@ def test_model(model, sent):
     K.clear_session()
     fileh = open('/var/wwww/apis-core/data/nlp_models/{}_vocab.obj'.format(model), 'rb')
     lst_orth, lst_orth_dict, lst_labels, lst_labels_dict, lst_zero_label, lst_labels_dhae2 = pickle.load(fileh)
-    model = keras.models.load_model('/var/wwww/apis-core/data/nlp_models/{}.h5'.format(model))
+    model = keras.models.load_model('/var/www/apis-core/data/nlp_models/{}.h5'.format(model))
     result = []
     txt = nlp(sent)
     tokens_lst = []
