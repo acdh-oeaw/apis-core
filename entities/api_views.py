@@ -1,9 +1,12 @@
 from rest_framework import viewsets, generics, filters
+from rest_framework.reverse import reverse_lazy
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
+
+from helper_functions.RDFparsers import GenericRDFParser
 from .serializers import (
     InstitutionSerializer, PersonSerializer, PlaceSerializer, EventSerializer, WorkSerializer,
     GeoJsonSerializer, NetJsonEdgeSerializer, NetJsonNodeSerializer
@@ -17,6 +20,7 @@ from rest_framework.settings import api_settings
 from rest_framework.permissions import DjangoObjectPermissions, AllowAny
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import FileUploadParser
+from django.urls import reverse
 
 import re
 import json
@@ -269,3 +273,14 @@ class ResolveAbbreviations(APIView):
         file_obj = request.data['file']
         txt = TextIOWrapper(file_obj, encoding='utf8')
         return Response(status=204)
+
+
+class GetOrCreateEntity(APIView):
+
+    def post(self, request):
+        entity = request.query_params.get('entity2', None)
+        uri = request.query_params.get('uri', None)
+        ent = GenericRDFParser(uri, entity.title()).get_or_create()
+        res = {'id': ent.pk, 'url': reverse_lazy('entities:generic_entities_edit_view', request=request,
+                                            kwargs={'pk': ent.pk, 'entity': entity})}
+        return Response(res)
