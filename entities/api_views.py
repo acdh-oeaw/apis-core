@@ -277,7 +277,7 @@ class ResolveAbbreviations(APIView):
 
 class GetOrCreateEntity(APIView):
 
-    def post(self, request):
+    def get(self, request):
         entity = request.query_params.get('entity2', None)
         uri = request.query_params.get('uri', None)
         ent = GenericRDFParser(uri, entity.title()).get_or_create()
