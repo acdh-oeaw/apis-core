@@ -3,6 +3,7 @@ from keras.models import load_model
 from keras.preprocessing.text import Tokenizer
 import pickle
 from keras import backend as K
+import os
 
 import spacy
 from spacy.matcher import Matcher
@@ -38,7 +39,6 @@ def extract_verbs_from_entity(ent, lst_orth, lst_orth_dict, accept_pos=['VERB', 
                         tokens.append(len(lst_orth))
                     else:
                         continue
-                    #tokens.append(head.orth)
                     pos_tags.append(head.pos)
                     shapes.append(head.shape)
             else:
@@ -48,9 +48,12 @@ def extract_verbs_from_entity(ent, lst_orth, lst_orth_dict, accept_pos=['VERB', 
 
 def test_model(model, sent):
     K.clear_session()
-    fileh = open('data/nlp_models/{}_vocab.obj'.format(model), 'rb')
+    script_dir = os.path.dirname(os.path.relpath('__file__'))
+    fileh = open(os.path.join(script_dir,
+                              'apis_core/data/nlp_models/{}_vocab.obj'.format(model)), 'rb')
     lst_orth, lst_orth_dict, lst_labels, lst_labels_dict, lst_zero_label, lst_labels_dhae2 = pickle.load(fileh)
-    model = load_model('data/nlp_models/{}.h5'.format(model))
+    model = load_model(os.path.join(script_dir,
+                       'data/nlp_models/{}.h5'.format(model)))
     result = []
     txt = nlp(sent)
     tokens_lst = []
@@ -72,4 +75,3 @@ def test_model(model, sent):
                     v_id = VocabsBaseClass.objects.get(id=k).name
             result.append((str(txt.ents[idx1]), idx, v_id, x))
     return result
-
