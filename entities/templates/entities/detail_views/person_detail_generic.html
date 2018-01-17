@@ -1,0 +1,62 @@
+{% extends "entities/detail_views/entity_detail_generic.html" %}
+{% block Titel %} {{ object.id }} {% endblock %}
+
+
+    {% block info-table %}
+    <table class="table table-bordered table-hover">
+        <tr>
+            <th>
+                Name
+            </th>
+            <td>
+                {{ object.name }}, {{ object.first_name }}
+            </td>
+        </tr>
+        <tr>
+          <th>
+            Gender
+          </th>
+          <td>
+            {{ object.gender }}
+          </td>
+        </tr>
+        {% if object.start_date or object.end_date %}
+        <tr>
+            <th>
+                Lifespan
+            </th>
+            <td>
+                {% if object.start_date %}
+                    <abbr title="{{ object.start_date_written }}">{{ object.start_date }}</abbr>
+                {% endif %}
+                {% if object.end_date %}
+                    - <abbr title="{{ object.end_date_written }}">{{ object.end_date }}</abbr>
+                {% endif %}
+            </td>
+        </tr>
+        {% endif %}
+        {% if object.profession.all %}
+        <tr>
+            <th>
+                Professions
+            </th>
+            <td>
+              {% for prof in object.profession.all %}
+                {{ prof.name }}{% if forloop.last %}{% else %},{% endif %}
+              {% endfor %}
+            </td>
+        </tr>
+        {% endif %}
+        {% if object.uri_set %}
+        <tr>
+          <th>
+            URIs
+          </th>
+          <td>
+            {% for uri in object.uri_set.all %}<a href="{{uri.uri}}">{{uri.uri}}</a>
+              {% if forloop.last %}{% else %},{% endif %}
+            {% endfor %}
+          </td>
+          {% endif %}
+    </table>
+    {% endblock info-table %}

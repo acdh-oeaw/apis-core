@@ -2,11 +2,13 @@
 {% load staticfiles %}
 {% load django_tables2 %}
 {% block Titel %} {{ object.id }} {% endblock %}
-
-{% block content %}
+{% block scriptHeader %}
+{{ block.super }}
 <link rel="stylesheet" href="http://teic.github.io/CETEIcean/css/CETEIcean.css" media="screen" charset="utf-8">
 <script src="http://teic.github.io/CETEIcean/js/CETEI.js"></script>
-<div class="container">
+{% endblock scriptHeader %}
+{% block content %}
+<div class="row" xmlns="http://www.w3.org/1999/html">
     <div class="panel panel-default procustom-panel-create">
         <div class="panel-heading procustom-panel-heading">
             <div class="row">
@@ -26,7 +28,7 @@
                          </a>
                      {% endif %}
                     </h1>
-                    <small><a href="{% url 'entities:generic_entities_list' 'work' %}">see all works</a></small>
+                    <small><a href="{% url 'entities:generic_entities_list' entity_type %}">see all {{entity_type}}</a></small>
                 </div>
                 <div class="col-md-2">
                 {% if object.get_next %}
@@ -41,6 +43,7 @@
             <div class="col-md-6">
                 <div class="panel-body">
                     <legend>General Info</legend>
+                    {% block info-table %}
                     <table class="table table-bordered table-hover">
                         <tr>
                             <th>
@@ -74,7 +77,9 @@
                         </tr>
                         {% endif %}
                     </table>
+                    {% endblock info-table %}
                     <legend>Relations</legend>
+                    {% block relations %}
                     {% for obj in right_panel %}
                         {% if obj.1.data|length > 0 %}
                             <div class="panel panel-default">
@@ -89,6 +94,8 @@
                             </div>
                         {% endif %}
                     {% endfor %}
+                    {% endblock relations %}
+                    {% block images %}
                     {% if object.work_depicted_by.all %}
                         <legend>Images</legend>
                         {% for x in object.work_depicted_by.all %}
@@ -97,47 +104,58 @@
                             </li>
                         {% endfor %}
                     {% endif %}
-
+                    {% endblock images %}
+                    {% block left-pane-additional %}
+                    {% endblock left-pane-additional %}
                 </div>
             </div>
             <div class="col-md-6">
+              {% block right-pane-additional %}
+              {% endblock right-pane-additional %}
+              {% block right-panel-text %}
                 {% if object.text.all %}
                     <div class="panel-body">
                         <legend>
                             Text as TEI
                         </legend>
                         {% for x in object.text.all %}
+                        {% if "<text" in x.text %}
                         <div id="TEI">
                             hansi
                         </div>
+                        {% endif %}
                             <div class="panel panel-default">
                                 <div class="panel-heading">
                                     <h4 class="panel-title"> {{ x.kind }}</h4>
                                 </div>
                                 <div class="panel-body">
-                                    <div class="panel-body" id="sourctei">
+                                    <div class="panel-body" {% if "<text" in x.text %}id="sourctei"{% endif %}>
                                             {{ x.text }}
                                     </div>
                                 </div>
                             </div>
                         {% endfor %}
-                        <script>
-                            var CETEIcean = new CETEI();
-                            var teiString = $("#sourctei").text();
-                            CETEIcean.makeHTML5(teiString, function(data) {
-                                document.getElementById("TEI").innerHTML = "";
-                                document.getElementById("TEI").appendChild(data);
-                                CETEIcean.addStyle(document, data);
-                            });
-                        </script>
                     </div>
                 {% else %}
                     <div class="panel-body">
                         <legend>No text provided for this Work</legend>
                     </div>
                 {% endif %}
+                {% endblock right-panel-text %}
             </div>
         </div>
     </div>
 </div>
 {% endblock content %}
+{% block scripts %}
+{{block.super}}
+<script type="text/javascript">
+    var CETEIcean = new CETEI();
+    var teiString = $("#sourctei").text();
+    CETEIcean.makeHTML5(teiString, function(data) {
+        document.getElementById("TEI").innerHTML = "";
+        document.getElementById("TEI").appendChild(data);
+        CETEIcean.addStyle(document, data);
+    });
+</script>
+{% endblock scripts %}
