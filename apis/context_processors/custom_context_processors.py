@@ -1,10 +1,14 @@
-from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
+import sys, inspect
 
 
 def add_entities(request):
+    ent_list = []
+    for name, obj in inspect.getmembers(sys.modules['entities.models'], inspect.isclass):
+        if obj.__module__ == 'entities.models':
+            ent_list.append(str(name).lower())
     res = {
-        'entities_list': [x.name for x in ContentType.objects.filter(app_label='entities')],
+        'entities_list': ent_list,
         'request': request
     }
     return res
