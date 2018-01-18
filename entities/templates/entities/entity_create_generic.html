@@ -50,7 +50,7 @@
                     {% block editbuttons %}
     {% if instance %}
     {% if "delete" in permissions %}
-                    <input class ="btn btn-danger btn-primary" type="submit" value="delete" />
+                    <a class ="btn btn-danger btn-primary" href="delete">Delete</a>
     {% endif %}
     {% if "change" in permissions %}
     <input class="btn btn-primary" type="submit" value="modify" />
