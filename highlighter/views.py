@@ -3,9 +3,11 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
 
 from highlighter.forms import SelectAnnotatorAgreementCollection
-from helper_functions.inter_annotator_agreement import InternalDataAgreement
+if 'annotator agreement' in getattr(settings, "APIS_COMPONENTS", []):
+    from helper_functions.inter_annotator_agreement import InternalDataAgreement
 from metainfo.models import Text, Collection, TempEntityClass
 
 
