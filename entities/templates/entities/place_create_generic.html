@@ -10,7 +10,7 @@
                                 </a>
                             </h4>
                         </div>
-                
+
                 <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
                             <div id="tab_Map" class="panel-body">
                             <div class="input-group">
@@ -41,7 +41,7 @@
 
             layer.bindPopup(popupContent);
         };
-    
+
 
         var mymap = L.map('map').setView([51.505, -0.09], 13);
 
@@ -69,10 +69,10 @@
                 }
             });
 
-     
-     $.ApisMaps.PlaceMap.map = mymap 
 
-    
+     $.ApisMaps.PlaceMap.map = mymap
+
+
 
 </script>
 <script type="text/javascript">
@@ -100,7 +100,7 @@
                     //$(data).each(function(key, data) {
                     //    district_boundary.addData(data);
                     //});
-                    
+
                 }
             });
         })
@@ -149,7 +149,7 @@ $(function(){
     {% if instance %}
         {% get_obj_perms request.user for instance as "instance_perms" %}
     {% if "delete_place" in instance_perms %}
-        <input class="btn btn-danger btn-primary" type="submit" value="delete" />
+        <a class ="btn btn-danger btn-primary" href="delete">Delete</a>
     {% endif %}
     {% if "change_place" in instance_perms %}
     <input class="btn btn-primary" type="submit" value="modify" />
