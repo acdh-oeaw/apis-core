@@ -61,7 +61,7 @@ import json
 ############################################################################
 ############################################################################
 
-
+@login_required
 def set_session_variables(request):
     ann_proj_pk = request.GET.get('project', None)
     types = request.GET.getlist('types', None)
@@ -75,6 +75,7 @@ def set_session_variables(request):
     return request
 
 
+@login_required
 def get_highlighted_texts(request, instance):
     set_ann_proj = request.session.get('annotation_project', 1)
     entity_types_highlighter = request.session.get('entity_types_highlighter', None)
@@ -144,10 +145,9 @@ class GenericListViewNew(ExportMixin, SingleTableView):
         return self.filter.qs
 
     def get_table(self, **kwargs):
-        edit_v = self.request.GET.get('edit_view', False)
+        edit_v = self.request.session.get('edit_views', False)
         self.table_class = get_entities_table(self.entity.title(), edit_v)
         table = super(GenericListViewNew, self).get_table()
-        print(table)
         RequestConfig(self.request, paginate={
             'page': 1, 'per_page': self.paginate_by}).configure(table)
         return table

@@ -6,6 +6,7 @@ from django.conf import settings
 
 
 def get_entities_table(entity, edit_v):
+
     class GenericEntitiesTable(tables.Table):
         if edit_v:
             name = tables.LinkColumn('entities:generic_entities_edit_view', args=[entity.lower(), A('pk')])
