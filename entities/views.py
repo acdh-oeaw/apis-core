@@ -66,12 +66,17 @@ def set_session_variables(request):
     ann_proj_pk = request.GET.get('project', None)
     types = request.GET.getlist('types', None)
     users_show = request.GET.getlist('users_show', None)
+    edit_views = request.GET.get('edit_views', False)
+    print('edit views: {}'.format(edit_views))
     if types:
         request.session['entity_types_highlighter'] = types
     if users_show:
         request.session['users_show_highlighter'] = users_show
     if ann_proj_pk:
         request.session['annotation_project'] = ann_proj_pk
+    if edit_views:
+        if edit_views != 'false':
+            request.session['edit_views'] = True
     return request
 
 
@@ -100,6 +105,7 @@ def get_highlighted_texts(request, instance):
 #
 ############################################################################
 ############################################################################
+
 
 @method_decorator(login_required, name='dispatch')
 class GenericListView(SingleTableView):
@@ -145,6 +151,7 @@ class GenericListViewNew(ExportMixin, SingleTableView):
         return self.filter.qs
 
     def get_table(self, **kwargs):
+        self.request = set_session_variables(self.request)
         edit_v = self.request.session.get('edit_views', False)
         self.table_class = get_entities_table(self.entity.title(), edit_v)
         table = super(GenericListViewNew, self).get_table()
