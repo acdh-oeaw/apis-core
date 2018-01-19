@@ -106,6 +106,7 @@ def get_highlighted_texts(request, instance):
 ############################################################################
 ############################################################################
 
+
 @method_decorator(login_required, name='dispatch')
 class GenericListView(SingleTableView):
     filter_class = None

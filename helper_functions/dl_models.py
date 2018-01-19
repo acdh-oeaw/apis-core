@@ -19,7 +19,8 @@ lst_orth = []
 lst_orth_dict = dict()
 
 
-def extract_verbs_from_entity(ent, lst_orth, lst_orth_dict, accept_pos=['VERB', 'AUX', 'NOUN', 'ADP', 'PART'], add=True):
+def extract_verbs_from_entity(
+        ent, lst_orth, lst_orth_dict, accept_pos=['VERB', 'AUX', 'NOUN', 'ADP', 'PART'], add=True):
     res = []
     for y in ent:
         head = y
