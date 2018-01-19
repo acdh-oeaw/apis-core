@@ -1,5 +1,7 @@
+import sys
+import inspect
+
 from django.conf import settings
-import sys, inspect
 
 
 def add_entities(request):
@@ -15,6 +17,7 @@ def add_entities(request):
 
 
 def add_apis_settings(request):
+    """adds the custom settings to the templates"""
     res = {
         'additional_functions': getattr(settings, "APIS_COMPONENTS", []),
         'request': request

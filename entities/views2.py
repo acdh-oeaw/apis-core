@@ -19,29 +19,18 @@ from metainfo.models import Uri
 from relations.tables import get_generic_relations_table, EntityLabelTable
 from .forms import get_entities_form, FullTextForm, GenericEntitiesStanbolForm
 from highlighter.forms import SelectAnnotatorAgreement
+from .views import set_session_variables
 
 
 @method_decorator(login_required, name='dispatch')
 class GenericEntitiesEditView(View):
-    @staticmethod
-    def set_session_variables(request):
-        ann_proj_pk = request.GET.get('project', None)
-        types = request.GET.getlist('types', None)
-        users_show = request.GET.getlist('users_show', None)
-        if types:
-            request.session['entity_types_highlighter'] = types
-        if users_show:
-            request.session['users_show_highlighter'] = users_show
-        if ann_proj_pk:
-            request.session['annotation_project'] = ann_proj_pk
-        return request
 
     def get(self, request, *args, **kwargs):
         entity = kwargs['entity']
         pk = kwargs['pk']
         entity_model = ContentType.objects.get(app_label='entities', model=entity).model_class()
         instance = get_object_or_404(entity_model, pk=pk)
-        request = self.set_session_variables(request)
+        request = set_session_variables(request)
         relations = ContentType.objects.filter(app_label='relations', model__icontains=entity)
         side_bar = []
         for rel in relations:
