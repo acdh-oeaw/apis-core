@@ -47,7 +47,7 @@ $(function(){
     {% if instance %}
         {% get_obj_perms request.user for instance as "instance_perms" %}
     {% if "delete_institution" in instance_perms %}
-        <input class="btn btn-danger btn-primary" type="submit" value="delete" />
+        <a class ="btn btn-danger btn-primary" href="delete">Delete</a>
     {% endif %}
     {% if "change_institution" in instance_perms %}
     <input class="btn btn-primary" type="submit" value="modify" />

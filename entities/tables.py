@@ -5,9 +5,13 @@ from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 
 
-def get_entities_table(entity):
+def get_entities_table(entity, edit_v):
+
     class GenericEntitiesTable(tables.Table):
-        name = tables.LinkColumn('entities:generic_entities_edit_view', args=[entity.lower(), A('pk')])
+        if edit_v:
+            name = tables.LinkColumn('entities:generic_entities_edit_view', args=[entity.lower(), A('pk')])
+        else:
+            name = tables.LinkColumn('entities:generic_entities_detail_view', args=[entity.lower(), A('pk')])
         export_formats = ['csv', 'json', 'xls', 'xlsx']
 
         class Meta:

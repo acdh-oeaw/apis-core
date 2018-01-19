@@ -1,9 +1,25 @@
-from django.contrib.contenttypes.models import ContentType
+import sys
+import inspect
+
+from django.conf import settings
 
 
 def add_entities(request):
+    ent_list = []
+    for name, obj in inspect.getmembers(sys.modules['entities.models'], inspect.isclass):
+        if obj.__module__ == 'entities.models':
+            ent_list.append(str(name).lower())
     res = {
-        'entities_list': [x.name for x in ContentType.objects.filter(app_label='entities')],
+        'entities_list': ent_list,
+        'request': request
+    }
+    return res
+
+
+def add_apis_settings(request):
+    """adds the custom settings to the templates"""
+    res = {
+        'additional_functions': getattr(settings, "APIS_COMPONENTS", []),
         'request': request
     }
     return res
