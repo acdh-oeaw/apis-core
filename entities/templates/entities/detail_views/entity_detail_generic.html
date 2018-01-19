@@ -119,7 +119,7 @@
                 {% if object.text.all %}
                     <div class="panel-body">
                         <legend>
-                            Text as TEI
+                            Texts
                         </legend>
                         {% for x in object.text.all %}
                         {% if "<text" in x.text %}
@@ -141,7 +141,7 @@
                     </div>
                 {% else %}
                     <div class="panel-body">
-                        <legend>No text provided for this Work</legend>
+                        <legend>No text provided for this {{entity-type}}</legend>
                     </div>
                 {% endif %}
                 {% endblock right-panel-text %}
