@@ -1,4 +1,5 @@
 from SPARQLWrapper import SPARQLWrapper, JSON
+from urllib.parse import urlsplit
 
 def sparql_coin_autocomplete(q, page_size=20, offset=0):
 
@@ -34,8 +35,8 @@ def sparql_coin_autocomplete(q, page_size=20, offset=0):
     results = sparql.query().convert()
     res = []
     for r in results['results']['bindings']:
-        txt = '''<span class="autocomplete-span" data-pic="{}"><small>nom</small><b>{}</b></span>
-                '''.format(r['pic']['value'], r['name']['value'])
+        txt = '''<span class="apis-autocomplete-span coin" data-vis-tooltip="coin" data-apis-pic="{}"><small>nom</small>&nbsp;<b>{}</b>&nbsp;({})</span>
+                '''.format(r['pic']['value'], r['name']['value'], urlsplit(r['o']['value']).netloc)
         res.append({'text': txt, 'id': r['id']['value']})
     return res
 
