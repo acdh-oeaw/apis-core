@@ -70,11 +70,12 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
         if not db_include:
             for r in res[offset:offset+page_size]:
                 f = dict()
+                dataclass = ""
                 try:
                     f['id'] = Uri.objects.filter(entity=r)[0].uri
                 except:
                     continue
-                f['text'] = '<small>db</small> {}'.format(str(r))
+                f['text'] = '<span {} class="apis-autocomplete-span"><small>db</small> {}</span>'.format(dataclass, str(r))
                 choices.append(f)
             if len(choices) < page_size:
                 test_db = False
@@ -106,6 +107,7 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                     test_stanbol_list[y['url']] = True
                 for x in res['results']:
                     f = dict()
+                    dataclass = ""
                     name = x['name'][0]['value']
                     score = str(x[ac_settings['score']][0]['value'])
                     id = x[ac_settings['uri']]
@@ -116,7 +118,7 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                         descr = x['descr'][0]['value']
                     else:
                         descr = None
-                    f['text'] = '<small>{}</small> <b>{}</b> ({}): {}'.format(source, name, score, descr)
+                    f['text'] = '<span {} class="apis-autocomplete-span"><small>{}</small> <b>{}</b> ({}): {}</span>'.format(dataclass, source, name, score, descr)
                     choices.append(f)
             for k in test_stanbol_list.keys():
                 if test_stanbol_list[k]:
