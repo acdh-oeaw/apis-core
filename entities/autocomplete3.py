@@ -4,6 +4,7 @@ from entities.models import Place, Person, Institution, Event, Work
 from metainfo.models import Uri, Collection
 from apis.settings.NER_settings import autocomp_settings as ac_settings
 from django.conf import settings
+from .custom_autocompletes import CustomEntityAutocompletes
 
 from dal import autocomplete
 from django.db.models import Q
@@ -122,7 +123,10 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                     test_stanbol = True
         else:
             test_stanbol = False
-        if not test_db and not test_stanbol:
+        cust_auto = CustomEntityAutocompletes(ac_type, q, page_size=page_size, offset=offset)
+        if len(cust_auto.results) > 0:
+            choices.extend(cust_auto.results)
+        if not test_db and not test_stanbol and not cust_auto.more:
             more = False
         return http.HttpResponse(json.dumps({
             'results': choices + [],
