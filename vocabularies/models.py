@@ -161,6 +161,18 @@ class CoinType(VocabsBaseClass):
 
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
+class ArtifactType(VocabsBaseClass):
+    """Holds controlled vocabularies about coin-types"""
+    pass
+
+
+@reversion.register(follow=['vocabsbaseclass_ptr'])
+class Material(VocabsBaseClass):
+    """Holds controlled vocabularies about coin-types"""
+    pass
+
+
+@reversion.register(follow=['vocabsbaseclass_ptr'])
 class LabelType(VocabsBaseClass):
     """Holds controlled vocabularies about label-types"""
     pass
@@ -225,6 +237,12 @@ class PersonCoinRelation(RelationBaseClass):
     """Holds controlled vocabularies relation types of Persons and Coins"""
     pass
 
+
+@reversion.register(follow=['relationbaseclass_ptr'])
+class PersonArtifactRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Persons and Artifacts"""
+    pass
+
 #######################################################################
 # Institution-Relation-Types
 #######################################################################
@@ -259,6 +277,12 @@ class InstitutionCoinRelation(RelationBaseClass):
     """Holds controlled vocabularies relation types of Institutions and Coins."""
     pass
 
+
+@reversion.register(follow=['relationbaseclass_ptr'])
+class InstitutionArtifactRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Institutions and Artifacts."""
+    pass
+
 #######################################################################
 # Place-Relation-Types
 #######################################################################
@@ -284,6 +308,12 @@ class PlaceWorkRelation(RelationBaseClass):
 
 @reversion.register(follow=['relationbaseclass_ptr'])
 class PlaceCoinRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Places and Coins"""
+    pass
+
+
+@reversion.register(follow=['relationbaseclass_ptr'])
+class PlaceArtifactRelation(RelationBaseClass):
     """Holds controlled vocabularies relation types of Places and Coins"""
     pass
 
@@ -318,4 +348,10 @@ class WorkWorkRelation(RelationBaseClass):
 @reversion.register(follow=['relationbaseclass_ptr'])
 class WorkCoinRelation(RelationBaseClass):
     """Holds controlled vocabularies relation types of Works and Coins"""
+    pass
+
+
+@reversion.register(follow=['relationbaseclass_ptr'])
+class WorkArtifactRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Works and Artifacts"""
     pass

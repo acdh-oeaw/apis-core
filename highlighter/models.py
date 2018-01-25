@@ -73,25 +73,30 @@ class Annotation(models.Model):
         'entities.Event',
         'entities.Work',
         'entities.Coin',
+        'entities.Artifact',
         'relations.PersonPerson',
         'relations.PersonPlace',
         'relations.PersonInstitution',
         'relations.PersonEvent',
         'relations.PersonWork',
         'relations.PersonCoin',
+        'relations.PersonArtifact',
         'relations.InstitutionPlace',
         'relations.InstitutionEvent',
         'relations.InstitutionWork',
         'relations.InstitutionInstitution',
         'relations.InstitutionCoin',
+        'relations.InstitutionArtifact',
         'relations.PlaceEvent',
         'relations.PlaceWork',
         'relations.PlacePlace',
         'relations.PlaceCoin',
+        'relations.Placeartifact',
         'relations.EventWork',
         'relations.EventEvent',
         'relations.WorkWork',
-        'relations.WorkCoin'
+        'relations.WorkCoin',
+        'relations.WorkArtifact'
     )  # generic field to store the relation object
     entity_candidate = models.ManyToManyField('metainfo.UriCandidate', blank=True)
     orig_string = models.CharField(max_length=255, blank=True, null=True)    # string originally highlighted
@@ -116,8 +121,8 @@ class Annotation(models.Model):
     def annotation_hash(self, format_string='start_end_text_ent_entid'):
         """
         Function that returns a hash of the annotaion used to calculate inter-annotator agreement.
-        
-        :return: 
+
+        :return:
         """
         matching = {'start': 'start', 'end': 'end', 'text': 'text_id'}
         f_list = format_string.split('_')

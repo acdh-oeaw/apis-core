@@ -12,7 +12,8 @@ from django.contrib.auth.models import Group
 from metainfo.models import TempEntityClass, Uri, Text, Collection
 from labels.models import Label
 from vocabularies.models import (ProfessionType, PlaceType, InstitutionType,
-                                 EventType, Title, WorkType, CoinType)
+                                 EventType, Title, WorkType, CoinType, Material,
+                                 ArtifactType)
 from apis.settings.base import BASE_URI
 from apis.settings.base import BASE_DIR
 
@@ -172,8 +173,9 @@ class Coin(TempEntityClass):
     """ A temporalized entity to model a Coin"""
 
     kind = models.ForeignKey(CoinType, blank=True, null=True, max_length=255)
-    metal = models.CharField(blank=True, null=True, max_length=255)
-    exact_date = models.CharField(blank=True, null=True, verbose_name='Exact date', max_length=255)
+    material = models.ForeignKey(Material, blank=True, null=True, max_length=255)
+    denomination = models.CharField(blank=True, null=True,
+                                    verbose_name='Denomination', max_length=255)
 
     def __str__(self):
         if self.name != "":
@@ -192,6 +194,32 @@ class Coin(TempEntityClass):
             return False
 
 
+@reversion.register(follow=['tempentityclass_ptr'])
+class Artifact(TempEntityClass):
+    """ A temporalized entity to model a Artifact"""
+
+    kind = models.ForeignKey(ArtifactType, blank=True, null=True, max_length=255)
+    material = models.ForeignKey(Material, blank=True, null=True, max_length=255)
+    provenance = models.CharField(blank=True, null=True,
+                                  verbose_name='Provenance', max_length=255)
+
+    def __str__(self):
+        if self.name != "":
+            return self.name
+        else:
+            return "no name provided"
+
+    def get_or_create_uri(uri):
+        try:
+            if re.match(r'^[0-9]*$', uri):
+                p = Artifact.objects.get(pk=uri)
+            else:
+                p = Artifact.objects.get(uri__uri=uri)
+            return p
+        except:
+            return False
+
+
 @receiver(post_save, sender=Event, dispatch_uid="create_default_uri")
 @receiver(post_save, sender=Work, dispatch_uid="create_default_uri")
 @receiver(post_save, sender=Institution, dispatch_uid="create_default_uri")
@@ -202,9 +230,9 @@ def create_default_uri(sender, instance, **kwargs):
     uri = Uri.objects.filter(entity=instance)
     if uri.count() == 0:
         uri2 = Uri(
-                uri=''.join((BASE_URI, str(instance.pk))),
-                domain='apis default',
-                entity=instance)
+            uri=''.join((BASE_URI, str(instance.pk))),
+            domain='apis default',
+            entity=instance)
         uri2.save()
 
 

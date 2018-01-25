@@ -15,14 +15,16 @@ from .forms import PersonLabelForm
 from highlighter.models import Annotation
 from .models import (PersonPlace, PersonPerson, PersonInstitution, InstitutionPlace,
                      InstitutionInstitution, PlacePlace, PersonEvent, InstitutionEvent, PlaceEvent, PersonWork,
-                     InstitutionWork, PlaceWork, EventWork, WorkWork)
+                     InstitutionWork, PlaceWork, EventWork, WorkWork, InstitutionArtifact,
+                     PlaceArtifact, PersonArtifact, InstitutionCoin, PersonCoin,
+                     PlaceCoin, WorkCoin, WorkArtifact)
 from .tables import PersonInstitutionTable
 from relations.tables import (PersonInstitutionTable, PersonPersonTable, PersonPlaceTable,
                               EntityLabelTable, InstitutionPlaceTable, InstitutionInstitutionTable,
                               PersonEventTable, InstitutionEventTable, PlaceEventTable, PersonWorkTable,
                               InstitutionWorkTable, PlaceWorkTable, EventWorkTable, EntityUriTable, PlacePlaceTable)
 from metainfo.models import Uri
-from entities.models import Person, Institution, Place, Event, Work
+from entities.models import Person, Institution, Place, Event, Work, Artifact, Coin
 from entities.forms import PersonResolveUriForm
 from labels.models import Label
 from helper_functions.highlighter import highlight_text
@@ -57,6 +59,8 @@ registered_forms = {'WorkWorkForm': [WorkWork, Work, Work],
                     'PersonWorkForm': [PersonWork, Person, Work],
                     'PersonInstitutionHighlighterForm': [PersonInstitution, Person, Institution],
                     'PersonWorkHighlighterForm': [PersonWork, Person, Work],
+                    'PersonCoinForm': [PersonCoin, Person, Coin],
+                    'PersonCoinForm': [PersonArtifact, Person, Artifact],
                     'PlaceWorkHighlighterForm': [PlaceWork, Place, Work],
                     'InstitutionWorkHighlighterForm': [InstitutionWork, Institution, Work],
                     'InstitutionPlaceForm': [InstitutionPlace, Institution, Place],
@@ -68,10 +72,16 @@ registered_forms = {'WorkWorkForm': [WorkWork, Work, Work],
                     'InstitutionPersonForm': [PersonInstitution, Institution, Person],
                     'InstitutionEventForm': [InstitutionEvent, Institution, Event],
                     'InstitutionWorkForm': [InstitutionWork, Institution, Work],
+                    'InstitutionArtifactForm': [InstitutionArtifact, Institution, Artifact],
+                    'InstitutionCoinForm': [InstitutionCoin, Institution, Coin],
                     'PlaceEventForm': [PlaceEvent, Place, Event],
                     'PlaceWorkForm': [PlaceWork, Place, Work],
                     'PlacePlaceForm': [PlacePlace, Place, Place],
+                    'PlaceArtifactForm': [PlaceArtifact, Place, Artifact],
+                    'PlaceCoinForm': [PlaceCoin, Place, Coin],
                     'EventWorkForm': [EventWork, Event, Work],
+                    'WorkCoinForm': [WorkCoin, Work, Coin],
+                    'WorkArtifactForm': [WorkArtifact, Work, Artifact],
                     'InstitutionLabelForm': [Label, Institution, Label],
                     'PersonLabelForm': [Label, Person, Label],
                     'EventLabelForm': [Label, Event, Label],
