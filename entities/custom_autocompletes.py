@@ -60,9 +60,10 @@ class CustomEntityAutocompletes(object):
         """
         :param entity: (string) entity type to fetch additional autocompletes for
         """
-        func_list = {'coin': [sparql_coin_autocomplete,]}
+        func_list = {}
         if entity not in func_list.keys():
-            return False
+            self.results = None
+            return None
         res = []
         more = dict()
         more_gen = False
