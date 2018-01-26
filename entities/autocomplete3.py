@@ -114,8 +114,8 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                     score = score
                     f['id'] = id
                     source = y['source']
-                    if 'lat' in ac_settings.keys() and 'lng' in ac_settings.keys():
-                        dataclass = 'data-vis-tooltip="{}" data-lat="{}" data-lng="{}"'.format(ac_type, x[ac_settings['lat']][0]['value'], x[ac_settings['lng']][0]['value'])
+                    if 'lat' in x.keys() and 'long' in x.keys():
+                        dataclass = 'data-vis-tooltip="{}" data-lat="{}" data-long="{}"'.format(ac_type, x['lat'][0]['value'], x['long'][0]['value'])
                     if 'descr' in x.keys():
                         descr = x['descr'][0]['value']
                     else:
@@ -128,7 +128,7 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
         else:
             test_stanbol = False
         cust_auto = CustomEntityAutocompletes(ac_type, q, page_size=page_size, offset=offset)
-        if cust_auto is not None:
+        if cust_auto.results is not None:
             if len(cust_auto.results) > 0:
                 choices.extend(cust_auto.results)
         if not test_db and not test_stanbol and not cust_auto.more:
