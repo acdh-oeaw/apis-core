@@ -128,10 +128,12 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
         else:
             test_stanbol = False
         cust_auto = CustomEntityAutocompletes(ac_type, q, page_size=page_size, offset=offset)
+        cust_auto_more = False
         if cust_auto.results is not None:
+            cust_auto_more = cust_auto.more
             if len(cust_auto.results) > 0:
                 choices.extend(cust_auto.results)
-        if not test_db and not test_stanbol and not cust_auto.more:
+        if not test_db and not test_stanbol and not cust_auto_more:
             more = False
         return http.HttpResponse(json.dumps({
             'results': choices + [],
