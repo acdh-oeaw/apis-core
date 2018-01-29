@@ -75,7 +75,9 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                     f['id'] = Uri.objects.filter(entity=r)[0].uri
                 except:
                     continue
-                f['text'] = '<span {} class="apis-autocomplete-span"><small>db</small> {}</span>'.format(dataclass, str(r))
+                if r.lng and r.lat:
+                    dataclass = 'data-vis-tooltip="{}" data-lat="{}" data-long="{}"  class="apis-autocomplete-span"'.format(ac_type, r.lat, r.lng)
+                f['text'] = '<span {}><small>db</small> {}</span>'.format(dataclass, str(r))
                 choices.append(f)
             if len(choices) < page_size:
                 test_db = False
