@@ -75,7 +75,10 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                     f['id'] = Uri.objects.filter(entity=r)[0].uri
                 except:
                     continue
-                f['text'] = '<span {} class="apis-autocomplete-span"><small>db</small> {}</span>'.format(dataclass, str(r))
+                if r.lng and r.lat:
+                    dataclass = 'data-vis-tooltip="{}" data-lat="{}" \
+                    data-long="{}"  class="apis-autocomplete-span"'.format(ac_type, r.lat, r.lng)
+                f['text'] = '<span {}><small>db</small> {}</span>'.format(dataclass, str(r))
                 choices.append(f)
             if len(choices) < page_size:
                 test_db = False
@@ -115,12 +118,15 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                     f['id'] = id
                     source = y['source']
                     if 'lat' in x.keys() and 'long' in x.keys():
-                        dataclass = 'data-vis-tooltip="{}" data-lat="{}" data-long="{}"'.format(ac_type, x['lat'][0]['value'], x['long'][0]['value'])
+                        dataclass = 'data-vis-tooltip="{}" \
+                        data-lat="{}" data-long="{}"'.format(
+                            ac_type, x['lat'][0]['value'], x['long'][0]['value'])
                     if 'descr' in x.keys():
                         descr = x['descr'][0]['value']
                     else:
                         descr = None
-                    f['text'] = '<span {} class="apis-autocomplete-span"><small>{}</small> <b>{}</b> ({}): {}</span>'.format(dataclass, source, name, score, descr)
+                    f['text'] = '<span {} class="apis-autocomplete-span"><small>{}</small> <b>{}</b>\
+                    ({}): {}</span>'.format(dataclass, source, name, score, descr)
                     choices.append(f)
             for k in test_stanbol_list.keys():
                 if test_stanbol_list[k]:
