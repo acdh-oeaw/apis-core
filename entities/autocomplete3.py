@@ -49,7 +49,7 @@ class CustomEntityAutocompletes(object):
         more = dict()
         more_gen = False
         for x in func_list[entity]:
-            res2 = x(query, page_size, offset)
+            res2 = x().query(query, page_size, offset)
             if len(res2) == page_size:
                 more[x.__name__] = (True, offset+1)
                 more_gen = True
