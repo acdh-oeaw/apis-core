@@ -21,7 +21,6 @@ import re
 from vocabularies.models import VocabsBaseClass
 
 
-
 class CustomEntityAutocompletes(object):
     """A class for collecting all the custom autocomplete functions for one entity.
 
@@ -132,9 +131,10 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                     f['id'] = Uri.objects.filter(entity=r)[0].uri
                 except:
                     continue
-                if r.lng and r.lat:
-                    dataclass = 'data-vis-tooltip="{}" data-lat="{}" \
-                    data-long="{}"  class="apis-autocomplete-span"'.format(ac_type, r.lat, r.lng)
+                if hasattr(r, 'lng'):
+                    if r.lng and r.lat:
+                        dataclass = 'data-vis-tooltip="{}" data-lat="{}" \
+                        data-long="{}"  class="apis-autocomplete-span"'.format(ac_type, r.lat, r.lng)
                 f['text'] = '<span {}><small>db</small> {}</span>'.format(dataclass, str(r))
                 choices.append(f)
             if len(choices) < page_size:
