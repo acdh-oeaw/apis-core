@@ -136,9 +136,11 @@
         {% endif %}
 <div class="row">
 <div class="col-md-12">
+  {% if ann_proj_form %}
 <div class="panel panel-default">
 {% crispy ann_proj_form ann_proj_form.helper %}
 </div>
+{% endif %}
 {% for txt in object_texts %}
 
 <div class="panel panel-default">
@@ -423,6 +425,7 @@
             $(this).parents('form').find('input[name=RL_type]').val(choice.data('cont'))
             $(this).parents('form').find('input[name=RL_pk]').val(choice.data('value'))
         });
+        {% if highlighter_active %}
         $('body').on('click','mark.hl_text_complex', function (event){
             var text_id = $(this).data('hl-text-id');
             var char_start = $(this).data('hl-start');
@@ -455,9 +458,11 @@
         $(this).tooltipster('open');
         event.stopPropagation();
         });
+        {% endif %}
         unbind_ann_agreement_form();
     });
 </script>
+{% if highlighter_active %}
 <script type="application/javascript">
     function unbind_ann_agreement_form() {
         $('#SelectAnnotatorAgreement').submit(function (event) {
@@ -487,6 +492,7 @@
 
     }
 </script>
+{% endif %}
 <script type="text/javascript">
     function check_perms_relation(){
         {% if instance %}

@@ -8,6 +8,7 @@ from django.views.generic.detail import DetailView
 from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 from django_tables2 import RequestConfig
+from django.conf import settings
 
 from entities.views import get_highlighted_texts
 from .models import Work
@@ -35,8 +36,12 @@ class GenericEntitiesDetailView(View):
                 title_panel = entity.title()
                 dict_1 = {'related_' + entity.lower() + 'A': instance}
                 dict_2 = {'related_' + entity.lower() + 'B': instance}
-                object_pre = rel.model_class().annotation_links.filter_ann_proj(request=request).filter(
-                    Q(**dict_1) | Q(**dict_2))
+                if 'apis_highlighter' in settings.INSTALLED_APPS:
+                    object_pre = rel.model_class().annotation_links.filter_ann_proj(request=request).filter(
+                        Q(**dict_1) | Q(**dict_2))
+                else:
+                    object_pre = rel.model_class().objects.filter(
+                        Q(**dict_1) | Q(**dict_2))
                 objects = []
                 for x in object_pre:
                     objects.append(x.get_table_dict(instance))
@@ -46,7 +51,12 @@ class GenericEntitiesDetailView(View):
                 else:
                     title_panel = match[0].title()
                 dict_1 = {'related_' + entity.lower(): instance}
-                objects = list(rel.model_class().annotation_links.filter_ann_proj(request=request).filter(**dict_1))
+                if 'apis_highlighter' in settings.INSTALLED_APPS:
+                    objects = list(rel.model_class()
+                                   .annotation_links.filter_ann_proj(request=request)
+                                   .filter(**dict_1))
+                else:
+                    objects = list(rel.model_class().objects.filter(**dict_1))
             tb_object = table(objects, prefix=prefix)
             tb_object_open = request.GET.get(prefix + 'page', None)
             RequestConfig(request, paginate={"per_page": 10}).configure(tb_object)

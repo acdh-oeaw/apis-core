@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.metrics import precision_recall_fscore_support
 import numpy as np
 
-from highlighter.models import Annotation
+from apis_highlighter.models import Annotation
 from metainfo.models import Text, TempEntityClass
 
 

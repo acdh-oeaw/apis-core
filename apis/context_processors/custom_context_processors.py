@@ -22,4 +22,8 @@ def add_apis_settings(request):
         'additional_functions': getattr(settings, "APIS_COMPONENTS", []),
         'request': request
     }
+    if 'apis_highlighter' in settings.INSTALLED_APPS:
+        res['highlighter_active'] = True
+    else:
+        res['highlighter_active'] = False
     return res
