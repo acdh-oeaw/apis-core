@@ -4,9 +4,9 @@ import reversion
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
+from django.conf import settings
 
 from vocabularies.models import CollectionType, TextType
-from highlighter.models import Annotation
 from .validators import date_validator
 
 from datetime import datetime
@@ -15,6 +15,8 @@ import unicodedata
 from difflib import SequenceMatcher
 #from helper_functions.highlighter import highlight_text
 
+if 'apis_highlighter' in settings.INSTALLED_APPS:
+    from apis_highlighter.models import Annotation
 
 @reversion.register()
 class TempEntityClass(models.Model):
@@ -153,7 +155,7 @@ class Text(models.Model):
     def save(self, *args, **kwargs):
         if self.pk is not None:
             orig = Text.objects.get(pk=self.pk)
-            if orig.text != self.text:
+            if orig.text != self.text and 'apis_highlighter' in settings.INSTALLED_APPS:
                 ann = Annotation.objects.filter(text_id=self.pk).order_by('start')
                 seq = SequenceMatcher(None, orig.text, self.text)
                 for a in ann:

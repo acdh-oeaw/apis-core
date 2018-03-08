@@ -8,11 +8,11 @@ from django.core import serializers
 from django_tables2 import RequestConfig
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
 
 from .forms2 import GenericRelationForm
-from entities.forms import (PlaceHighlighterForm, PersonHighlighterForm)
+#from entities.forms import (PlaceHighlighterForm, PersonHighlighterForm)
 from .forms import PersonLabelForm
-from highlighter.models import Annotation
 from .models import (PersonPlace, PersonPerson, PersonInstitution, InstitutionPlace,
                      InstitutionInstitution, PlacePlace, PersonEvent, InstitutionEvent, PlaceEvent, PersonWork,
                      InstitutionWork, PlaceWork, EventWork, WorkWork)
@@ -25,12 +25,15 @@ from metainfo.models import Uri
 from entities.models import Person, Institution, Place, Event, Work
 from entities.forms import PersonResolveUriForm
 from labels.models import Label
-from helper_functions.highlighter import highlight_text
 from django.views.decorators.csrf import csrf_exempt
 
 
 import json, re
 from copy import deepcopy
+
+if 'apis_highlighter' in settings.INSTALLED_APPS:
+    from helper_functions.highlighter import highlight_text
+
 
 ############################################################################
 ############################################################################
@@ -77,8 +80,8 @@ registered_forms = {'WorkWorkForm': [WorkWork, Work, Work],
                     'EventLabelForm': [Label, Event, Label],
                     'PersonResolveUriForm': [Uri, Person, Uri],
                     'AddRelationHighlighterPersonForm': [],
-                    'PlaceHighlighterForm': [Annotation, ],
-                    'PersonHighlighterForm': [Annotation, ]
+                    #'PlaceHighlighterForm': [Annotation, ],
+                    #'PersonHighlighterForm': [Annotation, ]
                     }
 
 
