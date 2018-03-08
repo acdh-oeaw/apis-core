@@ -6,6 +6,7 @@ from django.utils.decorators import method_decorator
 from django.core.urlresolvers import reverse
 from django.views.generic.edit import DeleteView
 from django.views import generic
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 #from reversion import revisions as reversion
 from reversion.models import Version
@@ -19,8 +20,8 @@ import reversion
 from django_tables2.export.views import ExportMixin
 
 from .models import Person, Place, Institution, Event, Work
-from .forms import (PersonForm, PlaceForm, InstitutionForm, EventForm, FullTextForm, SearchForm,
-                    WorkForm, GenericFilterFormHelper, NetworkVizFilterForm, PersonResolveUriForm,
+from .forms import (FullTextForm, SearchForm, GenericFilterFormHelper,
+                    NetworkVizFilterForm, PersonResolveUriForm,
                     get_entities_form, GenericEntitiesStanbolForm)
 from relations.models import (PersonPerson, PersonInstitution, PersonEvent,
                               PersonPlace, InstitutionEvent, InstitutionPlace,
@@ -35,7 +36,6 @@ from relations.tables import (PersonInstitutionTable, PersonPersonTable, PersonP
 from metainfo.models import Uri, UriCandidate, TempEntityClass, Text
 from apis.settings.base import BASE_DIR
 from helper_functions.stanbolQueries import retrieve_obj
-from helper_functions.highlighter import highlight_text
 from helper_functions.RDFparsers import GenericRDFParser
 from labels.models import Label
 from .tables import (
@@ -46,11 +46,14 @@ from .filters import (
     PersonListFilter, PlaceListFilter, InstitutionListFilter, EventListFilter, WorkListFilter,
     get_generic_list_filter
 )
-from highlighter.forms import SelectAnnotationProject, SelectAnnotatorAgreement
 from relations.forms2 import GenericRelationForm
 
 
 import json
+
+if 'apis_highlighter' in settings.INSTALLED_APPS:
+    from apis_highlighter.forms import SelectAnnotationProject, SelectAnnotatorAgreement
+    from helper_functions.highlighter import highlight_text
 
 
 ############################################################################
@@ -82,21 +85,29 @@ def set_session_variables(request):
 
 @login_required
 def get_highlighted_texts(request, instance):
-    set_ann_proj = request.session.get('annotation_project', 1)
-    entity_types_highlighter = request.session.get('entity_types_highlighter', None)
-    users_show = request.session.get('users_show_highlighter', None)
-    object_texts = [{'text': highlight_text(
-        x,
-        set_ann_proj=set_ann_proj,
-        types=entity_types_highlighter,
-        users_show=users_show).strip(),
-                     'id': x.pk,
-                     'kind': x.kind} for x in Text.objects.filter(tempentityclass=instance)]
-    ann_proj_form = SelectAnnotationProject(
-        set_ann_proj=set_ann_proj,
-        entity_types_highlighter=entity_types_highlighter,
-        users_show_highlighter=users_show)
-    return object_texts, ann_proj_form
+    if 'apis_highlighter' in settings.INSTALLED_APPS:
+        set_ann_proj = request.session.get('annotation_project', 1)
+        entity_types_highlighter = request.session.get('entity_types_highlighter', None)
+        users_show = request.session.get('users_show_highlighter', None)
+        object_texts = [{'text': highlight_text(
+            x,
+            set_ann_proj=set_ann_proj,
+            types=entity_types_highlighter,
+            users_show=users_show).strip(),
+                         'id': x.pk,
+                         'kind': x.kind} for x in Text.objects.filter(tempentityclass=instance)]
+        ann_proj_form = SelectAnnotationProject(
+            set_ann_proj=set_ann_proj,
+            entity_types_highlighter=entity_types_highlighter,
+            users_show_highlighter=users_show)
+        return object_texts, ann_proj_form
+    else:
+        object_texts = [{
+            'text': x.text,
+            'id': x.pk,
+            'kind': x.kind
+        } for x in Text.objects.filter(tempentityclass=instance)]
+        return object_texts, False
 
 ############################################################################
 ############################################################################

@@ -1,4 +1,4 @@
-from highlighter.models import Annotation
+from apis_highlighter.models import Annotation
 from metainfo.models import Text
 import re
 from django.contrib.contenttypes.models import ContentType
@@ -68,7 +68,7 @@ def highlight_textTEI(*args, **kwargs):
     t_start = 0
     t_end = 0
     if isinstance(obj, str):
-        obj = Text.objects.get(pk=obj) 
+        obj = Text.objects.get(pk=obj)
     lst_annot = []
     for an in Annotation.objects.filter(text=obj).order_by('start'):
         if an.start >= t_start and an.start <= t_end:
