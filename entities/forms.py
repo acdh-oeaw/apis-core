@@ -365,8 +365,9 @@ class FullTextForm(forms.Form):
                     required=False,
                     widget=forms.Textarea)
             if instance:
-                for t in Text.objects.filter(tempentityclass=instance):
-                    self.fields['text_'+str(t.kind.pk)].initial = t.text
+                for t in instance.text.all():
+                    if 'text_'+str(t.kind.pk) in self.fields.keys():
+                        self.fields['text_'+str(t.kind.pk)].initial = t.text
         except:
             pass
 
