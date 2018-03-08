@@ -163,9 +163,12 @@ class FullTextForm(forms.Form):
                     required=False,
                     widget=forms.Textarea)
             if instance:
-                for t in Text.objects.filter(tempentityclass=instance):
-                    self.fields['text_'+str(t.kind.pk)].initial = t.text
-        except:
+                for t in instance.text.all():
+                    if 'text_'+str(t.kind.pk) in self.fields.keys():
+                        self.fields['text_'+str(t.kind.pk)].initial = t.text
+        except Exception as ex2:
+            print('loading of text types failed')
+            print(ex2)
             pass
 
 
