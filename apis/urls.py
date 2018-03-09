@@ -82,6 +82,17 @@ router.register(r'GeoJsonPlace', PlaceGeoJsonViewSet, 'PlaceGeoJson')
 router.register(r'NetJson', NetJsonViewSet, 'NetJson')
 router.register(r'VocabNames', VocabNamesViewSet)
 
+if 'apis_highlighter' in settings.INSTALLED_APPS:
+    from apis_highlighter.api_views import (
+        HighlighterProjectViewSet, HighlighterTextHighViewSet, HighlighterMenuEntryViewSet,
+        HighlighterHighlightTextViewSet, HighlighterVocabularyAPIViewSet, HighlighterAnnotationViewSet
+    )
+    router.register(r'HLProjects', HighlighterProjectViewSet)
+    router.register(r'HLTextHigh', HighlighterTextHighViewSet)
+    router.register(r'HLMenuEntry', HighlighterMenuEntryViewSet)
+    router.register(r'HLTextHighlighter', HighlighterHighlightTextViewSet, 'HLTextHighlighter')
+    router.register(r'HLVocabularyAPI', HighlighterVocabularyAPIViewSet)
+    router.register(r'HLAnnotation', HighlighterAnnotationViewSet)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
@@ -101,14 +112,4 @@ urlpatterns = [
 ]
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
-    from apis_highlighter.api_views import (
-        HighlighterProjectViewSet, HighlighterTextHighViewSet, HighlighterMenuEntryViewSet,
-        HighlighterHighlightTextViewSet, HighlighterVocabularyAPIViewSet, HighlighterAnnotationViewSet
-    )
-    router.register(r'HLProjects', HighlighterProjectViewSet)
-    router.register(r'HLTextHigh', HighlighterTextHighViewSet)
-    router.register(r'HLMenuEntry', HighlighterMenuEntryViewSet)
-    router.register(r'HLTextHighlighter', HighlighterHighlightTextViewSet, 'HLTextHighlighter')
-    router.register(r'HLVocabularyAPI', HighlighterVocabularyAPIViewSet)
-    router.register(r'HLAnnotation', HighlighterAnnotationViewSet)
     urlpatterns.append(url(r'highlighter/', include('apis_highlighter.urls', namespace='highlighter')))
