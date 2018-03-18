@@ -166,12 +166,54 @@ class Work(TempEntityClass):
         except:
             return False
 
+############################################################
+#
+# dboe specific entities
+#
+############################################################
+
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class Lemma(TempEntityClass):
+    """ A temporalized entity to model a lemma."""
+
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class Questionnaire(TempEntityClass):
+    """ A temporalized entity to model a Questionnaire."""
+
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class Question(TempEntityClass):
+    """ A temporalized entity to model a Question."""
+
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class Paperslip(TempEntityClass):
+    """ A temporalized entity to model a Paperslip."""
+
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class Evidence(TempEntityClass):
+    """ A temporalized entity to model an Evidence."""
+
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class Multimedia(TempEntityClass):
+    """ A temporalized entity to model a Multimedia items."""
+
 
 @receiver(post_save, sender=Event, dispatch_uid="create_default_uri")
 @receiver(post_save, sender=Work, dispatch_uid="create_default_uri")
 @receiver(post_save, sender=Institution, dispatch_uid="create_default_uri")
 @receiver(post_save, sender=Person, dispatch_uid="create_default_uri")
 @receiver(post_save, sender=Place, dispatch_uid="create_default_uri")
+@receiver(post_save, sender=Lemma, dispatch_uid="create_default_uri")
+@receiver(post_save, sender=Questionnaire, dispatch_uid="create_default_uri")
+@receiver(post_save, sender=Question, dispatch_uid="create_default_uri")
+@receiver(post_save, sender=Paperslip, dispatch_uid="create_default_uri")
+@receiver(post_save, sender=Evidence, dispatch_uid="create_default_uri")
+@receiver(post_save, sender=Multimedia, dispatch_uid="create_default_uri")
 def create_default_uri(sender, instance, **kwargs):
     uri = Uri.objects.filter(entity=instance)
     if uri.count() == 0:
@@ -187,6 +229,12 @@ def create_default_uri(sender, instance, **kwargs):
 @receiver(m2m_changed, sender=Institution.collection.through, dispatch_uid="create_object_permissions")
 @receiver(m2m_changed, sender=Person.collection.through, dispatch_uid="create_object_permissions")
 @receiver(m2m_changed, sender=Place.collection.through, dispatch_uid="create_object_permissions")
+@receiver(m2m_changed, sender=Lemma.collection.through, dispatch_uid="create_object_permissions")
+@receiver(m2m_changed, sender=Questionnaire.collection.through, dispatch_uid="create_object_permissions")
+@receiver(m2m_changed, sender=Question.collection.through, dispatch_uid="create_object_permissions")
+@receiver(m2m_changed, sender=Paperslip.collection.through, dispatch_uid="create_object_permissions")
+@receiver(m2m_changed, sender=Evidence.collection.through, dispatch_uid="create_object_permissions")
+@receiver(m2m_changed, sender=Multimedia.collection.through, dispatch_uid="create_object_permissions")
 def create_object_permissions(sender, instance, **kwargs):
     if kwargs['action'] == 'pre_add':
         perms = []
