@@ -39,15 +39,17 @@ class StandardResultsSetPagination(PageNumberPagination):
 
 
 class InstitutionViewSet(viewsets.ModelViewSet):
-    """Serialization of the institution class. 
+    """Serialization of the institution class.
     In addition to the institution this view includes related texts and \
     the kind of the institution (separated object)."""
     permission_classes = (DjangoObjectPermissions,)
     queryset = Institution.objects.all()
     serializer_class = InstitutionSerializer
     pagination_class = StandardResultsSetPagination
+    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter)
     depth = 2
-    filter_fields = ('name', 'kind__name')
+    filter_fields = ('name', 'kind__name', 'collection__name')
+    search_fields = ('name', )
 
 
 class PersonViewSet(viewsets.ModelViewSet):
@@ -60,7 +62,7 @@ class PersonViewSet(viewsets.ModelViewSet):
     pagination_class = StandardResultsSetPagination
     depth = 2
     filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter)
-    filter_fields = ('name', 'first_name', 'gender', 'profession__name', 'collection', 'uri__uri')
+    filter_fields = ('name', 'first_name', 'gender', 'profession__name', 'collection__name', 'uri__uri')
     search_fields = ('name', 'first_name')
 
 
@@ -72,8 +74,10 @@ class PlaceViewSet(viewsets.ModelViewSet):
     queryset = Place.objects.all()
     serializer_class = PlaceSerializer
     pagination_class = StandardResultsSetPagination
+    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter)
     depth = 2
-    filter_fields = ('name',)
+    filter_fields = ('name', 'kind__name', 'collection__name',)
+    search_fields = ('name', )
     renderer_classes = tuple(api_settings.DEFAULT_RENDERER_CLASSES) + (PaginatedCSVRenderer, )
 
 
@@ -85,8 +89,10 @@ class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     pagination_class = StandardResultsSetPagination
+    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter)
     depth = 2
-    filter_fields = ('name', 'kind__name')
+    filter_fields = ('name', 'kind__name', 'collection__name',)
+    search_fields = ('name', )
 
 
 class WorkViewSet(viewsets.ModelViewSet):
@@ -97,8 +103,10 @@ class WorkViewSet(viewsets.ModelViewSet):
     queryset = Work.objects.all()
     serializer_class = WorkSerializer
     pagination_class = StandardResultsSetPagination
+    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter)
     depth = 2
-    filter_fields = ('name', 'kind__name')
+    filter_fields = ('name', 'kind__name', 'collection__name',)
+    search_fields = ('name', )
 
 
 class PlaceGeoJsonViewSet(viewsets.ViewSet):

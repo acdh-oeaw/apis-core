@@ -5,7 +5,8 @@ from .models import Collection, Text, Source, Uri, TempEntityClass
 
 class CollectionSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
-        fields = '__all__'
+        #fields = '__all__'
+        exclude = ('groups_allowed', )
         model = Collection
 
 
