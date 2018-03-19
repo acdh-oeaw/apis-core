@@ -704,3 +704,65 @@ class WorkWork(TempEntityClass):
 
     def __str__(self):
         return "{} ({}) {}".format(self.related_workA, self.relation_type, self.related_workB)
+
+
+############################################################
+#
+# dboe specific relations
+#
+############################################################
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class LemmaLemma(TempEntityClass):
+    """Describes a relation between Lemma and a Lemma
+
+    :param int relation_type: Foreign Key to :class:`vocabularies.models.LemmaLemmaRelation`
+    :param int related_lemmaA: Foreign Key to :class:`entities.models.Lemma`
+    :param int related_lemmaB: Foreign Key to :class:`entities.models.Lemma`
+    """
+
+    relation_type = models.ForeignKey(LemmaLemmaRelation, blank=True, null=True)
+    related_lemmaA = models.ForeignKey(
+        Lemma, blank=True, null=True, related_name="related_lemmaA")
+    related_lemmaB = models.ForeignKey(
+        Lemma, blank=True, null=True, related_name="related_lemmaB")
+    objects = models.Manager()
+    annotation_links = AnnotationRelationLinkManager()
+
+    def get_table_dict(self, entity):
+        """Dict for the tabels in the html view
+
+        :param entity: Object of type :class:`entities.models.Lemma`; Used to determine which Lemma is the main entity
+            and which one the related.
+        :return:
+        """
+        if self.related_lemmaA == entity:
+            rel_lemma = self.related_lemmaB
+            rel_type = self.relation_type.name
+        elif self.related_lemmaB == entity:
+            rel_work = self.related_lemmaA
+            rel_type = self.relation_type.name_reverse
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': rel_type,
+            'related_lemma': rel_lemma,
+            'start_date': self.start_date,
+            'end_date': self.end_date}
+        return result
+
+    def get_web_object(self):
+        """Used in some html views.
+
+        :return: Dict with object properties
+        """
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': self.relation_type.name,
+            'related_lemmaA': self.related_lemmaA.name,
+            'related_lemmaB': self.related_lemmaB.name,
+            'start_date': self.start_date_written,
+            'end_date': self.end_date_written}
+        return result
+
+    def __str__(self):
+        return "{} ({}) {}".format(self.related_lemmaA, self.relation_type, self.related_lemmaB)
