@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from dal import autocomplete
 from django import forms
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from crispy_forms.layout import Layout
