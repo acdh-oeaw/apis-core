@@ -769,7 +769,7 @@ class LemmaLemma(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class LemmaEvidence(TempEntityClass):
+class LemmaBeleg(TempEntityClass):
     """Defines and describes a relation between a Lemma and a Evidence
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.LemmaEvidenceRelation`
@@ -777,16 +777,16 @@ class LemmaEvidence(TempEntityClass):
     :param int related_evidence: Foreign Key to :class:`entities.models.Evidence`
     """
 
-    relation_type = models.ForeignKey(LemmaEvidenceRelation, blank=True, null=True)
-    related_person = models.ForeignKey(
+    relation_type = models.ForeignKey(LemmaBelegRelation, blank=True, null=True)
+    related_lemma = models.ForeignKey(
         Lemma, blank=True, null=True)
-    related_place = models.ForeignKey(
-        Evidence, blank=True, null=True)
+    related_beleg = models.ForeignKey(
+        Beleg, blank=True, null=True)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
-        return "{} ({}) {}".format(self.related_lemma, self.relation_type, self.related_evidence)
+        return "{} ({}) {}".format(self.related_lemma, self.relation_type, self.related_beleg)
 
     def get_web_object(self):
         """Used in some html views.
@@ -798,14 +798,14 @@ class LemmaEvidence(TempEntityClass):
             'relation_pk': self.pk,
             'relation_type': self.relation_type.name,
             'related_lemma': self.related_lemma.name,
-            'related_evidence': self.related_evidence.name,
+            'related_evidence': self.related_beleg.name,
             'start_date': self.start_date_written,
             'end_date': self.end_date_written}
         return result
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PaperslipEvidence(TempEntityClass):
+class BelegzettelBeleg(TempEntityClass):
     """Defines and describes a relation between a Paperslip and a Evidence
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PaperslipEvidenceRelation`
