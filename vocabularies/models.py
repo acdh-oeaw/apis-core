@@ -176,6 +176,31 @@ class TextType(VocabsBaseClass):
     entity = models.CharField(max_length=255)
     collections = models.ManyToManyField('metainfo.Collection', blank=True)
 
+
+#######################################################################
+#
+#   dboe specific entity vocabularies
+#
+#######################################################################
+
+
+@reversion.register(follow=['vocabsbaseclass_ptr'])
+class Wortart(VocabsBaseClass):
+    """e.g. Hauptwort etc """
+    pass
+
+
+@reversion.register(follow=['vocabsbaseclass_ptr'])
+class Sprache(VocabsBaseClass):
+    """e.g. Oberösterreichisch """
+    pass
+
+
+@reversion.register(follow=['vocabsbaseclass_ptr'])
+class Kategorie(VocabsBaseClass):
+    """e.g. Hauptwort etc """
+    pass
+
 #######################################################################
 #
 #   relation types
@@ -294,4 +319,21 @@ class EventWorkRelation(RelationBaseClass):
 @reversion.register(follow=['relationbaseclass_ptr'])
 class WorkWorkRelation(RelationBaseClass):
     """Holds controlled vocabularies relation types of Works and Works"""
+    pass
+
+
+#######################################################################
+# dboe specific Relation-Types
+#######################################################################
+
+
+@reversion.register(follow=['relationbaseclass_ptr'])
+class LemmaLemmaRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Lemmas and Lemmas"""
+    pass
+
+
+@reversion.register(follow=['relationbaseclass_ptr'])
+class LemmaBelegRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Lemmas and Belegs"""
     pass

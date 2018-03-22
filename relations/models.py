@@ -721,11 +721,15 @@ class LemmaLemma(TempEntityClass):
     :param int related_lemmaB: Foreign Key to :class:`entities.models.Lemma`
     """
 
-    relation_type = models.ForeignKey(LemmaLemmaRelation, blank=True, null=True)
+    relation_type = models.ForeignKey('vocabularies.LemmaLemmaRelation',
+                                      blank=True, null=True,
+                                      on_delete=models.SET_NULL)
     related_lemmaA = models.ForeignKey(
-        Lemma, blank=True, null=True, related_name="related_lemmaA")
+        'entities.Lemma', blank=True, null=True, related_name="related_lemmaA",
+        on_delete=models.CASCADE)
     related_lemmaB = models.ForeignKey(
-        Lemma, blank=True, null=True, related_name="related_lemmaB")
+        'entities.Lemma', blank=True, null=True, related_name="related_lemmaB",
+        on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
@@ -772,16 +776,18 @@ class LemmaLemma(TempEntityClass):
 class LemmaBeleg(TempEntityClass):
     """Defines and describes a relation between a Lemma and a Evidence
 
-    :param int relation_type: Foreign Key to :class:`vocabularies.models.LemmaEvidenceRelation`
+    :param int relation_type: Foreign Key to :class:`vocabularies.models.LemmaBelegRelation`
     :param int related_lemma: Foreign Key to :class:`entities.models.Lemma`
-    :param int related_evidence: Foreign Key to :class:`entities.models.Evidence`
+    :param int related_evidence: Foreign Key to :class:`entities.models.Beleg`
     """
 
-    relation_type = models.ForeignKey(LemmaBelegRelation, blank=True, null=True)
+    relation_type = models.ForeignKey('vocabularies.LemmaBelegRelation',
+                                      blank=True, null=True,
+                                      on_delete=models.SET_NULL)
     related_lemma = models.ForeignKey(
-        Lemma, blank=True, null=True)
+        'entities.Lemma', blank=True, null=True, on_delete=models.CASCADE)
     related_beleg = models.ForeignKey(
-        Beleg, blank=True, null=True)
+        'entities.Beleg', blank=True, null=True, on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
@@ -813,16 +819,19 @@ class BelegzettelBeleg(TempEntityClass):
     :param int related_evidence: Foreign Key to :class:`entities.models.Evidence`
     """
 
-    relation_type = models.ForeignKey(PaperslipEvidenceRelation, blank=True, null=True)
-    related_paperslip = models.ForeignKey(
-        Paperslip, blank=True, null=True)
-    related_lemma = models.ForeignKey(
-        Evidence, blank=True, null=True)
+    relation_type = models.ForeignKey('vocabularies.BelegzettelBelegRelation',
+                                      blank=True, null=True,
+                                      on_delete=models.SET_NULL)
+    related_belegzettel = models.ForeignKey(
+        'entities.Belegzettel', blank=True, null=True, on_delete=models.CASCADE)
+    related_beleg = models.ForeignKey(
+        'entities.Beleg', blank=True, null=True, on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
-        return "{} ({}) {}".format(self.related_paperslip, self.relation_type, self.related_evidence)
+        return "{} ({}) {}".format(self.related_belegzettel,
+                                   self.relation_type, self.related_beleg)
 
     def get_web_object(self):
         """Used in some html views.
@@ -833,44 +842,8 @@ class BelegzettelBeleg(TempEntityClass):
         result = {
             'relation_pk': self.pk,
             'relation_type': self.relation_type.name,
-            'related_lemma': self.related_paperslip.name,
-            'related_evidence': self.related_evidence.name,
-            'start_date': self.start_date_written,
-            'end_date': self.end_date_written}
-        return result
-
-
-@reversion.register(follow=['tempentityclass_ptr'])
-class LemmaEvidence(TempEntityClass):
-    """Defines and describes a relation between a Lemma and a Evidence
-
-    :param int relation_type: Foreign Key to :class:`vocabularies.models.LemmaEvidenceRelation`
-    :param int related_lemma: Foreign Key to :class:`entities.models.Lemma`
-    :param int related_evidence: Foreign Key to :class:`entities.models.Evidence`
-    """
-
-    relation_type = models.ForeignKey(LemmaEvidenceRelation, blank=True, null=True)
-    related_person = models.ForeignKey(
-        Lemma, blank=True, null=True)
-    related_place = models.ForeignKey(
-        Evidence, blank=True, null=True)
-    objects = models.Manager()
-    annotation_links = AnnotationRelationLinkManager()
-
-    def __str__(self):
-        return "{} ({}) {}".format(self.related_lemma, self.relation_type, self.related_evidence)
-
-    def get_web_object(self):
-        """Used in some html views.
-
-        :return: Dict with object properties
-        """
-
-        result = {
-            'relation_pk': self.pk,
-            'relation_type': self.relation_type.name,
-            'related_lemma': self.related_lemma.name,
-            'related_evidence': self.related_evidence.name,
+            'related_belegzettel': self.related_belegzettel.name,
+            'related_beleg': self.related_beleg.name,
             'start_date': self.start_date_written,
             'end_date': self.end_date_written}
         return result

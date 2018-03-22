@@ -191,22 +191,28 @@ class Work(TempEntityClass):
 class Lemma(TempEntityClass):
     """ A temporalized entity to model a lemma."""
     orig_id = models.IntegerField()
-    lemma_wortart_id = models.ForeignKey(wortart, blank=True, null=True)
-    lemma_sprache_id = models.ForeignKey(sprache, blank=True, null=True)
-    lemma_kategorie_id = models.ForeignKey(kategorie, blank=True, null=True)
+    lemma_wortart_id = models.ForeignKey('vocabularies.Wortart',
+                                         blank=True, null=True,
+                                         on_delete=models.SET_NULL)
+    lemma_sprache_id = models.ForeignKey('vocabularies.Sprache',
+                                         blank=True, null=True,
+                                         on_delete=models.SET_NULL)
+    lemma_kategorie_id = models.ForeignKey('vocabularies.Kategorie',
+                                           blank=True, null=True,
+                                           on_delete=models.SET_NULL)
     freigabe = models.BooleanField(default=False)
     checked = models.BooleanField(default=False)
     wordleiste = models.BooleanField(default=False)
     druck = models.BooleanField(default=False)
     online = models.BooleanField(default=False)
     publiziert = models.BooleanField(default=False)
-    dbo_inverted = models.CharField(max_length=255)
-    dbo_inverted_sort = models.CharField(max_length=255)
-    wbo_inverted = models.CharField(max_length=255)
-    tirol = models.CharField(max_length=255)
-    lemmacol = models.CharField(max_length=45)
-    wbo_unicode = models.CharField(max_length=255)
-    dbo_unicode = models.CharField(max_length=255)
+    dbo_inverted = models.CharField(max_length=255, blank=True, null=True)
+    dbo_inverted_sort = models.CharField(max_length=255, blank=True, null=True)
+    wbo_inverted = models.CharField(max_length=255, blank=True, null=True)
+    tirol = models.CharField(max_length=255, blank=True, null=True)
+    lemmacol = models.CharField(max_length=45, blank=True, null=True)
+    wbo_unicode = models.CharField(max_length=255, blank=True, null=True)
+    dbo_unicode = models.CharField(max_length=255, blank=True, null=True)
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
