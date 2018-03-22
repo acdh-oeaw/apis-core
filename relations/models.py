@@ -728,7 +728,7 @@ class LemmaLemma(TempEntityClass):
         'entities.Lemma', blank=True, null=True, related_name="related_lemmaA",
         on_delete=models.CASCADE)
     related_lemmaB = models.ForeignKey(
-        'entitiesself.Lemma', blank=True, null=True, related_name="related_lemmaB",
+        'entities.Lemma', blank=True, null=True, related_name="related_lemmaB",
         on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()

@@ -336,4 +336,10 @@ class LemmaLemmaRelation(RelationBaseClass):
 @reversion.register(follow=['relationbaseclass_ptr'])
 class LemmaBelegRelation(RelationBaseClass):
     """Holds controlled vocabularies relation types of Lemmas and Belegs"""
+    pass#
+
+
+@reversion.register(follow=['relationbaseclass_ptr'])
+class BelegzettelBelegRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Belegzettel and Beleg"""
     pass
