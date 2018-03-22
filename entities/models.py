@@ -13,8 +13,8 @@ from metainfo.models import TempEntityClass, Uri, Text, Collection
 from labels.models import Label
 from vocabularies.models import (ProfessionType, PlaceType, InstitutionType,
     EventType, Title, WorkType)
-from apis.settings.base import BASE_URI
-from apis.settings.base import BASE_DIR
+from dboe.settings.base import BASE_URI
+from dboe.settings.base import BASE_DIR
 
 import re
 import unicodedata
