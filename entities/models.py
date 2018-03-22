@@ -20,6 +20,15 @@ import re
 import unicodedata
 
 
+def modify_fields(**kwargs):
+    def wrap(cls):
+        for field, prop_dict in kwargs.items():
+            for prop, val in prop_dict.items():
+                setattr(cls._meta.get_field(field), prop, val)
+        return cls
+    return wrap
+
+
 @reversion.register(follow=['tempentityclass_ptr'])
 class Person(TempEntityClass):
     """ A temporalized entity to model a human beeing."""
@@ -173,34 +182,62 @@ class Work(TempEntityClass):
 ############################################################
 
 
+@modify_fields(name={'verbose_name': 'Hochdeutsch'})
 @reversion.register(follow=['tempentityclass_ptr'])
 class Lemma(TempEntityClass):
     """ A temporalized entity to model a lemma."""
+    orig_id = models.IntegerField()
+    lemma_wortart_id = models.ForeignKey(wortart, blank=True, null=True)
+    lemma_sprache_id = models.ForeignKey(sprache, blank=True, null=True)
+    lemma_kategorie_id = models.ForeignKey(kategorie, blank=True, null=True)
+    freigabe = models.BooleanField(default=False)
+    checked = models.BooleanField(default=False)
+    wordleiste = models.BooleanField(default=False)
+    druck = models.BooleanField(default=False)
+    online = models.BooleanField(default=False)
+    publiziert = models.BooleanField(default=False)
+    dbo_inverted = models.CharField(max_length=255)
+    dbo_inverted_sort = models.CharField(max_length=255)
+    wbo_inverted = models.CharField(max_length=255)
+    tirol = models.CharField(max_length=255)
+    lemmacol = models.CharField(max_length=45)
+    wbo_unicode = models.CharField(max_length=255)
+    dbo_unicode = models.CharField(max_length=255)
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class Questionnaire(TempEntityClass):
-    """ A temporalized entity to model a Questionnaire."""
+class Fragebogen(TempEntityClass):
+    """ A temporalized entity to model a Fragebogen."""
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class Question(TempEntityClass):
-    """ A temporalized entity to model a Question."""
+class Frage(TempEntityClass):
+    """ A temporalized entity to model a Frage."""
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class Paperslip(TempEntityClass):
+class Belegzettel(TempEntityClass):
     """ A temporalized entity to model a Paperslip."""
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class Evidence(TempEntityClass):
+class Beleg(TempEntityClass):
     """ A temporalized entity to model an Evidence."""
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class Multimedia(TempEntityClass):
     """ A temporalized entity to model a Multimedia items."""
+
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class Anmerkung(TempEntityClass):
+    """ A temporalized entity to model a Notes items."""
+
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class Bedeutung(TempEntityClass):
+    """ A temporalized entity to model a Sense items."""
 
 
 @receiver(post_save, sender=Event, dispatch_uid="create_default_uri")
@@ -214,6 +251,8 @@ class Multimedia(TempEntityClass):
 @receiver(post_save, sender=Paperslip, dispatch_uid="create_default_uri")
 @receiver(post_save, sender=Evidence, dispatch_uid="create_default_uri")
 @receiver(post_save, sender=Multimedia, dispatch_uid="create_default_uri")
+@receiver(post_save, sender=Notes, dispatch_uid="create_default_uri")
+@receiver(post_save, sender=Denotation, dispatch_uid="create_default_uri")
 def create_default_uri(sender, instance, **kwargs):
     uri = Uri.objects.filter(entity=instance)
     if uri.count() == 0:
@@ -235,6 +274,8 @@ def create_default_uri(sender, instance, **kwargs):
 @receiver(m2m_changed, sender=Paperslip.collection.through, dispatch_uid="create_object_permissions")
 @receiver(m2m_changed, sender=Evidence.collection.through, dispatch_uid="create_object_permissions")
 @receiver(m2m_changed, sender=Multimedia.collection.through, dispatch_uid="create_object_permissions")
+@receiver(m2m_changed, sender=Notes.collection.through, dispatch_uid="create_object_permissions")
+@receiver(m2m_changed, sender=Denotation.collection.through, dispatch_uid="create_object_permissions")
 def create_object_permissions(sender, instance, **kwargs):
     if kwargs['action'] == 'pre_add':
         perms = []
