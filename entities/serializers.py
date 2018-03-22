@@ -1,4 +1,4 @@
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 from rest_framework import serializers
 from .models import Institution, Person, Place, Event, Work
 

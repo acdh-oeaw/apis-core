@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, generics, filters
 from rest_framework.reverse import reverse_lazy
 from rest_framework.views import APIView
@@ -46,7 +47,7 @@ class InstitutionViewSet(viewsets.ModelViewSet):
     queryset = Institution.objects.all()
     serializer_class = InstitutionSerializer
     pagination_class = StandardResultsSetPagination
-    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     depth = 2
     filter_fields = ('name', 'kind__name', 'collection__name')
     search_fields = ('name', )
@@ -61,7 +62,7 @@ class PersonViewSet(viewsets.ModelViewSet):
     serializer_class = PersonSerializer
     pagination_class = StandardResultsSetPagination
     depth = 2
-    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filter_fields = ('name', 'first_name', 'gender', 'profession__name', 'collection__name', 'uri__uri')
     search_fields = ('name', 'first_name')
 
@@ -74,7 +75,7 @@ class PlaceViewSet(viewsets.ModelViewSet):
     queryset = Place.objects.all()
     serializer_class = PlaceSerializer
     pagination_class = StandardResultsSetPagination
-    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     depth = 2
     filter_fields = ('name', 'kind__name', 'collection__name',)
     search_fields = ('name', )
@@ -89,7 +90,7 @@ class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     pagination_class = StandardResultsSetPagination
-    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     depth = 2
     filter_fields = ('name', 'kind__name', 'collection__name',)
     search_fields = ('name', )
@@ -103,7 +104,7 @@ class WorkViewSet(viewsets.ModelViewSet):
     queryset = Work.objects.all()
     serializer_class = WorkSerializer
     pagination_class = StandardResultsSetPagination
-    filter_backends = (filters.DjangoFilterBackend, filters.SearchFilter)
+    filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     depth = 2
     filter_fields = ('name', 'kind__name', 'collection__name',)
     search_fields = ('name', )

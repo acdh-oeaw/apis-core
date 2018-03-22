@@ -27,10 +27,13 @@ class VocabsBaseClass(models.Model):
     description = models.TextField(
         blank=True,
         help_text="Brief description of the used term.")
-    parent_class = models.ForeignKey('self', blank=True, null=True)
+    parent_class = models.ForeignKey('self', blank=True, null=True,
+                                     on_delete=models.CASCADE)
     status = models.CharField(max_length=4, choices=choices_status, default='can')
-    userAdded = models.ForeignKey(User, blank=True, null=True)  #changed from default=12
-    vocab_name = models.ForeignKey(VocabNames, blank=True, null=True)
+    userAdded = models.ForeignKey(User, blank=True, null=True,
+                                  on_delete=models.SET_NULL)  #changed from default=12
+    vocab_name = models.ForeignKey(VocabNames, blank=True, null=True,
+                                   on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.name
@@ -102,7 +105,8 @@ class VocabsUri(models.Model):
     uri = models.URLField()
     domain = models.CharField(max_length=255, blank=True)
     rdf_link = models.URLField(blank=True)
-    vocab = models.ForeignKey(VocabsBaseClass, blank=True, null=True)
+    vocab = models.ForeignKey(VocabsBaseClass, blank=True, null=True,
+                              on_delete=models.CASCADE)
     # loaded: set to True when RDF was loaded and parsed into the data model
     loaded = models.BooleanField(default=False)
     # loaded_time: Timestamp when file was loaded and parsed

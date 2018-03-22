@@ -5,6 +5,8 @@ from entities import api_views
 from entities.api_views import GetOrCreateEntity
 from highlighter.api_views import AnnotatorAgreementView, ShowOverlappingHighlights
 
+app_name = 'entities'
+
 urlpatterns = [
     url(r'^savenetworkfiles/$', api_views.SaveNetworkFiles.as_view()),
     url(r'^annotatoragreement/$', AnnotatorAgreementView.as_view(), name='AnnotatorAgreementView'),

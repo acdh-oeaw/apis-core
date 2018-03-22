@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.core.urlresolvers import reverse, reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views.generic.edit import DeleteView
 from django.views import generic
 
@@ -47,6 +47,3 @@ class LabelDelete(DeleteView):
 	model = Label
 	template_name = 'webpage/confirm_delete.html'
 	success_url = reverse_lazy('labels:label_list')
-
-
-

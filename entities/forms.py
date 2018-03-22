@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from dal import autocomplete
 from django import forms
-from django.core.urlresolvers import reverse_lazy
+from django.urls import reverse_lazy
 #from autocomplete_light import shortcuts as al
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
@@ -9,7 +9,7 @@ from crispy_forms.layout import Layout
 from crispy_forms.bootstrap import Accordion, AccordionGroup
 from django.forms import ModelMultipleChoiceField
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import URLValidator

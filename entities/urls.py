@@ -5,6 +5,8 @@ from entities.views import ReversionCompareView
 from entities.views2 import GenericEntitiesCreateStanbolView
 from . import views, views2, detail_views
 
+app_name = 'entities'
+
 urlpatterns = [
     url(r'^entity/(?P<entity>[a-z]+)/(?P<pk>[0-9]+)/edit$',
         views2.GenericEntitiesEditView.as_view(),

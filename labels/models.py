@@ -15,8 +15,9 @@ class Label(models.Model):
         max_length=3, blank=True, null=True,
         help_text="The ISO 639-3 (or 2) code for the label's language.",
         verbose_name='ISO Code', default='deu')
-    label_type = models.ForeignKey(LabelType, blank=True, null=True)
-    temp_entity = models.ForeignKey(TempEntityClass)
+    label_type = models.ForeignKey(LabelType, blank=True, null=True,
+                                   on_delete=models.SET_NULL)
+    temp_entity = models.ForeignKey(TempEntityClass, on_delete=models.CASCADE)
 
     def get_web_object(self):
         result = {

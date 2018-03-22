@@ -43,7 +43,8 @@ class TempEntityClass(models.Model):
     text = models.ManyToManyField("Text", blank=True)
     collection = models.ManyToManyField("Collection")
     status = models.CharField(max_length=100)
-    source = models.ForeignKey('Source', blank=True, null=True)
+    source = models.ForeignKey('Source', blank=True, null=True,
+                               on_delete=models.SET_NULL)
     references = models.TextField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
 
@@ -122,9 +123,11 @@ class Collection(models.Model):
     """ Allows to group entities and relation. """
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    collection_type = models.ForeignKey(CollectionType, blank=True, null=True)
+    collection_type = models.ForeignKey(CollectionType, blank=True, null=True,
+                                        on_delete=models.SET_NULL)
     groups_allowed = models.ManyToManyField(Group)
-    parent_class = models.ForeignKey('self', blank=True, null=True)
+    parent_class = models.ForeignKey('self', blank=True, null=True,
+                                     on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -135,9 +138,11 @@ class Text(models.Model):
     """ Holds unstructured text associeted with
     one ore many entities/relations. """
 
-    kind = models.ForeignKey(TextType, blank=True, null=True)
+    kind = models.ForeignKey(TextType, blank=True, null=True,
+                             on_delete=models.SET_NULL)
     text = models.TextField(blank=True)
-    source = models.ForeignKey(Source, blank=True, null=True)
+    source = models.ForeignKey(Source, blank=True, null=True,
+                               on_delete=models.SET_NULL)
 
     def __str__(self):
         if self.text != "":
@@ -171,7 +176,8 @@ class Uri(models.Model):
     uri = models.URLField(blank=True, null=True, unique=True)
     domain = models.CharField(max_length=255, blank=True)
     rdf_link = models.URLField(blank=True)
-    entity = models.ForeignKey(TempEntityClass, blank=True, null=True)
+    entity = models.ForeignKey(TempEntityClass, blank=True, null=True,
+                               on_delete=models.CASCADE)
     # loaded set to True when RDF was loaded and parsed into the data model
     loaded = models.BooleanField(default=False)
     # Timestamp when file was loaded and parsed
@@ -197,7 +203,8 @@ class UriCandidate(models.Model):
     uri = models.URLField()
     confidence = models.FloatField(blank=True, null=True)
     responsible = models.CharField(max_length=255)
-    entity = models.ForeignKey(TempEntityClass, blank=True, null=True)
+    entity = models.ForeignKey(TempEntityClass, blank=True, null=True,
+                               on_delete=models.CASCADE)
 
 
 @receiver(post_save, sender=Uri, dispatch_uid="remove_default_uri")

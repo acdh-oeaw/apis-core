@@ -68,7 +68,8 @@ class Person(TempEntityClass):
 class Place(TempEntityClass):
     """ A temporalized entity to model a place"""
 
-    kind = models.ForeignKey(PlaceType, blank=True, null=True)
+    kind = models.ForeignKey(PlaceType, blank=True, null=True,
+                             on_delete=models.SET_NULL)
     lat = models.FloatField(blank=True, null=True, verbose_name='latitude')
     lng = models.FloatField(blank=True, null=True, verbose_name='longitude')
 
@@ -91,7 +92,8 @@ class Place(TempEntityClass):
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class Institution(TempEntityClass):
-    kind = models.ForeignKey(InstitutionType, blank=True, null=True)
+    kind = models.ForeignKey(InstitutionType, blank=True, null=True,
+                             on_delete=models.SET_NULL)
     homepage = models.URLField(blank=True, null=True)
 
     def __str__(self):
@@ -115,7 +117,8 @@ class Institution(TempEntityClass):
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class Event(TempEntityClass):
-    kind = models.ForeignKey(EventType, blank=True, null=True)
+    kind = models.ForeignKey(EventType, blank=True, null=True,
+                             on_delete=models.SET_NULL)
 
     def __str__(self):
         if self.name != "":
@@ -136,7 +139,8 @@ class Event(TempEntityClass):
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class Work(TempEntityClass):
-    kind = models.ForeignKey(WorkType, blank=True, null=True)
+    kind = models.ForeignKey(WorkType, blank=True, null=True,
+                             on_delete=models.SET_NULL)
 
     def get_next(self):
         next = Work.objects.filter(id__gt=self.id)

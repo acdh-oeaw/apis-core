@@ -73,11 +73,14 @@ class PersonPerson(TempEntityClass):
     :param int related_personB: Foreign Key to :class:`entities.models.Person`
     """
 
-    relation_type = models.ForeignKey(PersonPersonRelation, blank=True, null=True)
+    relation_type = models.ForeignKey(PersonPersonRelation, blank=True,
+                                      null=True, on_delete=models.SET_NULL)
     related_personA = models.ForeignKey(
-        Person, blank=True, null=True, related_name="related_personA")
+        Person, blank=True, null=True, related_name="related_personA",
+        on_delete=models.CASCADE)
     related_personB = models.ForeignKey(
-        Person, blank=True, null=True, related_name="related_personB")
+        Person, blank=True, null=True, related_name="related_personB",
+        on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
@@ -133,11 +136,12 @@ class PersonPlace(TempEntityClass):
     :param int related_place: Foreign Key to :class:`entities.models.Place`
     """
 
-    relation_type = models.ForeignKey(PersonPlaceRelation, blank=True, null=True)
+    relation_type = models.ForeignKey(PersonPlaceRelation, blank=True,
+                                      null=True, on_delete=models.SET_NULL)
     related_person = models.ForeignKey(
-        Person, blank=True, null=True)
+        Person, blank=True, null=True, on_delete=models.CASCADE)
     related_place = models.ForeignKey(
-        Place, blank=True, null=True)
+        Place, blank=True, null=True, on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
@@ -171,11 +175,12 @@ class PersonInstitution(TempEntityClass):
     :param int related_institution: Foreign Key to :class:`entities.models.Institution`
     """
 
-    relation_type = models.ForeignKey(PersonInstitutionRelation, blank=True, null=True)
+    relation_type = models.ForeignKey(PersonInstitutionRelation, blank=True,
+                                      null=True, on_delete=models.SET_NULL)
     related_person = models.ForeignKey(
-        Person, blank=True, null=True)
+        Person, blank=True, null=True, on_delete=models.CASCADE)
     related_institution = models.ForeignKey(
-        Institution, blank=True, null=True)
+        Institution, blank=True, null=True, on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
@@ -206,11 +211,12 @@ class PersonEvent(TempEntityClass):
     :param int related_event: Foreign Key to :class:`entities.models.Event`
     """
 
-    relation_type = models.ForeignKey(PersonEventRelation, blank=True, null=True)
+    relation_type = models.ForeignKey(PersonEventRelation, blank=True,
+                                      null=True, on_delete=models.SET_NULL)
     related_person = models.ForeignKey(
-        Person, blank=True, null=True)
+        Person, blank=True, null=True, on_delete=models.CASCADE)
     related_event = models.ForeignKey(
-        Event, blank=True, null=True)
+        Event, blank=True, null=True, on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
@@ -240,11 +246,12 @@ class PersonWork(TempEntityClass):
     :param int related_work: Foreign Key to :class:`entities.models.Work`
     """
 
-    relation_type = models.ForeignKey(PersonWorkRelation, blank=True, null=True)
+    relation_type = models.ForeignKey(PersonWorkRelation, blank=True, null=True,
+                                      on_delete=models.SET_NULL)
     related_person = models.ForeignKey(
-        Person, blank=True, null=True)
+        Person, blank=True, null=True, on_delete=models.CASCADE)
     related_work = models.ForeignKey(
-        Work, blank=True, null=True)
+        Work, blank=True, null=True, on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
@@ -281,11 +288,15 @@ class InstitutionInstitution(TempEntityClass):
     :param int related_institutionB: Foreign Key to :class:`entities.models.Institution`
     """
 
-    relation_type = models.ForeignKey(InstitutionInstitutionRelation, blank=True, null=True)
+    relation_type = models.ForeignKey(InstitutionInstitutionRelation,
+                                      blank=True, null=True,
+                                      on_delete=models.SET_NULL)
     related_institutionA = models.ForeignKey(
-        Institution, blank=True, null=True, related_name="related_institutionA")
+        Institution, blank=True, null=True, related_name="related_institutionA",
+        on_delete=models.CASCADE)
     related_institutionB = models.ForeignKey(
-        Institution, blank=True, null=True, related_name="related_institutionB")
+        Institution, blank=True, null=True, related_name="related_institutionB",
+        on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
@@ -329,11 +340,12 @@ class InstitutionPlace(TempEntityClass):
     """
 
     relation_type = models.ForeignKey(
-        InstitutionPlaceRelation, blank=True, null=True)
+        InstitutionPlaceRelation, blank=True, null=True,
+        on_delete=models.SET_NULL)
     related_institution = models.ForeignKey(
-        Institution, blank=True, null=True)
+        Institution, blank=True, null=True, on_delete=models.CASCADE)
     related_place = models.ForeignKey(
-        Place, blank=True, null=True)
+        Place, blank=True, null=True, on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
@@ -361,11 +373,12 @@ class InstitutionEvent(TempEntityClass):
     :param int related_event: Foreign Key to :class:`entities.models.Event`
     """
 
-    relation_type = models.ForeignKey(InstitutionEventRelation, blank=True, null=True)
+    relation_type = models.ForeignKey(InstitutionEventRelation, blank=True,
+                                      null=True, on_delete=models.SET_NULL)
     related_institution = models.ForeignKey(
-        Institution, blank=True, null=True)
+        Institution, blank=True, null=True, on_delete=models.CASCADE)
     related_event = models.ForeignKey(
-        Event, blank=True, null=True)
+        Event, blank=True, null=True, on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
@@ -393,11 +406,12 @@ class InstitutionWork(TempEntityClass):
     :param int related_work: Foreign Key to :class:`entities.models.Work`
     """
 
-    relation_type = models.ForeignKey(InstitutionWorkRelation, blank=True, null=True)
+    relation_type = models.ForeignKey(InstitutionWorkRelation, blank=True,
+                                      null=True, on_delete=models.SET_NULL)
     related_institution = models.ForeignKey(
-        Institution, blank=True, null=True)
+        Institution, blank=True, null=True, on_delete=models.CASCADE)
     related_work = models.ForeignKey(
-        Work, blank=True, null=True)
+        Work, blank=True, null=True, on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
@@ -433,11 +447,14 @@ class PlacePlace(TempEntityClass):
     :param int related_placeB: Foreign Key to :class:`entities.models.Place`
     """
 
-    relation_type = models.ForeignKey(PlacePlaceRelation, blank=True, null=True)
+    relation_type = models.ForeignKey(PlacePlaceRelation, blank=True, null=True,
+                                      on_delete=models.SET_NULL)
     related_placeA = models.ForeignKey(
-        Place, blank=True, null=True, related_name="related_place_placeA")
+        Place, blank=True, null=True, related_name="related_place_placeA",
+        on_delete=models.CASCADE)
     related_placeB = models.ForeignKey(
-        Place, blank=True, null=True, related_name="related_place_placeB")
+        Place, blank=True, null=True, related_name="related_place_placeB",
+        on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
@@ -489,11 +506,12 @@ class PlaceEvent(TempEntityClass):
     :param int related_event: Foreign Key to :class:`entities.models.Event`
     """
 
-    relation_type = models.ForeignKey(PlaceEventRelation, blank=True, null=True)
+    relation_type = models.ForeignKey(PlaceEventRelation, blank=True, null=True,
+                                      on_delete=models.SET_NULL)
     related_place = models.ForeignKey(
-        Place, blank=True, null=True)
+        Place, blank=True, null=True, on_delete=models.CASCADE)
     related_event = models.ForeignKey(
-        Event, blank=True, null=True)
+        Event, blank=True, null=True, on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
@@ -525,11 +543,12 @@ class PlaceWork(TempEntityClass):
     :param int related_Work: Foreign Key to :class:`entities.models.Work`
     """
 
-    relation_type = models.ForeignKey(PlaceWorkRelation, blank=True, null=True)
+    relation_type = models.ForeignKey(PlaceWorkRelation, blank=True, null=True,
+                                      on_delete=models.SET_NULL)
     related_place = models.ForeignKey(
-        Place, blank=True, null=True)
+        Place, blank=True, null=True, on_delete=models.CASCADE)
     related_work = models.ForeignKey(
-        Work, blank=True, null=True)
+        Work, blank=True, null=True, on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
@@ -568,11 +587,14 @@ class EventEvent(TempEntityClass):
     :param int related_eventB: Foreign Key to :class:`entities.models.Event`
     """
 
-    relation_type = models.ForeignKey(EventEventRelation, blank=True, null=True)
+    relation_type = models.ForeignKey(EventEventRelation, blank=True, null=True,
+                                      on_delete=models.SET_NULL)
     related_eventA = models.ForeignKey(
-        Event, blank=True, null=True, related_name="related_eventA")
+        Event, blank=True, null=True, related_name="related_eventA",
+        on_delete=models.CASCADE)
     related_eventB = models.ForeignKey(
-        Event, blank=True, null=True, related_name="related_eventB")
+        Event, blank=True, null=True, related_name="related_eventB",
+        on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
@@ -590,11 +612,12 @@ class EventWork(TempEntityClass):
     :param int related_work: Foreign Key to :class:`entities.models.Work`
     """
 
-    relation_type = models.ForeignKey(EventWorkRelation, blank=True, null=True)
+    relation_type = models.ForeignKey(EventWorkRelation, blank=True, null=True,
+                                      on_delete=models.SET_NULL)
     related_event = models.ForeignKey(
-        Event, blank=True, null=True)
+        Event, blank=True, null=True, on_delete=models.CASCADE)
     related_work = models.ForeignKey(
-        Work, blank=True, null=True)
+        Work, blank=True, null=True, on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
@@ -633,11 +656,14 @@ class WorkWork(TempEntityClass):
     :param int related_workB: Foreign Key to :class:`entities.models.Work`
     """
 
-    relation_type = models.ForeignKey(WorkWorkRelation, blank=True, null=True)
+    relation_type = models.ForeignKey(WorkWorkRelation, blank=True, null=True,
+                                      on_delete=models.SET_NULL)
     related_workA = models.ForeignKey(
-        Work, blank=True, null=True, related_name="related_workA")
+        Work, blank=True, null=True, related_name="related_workA",
+        on_delete=models.CASCADE)
     related_workB = models.ForeignKey(
-        Work, blank=True, null=True, related_name="related_workB")
+        Work, blank=True, null=True, related_name="related_workB",
+        on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 

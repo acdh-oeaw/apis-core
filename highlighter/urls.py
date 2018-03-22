@@ -1,6 +1,8 @@
 from django.conf.urls import url
 from django.conf import settings
 
+app_name = 'highlighter'
+
 urlpatterns = []
 
 if 'annotator agreement' in getattr(settings, "APIS_COMPONENTS", []):

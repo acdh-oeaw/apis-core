@@ -22,7 +22,7 @@ class Project(models.Model):
     Id is used by the JavaScript function to target the right endpoints
     """
     name = models.CharField(max_length=255)  # name of the project registered
-    user = models.ForeignKey(User)  # foreignkey to the User who created the project
+    user = models.ForeignKey(User, null=True, on_delete=models.SET_NULL)  # foreignkey to the User who created the project
     description = models.TextField(blank=True, null=True)
     base_url = models.URLField(blank=True, null=True)    # optional base URL to restrict highlights to a base URL
     store_text = models.BooleanField(default=False) # Whether to store the text in the tool or work with ids only.
@@ -42,7 +42,8 @@ class TextHigh(models.Model):
     text = models.TextField(blank=True, null=True)
     text_id = models.PositiveIntegerField(blank=True, null=True) # UID to identify the text within the project. Allows to not upload the texts.
     text_class = models.CharField(max_length=255, blank=True, null=True)
-    project = models.ForeignKey(Project, blank=True, null=True)
+    project = models.ForeignKey(Project, blank=True, null=True,
+                                on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title
@@ -90,10 +91,13 @@ class Annotation(models.Model):
     )  # generic field to store the relation object
     entity_candidate = models.ManyToManyField('metainfo.UriCandidate', blank=True)
     orig_string = models.CharField(max_length=255, blank=True, null=True)    # string originally highlighted
-    text = models.ForeignKey('metainfo.Text')
-    parent = models.ForeignKey('self', related_name='parent_annotation', blank=True, null=True)    #parent annotations are used to allow for a stacked design of the annotation project
-    user_added = models.ForeignKey(User, blank=True, null=True) #changed from default=12
-    annotation_project = models.ForeignKey(AnnotationProject, blank=True, null=True)
+    text = models.ForeignKey('metainfo.Text', on_delete=models.CASCADE)
+    parent = models.ForeignKey('self', related_name='parent_annotation',
+                               blank=True, null=True, on_delete=models.SET_NULL)    #parent annotations are used to allow for a stacked design of the annotation project
+    user_added = models.ForeignKey(User, blank=True, null=True,
+                                   on_delete=models.SET_NULL) #changed from default=12
+    annotation_project = models.ForeignKey(AnnotationProject, blank=True,
+                                           null=True, on_delete=models.SET_NULL)
     status = models.CharField(max_length=4, choices=status_choices, blank=True, null=True)
 
     def __str__(self):
@@ -111,8 +115,8 @@ class Annotation(models.Model):
     def annotation_hash(self, format_string='start_end_text_ent_entid'):
         """
         Function that returns a hash of the annotaion used to calculate inter-annotator agreement.
-        
-        :return: 
+
+        :return:
         """
         matching = {'start': 'start', 'end': 'end', 'text': 'text_id'}
         f_list = format_string.split('_')
@@ -197,9 +201,12 @@ class MenuEntry(models.Model):
     choices_kind = (('txt', 'Text field'), ('frm', 'Form'), ('m', 'menu entry'), ('fn', 'Javascript function'))
     kind = models.CharField(max_length=4, choices=choices_kind, default='txt')
     name = models.CharField(max_length=255, null=True, blank=True)    # Charfield used when txt is as type of entry specified
-    api = models.ForeignKey(VocabularyAPI, blank=True, null=True)  # Foreignkey used to link the API entry in case api is set as kind
-    parent = models.ForeignKey('self', related_name='parent_menuEntry', blank=True, null=True)
-    project = models.ForeignKey(Project, null=True, blank=True)
+    api = models.ForeignKey(VocabularyAPI, blank=True, null=True,
+                            on_delete=models.CASCADE)  # Foreignkey used to link the API entry in case api is set as kind
+    parent = models.ForeignKey('self', related_name='parent_menuEntry',
+                               blank=True, null=True, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, null=True, blank=True,
+                                on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
