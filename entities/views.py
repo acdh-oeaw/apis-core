@@ -34,7 +34,7 @@ from relations.tables import (PersonInstitutionTable, PersonPersonTable, PersonP
                               InstitutionEventTable, PersonWorkTable, InstitutionWorkTable,
                               PlaceWorkTable, EventWorkTable, EntityUriTable)
 from metainfo.models import Uri, UriCandidate, TempEntityClass, Text
-from apis.settings.base import BASE_DIR
+from dboe.settings.base import BASE_DIR
 from helper_functions.stanbolQueries import retrieve_obj
 from helper_functions.RDFparsers import GenericRDFParser
 from labels.models import Label

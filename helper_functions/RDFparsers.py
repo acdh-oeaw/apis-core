@@ -11,8 +11,8 @@ from vocabularies.models import (
     InstitutionPlaceRelation, VocabsUri, ProfessionType, PersonWorkRelation,
     PersonPersonRelation, PersonPlaceRelation, WorkType, PersonInstitutionRelation,
     PlaceType, PlacePlaceRelation)
-from apis.settings.NER_settings import geonames_feature_codes as gn_f
-from apis.settings.RDF_settings import sett_RDF_generic
+from dboe.settings.NER_settings import geonames_feature_codes as gn_f
+from dboe.settings.RDF_settings import sett_RDF_generic
 from metainfo.models import Collection, Uri
 
 import rdflib

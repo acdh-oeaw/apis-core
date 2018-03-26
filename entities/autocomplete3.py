@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 from entities.models import Place, Person, Institution, Event, Work
 from metainfo.models import Uri, Collection
-from apis.settings.NER_settings import autocomp_settings as ac_settings
+from dboe.settings.NER_settings import autocomp_settings as ac_settings
 from django.conf import settings
 from .custom_autocompletes import *
 

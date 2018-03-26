@@ -28,7 +28,7 @@ class TempEntityClass(models.Model):
     from the written dates.
     A review boolean field to mark an object as reviewed
     """
-    name = models.CharField(max_length=255, blank=True)
+    name = models.CharField(max_length=255, blank=True, verbose_name='name')
     review = models.BooleanField(
         default=False,
         help_text="Should be set to True, if the data record holds up quality standards.")

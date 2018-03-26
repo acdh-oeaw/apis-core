@@ -22,6 +22,7 @@ import unicodedata
 
 def modify_fields(**kwargs):
     def wrap(cls):
+        print(cls)
         for field, prop_dict in kwargs.items():
             for prop, val in prop_dict.items():
                 setattr(cls._meta.get_field(field), prop, val)
@@ -186,7 +187,7 @@ class Work(TempEntityClass):
 ############################################################
 
 
-@modify_fields(name={'verbose_name': 'Hochdeutsch'})
+#@modify_fields(name={'verbose_name': 'Hochdeutsch'})
 @reversion.register(follow=['tempentityclass_ptr'])
 class Lemma(TempEntityClass):
     """ A temporalized entity to model a lemma."""
@@ -218,6 +219,18 @@ class Lemma(TempEntityClass):
 @reversion.register(follow=['tempentityclass_ptr'])
 class Fragebogen(TempEntityClass):
     """ A temporalized entity to model a Fragebogen."""
+    nummer = models.CharField(unique=True, max_length=28, blank=True, null=True)
+    titel = models.CharField(max_length=512)
+    schlagwoerter = models.CharField(max_length=1024, blank=True, null=True)
+    erscheinungsjahr = models.IntegerField(blank=True, null=True)
+    freigabe = models.BooleanField(default=False)
+    checked = models.BooleanField(default=False)
+    wordleiste = models.BooleanField(default=False)
+    druck = models.BooleanField(default=False)
+    online = models.BooleanField(default=False)
+    publiziert = models.BooleanField(default=False)
+    kind = models.ForeignKey('vocabularies.FragebogenTyp', blank=True, null=True,
+                             on_delete=models.SET_NULL)
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
