@@ -90,9 +90,14 @@ class GenericRelationForm(forms.ModelForm):
             list_rel = []
             dic_a = {'related_'+entity_type.lower()+'A': site_instance}
             dic_b = {'related_' + entity_type.lower() + 'B': site_instance}
-            for x in self.relation_form.annotation_links.filter_ann_proj(request=request).filter(
-                            Q(**dic_a) | Q(**dic_b)):
-                list_rel.append(x.get_table_dict(site_instance))
+            if 'apis_highlighter' in settings.INSTALLED_APPS:
+                for x in self.relation_form.annotation_links.filter_ann_proj(request=request).filter(
+                                Q(**dic_a) | Q(**dic_b)):
+                    list_rel.append(x.get_table_dict(site_instance))
+            else:
+                for x in self.relation_form.objects.filter(
+                        Q(**dic_a) | Q(**dic_b)):
+                    list_rel.append(x.get_table_dict(site_instance))
             table_html = table(list_rel, prefix=prefix)
         else:
             tab_query = {'related_'+entity_type.lower(): site_instance}
