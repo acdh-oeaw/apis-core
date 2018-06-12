@@ -115,10 +115,23 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
         db_include = self.kwargs.get('db_include', False)
         choices = []
         headers = {'Content-Type': 'application/json'}
-        q = self.q
+        q1 = re.match('^([^\[]+)\[([^\]]+)\]$', self.q)
+        if q1:
+            q = q1.group(1).strip()
+            q3 = q1.group(2).split(',')
+            q3 = [e.strip() for e in q3]
+        else:
+            q = re.match('^[^[]+', self.q).group(0)
+            q3 = False
+        print(q3)
         ent_model = ContentType.objects.get(app_label='entities', model=ac_type).model_class()
         arg_list = [Q(**{x+'__icontains': q}) for x in settings.APIS_ENTITIES[ac_type.title()]['search']]
         res = ent_model.objects.filter(reduce(operator.or_, arg_list)).distinct()
+        if q3:
+            f_dict2 = {}
+            for fd in q3:
+                f_dict2[fd.split('=')[0].strip()] = fd.split('=')[1].strip()
+            res.filter(**f_dict2)
         test_db = True
         test_stanbol = False
         test_stanbol_list = dict()
@@ -148,17 +161,39 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                     ldpath += "{} = <{}>;\n".format(d, y['fields'][d][0])
                 data = {
                     'limit': page_size,
-                    'name': q,
                     'ldpath': ldpath,
-                    'offset': offset
+                    'offset': offset,
+                    'constraints': [{
+                        "type": "text",
+                        "patternType": "wildcard",
+                        "field": "http://www.w3.org/2000/01/rdf-schema#label",
+                        "text": q.split()
+                    }]
                 }
+                if q3 and 'search fields' in y.keys():
+                    for fd in q3:
+                        fd = [fd2.strip() for fd2 in fd.split('=')]
+                        fd3 = y['search fields'][fd[0]]
+                        if fd3[2] == 'reference' and fd[1] in fd3[1]:
+                            fd_4 = {
+                                'type': 'reference',
+                                'value': fd3[1][fd[1]],
+                                'field': fd3[0]
+                            }
+                            data['constraints'].append(fd_4)
+                print(data)
                 try:
-                    r = requests.get(y['url'], params=data, headers=headers)
+                    url2 = y['url'].replace('find', 'query')
+                    print(url2)
+                    r = requests.post(url2, data=json.dumps(data), headers=headers)
                     if r.status_code != 200:
                         choices.append({'name': 'Connection to Stanbol failed'})
+                        print(r.text)
                         continue
                     res = r.json()
+
                 except:
+                    print('exception')
                     choices.append({'name': 'Connection to Stanbol failed'})
                     continue
                 if len(res['results']) < page_size:
