@@ -1,6 +1,6 @@
 from django.db import models
 from vocabularies.models import LabelType
-from metainfo.models import TempEntityClass
+#from metainfo.models import TempEntityClass
 #from reversion import revisions as reversion
 import reversion
 
@@ -17,7 +17,7 @@ class Label(models.Model):
         verbose_name='ISO Code', default='deu')
     label_type = models.ForeignKey(LabelType, blank=True, null=True,
                                    on_delete=models.SET_NULL)
-    temp_entity = models.ForeignKey(TempEntityClass, on_delete=models.CASCADE)
+    temp_entity = models.ForeignKey("metainfo.TempEntityClass", on_delete=models.CASCADE)
 
     def get_web_object(self):
         result = {

@@ -5,8 +5,10 @@ from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 
-from vocabularies.models import CollectionType, TextType
+from vocabularies.models import CollectionType, TextType, LabelType
+from labels.models import Label
 from .validators import date_validator
 
 from datetime import datetime
@@ -17,6 +19,7 @@ from difflib import SequenceMatcher
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.models import Annotation
+
 
 @reversion.register()
 class TempEntityClass(models.Model):
@@ -51,8 +54,9 @@ class TempEntityClass(models.Model):
     notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
-        if self.name != "":  # relation usually don´t have names
-
+        if self.name != "" and hasattr(self, 'first_name'):  # relation usually don´t have names
+            return "{}, {}".format(self.name, self.first_name)
+        elif self.name != "":
             return self.name
         else:
             return "(ID: {})".format(self.id)
@@ -101,6 +105,49 @@ class TempEntityClass(models.Model):
             self.name = unicodedata.normalize('NFC', self.name)
         super(TempEntityClass, self).save(*args, **kwargs)
         return self
+
+    def merge_with(self, entities):
+        if not isinstance(entities, list):
+            entities = [entities]
+        e_a = type(self).__name__
+        rels = ContentType.objects.filter(
+            app_label='relations', model__icontains=e_a)
+        rels_names = rels.values_list('model', flat=True)
+        print(rels)
+        for ent in entities:
+            e_b = type(ent).__name__
+            if e_a != e_b:
+                continue
+            print(e_b)
+            print(str(ent))
+            lt, created = LabelType.objects.get_or_create(name='Legacy name (merge)')
+            l_uri, created = LabelType.objects.get_or_create(name='Legacy URI (merge)')
+            Label.objects.create(label=str(ent), label_type=lt, temp_entity=self)
+            for u in Uri.objects.filter(entity=ent):
+                Label.objects.create(label=str(u.uri), label_type=l_uri, temp_entity=self)
+            for l in Label.objects.filter(temp_entity=ent):
+                l.temp_entity = self
+                l.save()
+            for r in rels.filter(model__icontains=e_b):
+                lst_ents_rel = str(r).split()
+                if lst_ents_rel[0] == lst_ents_rel[1]:
+                    q_d = {'related_{}A'.format(e_b.lower()): ent}
+                    k = r.model_class().objects.filter(**q_d)
+                    for t in k:
+                        setattr(t, 'related_{}A'.format(e_a.lower()), self)
+                        t.save()
+                    q_d = {'related_{}B'.format(e_b.lower()): ent}
+                    k = r.model_class().objects.filter(**q_d)
+                    for t in k:
+                        setattr(t, 'related_{}B'.format(e_a.lower()), self)
+                        t.save()
+                else:
+                    q_d = {'related_{}'.format(e_b.lower()): ent}
+                    k = r.model_class().objects.filter(**q_d)
+                    for t in k:
+                        setattr(t, 'related_{}'.format(e_a.lower()), self)
+                        t.save()
+            ent.delete()
 
 
 @reversion.register()
