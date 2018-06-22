@@ -263,8 +263,9 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                             choices.append({'name': 'Connection to Stanbol failed'})
                             continue
                         res = r.json()
-                    except:
+                    except Exception as e:
                         choices.append({'name': 'Connection to Stanbol failed'})
+                        print(e)
                         continue
                 if len(res['results']) < page_size:
                     test_stanbol_list[y['url']] = False

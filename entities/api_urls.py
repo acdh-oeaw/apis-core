@@ -12,8 +12,8 @@ urlpatterns = [
     url(r'^getorcreateentity/$', GetOrCreateEntity.as_view(), name='GetOrCreateEntity')
 ]
 
-if 'deep learning' in getattr(settings, "APIS_COMPONENTS", []):
-    from highlighter.api_views import TestDLModel
+if 'deep learning' in getattr(settings, "APIS_COMPONENTS", []) and 'apis_highlighter' in settings.INSTALLED_APPS:
+    from apis_highlighter.api_views import TestDLModel
     urlpatterns.append(url(r'^nlp_model/$', TestDLModel.as_view(), name='TestDLModel'),)
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
