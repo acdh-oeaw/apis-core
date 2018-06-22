@@ -12,12 +12,16 @@ from django.urls import reverse
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import URLValidator
+from django.conf import settings
 
 from .models import Person, Place, Institution, Event, Work
 from vocabularies.models import TextType
 from metainfo.models import Text, Uri
 
 from helper_functions.RDFparsers import GenericRDFParser
+
+if 'apis_highlighter' in settings.INSTALLED_APPS:
+    from apis_highlighter.models import AnnotationProject
 
 
 class SearchForm(forms.Form):
@@ -249,12 +253,13 @@ class NetworkVizFilterForm(forms.Form):
                                                         kwargs={'vocab': 'personplacerelation',
                                                                 'direct': 'normal'}),
                                             attrs=attrs))
-        self.fields['annotation_proj'] = forms.ChoiceField(
-            label='Annotation Project',
-            choices=BLANK_CHOICE_DASH + list((x.pk, x.name) for x in AnnotationProject.objects.all()),
-            required=False,
-            help_text="Include only relations related to this annotation project \
-            (See the include general relations checkbox)")
+        if 'apis_highlighter' in settings.INSTALLED_APPS:
+            self.fields['annotation_proj'] = forms.ChoiceField(
+                label='Annotation Project',
+                choices=BLANK_CHOICE_DASH + list((x.pk, x.name) for x in AnnotationProject.objects.all()),
+                required=False,
+                help_text="Include only relations related to this annotation project \
+                (See the include general relations checkbox)")
         self.helper = FormHelper()
         self.helper.form_class = 'FilterNodesForm'
         self.helper.form_action = 'NetJson-list'
