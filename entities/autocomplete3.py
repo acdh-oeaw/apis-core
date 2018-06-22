@@ -189,14 +189,18 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                     w = requests.get(y['url'].replace('find', 'entity'), params=params, headers=headers)
                     res3 = dict()
                     ldpath_fields = [y['fields'][d][0] for d in y['fields'].keys()]
-                    for x in w.json()['representation'].keys():
-                        if x in ldpath_fields:
-                            for d in y['fields'].keys():
-                                if y['fields'][d][0] == x:
-                                    res3[d] = w.json()['representation'][x]
-                    res = dict()
-                    res3['id'] = w.json()['id']
-                    res['results'] = [res3]
+                    print(w.status_code)
+                    if w.status_code == 200:
+                        for x in w.json()['representation'].keys():
+                            if x in ldpath_fields:
+                                for d in y['fields'].keys():
+                                    if y['fields'][d][0] == x:
+                                        res3[d] = w.json()['representation'][x]
+                        res = dict()
+                        res3['id'] = w.json()['id']
+                        res['results'] = [res3]
+                    else:
+                        continue
                 else:
 
                     data = {
