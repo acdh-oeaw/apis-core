@@ -24,6 +24,7 @@ from .views import set_session_variables
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.forms import SelectAnnotatorAgreement
 
+
 @method_decorator(login_required, name='dispatch')
 class GenericEntitiesEditView(View):
 
@@ -90,8 +91,10 @@ class GenericEntitiesEditView(View):
                        'create': request.user.has_perm('entities.add_{}'.format(entity))}
         template = select_template(['entities/{}_create_generic.html'.format(entity),
                                     'entities/entity_create_generic.html'])
+        form_merge_with = GenericEntitiesStanbolForm(entity, ent_merge_pk=pk)
         return HttpResponse(template.render(request=request, context={
             'entity_type': entity,
+            'form_merge_with': form_merge_with,
             'form': form,
             'form_text': form_text,
             'instance': instance,
@@ -168,10 +171,15 @@ class GenericEntitiesCreateStanbolView(View):
 
     def post(self, request, *args, **kwargs):
         entity = kwargs['entity']
-        form = GenericEntitiesStanbolForm(entity, request.POST)
+        ent_merge_pk = kwargs.get('ent_merge_pk', False)
+        if ent_merge_pk:
+            form = GenericEntitiesStanbolForm(entity, request.POST, ent_merge_pk=ent_merge_pk)
+        else:
+            form = GenericEntitiesStanbolForm(entity, request.POST)
         #form = form(request.POST)
         if form.is_valid():
             entity_2 = form.save()
+            entity_2.merge_with(int(ent_merge_pk))
             return redirect(reverse('entities:generic_entities_edit_view', kwargs={
                 'pk': entity_2.pk, 'entity': entity
             }))
@@ -181,8 +189,7 @@ class GenericEntitiesCreateStanbolView(View):
                                         'entities/entity_create_generic.html'])
             return HttpResponse(template.render(request=request, context={
                 'permissions': permissions,
-                'form': form,
-                'form_text': form_text}))
+                'form': form}))
 
 
 @method_decorator(login_required, name='dispatch')

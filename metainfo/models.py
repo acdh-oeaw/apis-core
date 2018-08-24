@@ -107,12 +107,17 @@ class TempEntityClass(models.Model):
         return self
 
     def merge_with(self, entities):
+        e_a = type(self).__name__
+        self_model_class = ContentType.objects.get(
+            app_label='entities',
+            model__iexact=e_a).model_class()
+        if isinstance(entities, int):
+            entities = self_model_class.objects.get(pk=entities)
         if not isinstance(entities, list):
             entities = [entities]
-        e_a = type(self).__name__
+        entities = [self_model_class.objects.get(pk=ent) if type(ent) == int else ent for ent in entities]
         rels = ContentType.objects.filter(
             app_label='relations', model__icontains=e_a)
-        rels_names = rels.values_list('model', flat=True)
         print(rels)
         for ent in entities:
             e_b = type(ent).__name__

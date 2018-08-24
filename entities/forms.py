@@ -105,15 +105,25 @@ class GenericEntitiesStanbolForm(forms.Form):
                  'data-minimum-input-length': 3,
                  'data-html': True,
                  'style': 'width: auto'}
+        ent_merge_pk = kwargs.pop('ent_merge_pk', False)
         super(GenericEntitiesStanbolForm, self).__init__(*args, **kwargs)
         self.entity = entity
         self.helper = FormHelper()
-        self.helper.form_action = reverse('entities:generic_entities_stanbol_create', kwargs={'entity': entity})
-        self.helper.add_input(Submit('submit', 'Create'))
+        form_kwargs = {'entity': entity}
+        url = '/entities/autocomplete/{}/remove'.format(entity)
+        label = 'Create {} from reference resources'.format(entity.title())
+        button_label = 'Create'
+        if ent_merge_pk:
+            form_kwargs['ent_merge_pk'] = ent_merge_pk
+            url = '/entities/autocomplete/{}'.format(entity)
+            label = 'Search for {0} in reference resources or db'.format(entity.title())
+            button_label = 'Merge'
+        self.helper.form_action = reverse('entities:generic_entities_stanbol_create', kwargs=form_kwargs)
+        self.helper.add_input(Submit('submit', button_label))
         self.fields['entity'] = autocomplete.Select2ListCreateChoiceField(
-                label='Create {} from reference resources'.format(entity.title()),
+                label=label,
                 widget=autocomplete.ListSelect2(
-                    url='/entities/autocomplete/{}/remove'.format(entity),
+                    url=url,
                     attrs=attrs),
                 validators=[URLValidator])
 
