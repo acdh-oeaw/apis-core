@@ -3,6 +3,7 @@ from django.db import models
 import reversion
 from django.db.models import Q
 import operator
+import pdb
 
 from entities.models import Person, Place, Institution, Event, Work
 from metainfo.models import TempEntityClass
@@ -41,7 +42,6 @@ class AnnotationRelationLinkManager(models.Manager):
         :return: queryset that contains only objects that are shown in the highlighted text or those not connected
             to an annotation at all.
         """
-
         users_show = None
         if request:
             ann_proj = request.session.get('annotation_project', 1)
@@ -50,7 +50,7 @@ class AnnotationRelationLinkManager(models.Manager):
             users_show = request.session.get('users_show_highlighter', None)
         query = Q(annotation__annotation_project_id=ann_proj)
         qs = super(AnnotationRelationLinkManager, self).get_queryset()
-        if users_show:
+        if users_show is not None:
             query.add(Q(annotation__user_added_id__in=users_show), Q.AND)
         if include_all:
             query.add(Q(annotation__annotation_project__isnull=True), Q.OR)

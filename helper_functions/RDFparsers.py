@@ -166,19 +166,21 @@ class GenericRDFParser(object):
 
         def prep_string(tupl):
             if isinstance(tupl, str):
-                return tupl
-            if tupl[1]:
+                res = tupl
+            elif tupl[1]:
                 m = re.match(tupl[1][0], tupl[0])
                 group = tupl[1][1]
                 if not group:
                     group = 0
                 try:
-                    return m.group(group)
+                    res = m.group(group)
                 except:
-                    return tupl[0]
+                    res = tupl[0]
             else:
-                r = tupl[0]
-            return r.strip()
+                res = tupl[0]
+            if len(res) > 255:
+                res = res[:250] + '...'
+            return res.strip()
         objct = ContentType.objects.get(app_label=app_label_entities, model=kind.lower()).model_class()
         force = kwargs.get('force', None)
         res_attrb = dict()
