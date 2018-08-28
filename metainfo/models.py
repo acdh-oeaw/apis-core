@@ -227,7 +227,7 @@ class Text(models.Model):
 
 @reversion.register()
 class Uri(models.Model):
-    uri = models.URLField(blank=True, null=True, unique=True)
+    uri = models.URLField(blank=True, null=True, unique=True, max_length=255)
     domain = models.CharField(max_length=255, blank=True)
     rdf_link = models.URLField(blank=True)
     entity = models.ForeignKey(TempEntityClass, blank=True, null=True,
