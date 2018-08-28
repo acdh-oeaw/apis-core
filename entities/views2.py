@@ -91,10 +91,8 @@ class GenericEntitiesEditView(View):
                        'create': request.user.has_perm('entities.add_{}'.format(entity))}
         template = select_template(['entities/{}_create_generic.html'.format(entity),
                                     'entities/entity_create_generic.html'])
-        form_merge_with = GenericEntitiesStanbolForm(entity, ent_merge_pk=pk)
-        return HttpResponse(template.render(request=request, context={
+        context = {
             'entity_type': entity,
-            'form_merge_with': form_merge_with,
             'form': form,
             'form_text': form_text,
             'instance': instance,
@@ -104,7 +102,11 @@ class GenericEntitiesEditView(View):
             'object_lod': object_lod,
             'ann_proj_form': ann_proj_form,
             'form_ann_agreement': form_ann_agreement,
-            'permissions': permissions}))
+            'permissions': permissions}
+        if entity.lower() != 'place':
+            form_merge_with = GenericEntitiesStanbolForm(entity, ent_merge_pk=pk)
+            context['form_merge_with'] = form_merge_with
+        return HttpResponse(template.render(request=request, context=context))
 
     def post(self, request, *args, **kwargs):
         entity = kwargs['entity']

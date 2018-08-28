@@ -1,4 +1,5 @@
 from django.db import models
+import requests
 #from reversion import revisions as reversion
 import reversion
 from django.db.models.signals import post_save, m2m_changed
@@ -6,6 +7,8 @@ from django.dispatch import receiver
 from django.contrib.auth.models import Group
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.utils.functional import cached_property
+from model_utils.managers import InheritanceManager
 
 from vocabularies.models import CollectionType, TextType, LabelType
 from labels.models import Label
@@ -16,6 +19,8 @@ import re
 import unicodedata
 from difflib import SequenceMatcher
 #from helper_functions.highlighter import highlight_text
+from apis.settings.NER_settings import autocomp_settings
+
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.models import Annotation
@@ -52,6 +57,8 @@ class TempEntityClass(models.Model):
                                on_delete=models.SET_NULL)
     references = models.TextField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
+    objects = models.Manager()
+    objects_inheritance = InheritanceManager()
 
     def __str__(self):
         if self.name != "" and hasattr(self, 'first_name'):  # relation usually don´t have names
@@ -259,7 +266,23 @@ class UriCandidate(models.Model):
     responsible = models.CharField(max_length=255)
     entity = models.ForeignKey(TempEntityClass, blank=True, null=True,
                                on_delete=models.CASCADE)
-
+   
+    @cached_property
+    def description(self):
+        headers = {'accept': 'application/json'}
+        cn = TempEntityClass.objects_inheritance.get_subclass(id=self.entity_id).__class__.__name__
+        for endp in autocomp_settings[cn.title()]:
+            url = re.sub(r'/[a-z]+$', '/entity', endp['url'])
+            params = {'id': self.uri}
+            print(url, params)
+            res = requests.get(url, params=params, headers=headers)
+            if res.status_code == 200:
+                if endp['fields']['descr'][0] in res.json()['representation'].keys():
+                    desc = res.json()['representation'][endp['fields']['descr'][0]][0]['value']
+                else:
+                    desc = 'undefined'
+                label = res.json()['representation'][endp['fields']['name'][0]][0]['value']
+                return (label, desc)
 
 @receiver(post_save, sender=Uri, dispatch_uid="remove_default_uri")
 def remove_default_uri(sender, instance, **kwargs):
