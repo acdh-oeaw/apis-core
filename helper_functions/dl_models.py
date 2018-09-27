@@ -51,10 +51,10 @@ def test_model(model, sent):
     K.clear_session()
     script_dir = os.path.dirname(os.path.realpath('__file__'))
     fileh = open(os.path.join(script_dir,
-                              'apis-core/data/nlp_models/{}_vocab.obj'.format(model)), 'rb')
+                              'data/nlp_models/{}_vocab.obj'.format(model)), 'rb')
     lst_orth, lst_orth_dict, lst_labels, lst_labels_dict, lst_zero_label, lst_labels_dhae2 = pickle.load(fileh)
     model = load_model(os.path.join(script_dir,
-                       'apis-core/data/nlp_models/{}.h5'.format(model)))
+                       'data/nlp_models/{}.h5'.format(model)))
     result = []
     txt = nlp(sent)
     tokens_lst = []

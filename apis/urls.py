@@ -113,3 +113,14 @@ urlpatterns = [
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     urlpatterns.append(url(r'highlighter/', include('apis_highlighter.urls', namespace='highlighter')))
+
+if 'apis_fulltext_download' in settings.INSTALLED_APPS:
+    urlpatterns.append(url(r'fulltext_download/', include('apis_fulltext_download.urls', namespace='apis_fulltext_download')))
+
+if settings.DEBUG:
+    if 'debug_toolbar' in settings.INSTALLED_APPS:
+        import debug_toolbar
+        urlpatterns = [
+            url(r'^__debug__/', include(debug_toolbar.urls)),
+        ] + urlpatterns
+
