@@ -1,11 +1,11 @@
 from django.conf.urls import url
 
-from entities.autocomplete3 import GenericEntitiesAutocomplete, GenericNetworkEntitiesAutocomplete
-from entities.views import ReversionCompareView
-from entities.views2 import GenericEntitiesCreateStanbolView
+from .autocomplete3 import GenericEntitiesAutocomplete, GenericNetworkEntitiesAutocomplete
+from .views import ReversionCompareView
+from .views2 import GenericEntitiesCreateStanbolView
 from . import views, views2, detail_views
 
-app_name = 'entities'
+app_name = 'apis_entities'
 
 urlpatterns = [
     url(r'^entity/(?P<entity>[a-z]+)/(?P<pk>[0-9]+)/edit$',

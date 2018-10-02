@@ -7,16 +7,16 @@ from rest_framework.exceptions import NotFound
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 
-from helper_functions.RDFparsers import GenericRDFParser
+from apis_core.helper_functions.RDFparsers import GenericRDFParser
 from .serializers import (
     InstitutionSerializer, PersonSerializer, PlaceSerializer, EventSerializer, WorkSerializer,
     GeoJsonSerializer, NetJsonEdgeSerializer, NetJsonNodeSerializer
 )
 from .models import Institution, Person, Place, Event, Work
-from vocabularies.models import VocabsBaseClass
-from helper_functions.stanbolQueries import find_loc
-from apis.settings.NER_settings import autocomp_settings, stb_base
-from metainfo.api_renderers import PaginatedCSVRenderer
+from apis_core.vocabularies.models import VocabsBaseClass
+from apis_core.helper_functions.stanbolQueries import find_loc
+from apis_core.settings.NER_settings import autocomp_settings, stb_base
+from apis_core.metainfo.api_renderers import PaginatedCSVRenderer
 from rest_framework.settings import api_settings
 from rest_framework.permissions import DjangoObjectPermissions, AllowAny
 from rest_framework.pagination import PageNumberPagination

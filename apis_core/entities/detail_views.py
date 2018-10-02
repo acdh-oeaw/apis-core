@@ -10,11 +10,11 @@ from django.shortcuts import get_object_or_404
 from django_tables2 import RequestConfig
 from django.conf import settings
 
-from entities.views import get_highlighted_texts
+from .views import get_highlighted_texts
 from .models import Work
-from labels.models import Label
-from metainfo.models import Uri
-from relations.tables import get_generic_relations_table, EntityLabelTable, EntityDetailViewLabelTable
+from apis_core.labels.models import Label
+from apis_core.metainfo.models import Uri
+from apis_core.relations.tables import get_generic_relations_table, EntityLabelTable, EntityDetailViewLabelTable
 
 
 class GenericEntitiesDetailView(View):

@@ -9,16 +9,16 @@ from registration.backends.simple.views import RegistrationView
 from registration.signals import user_registered
 from django.contrib.auth.models import Group
 
-from metainfo.models import TempEntityClass, Uri, Text, Collection
-from labels.models import Label
-from vocabularies.models import (ProfessionType, PlaceType, InstitutionType,
+from apis_core.metainfo.models import TempEntityClass, Uri, Text, Collection
+from apis_core.labels.models import Label
+from apis_core.vocabularies.models import (ProfessionType, PlaceType, InstitutionType,
     EventType, Title, WorkType)
-from apis.settings.base import BASE_URI
-from apis.settings.base import BASE_DIR
 
 import re
 import unicodedata
 
+
+BASE_URI = getattr(settings, "APIS_BASE_URI", 'http://apis.info')
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class Person(TempEntityClass):

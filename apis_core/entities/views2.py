@@ -14,10 +14,10 @@ from django_tables2 import RequestConfig
 from guardian.core import ObjectPermissionChecker
 from reversion.models import Version
 
-from entities.views import get_highlighted_texts
-from labels.models import Label
-from metainfo.models import Uri
-from relations.tables import get_generic_relations_table, EntityLabelTable
+from .views import get_highlighted_texts
+from apis_core.labels.models import Label
+from apis_core.metainfo.models import Uri
+from apis_core.relations.tables import get_generic_relations_table, EntityLabelTable
 from .forms import get_entities_form, FullTextForm, GenericEntitiesStanbolForm
 from .views import set_session_variables
 

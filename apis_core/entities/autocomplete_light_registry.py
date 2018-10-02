@@ -1,7 +1,7 @@
 from autocomplete_light import shortcuts as al
-from vocabularies.models import ProfessionType, Title
+from apis_core.vocabularies.models import ProfessionType, Title
 
-from entities.models import Person, Place, Institution, Event, Work
+from .models import Person, Place, Institution, Event, Work
 
 class TitleAutocomplete(al.AutocompleteModelBase):
 	search_fields=['name', 'abbreviation']

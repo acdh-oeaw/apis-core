@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from entities.models import Place, Person, Institution, Event, Work
-from metainfo.models import Uri, Collection
-from apis.settings.NER_settings import autocomp_settings as ac_settings
+from .models import Place, Person, Institution, Event, Work
+from apis_core.metainfo.models import Uri, Collection
+from apis_core.default_settings.NER_settings import autocomp_settings as ac_settings
 from django.conf import settings
 from .custom_autocompletes import *
 

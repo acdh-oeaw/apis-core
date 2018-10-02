@@ -5,7 +5,7 @@ from entities import api_views
 from entities.api_views import GetOrCreateEntity
 
 
-app_name = 'entities'
+app_name = 'apis_entities'
 
 urlpatterns = [
     url(r'^savenetworkfiles/$', api_views.SaveNetworkFiles.as_view()),

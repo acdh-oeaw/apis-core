@@ -15,10 +15,10 @@ from django.core.validators import URLValidator
 from django.conf import settings
 
 from .models import Person, Place, Institution, Event, Work
-from vocabularies.models import TextType
-from metainfo.models import Text, Uri
+from apis_core.vocabularies.models import TextType
+from apis_core.metainfo.models import Text, Uri
 
-from helper_functions.RDFparsers import GenericRDFParser
+from apis_core.helper_functions.RDFparsers import GenericRDFParser
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.models import AnnotationProject
