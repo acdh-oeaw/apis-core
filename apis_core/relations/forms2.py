@@ -12,9 +12,9 @@ from django.conf import settings
 from dal import autocomplete
 from django.core.validators import URLValidator
 
-from metainfo.models import TempEntityClass, Text
-from helper_functions.RDFparsers import GenericRDFParser
-from relations.tables import *
+from apis_core.metainfo.models import TempEntityClass, Text
+from apis_core.helper_functions.RDFparsers import GenericRDFParser
+from .tables import *
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.models import Annotation

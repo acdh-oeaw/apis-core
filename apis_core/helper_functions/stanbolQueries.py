@@ -1,6 +1,6 @@
 import requests
 import json
-from apis.settings.NER_settings import StbGeoQuerySettings, autocomp_settings
+from apis_core.default_settings.NER_settings import StbGeoQuerySettings, autocomp_settings
 
 
 def decide_score_stanbol(results, dec_diff):

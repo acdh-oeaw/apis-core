@@ -13,14 +13,14 @@ from django.contrib.contenttypes.models import ContentType
 from .models import (PersonPlace, PersonPerson, PersonInstitution,
                      InstitutionPlace, InstitutionInstitution, PersonEvent, InstitutionEvent,
                      PlaceEvent, PersonWork, InstitutionWork, PlaceWork, EventWork, PlacePlace)
-from entities.models import Place, Institution, Person, Event, Work
-from metainfo.models import Uri, Text
-from vocabularies.models import (PersonInstitutionRelation, PersonPlaceRelation, InstitutionPlaceRelation,
+from apis_core.entities.models import Place, Institution, Person, Event, Work
+from apis_core.metainfo.models import Uri, Text
+from apis_core.vocabularies.models import (PersonInstitutionRelation, PersonPlaceRelation, InstitutionPlaceRelation,
                                  PersonEventRelation, InstitutionEventRelation, PlaceEventRelation,
                                  InstitutionInstitutionRelation, PersonPersonRelation)
-from labels.models import Label
+from apis_core.labels.models import Label
 from highlighter.models import Annotation
-from helper_functions.RDFparsers import GenericRDFParser
+from apis_core.helper_functions.RDFparsers import GenericRDFParser
 
 
 ##############################################

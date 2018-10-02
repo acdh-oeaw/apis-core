@@ -5,9 +5,9 @@ from django.db.models import Q
 import operator
 import pdb
 
-from entities.models import Person, Place, Institution, Event, Work
-from metainfo.models import TempEntityClass
-from vocabularies.models import (PersonPlaceRelation, PersonPersonRelation,
+from apis_core.entities.models import Person, Place, Institution, Event, Work
+from apis_core.metainfo.models import TempEntityClass
+from apis_core.vocabularies.models import (PersonPlaceRelation, PersonPersonRelation,
     PersonInstitutionRelation, PersonEventRelation, PersonWorkRelation,
     InstitutionInstitutionRelation, InstitutionPlaceRelation,
     InstitutionEventRelation, PlacePlaceRelation, PlaceEventRelation,

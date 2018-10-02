@@ -2,7 +2,7 @@
 from django.conf.urls import url
 from . import views
 
-app_name = 'labels'
+app_name = 'apis_labels'
 
 urlpatterns = [
 url(r'^list/$', views.LabelListView.as_view(), name='label_list'),

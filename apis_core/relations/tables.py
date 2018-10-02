@@ -4,8 +4,8 @@ from django_tables2.utils import A
 
 from .models import (PersonInstitution, PersonPlace, PersonPerson, PersonEvent, InstitutionEvent, PlaceEvent,
                      PersonWork, InstitutionWork, InstitutionPlace, PlaceWork, EventWork)
-from labels.models import Label
-from metainfo.models import Uri
+from apis_core.labels.models import Label
+from apis_core.metainfo.models import Uri
 
 
 empty_text_default = 'There are currently no relations'

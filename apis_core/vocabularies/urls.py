@@ -1,8 +1,8 @@
 from django.conf.urls import url
 
-from entities.autocomplete3 import GenericVocabulariesAutocomplete
+from apis_core.entities.autocomplete3 import GenericVocabulariesAutocomplete
 
-app_name = 'vocabularies'
+app_name = 'apis_vocabularies'
 
 urlpatterns = [
     url(r'^autocomplete/(?P<vocab>[a-zA-Z0-9-]+)/(?P<direct>[a-zA-Z0-9-]+)/$',

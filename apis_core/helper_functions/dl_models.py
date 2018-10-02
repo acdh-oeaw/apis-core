@@ -11,7 +11,7 @@ from spacy.attrs import IS_PUNCT, LOWER, ENT_TYPE, IS_ALPHA, TAG
 
 import de_core_news_sm
 
-from vocabularies.models import VocabsBaseClass
+from apis_core.vocabularies.models import VocabsBaseClass
 
 nlp = de_core_news_sm.load()
 

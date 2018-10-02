@@ -1,5 +1,5 @@
 from apis_highlighter.models import Annotation
-from metainfo.models import Text
+from apis_core.metainfo.models import Text
 import re
 from django.contrib.contenttypes.models import ContentType
 

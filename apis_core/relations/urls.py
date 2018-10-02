@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from . import views
 
-app_name = 'relations'
+app_name = 'apis_relations'
 
 urlpatterns = [
 url(r'^ajax/get/$', views.get_form_ajax, name='get_form_ajax'),

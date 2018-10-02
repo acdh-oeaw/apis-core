@@ -7,7 +7,7 @@ from .serializers import (
 from .models import (InstitutionInstitution, PersonInstitution, PersonPlace, PersonPerson, PersonEvent, PersonWork,
                      InstitutionPlace, InstitutionEvent, InstitutionWork, EventWork, EventEvent, PlaceEvent, PlaceWork,
                      PlacePlace, WorkWork)
-from entities.api_views import StandardResultsSetPagination
+from apis_core.entities.api_views import StandardResultsSetPagination
 
 
 class InstitutionInstitutionViewSet(viewsets.ModelViewSet):

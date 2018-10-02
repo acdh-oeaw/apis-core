@@ -10,8 +10,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.functional import cached_property
 from model_utils.managers import InheritanceManager
 
-from vocabularies.models import CollectionType, TextType, LabelType
-from labels.models import Label
+from apis_core.vocabularies.models import CollectionType, TextType, LabelType
+from apis_core.labels.models import Label
 from .validators import date_validator
 
 from datetime import datetime
@@ -19,7 +19,7 @@ import re
 import unicodedata
 from difflib import SequenceMatcher
 #from helper_functions.highlighter import highlight_text
-from apis.settings.NER_settings import autocomp_settings
+from apis_core.default_settings.NER_settings import autocomp_settings
 
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
