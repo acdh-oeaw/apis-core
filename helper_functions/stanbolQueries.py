@@ -89,16 +89,19 @@ def find_loc(lst, geonames_chains=False, dec_diff=5):
                     countr = find_geonames2(t, c, dec_diff=dec_diff)
                 check = True
                 while check:
-                    if countr[0]:
-                        if countr[1]['http://www.geonames.org/ontology#featureCode'][0]['value'] == 'http://www.geonames.org/ontology#A.PCLI':
-                            prev_elem = (
-                                countr[1]['id'],
-                                'http://www.geonames.org/ontology#parentCountry'
-                            )
-                        else:
-                            prev_elem = (countr[1]['id'], 'http://www.geonames.org/ontology#parent'+countr[1]['http://www.geonames.org/ontology#featureCode'][0]['value'].split('.')[-1])
-                        check = False
-                    if not countr[0]:
+                    if countr:
+                        if countr[0]:
+                            if countr[1]['http://www.geonames.org/ontology#featureCode'][0]['value'] == 'http://www.geonames.org/ontology#A.PCLI':
+                                prev_elem = (
+                                    countr[1]['id'],
+                                    'http://www.geonames.org/ontology#parentCountry'
+                                )
+                            else:
+                                prev_elem = (countr[1]['id'], 'http://www.geonames.org/ontology#parent'+countr[1]['http://www.geonames.org/ontology#featureCode'][0]['value'].split('.')[-1])
+                            check = False
+                        if not countr[0]:
+                            check = False
+                    else:
                         check = False
             else:
                 o = StbGeoQuerySettings('place')

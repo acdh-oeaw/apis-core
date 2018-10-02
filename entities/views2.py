@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import Context
 from django.template.loader import select_template
@@ -18,8 +19,10 @@ from labels.models import Label
 from metainfo.models import Uri
 from relations.tables import get_generic_relations_table, EntityLabelTable
 from .forms import get_entities_form, FullTextForm, GenericEntitiesStanbolForm
-from highlighter.forms import SelectAnnotatorAgreement
 from .views import set_session_variables
+
+if 'apis_highlighter' in settings.INSTALLED_APPS:
+    from apis_highlighter.forms import SelectAnnotatorAgreement
 
 
 @method_decorator(login_required, name='dispatch')
@@ -34,7 +37,6 @@ class GenericEntitiesEditView(View):
         relations = ContentType.objects.filter(app_label='relations', model__icontains=entity)
         side_bar = []
         for rel in relations:
-            print(str(rel))
             match = str(rel).split()
             prefix = "{}{}-".format(match[0].title()[:2], match[1].title()[:2])
             table = get_generic_relations_table(''.join(match), entity)
@@ -43,8 +45,12 @@ class GenericEntitiesEditView(View):
                 title_panel = entity.title()
                 dict_1 = {'related_' + entity.lower() + 'A': instance}
                 dict_2 = {'related_' + entity.lower() + 'B': instance}
-                object_pre = rel.model_class().annotation_links.filter_ann_proj(request=request).filter(
-                    Q(**dict_1) | Q(**dict_2))
+                if 'apis_highlighter' in settings.INSTALLED_APPS:
+                    object_pre = rel.model_class().annotation_links.filter_ann_proj(request=request).filter(
+                        Q(**dict_1) | Q(**dict_2))
+                else:
+                    object_pre = rel.model_class().objects.filter(
+                        Q(**dict_1) | Q(**dict_2))
                 objects = []
                 for x in object_pre:
                     objects.append(x.get_table_dict(instance))
@@ -54,7 +60,12 @@ class GenericEntitiesEditView(View):
                 else:
                     title_panel = match[0].title()
                 dict_1 = {'related_' + entity.lower(): instance}
-                objects = list(rel.model_class().annotation_links.filter_ann_proj(request=request).filter(**dict_1))
+                if 'apis_highlighter' in settings.INSTALLED_APPS:
+                    objects = list(rel.model_class()
+                                   .annotation_links.filter_ann_proj(request=request)
+                                   .filter(**dict_1))
+                else:
+                    objects = list(rel.model_class().objects.filter(**dict_1))
             tb_object = table(objects, prefix=prefix)
             tb_object_open = request.GET.get(prefix + 'page', None)
             RequestConfig(request, paginate={"per_page": 10}).configure(tb_object)
@@ -62,7 +73,10 @@ class GenericEntitiesEditView(View):
         form = get_entities_form(entity.title())
         form = form(instance=instance)
         form_text = FullTextForm(entity=entity.title(), instance=instance)
-        form_ann_agreement = SelectAnnotatorAgreement()
+        if 'apis_highlighter' in settings.INSTALLED_APPS:
+            form_ann_agreement = SelectAnnotatorAgreement()
+        else:
+            form_ann_agreement = False
         object_revisions = Version.objects.get_for_object(instance)
         object_lod = Uri.objects.filter(entity=instance)
         object_texts, ann_proj_form = get_highlighted_texts(request, instance)
@@ -77,7 +91,7 @@ class GenericEntitiesEditView(View):
                        'create': request.user.has_perm('entities.add_{}'.format(entity))}
         template = select_template(['entities/{}_create_generic.html'.format(entity),
                                     'entities/entity_create_generic.html'])
-        return HttpResponse(template.render(request=request, context={
+        context = {
             'entity_type': entity,
             'form': form,
             'form_text': form_text,
@@ -88,7 +102,11 @@ class GenericEntitiesEditView(View):
             'object_lod': object_lod,
             'ann_proj_form': ann_proj_form,
             'form_ann_agreement': form_ann_agreement,
-            'permissions': permissions}))
+            'permissions': permissions}
+        if entity.lower() != 'place':
+            form_merge_with = GenericEntitiesStanbolForm(entity, ent_merge_pk=pk)
+            context['form_merge_with'] = form_merge_with
+        return HttpResponse(template.render(request=request, context=context))
 
     def post(self, request, *args, **kwargs):
         entity = kwargs['entity']
@@ -155,10 +173,15 @@ class GenericEntitiesCreateStanbolView(View):
 
     def post(self, request, *args, **kwargs):
         entity = kwargs['entity']
-        form = GenericEntitiesStanbolForm(entity, request.POST)
+        ent_merge_pk = kwargs.get('ent_merge_pk', False)
+        if ent_merge_pk:
+            form = GenericEntitiesStanbolForm(entity, request.POST, ent_merge_pk=ent_merge_pk)
+        else:
+            form = GenericEntitiesStanbolForm(entity, request.POST)
         #form = form(request.POST)
         if form.is_valid():
             entity_2 = form.save()
+            entity_2.merge_with(int(ent_merge_pk))
             return redirect(reverse('entities:generic_entities_edit_view', kwargs={
                 'pk': entity_2.pk, 'entity': entity
             }))
@@ -168,8 +191,7 @@ class GenericEntitiesCreateStanbolView(View):
                                         'entities/entity_create_generic.html'])
             return HttpResponse(template.render(request=request, context={
                 'permissions': permissions,
-                'form': form,
-                'form_text': form_text}))
+                'form': form}))
 
 
 @method_decorator(login_required, name='dispatch')

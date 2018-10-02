@@ -115,10 +115,41 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
         db_include = self.kwargs.get('db_include', False)
         choices = []
         headers = {'Content-Type': 'application/json'}
-        q = self.q
         ent_model = ContentType.objects.get(app_label='entities', model=ac_type).model_class()
-        arg_list = [Q(**{x+'__icontains': q}) for x in settings.APIS_ENTITIES[ac_type.title()]['search']]
-        res = ent_model.objects.filter(reduce(operator.or_, arg_list)).distinct()
+        if self.q.startswith('http'):
+            res = ent_model.objects.filter(uri__uri=self.q.strip())
+        else:
+            q1 = re.match('^([^\[]+)\[([^\]]+)\]$', self.q)
+            if q1:
+                q = q1.group(1).strip()
+                q3 = q1.group(2).split(',')
+                q3 = [e.strip() for e in q3]
+            else:
+                q = re.match('^[^[]+', self.q).group(0)
+                q3 = False
+            if re.match('^[^*]+\*$', q.strip()):
+                search_type = '__istartswith'
+                q = re.match('^([^*]+)\*$', q.strip()).group(1)
+            elif re.match('^\*[^*]+$', q.strip()):
+                search_type = '__iendswith'
+                q = re.match('^\*([^*]+)$', q.strip()).group(1)
+            elif re.match('^\*[^*]+\*$', q.strip()):
+                search_type = '__icontains'
+                q = re.match('^\*([^*]+)\*$', q.strip()).group(1)
+            elif re.match('^[^*]+$', q.strip()):
+                search_type = ''
+                q = q.strip()
+
+            arg_list = [Q(**{x+search_type: q}) for x in settings.APIS_ENTITIES[ac_type.title()]['search']]
+            res = ent_model.objects.filter(reduce(operator.or_, arg_list)).distinct()
+            if q3:
+                f_dict2 = {}
+                for fd in q3:
+                    f_dict2[fd.split('=')[0].strip()] = fd.split('=')[1].strip()
+                try:
+                    res = res.filter(**f_dict2)
+                except Exception as e:
+                    choices.append({'name': str(e)})
         test_db = True
         test_stanbol = False
         test_stanbol_list = dict()
@@ -146,21 +177,100 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                 ldpath = ""
                 for d in y['fields'].keys():
                     ldpath += "{} = <{}>;\n".format(d, y['fields'][d][0])
-                data = {
-                    'limit': page_size,
-                    'name': q,
-                    'ldpath': ldpath,
-                    'offset': offset
-                }
-                try:
-                    r = requests.get(y['url'], params=data, headers=headers)
-                    if r.status_code != 200:
-                        choices.append({'name': 'Connection to Stanbol failed'})
+                if self.q.startswith('http'):
+                    q = False
+                    match_url_geo = re.search(r'geonames[^0-9]+([0-9]+)', self.q.strip())
+                    if match_url_geo:
+                        url = 'http://sws.geonames.org/{}/'.format(match_url_geo.group(1))
+                    else:
+                        url = self.q.strip()
+                    params = {'id': url, 'ldpath': ldpath}
+                    headers = {'Content-Type': 'application/json'}
+                    w = requests.get(y['url'].replace('find', 'entity'), params=params, headers=headers)
+                    res3 = dict()
+                    ldpath_fields = [y['fields'][d][0] for d in y['fields'].keys()]
+                    print(w.status_code)
+                    if w.status_code == 200:
+                        for x in w.json()['representation'].keys():
+                            if x in ldpath_fields:
+                                for d in y['fields'].keys():
+                                    if y['fields'][d][0] == x:
+                                        res3[d] = w.json()['representation'][x]
+                        res = dict()
+                        res3['id'] = w.json()['id']
+                        res['results'] = [res3]
+                    else:
                         continue
-                    res = r.json()
-                except:
-                    choices.append({'name': 'Connection to Stanbol failed'})
-                    continue
+                else:
+
+                    data = {
+                        'limit': page_size,
+                        'ldpath': ldpath,
+                        'offset': offset,
+                        'constraints': [{
+                            "type": "text",
+                            "patternType": "wildcard",
+                            "field": "http://www.w3.org/2000/01/rdf-schema#label",
+                            "text": q.split()
+                        }]
+                    }
+                    if q3 and 'search fields' in y.keys():
+                        for fd in q3:
+                            fd = [fd2.strip() for fd2 in fd.split('=')]
+                            if fd[0] in y['search fields'].keys():
+                                fd3 = y['search fields'][fd[0]]
+                                v = False
+                                if isinstance(fd3[1], dict):
+                                    if fd[1] in fd3[1].keys():
+                                        v = fd3[1][fd[1]]
+                                else:
+                                    v = fd3[1](fd[1])
+                                if fd3[2] == 'reference' and v:
+                                    fd_4 = {
+                                        'type': 'reference',
+                                        'value': v,
+                                        'field': fd3[0]
+                                    }
+                                    data['constraints'].append(fd_4)
+                                elif fd3[2] == 'date_exact' and v:
+                                    fd_4 = {
+                                        'type': 'value',
+                                        'value': v,
+                                        'field': fd3[0],
+                                        "datatype": "xsd:dateTime"
+                                    }
+                                    data['constraints'].append(fd_4)
+                                elif fd3[2] == 'date_gt' and v:
+                                    fd_4 = {
+                                        'type': 'range',
+                                        'lowerBound': v,
+                                        'upperBound': "2100-12-31T23:59:59.999Z",
+                                        'field': fd3[0],
+                                        "datatype": "xsd:dateTime"
+                                    }
+                                    data['constraints'].append(fd_4)
+                                elif fd3[2] == 'date_lt' and v:
+                                    fd_4 = {
+                                        'type': 'range',
+                                        'lowerBound': "1-01-01T23:59:59.999Z",
+                                        'upperBound': v,
+                                        'field': fd3[0],
+                                        "datatype": "xsd:dateTime"
+                                    }
+                                    data['constraints'].append(fd_4)
+                            else:
+                                choices.append({'name': 'No additional query setting for Stanbol'})
+                    try:
+                        url2 = y['url'].replace('find', 'query')
+                        r = requests.post(url2, data=json.dumps(data), headers=headers)
+                        if r.status_code != 200:
+                            choices.append({'name': 'Connection to Stanbol failed'})
+                            continue
+                        res = r.json()
+                    except Exception as e:
+                        choices.append({'name': 'Connection to Stanbol failed'})
+                        print(e)
+                        continue
                 if len(res['results']) < page_size:
                     test_stanbol_list[y['url']] = False
                 else:
@@ -169,7 +279,10 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                     f = dict()
                     dataclass = ""
                     name = x['name'][0]['value']
-                    score = str(x[ac_settings['score']][0]['value'])
+                    if ac_settings['score'] in x.keys():
+                        score = str(x[ac_settings['score']][0]['value'])
+                    else:
+                        score = 'NA'
                     id = x[ac_settings['uri']]
                     score = score
                     f['id'] = id
@@ -190,12 +303,13 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                     test_stanbol = True
         else:
             test_stanbol = False
-        cust_auto = CustomEntityAutocompletes(ac_type, q, page_size=page_size, offset=offset)
         cust_auto_more = False
-        if cust_auto.results is not None:
-            cust_auto_more = cust_auto.more
-            if len(cust_auto.results) > 0:
-                choices.extend(cust_auto.results)
+        if q:
+            cust_auto = CustomEntityAutocompletes(ac_type, q, page_size=page_size, offset=offset)
+            if cust_auto.results is not None:
+                cust_auto_more = cust_auto.more
+                if len(cust_auto.results) > 0:
+                    choices.extend(cust_auto.results)
         if not test_db and not test_stanbol and not cust_auto_more:
             more = False
         return http.HttpResponse(json.dumps({

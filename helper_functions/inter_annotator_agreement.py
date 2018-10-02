@@ -3,7 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models.query import QuerySet
 from django.conf import settings
 
-from highlighter.models import Annotation
+from apis_highlighter.models import Annotation
 from metainfo.models import Text, TempEntityClass
 
 

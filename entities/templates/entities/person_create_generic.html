@@ -1,3 +1,22 @@
 {% extends "entities/entity_create_generic.html" %}
 
 
+{% block additional_accordion %}
+<div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingOne">
+                            <h4 class="panel-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Merge with
+                                </a>
+                            </h4>
+                        </div>
+
+                <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+                            <div id="tab_merge_with" class="panel-body">
+				    {% load crispy_forms_tags %}
+                			{% crispy form_merge_with  form_merge_with.helper %}
+				</div>
+                        </div>
+                    </div>
+                <hr/>
+{% endblock %}

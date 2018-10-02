@@ -1,4 +1,5 @@
 from django.conf.urls import url, include
+from django.conf import settings
 from django.contrib import admin
 from rest_framework import routers
 from entities.api_views import (
@@ -25,10 +26,6 @@ from vocabularies.api_views import (
     InstitutionEventRelationViewSet, InstitutionWorkRelationViewSet, PlaceEventRelationViewSet,
     PlaceWorkRelationViewSet, EventWorkRelationViewSet, EventEventRelationViewSet, WorkWorkRelationViewSet,
     PlacePlaceRelationViewSet)
-from highlighter.api_views import (
-    HighlighterProjectViewSet, HighlighterTextHighViewSet, HighlighterMenuEntryViewSet,
-    HighlighterHighlightTextViewSet, HighlighterVocabularyAPIViewSet, HighlighterAnnotationViewSet
-)
 
 
 router = routers.DefaultRouter()
@@ -80,23 +77,27 @@ router.register(r'professiontype', ProfessionTypeViewSet)
 router.register(r'placetype', PlaceTypeViewSet)
 router.register(r'eventtype', EventTypeViewSet)
 router.register(r'worktype', WorkTypeViewSet)
-router.register(r'HLProjects', HighlighterProjectViewSet)
-router.register(r'HLTextHigh', HighlighterTextHighViewSet)
-router.register(r'HLMenuEntry', HighlighterMenuEntryViewSet)
-router.register(r'HLTextHighlighter', HighlighterHighlightTextViewSet, 'HLTextHighlighter')
-router.register(r'HLVocabularyAPI', HighlighterVocabularyAPIViewSet)
-router.register(r'HLAnnotation', HighlighterAnnotationViewSet)
 router.register(r'users', UserViewSet)
 router.register(r'GeoJsonPlace', PlaceGeoJsonViewSet, 'PlaceGeoJson')
 router.register(r'NetJson', NetJsonViewSet, 'NetJson')
 router.register(r'VocabNames', VocabNamesViewSet)
 
+if 'apis_highlighter' in settings.INSTALLED_APPS:
+    from apis_highlighter.api_views import (
+        HighlighterProjectViewSet, HighlighterTextHighViewSet, HighlighterMenuEntryViewSet,
+        HighlighterHighlightTextViewSet, HighlighterVocabularyAPIViewSet, HighlighterAnnotationViewSet
+    )
+    router.register(r'HLProjects', HighlighterProjectViewSet)
+    router.register(r'HLTextHigh', HighlighterTextHighViewSet)
+    router.register(r'HLMenuEntry', HighlighterMenuEntryViewSet)
+    router.register(r'HLTextHighlighter', HighlighterHighlightTextViewSet, 'HLTextHighlighter')
+    router.register(r'HLVocabularyAPI', HighlighterVocabularyAPIViewSet)
+    router.register(r'HLAnnotation', HighlighterAnnotationViewSet)
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'labels/', include('labels.urls', namespace='labels')),
     url(r'entities/', include('entities.urls', namespace='entities')),
-    url(r'highlighter/', include('highlighter.urls', namespace='highlighter')),
     url(r'relations/', include('relations.urls', namespace='relations')),
     url(r'vocabularies/', include('vocabularies.urls', namespace='vocabularies')),
     #url(r'^autocomplete/', include('autocomplete_light.urls')),
@@ -109,3 +110,17 @@ urlpatterns = [
     url(r'^', include('webpage.urls', namespace='webpage')),
     url(r'^accounts/', include('registration.backends.simple.urls')),
 ]
+
+if 'apis_highlighter' in settings.INSTALLED_APPS:
+    urlpatterns.append(url(r'highlighter/', include('apis_highlighter.urls', namespace='highlighter')))
+
+if 'apis_fulltext_download' in settings.INSTALLED_APPS:
+    urlpatterns.append(url(r'fulltext_download/', include('apis_fulltext_download.urls', namespace='apis_fulltext_download')))
+
+if settings.DEBUG:
+    if 'debug_toolbar' in settings.INSTALLED_APPS:
+        import debug_toolbar
+        urlpatterns = [
+            url(r'^__debug__/', include(debug_toolbar.urls)),
+        ] + urlpatterns
+

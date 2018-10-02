@@ -8,13 +8,16 @@ from crispy_forms.bootstrap import Accordion, AccordionGroup
 #import autocomplete_light.shortcuts as al
 from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
+from django.conf import settings
 from dal import autocomplete
 from django.core.validators import URLValidator
 
 from metainfo.models import TempEntityClass, Text
 from helper_functions.RDFparsers import GenericRDFParser
-from highlighter.models import Annotation
 from relations.tables import *
+
+if 'apis_highlighter' in settings.INSTALLED_APPS:
+    from apis_highlighter.models import Annotation
 
 
 class GenericRelationForm(forms.ModelForm):
@@ -87,13 +90,23 @@ class GenericRelationForm(forms.ModelForm):
             list_rel = []
             dic_a = {'related_'+entity_type.lower()+'A': site_instance}
             dic_b = {'related_' + entity_type.lower() + 'B': site_instance}
-            for x in self.relation_form.annotation_links.filter_ann_proj(request=request).filter(
-                            Q(**dic_a) | Q(**dic_b)):
-                list_rel.append(x.get_table_dict(site_instance))
+            if 'apis_highlighter' in settings.INSTALLED_APPS:
+                for x in self.relation_form.annotation_links.filter_ann_proj(request=request).filter(
+                                Q(**dic_a) | Q(**dic_b)):
+                    list_rel.append(x.get_table_dict(site_instance))
+            else:
+                for x in self.relation_form.objects.filter(
+                        Q(**dic_a) | Q(**dic_b)):
+                    list_rel.append(x.get_table_dict(site_instance))
             table_html = table(list_rel, prefix=prefix)
         else:
             tab_query = {'related_'+entity_type.lower(): site_instance}
-            table_html = table(self.relation_form.annotation_links.filter_ann_proj(request=request).filter(**tab_query),
+            if 'apis_highlighter' in settings.INSTALLED_APPS:
+                ttab = self.relation_form.annotation_links.filter_ann_proj(
+                    request=request).filter(**tab_query)
+            else:
+                ttab = self.relation_form.objects.filter(**tab_query)
+            table_html = table(ttab,
                                entity=entity_type,
                                prefix=prefix)
         return table_html

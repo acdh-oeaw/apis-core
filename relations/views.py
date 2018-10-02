@@ -8,11 +8,11 @@ from django.core import serializers
 from django_tables2 import RequestConfig
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
 
 from .forms2 import GenericRelationForm
-from entities.forms import (PlaceHighlighterForm, PersonHighlighterForm)
+#from entities.forms import (PlaceHighlighterForm, PersonHighlighterForm)
 from .forms import PersonLabelForm
-from highlighter.models import Annotation
 from .models import (PersonPlace, PersonPerson, PersonInstitution, InstitutionPlace,
                      InstitutionInstitution, PlacePlace, PersonEvent, InstitutionEvent, PlaceEvent, PersonWork,
                      InstitutionWork, PlaceWork, EventWork, WorkWork)
@@ -23,14 +23,17 @@ from relations.tables import (PersonInstitutionTable, PersonPersonTable, PersonP
                               InstitutionWorkTable, PlaceWorkTable, EventWorkTable, EntityUriTable, PlacePlaceTable)
 from metainfo.models import Uri
 from entities.models import Person, Institution, Place, Event, Work
-from entities.forms import PersonResolveUriForm
+from entities.forms import PersonResolveUriForm, GenericEntitiesStanbolForm
 from labels.models import Label
-from helper_functions.highlighter import highlight_text
 from django.views.decorators.csrf import csrf_exempt
 
 
 import json, re
 from copy import deepcopy
+
+if 'apis_highlighter' in settings.INSTALLED_APPS:
+    from helper_functions.highlighter import highlight_text
+
 
 ############################################################################
 ############################################################################
@@ -77,8 +80,8 @@ registered_forms = {'WorkWorkForm': [WorkWork, Work, Work],
                     'EventLabelForm': [Label, Event, Label],
                     'PersonResolveUriForm': [Uri, Person, Uri],
                     'AddRelationHighlighterPersonForm': [],
-                    'PlaceHighlighterForm': [Annotation, ],
-                    'PersonHighlighterForm': [Annotation, ]
+                    #'PlaceHighlighterForm': [Annotation, ],
+                    #'PersonHighlighterForm': [Annotation, ]
                     }
 
 
@@ -93,10 +96,15 @@ def get_form_ajax(request):
     ObjectID = request.POST.get('ObjectID')
     entity_type_str = request.POST.get('entity_type')
     form_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+)(Highlighter)?Form', FormName)
+    form_match2 = re.match(r'([A-Z][a-z]+)(Highlighter)?Form', FormName)
     if FormName and form_match:
         entity_type_v1 = ContentType.objects.filter(
             model='{}{}'.format(form_match.group(1).lower(), form_match.group(2)).lower(),
             app_label='relations')
+    elif FormName and form_match2:
+        entity_type_v2 = ContentType.objects.filter(
+            model='{}'.format(form_match.group(1).lower(),
+            app_label='entities'))
     else:
         entity_type_v1 = ContentType.objects.none()
     if ObjectID == 'false' or ObjectID is None or ObjectID == 'None':
@@ -104,6 +112,9 @@ def get_form_ajax(request):
         form_dict = {'entity_type': entity_type_str}
     elif entity_type_v1.count() > 0:
         d = entity_type_v1[0].model_class().objects.get(pk=ObjectID)
+        form_dict = {'instance': d, 'siteID': SiteID, 'entity_type': entity_type_str}
+    elif entity_type_v2.count() > 0:
+        d = entity_type_v2[0].model_class().objects.get(pk=ObjectID)
         form_dict = {'instance': d, 'siteID': SiteID, 'entity_type': entity_type_str}
     else:
         if FormName not in registered_forms.keys():

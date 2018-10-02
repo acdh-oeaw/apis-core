@@ -1,12 +1,17 @@
 from django.db import models
+import requests
 #from reversion import revisions as reversion
 import reversion
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 from django.contrib.auth.models import Group
+from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.utils.functional import cached_property
+from model_utils.managers import InheritanceManager
 
-from vocabularies.models import CollectionType, TextType
-from highlighter.models import Annotation
+from vocabularies.models import CollectionType, TextType, LabelType
+from labels.models import Label
 from .validators import date_validator
 
 from datetime import datetime
@@ -14,6 +19,11 @@ import re
 import unicodedata
 from difflib import SequenceMatcher
 #from helper_functions.highlighter import highlight_text
+from apis.settings.NER_settings import autocomp_settings
+
+
+if 'apis_highlighter' in settings.INSTALLED_APPS:
+    from apis_highlighter.models import Annotation
 
 
 @reversion.register()
@@ -47,10 +57,13 @@ class TempEntityClass(models.Model):
                                on_delete=models.SET_NULL)
     references = models.TextField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
+    objects = models.Manager()
+    objects_inheritance = InheritanceManager()
 
     def __str__(self):
-        if self.name != "":  # relation usually don´t have names
-
+        if self.name != "" and hasattr(self, 'first_name'):  # relation usually don´t have names
+            return "{}, {}".format(self.name, self.first_name)
+        elif self.name != "":
             return self.name
         else:
             return "(ID: {})".format(self.id)
@@ -99,6 +112,54 @@ class TempEntityClass(models.Model):
             self.name = unicodedata.normalize('NFC', self.name)
         super(TempEntityClass, self).save(*args, **kwargs)
         return self
+
+    def merge_with(self, entities):
+        e_a = type(self).__name__
+        self_model_class = ContentType.objects.get(
+            app_label='entities',
+            model__iexact=e_a).model_class()
+        if isinstance(entities, int):
+            entities = self_model_class.objects.get(pk=entities)
+        if not isinstance(entities, list):
+            entities = [entities]
+        entities = [self_model_class.objects.get(pk=ent) if type(ent) == int else ent for ent in entities]
+        rels = ContentType.objects.filter(
+            app_label='relations', model__icontains=e_a)
+        print(rels)
+        for ent in entities:
+            e_b = type(ent).__name__
+            if e_a != e_b:
+                continue
+            print(e_b)
+            print(str(ent))
+            lt, created = LabelType.objects.get_or_create(name='Legacy name (merge)')
+            l_uri, created = LabelType.objects.get_or_create(name='Legacy URI (merge)')
+            Label.objects.create(label=str(ent), label_type=lt, temp_entity=self)
+            for u in Uri.objects.filter(entity=ent):
+                Label.objects.create(label=str(u.uri), label_type=l_uri, temp_entity=self)
+            for l in Label.objects.filter(temp_entity=ent):
+                l.temp_entity = self
+                l.save()
+            for r in rels.filter(model__icontains=e_b):
+                lst_ents_rel = str(r).split()
+                if lst_ents_rel[0] == lst_ents_rel[1]:
+                    q_d = {'related_{}A'.format(e_b.lower()): ent}
+                    k = r.model_class().objects.filter(**q_d)
+                    for t in k:
+                        setattr(t, 'related_{}A'.format(e_a.lower()), self)
+                        t.save()
+                    q_d = {'related_{}B'.format(e_b.lower()): ent}
+                    k = r.model_class().objects.filter(**q_d)
+                    for t in k:
+                        setattr(t, 'related_{}B'.format(e_a.lower()), self)
+                        t.save()
+                else:
+                    q_d = {'related_{}'.format(e_b.lower()): ent}
+                    k = r.model_class().objects.filter(**q_d)
+                    for t in k:
+                        setattr(t, 'related_{}'.format(e_a.lower()), self)
+                        t.save()
+            ent.delete()
 
 
 @reversion.register()
@@ -153,7 +214,7 @@ class Text(models.Model):
     def save(self, *args, **kwargs):
         if self.pk is not None:
             orig = Text.objects.get(pk=self.pk)
-            if orig.text != self.text:
+            if orig.text != self.text and 'apis_highlighter' in settings.INSTALLED_APPS:
                 ann = Annotation.objects.filter(text_id=self.pk).order_by('start')
                 seq = SequenceMatcher(None, orig.text, self.text)
                 for a in ann:
@@ -173,7 +234,7 @@ class Text(models.Model):
 
 @reversion.register()
 class Uri(models.Model):
-    uri = models.URLField(blank=True, null=True, unique=True)
+    uri = models.URLField(blank=True, null=True, unique=True, max_length=255)
     domain = models.CharField(max_length=255, blank=True)
     rdf_link = models.URLField(blank=True)
     entity = models.ForeignKey(TempEntityClass, blank=True, null=True,
@@ -205,7 +266,23 @@ class UriCandidate(models.Model):
     responsible = models.CharField(max_length=255)
     entity = models.ForeignKey(TempEntityClass, blank=True, null=True,
                                on_delete=models.CASCADE)
-
+   
+    @cached_property
+    def description(self):
+        headers = {'accept': 'application/json'}
+        cn = TempEntityClass.objects_inheritance.get_subclass(id=self.entity_id).__class__.__name__
+        for endp in autocomp_settings[cn.title()]:
+            url = re.sub(r'/[a-z]+$', '/entity', endp['url'])
+            params = {'id': self.uri}
+            print(url, params)
+            res = requests.get(url, params=params, headers=headers)
+            if res.status_code == 200:
+                if endp['fields']['descr'][0] in res.json()['representation'].keys():
+                    desc = res.json()['representation'][endp['fields']['descr'][0]][0]['value']
+                else:
+                    desc = 'undefined'
+                label = res.json()['representation'][endp['fields']['name'][0]][0]['value']
+                return (label, desc)
 
 @receiver(post_save, sender=Uri, dispatch_uid="remove_default_uri")
 def remove_default_uri(sender, instance, **kwargs):
