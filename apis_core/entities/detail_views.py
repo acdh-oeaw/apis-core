@@ -22,9 +22,9 @@ class GenericEntitiesDetailView(View):
     def get(self, request, *args, **kwargs):
         entity = kwargs['entity'].lower()
         pk = kwargs['pk']
-        entity_model = ContentType.objects.get(app_label='entities', model=entity).model_class()
+        entity_model = ContentType.objects.get(app_label='apis_entities', model=entity).model_class()
         instance = get_object_or_404(entity_model, pk=pk)
-        relations = ContentType.objects.filter(app_label='relations', model__icontains=entity)
+        relations = ContentType.objects.filter(app_label='apis_relations', model__icontains=entity)
         side_bar = []
         for rel in relations:
             print(str(rel))
@@ -71,8 +71,8 @@ class GenericEntitiesDetailView(View):
         side_bar.append(('Label', tb_label, 'PersonLabel', tb_label_open))
         RequestConfig(request, paginate={"per_page": 10}).configure(tb_label)
         template = select_template([
-            'entities/detail_views/{}_detail_generic.html'.format(entity),
-            'entities/detail_views/entity_detail_generic.html'
+            'apis_entities/detail_views/{}_detail_generic.html'.format(entity),
+            'apis_entities/detail_views/entity_detail_generic.html'
             ])
         return HttpResponse(template.render(
             request=request, context={
@@ -87,7 +87,7 @@ class GenericEntitiesDetailView(View):
 
 class WorkDetailView(DetailView):
     model = Work
-    template_name = 'entities/detail_views/work_detail.html'
+    template_name = 'apis_entities/detail_views/work_detail.html'
 
     def get_context_data(self, **kwargs):
         context = super(WorkDetailView, self).get_context_data(**kwargs)

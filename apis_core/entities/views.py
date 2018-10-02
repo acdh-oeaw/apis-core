@@ -150,11 +150,11 @@ class GenericListViewNew(ExportMixin, SingleTableView):
     formhelper_class = GenericFilterFormHelper
     context_filter_name = 'filter'
     paginate_by = 25
-    template_name = 'entities/generic_list.html'
+    template_name = 'apis_entities/generic_list.html'
 
     def get_queryset(self, **kwargs):
         self.entity = self.kwargs.get('entity')
-        qs = ContentType.objects.get(app_label='entities', model=self.entity.lower()).model_class().objects.all()
+        qs = ContentType.objects.get(app_label='apis_entities', model=self.entity.lower()).model_class().objects.all()
         self.filter = get_generic_list_filter(self.entity.title())(self.request.GET, queryset=qs)
         self.filter.form.helper = self.formhelper_class()
         return self.filter.qs
@@ -203,7 +203,7 @@ def getGeoJson(request):
         for x in uric:
             o = retrieve_obj(x.uri)
             if o:
-                url_r = reverse_lazy('entities:resolve_ambigue_place', kwargs={'pk': str(instance.pk), 'uri': o['representation']['id'][7:]})
+                url_r = reverse_lazy('apis_entities:resolve_ambigue_place', kwargs={'pk': str(instance.pk), 'uri': o['representation']['id'][7:]})
                 select_text = "<a href='{}'>Select this URI</a>".format(url_r)
                 try:
                     add_info = "<b>Confidence:</b> {}<br/><b>Feature:</b> <a href='{}'>{}</a>".format(x.confidence, x.uri, x.uri)
@@ -250,15 +250,15 @@ def getGeoJson(request):
 def getGeoJsonList(request):
     '''Used to retrieve a list of GeoJsons. To generate the list the kind of connection
     and the connected entity is needed'''
-    relation = ContentType.objects.get(app_label='relations', model=request.GET.get("relation")).model_class()
+    relation = ContentType.objects.get(app_label='apis_relations', model=request.GET.get("relation")).model_class()
     #relation_type = request.GET.get("relation_type")
     objects = relation.objects.filter(
             related_place__status='distinct').select_related('related_person', 'related_place', 'relation_type')
     lst_json = []
     for x in objects:
-        pers_url = reverse_lazy('entities:generic_entities_edit_view', kwargs={'pk': str(x.related_person.pk),
+        pers_url = reverse_lazy('apis_entities:generic_entities_edit_view', kwargs={'pk': str(x.related_person.pk),
                                                                                'entity': 'person'})
-        place_url = reverse_lazy('entities:generic_entities_edit_view', kwargs={'pk': str(x.related_place.pk),
+        place_url = reverse_lazy('apis_entities:generic_entities_edit_view', kwargs={'pk': str(x.related_place.pk),
                                                                                 'entity': 'place'})
         r = {"geometry": {
                         "type": "Point",
@@ -278,7 +278,7 @@ def getGeoJsonList(request):
 @login_required
 def getNetJsonList(request):
     '''Used to retrieve a Json to draw a network'''
-    relation = ContentType.objects.get(app_label='relations', model='PersonPlace').model_class()
+    relation = ContentType.objects.get(app_label='apis_relations', model='PersonPlace').model_class()
     objects = relation.objects.filter(
             related_place__status='distinct')
     nodes = dict()
@@ -286,7 +286,7 @@ def getNetJsonList(request):
 
     for x in objects:
         if x.related_place.pk not in nodes.keys():
-            place_url = reverse_lazy('entities:place_edit', kwargs={'pk': str(x.related_place.pk)})
+            place_url = reverse_lazy('apis_entities:place_edit', kwargs={'pk': str(x.related_place.pk)})
             tt = "<div class='arrow'></div>\
             <div class='sigma-tooltip-header'>%s</div>\
             <div class='sigma-tooltip-body'>\
@@ -297,7 +297,7 @@ def getNetJsonList(request):
             </div>"% (x.related_place.name, 'place', place_url)
             nodes[x.related_place.pk] = {'type': 'place', 'label': x.related_place.name, 'id': str(x.related_place.pk), 'tooltip': tt}
         if x.related_person.pk not in nodes.keys():
-            pers_url = reverse_lazy('entities:person_edit', kwargs={'pk': str(x.related_person.pk)})
+            pers_url = reverse_lazy('apis_entities:person_edit', kwargs={'pk': str(x.related_person.pk)})
             tt = "<div class='arrow'></div>\
             <div class='sigma-tooltip-header'>%s</div>\
             <div class='sigma-tooltip-body'>\
@@ -316,14 +316,14 @@ def getNetJsonList(request):
 @login_required
 def getNetJsonListInstitution(request):
     '''Used to retrieve a Json to draw a network'''
-    relation = ContentType.objects.get(app_label='relations', model='PersonInstitution').model_class()
+    relation = ContentType.objects.get(app_label='apis_relations', model='PersonInstitution').model_class()
     objects = relation.objects.all()
     nodes = dict()
     edges = []
 
     for x in objects:
         if x.related_institution.pk not in nodes.keys():
-            inst_url = reverse_lazy('entities:institution_edit', kwargs={'pk': str(x.related_institution.pk)})
+            inst_url = reverse_lazy('apis_entities:institution_edit', kwargs={'pk': str(x.related_institution.pk)})
             tt = "<div class='arrow'></div>\
             <div class='sigma-tooltip-header'>%s</div>\
             <div class='sigma-tooltip-body'>\
@@ -334,7 +334,7 @@ def getNetJsonListInstitution(request):
             </div>"% (x.related_institution.name, 'institution', inst_url)
             nodes[x.related_institution.pk] = {'type': 'institution', 'label': x.related_institution.name, 'id': str(x.related_institution.pk), 'tooltip': tt}
         if x.related_person.pk not in nodes.keys():
-            pers_url = reverse_lazy('entities:person_edit', kwargs={'pk': str(x.related_person.pk)})
+            pers_url = reverse_lazy('apis_entities:person_edit', kwargs={'pk': str(x.related_person.pk)})
             tt = "<div class='arrow'></div>\
             <div class='sigma-tooltip-header'>%s</div>\
             <div class='sigma-tooltip-body'>\
@@ -360,7 +360,7 @@ def resolve_ambigue_place(request, pk, uri):
         pl_n_1 = pl_n.save()
         pl_n_1 = pl_n.merge(entity)
         url = reverse_lazy(
-            'entities:generic_entities_edit_view',
+            'apis_entities:generic_entities_edit_view',
             kwargs={
                 'entity': 'place',
                 'pk': str(pl_n_1.pk),
@@ -381,7 +381,7 @@ def resolve_ambigue_person(request):
         form = PersonResolveUriForm(request.POST)
     if form.is_valid():
         pers = form.save()
-        return redirect(reverse('entities:person_edit', kwargs={'pk': pers.pk}))
+        return redirect(reverse('apis_entities:person_edit', kwargs={'pk': pers.pk}))
     else:
         print(form)
 
@@ -396,24 +396,24 @@ def resolve_ambigue_person(request):
 
 @login_required
 def birth_death_map(request):
-    return render(request, 'entities/map_list.html')
+    return render(request, 'apis_entities/map_list.html')
 
 
 @login_required
 def pers_place_netw(request):
-    return render(request, 'entities/network.html')
+    return render(request, 'apis_entities/network.html')
 
 
 @login_required
 def pers_inst_netw(request):
-    return render(request, 'entities/network_institution.html')
+    return render(request, 'apis_entities/network_institution.html')
 
 
 @login_required
 def generic_network_viz(request):
     if request.method == 'GET':
         form = NetworkVizFilterForm()
-        return render(request, 'entities/generic_network_visualization.html',
+        return render(request, 'apis_entities/generic_network_visualization.html',
                       {'form': form})
 
 
@@ -426,7 +426,7 @@ def generic_network_viz(request):
 ############################################################################
 
 class ReversionCompareView(HistoryCompareDetailView):
-    template_name = 'entities/compare_base.html'
+    template_name = 'apis_entities/compare_base.html'
 
     def dispatch(self, request, app, kind, pk, *args, **kwargs):
         self.model = ContentType.objects.get(app_label=app, model=kind).model_class()

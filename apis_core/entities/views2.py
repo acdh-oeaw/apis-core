@@ -31,10 +31,10 @@ class GenericEntitiesEditView(View):
     def get(self, request, *args, **kwargs):
         entity = kwargs['entity']
         pk = kwargs['pk']
-        entity_model = ContentType.objects.get(app_label='entities', model=entity).model_class()
+        entity_model = ContentType.objects.get(app_label='apis_entities', model=entity).model_class()
         instance = get_object_or_404(entity_model, pk=pk)
         request = set_session_variables(request)
-        relations = ContentType.objects.filter(app_label='relations', model__icontains=entity)
+        relations = ContentType.objects.filter(app_label='apis_relations', model__icontains=entity)
         side_bar = []
         for rel in relations:
             match = str(rel).split()
@@ -89,8 +89,8 @@ class GenericEntitiesEditView(View):
         permissions = {'change': perm.has_perm('change_{}'.format(entity), instance),
                        'delete': perm.has_perm('delete_{}'.format(entity), instance),
                        'create': request.user.has_perm('entities.add_{}'.format(entity))}
-        template = select_template(['entities/{}_create_generic.html'.format(entity),
-                                    'entities/entity_create_generic.html'])
+        template = select_template(['apis_entities/{}_create_generic.html'.format(entity),
+                                    'apis_entities/entity_create_generic.html'])
         context = {
             'entity_type': entity,
             'form': form,
@@ -111,7 +111,7 @@ class GenericEntitiesEditView(View):
     def post(self, request, *args, **kwargs):
         entity = kwargs['entity']
         pk = kwargs['pk']
-        entity_model = ContentType.objects.get(app_label='entities', model=entity).model_class()
+        entity_model = ContentType.objects.get(app_label='apis_entities', model=entity).model_class()
         instance = get_object_or_404(entity_model, pk=pk)
         form = get_entities_form(entity.title())
         form = form(request.POST, instance=instance)
@@ -119,12 +119,12 @@ class GenericEntitiesEditView(View):
         if form.is_valid() and form_text.is_valid():
             entity_2 = form.save()
             form_text.save(entity_2)
-            return redirect(reverse('entities:generic_entities_edit_view', kwargs={
+            return redirect(reverse('apis_entities:generic_entities_edit_view', kwargs={
                 'pk': pk, 'entity': entity
             }))
         else:
-            template = select_template(['entities/{}_create_generic.html'.format(entity),
-                                        'entities/entity_create_generic.html'])
+            template = select_template(['apis_entities/{}_create_generic.html'.format(entity),
+                                        'apis_entities/entity_create_generic.html'])
             return HttpResponse(template.render(request=request, context={
                 'form': form,
                 'form_text': form_text,
@@ -139,8 +139,8 @@ class GenericEntitiesCreateView(View):
         form = form()
         form_text = FullTextForm(entity=entity.title())
         permissions = {'create': request.user.has_perm('entities.add_{}'.format(entity))}
-        template = select_template(['entities/{}_create_generic.html'.format(entity),
-                                    'entities/entity_create_generic.html'])
+        template = select_template(['apis_entities/{}_create_generic.html'.format(entity),
+                                    'apis_entities/entity_create_generic.html'])
         return HttpResponse(template.render(request=request, context={
             'entity_type': entity,
             'permissions': permissions,
@@ -155,13 +155,13 @@ class GenericEntitiesCreateView(View):
         if form.is_valid() and form_text.is_valid():
             entity_2 = form.save()
             form_text.save(entity_2)
-            return redirect(reverse('entities:generic_entities_edit_view', kwargs={
+            return redirect(reverse('apis_entities:generic_entities_edit_view', kwargs={
                 'pk': entity_2.pk, 'entity': entity
             }))
         else:
-            permissions = {'create': request.user.has_perm('entities.add_{}'.format(entity))}
-            template = select_template(['entities/{}_create_generic.html'.format(entity),
-                                        'entities/entity_create_generic.html'])
+            permissions = {'create': request.user.has_perm('apis_entities.add_{}'.format(entity))}
+            template = select_template(['apis_entities/{}_create_generic.html'.format(entity),
+                                        'apis_entities/entity_create_generic.html'])
             return HttpResponse(template.render(request=request, context={
                 'permissions': permissions,
                 'form': form,
@@ -182,13 +182,13 @@ class GenericEntitiesCreateStanbolView(View):
         if form.is_valid():
             entity_2 = form.save()
             entity_2.merge_with(int(ent_merge_pk))
-            return redirect(reverse('entities:generic_entities_edit_view', kwargs={
+            return redirect(reverse('apis_entities:generic_entities_edit_view', kwargs={
                 'pk': entity_2.pk, 'entity': entity
             }))
         else:
-            permissions = {'create': request.user.has_perm('entities.add_{}'.format(entity))}
-            template = select_template(['entities/{}_create_generic.html'.format(entity),
-                                        'entities/entity_create_generic.html'])
+            permissions = {'create': request.user.has_perm('apis_entities.add_{}'.format(entity))}
+            template = select_template(['apis_entities/{}_create_generic.html'.format(entity),
+                                        'apis_entities/entity_create_generic.html'])
             return HttpResponse(template.render(request=request, context={
                 'permissions': permissions,
                 'form': form}))
@@ -196,10 +196,10 @@ class GenericEntitiesCreateStanbolView(View):
 
 @method_decorator(login_required, name='dispatch')
 class GenericEntitiesDeleteView(DeleteView):
-    model = ContentType.objects.get(app_label='metainfo', model='tempentityclass').model_class()
-    template_name = 'webpage/confirm_delete.html'
+    model = ContentType.objects.get(app_label='apis_metainfo', model='tempentityclass').model_class()
+    template_name = 'apis_templates/confirm_delete.html'
 
     def dispatch(self, request, *args, **kwargs):
         entity = kwargs['entity']
-        self.success_url = reverse('entities:generic_entities_list', kwargs={'entity': entity})
+        self.success_url = reverse('apis_entities:generic_entities_list', kwargs={'entity': entity})
         return super(GenericEntitiesDeleteView, self).dispatch(request, *args, **kwargs)
