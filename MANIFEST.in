@@ -1,0 +1,7 @@
+include LICENSE
+include README.rst
+recursive-include apis_core/entities/templates/apis_entities *
+recursive-include apis_core/labels/templates/apis_labels *
+recursive-include apis_core/metainfo/templates/apis_metainfo *
+recursive-include apis_core/relations/templates/apis_relations *
+recursive-include apis_core/templates/apis_templates *
