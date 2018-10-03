@@ -45,7 +45,7 @@ class VocabsRelationAdmin(BaseAdminVocabularies):
         return super(VocabsRelationAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-app = apps.get_app_config('vocabularies')
+app = apps.get_app_config('apis_vocabularies')
 
 
 for model_name, model in app.models.items():

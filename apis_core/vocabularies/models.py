@@ -174,7 +174,7 @@ class CollectionType(VocabsBaseClass):
 class TextType(VocabsBaseClass):
     """used to store the Text types for the forms"""
     entity = models.CharField(max_length=255)
-    collections = models.ManyToManyField('metainfo.Collection', blank=True)
+    collections = models.ManyToManyField('apis_metainfo.Collection', blank=True)
 
 #######################################################################
 #
