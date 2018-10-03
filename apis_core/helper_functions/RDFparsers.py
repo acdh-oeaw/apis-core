@@ -1,19 +1,19 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from apis_core.entities.models import Place, Institution, Person, Work
-from apis_core.relations.models import (
+from apis_core.apis_entities.models import Place, Institution, Person, Work
+from apis_core.apis_relations.models import (
     InstitutionInstitution, InstitutionPlace, PersonPerson,
     PersonWork, PersonPlace, PersonInstitution, PlacePlace, PlaceEvent, PlaceWork)
-from apis_core.metainfo.models import Uri as genUri
-from apis_core.labels.models import Label
-from apis_core.vocabularies.models import (
+from apis_core.apis_metainfo.models import Uri as genUri
+from apis_core.apis_labels.models import Label
+from apis_core.apis_vocabularies.models import (
     LabelType, InstitutionInstitutionRelation,
     InstitutionPlaceRelation, VocabsUri, ProfessionType, PersonWorkRelation,
     PersonPersonRelation, PersonPlaceRelation, WorkType, PersonInstitutionRelation,
     PlaceType, PlacePlaceRelation)
 from apis_core.default_settings.NER_settings import geonames_feature_codes as gn_f
 from apis_core.default_settings.RDF_settings import sett_RDF_generic
-from apis_core.metainfo.models import Collection, Uri
+from apis_core.apis_metainfo.models import Collection, Uri
 
 import rdflib
 from rdflib import ConjunctiveGraph, URIRef, RDFS, Literal, OWL

@@ -1,8 +1,8 @@
 from django.conf.urls import url
 from django.conf import settings
 from rest_framework.urlpatterns import format_suffix_patterns
-from entities import api_views
-from entities.api_views import GetOrCreateEntity
+from . import api_views
+from .api_views import GetOrCreateEntity
 
 
 app_name = 'apis_entities'

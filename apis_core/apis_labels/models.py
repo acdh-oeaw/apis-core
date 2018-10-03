@@ -1,5 +1,5 @@
 from django.db import models
-from apis_core.vocabularies.models import LabelType
+from apis_core.apis_vocabularies.models import LabelType
 #from metainfo.models import TempEntityClass
 #from reversion import revisions as reversion
 import reversion

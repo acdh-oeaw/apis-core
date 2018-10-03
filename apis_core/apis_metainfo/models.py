@@ -10,8 +10,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.functional import cached_property
 from model_utils.managers import InheritanceManager
 
-from apis_core.vocabularies.models import CollectionType, TextType, LabelType
-from apis_core.labels.models import Label
+from apis_core.apis_vocabularies.models import CollectionType, TextType, LabelType
+from apis_core.apis_labels.models import Label
 from .validators import date_validator
 
 from datetime import datetime

@@ -1,17 +1,16 @@
 from django.db import models
+from django.conf import settings
 #from reversion import revisions as reversion
 import reversion
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 from guardian.shortcuts import assign_perm, remove_perm
 from django.conf import settings
-from registration.backends.simple.views import RegistrationView
-from registration.signals import user_registered
 from django.contrib.auth.models import Group
 
-from apis_core.metainfo.models import TempEntityClass, Uri, Text, Collection
-from apis_core.labels.models import Label
-from apis_core.vocabularies.models import (ProfessionType, PlaceType, InstitutionType,
+from apis_core.apis_metainfo.models import TempEntityClass, Uri, Text, Collection
+from apis_core.apis_labels.models import Label
+from apis_core.apis_vocabularies.models import (ProfessionType, PlaceType, InstitutionType,
     EventType, Title, WorkType)
 
 import re
@@ -224,8 +223,12 @@ def add_usergroup_collection(sender, instance, **kwargs):
                         y.objects.filter(collection=instance))
 
 
-@receiver(user_registered, sender=RegistrationView, dispatch_uid="add_registered_user_to_group")
-def add_user_to_group(sender, user, request, **kwargs):
-    user_group = getattr(settings, "APIS_AUTO_USERGROUP", None)
-    if user_group is not None:
-        user.groups.add(Group.objects.get(name=user_group))
+if 'registration' in getattr(settings, 'INSTALLED_APPS', []):
+    from registration.backends.simple.views import RegistrationView
+    from registration.signals import user_registered
+
+    @receiver(user_registered, sender=RegistrationView, dispatch_uid="add_registered_user_to_group")
+    def add_user_to_group(sender, user, request, **kwargs):
+        user_group = getattr(settings, "APIS_AUTO_USERGROUP", None)
+        if user_group is not None:
+            user.groups.add(Group.objects.get(name=user_group))
