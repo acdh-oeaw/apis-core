@@ -4,8 +4,8 @@ from django_tables2.utils import A
 
 from .models import (PersonInstitution, PersonPlace, PersonPerson, PersonEvent, InstitutionEvent, PlaceEvent,
                      PersonWork, InstitutionWork, InstitutionPlace, PlaceWork, EventWork)
-from apis_core.labels.models import Label
-from apis_core.metainfo.models import Uri
+from apis_core.apis_labels.models import Label
+from apis_core.apis_metainfo.models import Uri
 
 
 empty_text_default = 'There are currently no relations'
@@ -115,4 +115,32 @@ class EntityUriTable(tables.Table):
         # add class="paleblue" to <table> tag
         attrs = {"class": "table table-hover table-striped table-condensed",
                  "id": "PURI_conn"}
+
+
+class EntityDetailViewLabelTable(tables.Table):
+    label2 = tables.Column(accessor='label')
+
+    class Meta:
+        empty_text = empty_text_default
+        model = Label
+        fields = ['isoCode_639_3', 'label_type']
+        sequence = ('label2', 'label_type', 'isoCode_639_3')
+        # add class="paleblue" to <table> tag
+        attrs = {"class": "table table-hover table-striped table-condensed",
+                "id": "PL_conn"}
+
+
+
+class EntityLabelTable(tables.Table):
+    edit = tables.TemplateColumn(template_name='edit_button_persLabel_ajax_form.html')
+    label2 = tables.Column(accessor='label')
+
+    class Meta:
+        empty_text = empty_text_default
+        model = Label
+        fields = ['isoCode_639_3', 'label_type']
+        sequence = ('label2', 'label_type', 'isoCode_639_3')
+        # add class="paleblue" to <table> tag
+        attrs = {"class": "table table-hover table-striped table-condensed",
+                "id": "PL_conn"}
 

@@ -12,9 +12,9 @@ from django.conf import settings
 
 from .views import get_highlighted_texts
 from .models import Work
-from apis_core.labels.models import Label
-from apis_core.metainfo.models import Uri
-from apis_core.relations.tables import get_generic_relations_table, EntityLabelTable, EntityDetailViewLabelTable
+from apis_core.apis_labels.models import Label
+from apis_core.apis_metainfo.models import Uri
+from apis_core.apis_relations.tables import get_generic_relations_table, EntityLabelTable, EntityDetailViewLabelTable
 
 
 class GenericEntitiesDetailView(View):

@@ -23,20 +23,15 @@ from .models import Person, Place, Institution, Event, Work
 from .forms import (FullTextForm, SearchForm, GenericFilterFormHelper,
                     NetworkVizFilterForm, PersonResolveUriForm,
                     get_entities_form, GenericEntitiesStanbolForm)
-from apis_core.relations.models import (PersonPerson, PersonInstitution, PersonEvent,
+from apis_core.apis_relations.models import (PersonPerson, PersonInstitution, PersonEvent,
                               PersonPlace, InstitutionEvent, InstitutionPlace,
                               InstitutionInstitution, PlacePlace, PlaceEvent, PersonWork,
                               InstitutionWork, PlaceWork, EventWork)
-from apis_core.vocabularies.models import LabelType
-from apis_core.relations.tables import (PersonInstitutionTable, PersonPersonTable, PersonPlaceTable,
-                              EntityLabelTable, InstitutionPlaceTable, InstitutionInstitutionTable,
-                              PlacePlaceTable, PersonEventTable, PlaceEventTable,
-                              InstitutionEventTable, PersonWorkTable, InstitutionWorkTable,
-                              PlaceWorkTable, EventWorkTable, EntityUriTable)
-from apis_core.metainfo.models import Uri, UriCandidate, TempEntityClass, Text
+from apis_core.apis_vocabularies.models import LabelType
+from apis_core.apis_metainfo.models import Uri, UriCandidate, TempEntityClass, Text
 from apis_core.helper_functions.stanbolQueries import retrieve_obj
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
-from apis_core.labels.models import Label
+from apis_core.apis_labels.models import Label
 from .tables import (
     PersonTable, PlaceTable, InstitutionTable, EventTable, WorkTable,
     get_entities_table

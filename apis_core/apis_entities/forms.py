@@ -15,8 +15,8 @@ from django.core.validators import URLValidator
 from django.conf import settings
 
 from .models import Person, Place, Institution, Event, Work
-from apis_core.vocabularies.models import TextType
-from apis_core.metainfo.models import Text, Uri
+from apis_core.apis_vocabularies.models import TextType
+from apis_core.apis_metainfo.models import Text, Uri
 
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
 

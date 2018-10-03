@@ -12,7 +12,7 @@ from django.conf import settings
 from dal import autocomplete
 from django.core.validators import URLValidator
 
-from apis_core.metainfo.models import TempEntityClass, Text
+from apis_core.apis_metainfo.models import TempEntityClass, Text
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
 from .tables import *
 

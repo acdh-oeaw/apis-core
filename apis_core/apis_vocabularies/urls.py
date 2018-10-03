@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from apis_core.entities.autocomplete3 import GenericVocabulariesAutocomplete
+from apis_core.apis_entities.autocomplete3 import GenericVocabulariesAutocomplete
 
 app_name = 'apis_vocabularies'
 

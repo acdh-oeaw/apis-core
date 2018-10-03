@@ -1,9 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from apis_core.entities.models import Place, Person, Institution, Event, Work
-from apis_core.metainfo.models import Uri
+from apis_core.apis_entities.models import Place, Person, Institution, Event, Work
+from apis_core.apis_metainfo.models import Uri
 from apis_core.default_settings.NER_settings import autocomp_settings as ac_settings
-from apis_core.relations.models import PersonPerson, PersonPlace, PersonInstitution
+from apis_core.apis_relations.models import PersonPerson, PersonPlace, PersonInstitution
 
 import autocomplete_light.shortcuts as al
 from django.db.models import Q

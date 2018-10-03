@@ -131,8 +131,8 @@ class PersonListFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(method='name_label_filter', label='Name')
     first_name = django_filters.CharFilter(lookup_expr='icontains', label='First Name')
     gender = django_filters.ChoiceFilter(choices=FILTER_CHOICES)
-    start_date = django_filters.DateFilter(lookup_expr=['lt', 'gt', 'exact'], label='Date of birth')
-    end_date = django_filters.DateFilter(lookup_expr=['lt', 'gt', 'exact'], label='Date of death')
+    start_date = django_filters.DateFilter(label='Date of birth') # Todo: add a datefilter that allows to filter for ranges
+    end_date = django_filters.DateFilter(label='Date of death')
     profession__name = django_filters.CharFilter(lookup_expr='icontains', label='Profession')
 
     class Meta:
@@ -155,9 +155,9 @@ class PersonListFilter(django_filters.FilterSet):
 
 class PlaceListFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains', label='Name')
-    lng = django_filters.NumberFilter(lookup_expr=['lt', 'gt'], label='Longitude')
-    lat = django_filters.NumberFilter(lookup_expr=['lt', 'gt'], label='Latitude')
-    status = django_filters.CharFilter(lookup_expr=['icontains','exact', 'iexact'])
+    lng = django_filters.NumberFilter(label='Longitude') # Todo: add filters that allow ranges
+    lat = django_filters.NumberFilter(label='Latitude')
+    status = django_filters.CharFilter(lookup_expr='icontains')
 
     class Meta:
         model = Place
@@ -166,9 +166,8 @@ class PlaceListFilter(django_filters.FilterSet):
 
 class InstitutionListFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains', label='Name')
-    start_date = django_filters.DateFilter(
-            lookup_expr=['lt', 'gt', 'exact'], label='Date of foundation')
-    end_date = django_filters.DateFilter(lookup_expr=['lt', 'gt', 'exact'], label='Date of closing')
+    start_date = django_filters.DateFilter(label='Date of foundation')
+    end_date = django_filters.DateFilter(label='Date of closing')
 
     class Meta:
         model = Institution
@@ -177,9 +176,8 @@ class InstitutionListFilter(django_filters.FilterSet):
 
 class EventListFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains', label='Name')
-    start_date = django_filters.DateFilter(
-            lookup_expr=['lt', 'gt', 'exact'], label='Start date')
-    end_date = django_filters.DateFilter(lookup_expr=['lt', 'gt', 'exact'], label='End date')
+    start_date = django_filters.DateFilter(label='Start date')
+    end_date = django_filters.DateFilter(label='End date')
     kind__name = django_filters.CharFilter(lookup_expr='icontains', label='Kind')
 
     class Meta:
@@ -189,9 +187,8 @@ class EventListFilter(django_filters.FilterSet):
 
 class WorkListFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains', label='Name')
-    start_date = django_filters.DateFilter(
-            lookup_expr=['lt', 'gt', 'exact'], label='Start date')
-    end_date = django_filters.DateFilter(lookup_expr=['lt', 'gt', 'exact'], label='End date')
+    start_date = django_filters.DateFilter(label='Start date')
+    end_date = django_filters.DateFilter(label='End date')
     kind__name = django_filters.CharFilter(lookup_expr='icontains', label='Kind')
 
     class Meta:

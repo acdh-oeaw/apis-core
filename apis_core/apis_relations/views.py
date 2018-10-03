@@ -16,15 +16,10 @@ from .forms import PersonLabelForm
 from .models import (PersonPlace, PersonPerson, PersonInstitution, InstitutionPlace,
                      InstitutionInstitution, PlacePlace, PersonEvent, InstitutionEvent, PlaceEvent, PersonWork,
                      InstitutionWork, PlaceWork, EventWork, WorkWork)
-from .tables import PersonInstitutionTable
-from .tables import (PersonInstitutionTable, PersonPersonTable, PersonPlaceTable,
-                              EntityLabelTable, InstitutionPlaceTable, InstitutionInstitutionTable,
-                              PersonEventTable, InstitutionEventTable, PlaceEventTable, PersonWorkTable,
-                              InstitutionWorkTable, PlaceWorkTable, EventWorkTable, EntityUriTable, PlacePlaceTable)
-from apis_core.metainfo.models import Uri
-from apis_core.entities.models import Person, Institution, Place, Event, Work
-from apis_core.entities.forms import PersonResolveUriForm, GenericEntitiesStanbolForm
-from apis_core.labels.models import Label
+from apis_core.apis_metainfo.models import Uri
+from apis_core.apis_entities.models import Person, Institution, Place, Event, Work
+from apis_core.apis_entities.forms import PersonResolveUriForm, GenericEntitiesStanbolForm
+from apis_core.apis_labels.models import Label
 from django.views.decorators.csrf import csrf_exempt
 
 
@@ -66,8 +61,7 @@ registered_forms = {'WorkWorkForm': [WorkWork, Work, Work],
                     'InstitutionInstitutionForm': [
                         InstitutionInstitution,
                         Institution,
-                        Institution,
-                        PersonInstitutionTable],
+                        Institution],
                     'InstitutionPersonForm': [PersonInstitution, Institution, Person],
                     'InstitutionEventForm': [InstitutionEvent, Institution, Event],
                     'InstitutionWorkForm': [InstitutionWork, Institution, Work],
