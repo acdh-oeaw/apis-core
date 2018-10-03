@@ -17,7 +17,7 @@ class Label(models.Model):
         verbose_name='ISO Code', default='deu')
     label_type = models.ForeignKey(LabelType, blank=True, null=True,
                                    on_delete=models.SET_NULL)
-    temp_entity = models.ForeignKey("metainfo.TempEntityClass", on_delete=models.CASCADE)
+    temp_entity = models.ForeignKey("apis_metainfo.TempEntityClass", on_delete=models.CASCADE)
 
     def get_web_object(self):
         result = {

@@ -10,7 +10,7 @@ class TEIBaseRenderer(renderers.BaseRenderer):
     format = 'xml'
 
     def render(self, data, media_type=None, renderer_context=None):
-        data = render_to_string("TEI_renderer.xml", {'data': data, 'renderer_context': renderer_context})
+        data = render_to_string("apis_metainfo/TEI_renderer.xml", {'data': data, 'renderer_context': renderer_context})
 
         return data
 

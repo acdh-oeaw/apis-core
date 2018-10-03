@@ -17,7 +17,7 @@ import re
 
 
 class StanbolAutocompleteBase(al.AutocompleteListTemplate):
-    autocomplete_template = 'autocomplete/stanbol.html'
+    autocomplete_template = 'apis_templates/autocomplete/stanbol.html'
 
     widget_attrs = {
 
@@ -125,7 +125,7 @@ class StanbolAutocompleteBase(al.AutocompleteListTemplate):
 
 
 class AddRelationBaseAutocomplete(al.AutocompleteListTemplate):
-    autocomplete_template = 'autocomplete/AddRelation.html'
+    autocomplete_template = 'apis_templates/autocomplete/AddRelation.html'
 
     widget_attrs = {
 

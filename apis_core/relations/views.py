@@ -162,7 +162,7 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
 
     test_form_relations = ContentType.objects.filter(
         model='{}{}'.format(form_match.group(1).lower(), form_match.group(2)).lower(),
-        app_label='relations')
+        app_label='apis_relations')
     tab = re.match(r'(.*)Form', kind_form).group(1)
     call_function = 'EntityRelationForm_response'
     if test_form_relations.count() > 0:

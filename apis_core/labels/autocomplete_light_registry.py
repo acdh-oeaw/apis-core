@@ -5,7 +5,7 @@ from .models import Label
 
 
 class LabelAutocomplete(autocomplete.Select2QuerySetView):
-    autocomplete_template = 'labels/label_al.html'
+    autocomplete_template = 'apis_labels/label_al.html'
     widget_attrs = {
 
     }

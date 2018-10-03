@@ -53,7 +53,7 @@ class GenericRelationForm(forms.ModelForm):
         x.notes = cd['notes']
         x.references = cd['references']
         setattr(x, self.rel_accessor[3], site_instance)
-        target = ContentType.objects.get(app_label='entities', model=self.rel_accessor[0].lower()).model_class()
+        target = ContentType.objects.get(app_label='apis_entities', model=self.rel_accessor[0].lower()).model_class()
         t1 = target.get_or_create_uri(cd['target'])
         if not t1:
             t1 = GenericRDFParser(cd['target'], self.rel_accessor[0]).get_or_create()
@@ -137,7 +137,7 @@ class GenericRelationForm(forms.ModelForm):
         self.relation_form = kwargs.pop('relation_form')
         if type(self.relation_form) == str:
             self.relation_form = ContentType.objects.get(
-                app_label='relations', model=self.relation_form.lower()).model_class()
+                app_label='apis_relations', model=self.relation_form.lower()).model_class()
         self.request = kwargs.pop('request', False)
         super(GenericRelationForm, self).__init__(*args, **kwargs)
         instance = getattr(self, 'instance', None)

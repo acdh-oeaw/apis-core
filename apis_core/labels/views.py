@@ -9,7 +9,7 @@ from .forms import LabelForm
 
 class LabelListView(generic.ListView):
 	model = Label
-	template_name = 'labels/labels_list.html'
+	template_name = 'apis_labels/labels_list.html'
 	context_object_name = 'object_list'
 
 	def get_queryset(self):
@@ -21,12 +21,12 @@ def label_create(request):
 		form = LabelForm(request.POST)
 		if form.is_valid():
 			form.save()
-			return redirect('labels:label_list')
+			return redirect('apis_labels:label_list')
 		else:
-			return render (request, 'labels/label_create.html', {'form':form})
+			return render (request, 'apis_labels/label_create.html', {'form':form})
 	else:
 		form = LabelForm()
-		return render (request, 'labels/label_create.html', {'form':form})
+		return render (request, 'apis_labels/label_create.html', {'form':form})
 
 
 def label_edit(request, pk):
@@ -35,15 +35,15 @@ def label_edit(request, pk):
 		form = LabelForm(request.POST, instance=instance)
 		if form.is_valid():
 			form.save()
-			return redirect('labels:label_list')
+			return redirect('apis_labels:label_list')
 		else:
-			return render (request, 'labels/label_create.html', {'form':form,'instance':instance})
+			return render (request, 'apis_labels/label_create.html', {'form':form,'instance':instance})
 	else:
 		form = LabelForm(instance=instance)
-		return render(request, 'labels/label_create.html', {'form':form, 'instance':instance})
+		return render(request, 'apis_labels/label_create.html', {'form':form, 'instance':instance})
 
 
 class LabelDelete(DeleteView):
 	model = Label
-	template_name = 'webpage/confirm_delete.html'
-	success_url = reverse_lazy('labels:label_list')
+	template_name = 'apis_templates/confirm_delete.html'
+	success_url = reverse_lazy('apis_labels:label_list')
