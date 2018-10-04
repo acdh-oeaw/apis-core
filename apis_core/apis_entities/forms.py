@@ -118,7 +118,7 @@ class GenericEntitiesStanbolForm(forms.Form):
             url = '/entities/autocomplete/{}'.format(entity)
             label = 'Search for {0} in reference resources or db'.format(entity.title())
             button_label = 'Merge'
-        self.helper.form_action = reverse('entities:generic_entities_stanbol_create', kwargs=form_kwargs)
+        self.helper.form_action = reverse('apis:apis_entities:generic_entities_stanbol_create', kwargs=form_kwargs)
         self.helper.add_input(Submit('submit', button_label))
         self.fields['entity'] = autocomplete.Select2ListCreateChoiceField(
                 label=label,
@@ -247,13 +247,13 @@ class NetworkVizFilterForm(forms.Form):
         self.fields['search_source'] = autocomplete.Select2ListCreateChoiceField(
                                         label='Search source',
                                         widget=autocomplete.ListSelect2(
-                                            url=reverse('entities:generic_network_entities_autocomplete',
+                                            url=reverse('apis:apis_entities:generic_network_entities_autocomplete',
                                                         kwargs={'entity': 'person'}),
                                             attrs=attrs))
         self.fields['search_target'] = autocomplete.Select2ListCreateChoiceField(
                                         label='Search target',
                                         widget=autocomplete.ListSelect2(
-                                            url=reverse('entities:generic_network_entities_autocomplete',
+                                            url=reverse('apis:apis_entities:generic_network_entities_autocomplete',
                                                         kwargs={'entity': 'place'}),
                                             attrs=attrs))
         self.fields['select_kind'] = autocomplete.Select2ListCreateChoiceField(

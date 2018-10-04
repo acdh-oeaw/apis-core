@@ -8,7 +8,7 @@ from django.views.generic.edit import DeleteView
 from django.views import generic
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-#from reversion import revisions as reversion
+# from reversion import revisions as reversion
 from reversion.models import Version
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -20,13 +20,17 @@ import reversion
 from django_tables2.export.views import ExportMixin
 
 from .models import Person, Place, Institution, Event, Work
-from .forms import (FullTextForm, SearchForm, GenericFilterFormHelper,
-                    NetworkVizFilterForm, PersonResolveUriForm,
-                    get_entities_form, GenericEntitiesStanbolForm)
-from apis_core.apis_relations.models import (PersonPerson, PersonInstitution, PersonEvent,
-                              PersonPlace, InstitutionEvent, InstitutionPlace,
-                              InstitutionInstitution, PlacePlace, PlaceEvent, PersonWork,
-                              InstitutionWork, PlaceWork, EventWork)
+from .forms import (
+    FullTextForm, SearchForm, GenericFilterFormHelper,
+    NetworkVizFilterForm, PersonResolveUriForm,
+    get_entities_form, GenericEntitiesStanbolForm
+)
+from apis_core.apis_relations.models import (
+    PersonPerson, PersonInstitution, PersonEvent,
+    PersonPlace, InstitutionEvent, InstitutionPlace,
+    InstitutionInstitution, PlacePlace, PlaceEvent, PersonWork,
+    InstitutionWork, PlaceWork, EventWork
+)
 from apis_core.apis_vocabularies.models import LabelType
 from apis_core.apis_metainfo.models import Uri, UriCandidate, TempEntityClass, Text
 from apis_core.helper_functions.stanbolQueries import retrieve_obj
@@ -149,7 +153,9 @@ class GenericListViewNew(ExportMixin, SingleTableView):
 
     def get_queryset(self, **kwargs):
         self.entity = self.kwargs.get('entity')
-        qs = ContentType.objects.get(app_label='apis_entities', model=self.entity.lower()).model_class().objects.all()
+        qs = ContentType.objects.get(
+            app_label='apis_entities', model=self.entity.lower()
+        ).model_class().objects.all()
         self.filter = get_generic_list_filter(self.entity.title())(self.request.GET, queryset=qs)
         self.filter.form.helper = self.formhelper_class()
         return self.filter.qs
