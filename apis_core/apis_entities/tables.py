@@ -15,7 +15,7 @@ def get_entities_table(entity, edit_v):
         export_formats = ['csv', 'json', 'xls', 'xlsx']
 
         class Meta:
-            model = ContentType.objects.get(app_label='entities', model=entity.lower()).model_class()
+            model = ContentType.objects.get(app_label='apis_entities', model=entity.lower()).model_class()
             if 'table_fields' in settings.APIS_ENTITIES[entity.title()]:
                 fields = settings.APIS_ENTITIES[entity.title()]['table_fields']
             else:

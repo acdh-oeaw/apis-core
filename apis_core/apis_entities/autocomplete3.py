@@ -115,7 +115,7 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
         db_include = self.kwargs.get('db_include', False)
         choices = []
         headers = {'Content-Type': 'application/json'}
-        ent_model = ContentType.objects.get(app_label='entities', model=ac_type).model_class()
+        ent_model = ContentType.objects.get(app_label='apis_entities', model=ac_type).model_class()
         if self.q.startswith('http'):
             res = ent_model.objects.filter(uri__uri=self.q.strip())
         else:
@@ -346,7 +346,7 @@ class GenericNetworkEntitiesAutocomplete(autocomplete.Select2ListView):
             res = Collection.objects.filter(name__icontains=q[3:])
             results = [{'id': 'cl:'+str(x.pk), 'text': x.name} for x in res]
         else:
-            ent_model = ContentType.objects.get(app_label='entities', model=entity).model_class()
+            ent_model = ContentType.objects.get(app_label='apis_entities', model=entity).model_class()
             arg_list = [Q(**{x + '__icontains': q}) for x in settings.APIS_ENTITIES[entity.title()]['search']]
             res = ent_model.objects.filter(reduce(operator.or_, arg_list)).distinct()
             results = [{'id': x.pk, 'text': str(x)} for x in res]

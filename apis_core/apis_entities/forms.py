@@ -40,7 +40,7 @@ class SearchForm(forms.Form):
 def get_entities_form(entity):
     class GenericEntitiesForm(forms.ModelForm):
         class Meta:
-            model = ContentType.objects.get(app_label='entities', model=entity.lower()).model_class()
+            model = ContentType.objects.get(app_label='apis_entities', model=entity.lower()).model_class()
             exclude = ['start_date', 'end_date', 'text', 'source']
 
         def __init__(self, *args, **kwargs):
@@ -62,22 +62,26 @@ def get_entities_form(entity):
             for f in self.fields.keys():
                 if type(self.fields[f]) == ModelMultipleChoiceField:
                     v_name_p = str(self.fields[f].queryset.model.__name__)
-                    if ContentType.objects.get(model=v_name_p.lower()).app_label.lower() == 'vocabularies':
-                        self.fields[f].widget = autocomplete.Select2Multiple(
-                            url=reverse('vocabularies:generic_vocabularies_autocomplete', kwargs={
-                                'vocab': v_name_p.lower(),
-                                'direct': 'normal'
-                            }),
-                            attrs=attrs)
-                        if self.instance:
-                            res = []
-                            try:
-                                for x in getattr(self.instance, f).all():
-                                    res.append((x.pk, x.name))
-                            except ValueError:
-                                pass
-                            self.fields[f].choices = res
-                            self.fields[f].initial = res
+                    # be aware, might be a very dirty hack to avoid naming conflict in project
+                    try:
+                        if ContentType.objects.get(app_label='apis_entities', model=v_name_p.lower()).app_label.lower() == 'apis_vocabularies':
+                            self.fields[f].widget = autocomplete.Select2Multiple(
+                                url=reverse('vocabularies:generic_vocabularies_autocomplete', kwargs={
+                                    'vocab': v_name_p.lower(),
+                                    'direct': 'normal'
+                                }),
+                                attrs=attrs)
+                            if self.instance:
+                                res = []
+                                try:
+                                    for x in getattr(self.instance, f).all():
+                                        res.append((x.pk, x.name))
+                                except ValueError:
+                                    pass
+                                self.fields[f].choices = res
+                                self.fields[f].initial = res
+                    except Exception as e:
+                        print(e)
                 if f not in acc_grp2:
                     acc_grp1.append(f)
 

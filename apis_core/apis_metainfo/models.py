@@ -18,7 +18,7 @@ from datetime import datetime
 import re
 import unicodedata
 from difflib import SequenceMatcher
-#from helper_functions.highlighter import highlight_text
+# from helper_functions.highlighter import highlight_text
 from apis_core.default_settings.NER_settings import autocomp_settings
 
 
@@ -266,7 +266,7 @@ class UriCandidate(models.Model):
     responsible = models.CharField(max_length=255)
     entity = models.ForeignKey(TempEntityClass, blank=True, null=True,
                                on_delete=models.CASCADE)
-   
+
     @cached_property
     def description(self):
         headers = {'accept': 'application/json'}
