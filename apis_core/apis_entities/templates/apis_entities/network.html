@@ -157,7 +157,7 @@
 {% block scripts %}
 {{block.super}}
 <script type="text/javascript">
-sigma.parsers.json('{% url 'entities:getNetJsonList' %}', {
+sigma.parsers.json('{% url 'apis:apis_entities:getNetJsonList' %}', {
   container: 'graph-container',
 }, function(s) {
     

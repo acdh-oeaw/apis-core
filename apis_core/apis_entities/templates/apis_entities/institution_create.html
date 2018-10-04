@@ -40,7 +40,7 @@
                 	{% csrf_token %}
                 	{% crispy form %}
                     <!--{% if instance %}
-                        <a class ="btn btn-danger btn-sm" href="{% url 'entities:person_delete' pk=instance.id %}">delete</a>
+                        <a class ="btn btn-danger btn-sm" href="{% url 'apis:apis_entities:person_delete' pk=instance.id %}">delete</a>
                     {% endif %}-->
                      {% for form1 in formset %}
                         <div class="Formset">
@@ -145,7 +145,7 @@
                                     <td>{{ x.start_date }}</td>
                                     <td>{{ x.relation_type.name_reverse }}</td>
                                     <td><a onclick='popupCreateObject("{% url 'admin:relations_personperson_change' x.id %}")'>{{ x.related_personA }}</a></td>
-                                    <td><a href="{% url 'entities:person_edit' pk=x.related_personA.id %}"> reverse</a></td>
+                                    <td><a href="{% url 'apis:apis_entities:person_edit' pk=x.related_personA.id %}"> reverse</a></td>
                                 </tr>
                                 {% endfor %}
                             </table>

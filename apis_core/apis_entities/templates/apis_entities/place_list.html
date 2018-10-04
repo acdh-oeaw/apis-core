@@ -6,11 +6,11 @@
 	<div class="panel-heading">
 		<h1>All Places</h1>
 		<!--<div>
-			<a class="btn btn-primary btn-lg" href="{% url 'entities:place_create' %}">create new Place</a>
+			<a class="btn btn-primary btn-lg" href="{% url 'apis:apis_entities:place_create' %}">create new Place</a>
 		</div>-->
 	</div>
 	<div class="panel-body">
-	<form method='get' action="{% url 'entities:place_list' %}?page=1">
+	<form method='get' action="{% url 'apis:apis_entities:place_list' %}?page=1">
 		{% load crispy_forms_tags %}
 		{% crispy SearchForm SearchForm.helper %}
 	</form>
@@ -25,7 +25,7 @@
 			<tbody>
 			{% for object in object_list %}
 				<tr>
-					<td><a href="{% url 'entities:place_edit' pk=object.id %}">{{ object }}</a></td><td>{{ object.status }}</td>
+					<td><a href="{% url 'apis:apis_entities:place_edit' pk=object.id %}">{{ object }}</a></td><td>{{ object.status }}</td>
 					<!-- <td>{{ object.start_date_written }} {% if object.end_date_written %} - {{ object.end_date_written }} {% endif %}</td>
 					<td>{{ object.isoCode }}</a></td> -->
 				</tr>
@@ -38,9 +38,9 @@
             <span class="page-links">
                 {% if page_obj.has_previous %}
                 	{% if search %}
-                    	<a href="{% url 'entities:place_list' %}?page={{ page_obj.previous_page_number }}&search={{ search }}">previous</a>
+                    	<a href="{% url 'apis:apis_entities:place_list' %}?page={{ page_obj.previous_page_number }}&search={{ search }}">previous</a>
                 	{% else %}
-                		<a href="{% url 'entities:place_list' %}?page={{ page_obj.previous_page_number }}">previous</a>
+                		<a href="{% url 'apis:apis_entities:place_list' %}?page={{ page_obj.previous_page_number }}">previous</a>
                 	{% endif %}
                 {% endif %}
                 <span class="page-current">
@@ -48,9 +48,9 @@
                 </span>
                 {% if page_obj.has_next %}
                 	{% if search %}
-                    	<a href="{% url 'entities:place_list' %}?page={{ page_obj.next_page_number }}&search={{ search }}">next</a>
+                    	<a href="{% url 'apis:apis_entities:place_list' %}?page={{ page_obj.next_page_number }}&search={{ search }}">next</a>
                     {% else %}
-                    	<a href="{% url 'entities:place_list' %}?page={{ page_obj.next_page_number }}">next</a>
+                    	<a href="{% url 'apis:apis_entities:place_list' %}?page={{ page_obj.next_page_number }}">next</a>
                     {% endif %}
                 {% endif %}
             </span>

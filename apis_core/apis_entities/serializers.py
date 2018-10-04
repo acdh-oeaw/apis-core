@@ -46,7 +46,7 @@ class GeoJsonSerializer(serializers.BaseSerializer):
     def to_representation(self, obj):
         p_pk = self.context.get('p_pk')
         short = False
-        url_r = reverse_lazy('entities:resolve_ambigue_place', kwargs={'pk': str(p_pk), 'uri': obj['id'][7:]})
+        url_r = reverse_lazy('apis:apis_entities:resolve_ambigue_place', kwargs={'pk': str(p_pk), 'uri': obj['id'][7:]})
         long = False
         if 'http://www.w3.org/2003/01/geo/wgs84_pos#long' in obj.keys():
             long = float(obj['http://www.w3.org/2003/01/geo/wgs84_pos#long'][0]['value'])
@@ -109,7 +109,7 @@ class NetJsonNodeSerializer(serializers.BaseSerializer):
 
     def to_representation(self, obj):
         ent_obj = obj.__class__.__name__
-        ent_url = reverse_lazy('entities:generic_entities_edit_view', kwargs={'pk': str(obj.pk),
+        ent_url = reverse_lazy('apis:apis_entities:generic_entities_edit_view', kwargs={'pk': str(obj.pk),
                                                                               'entity': ent_obj.lower()})
         tt = """<div class='arrow'></div>
             <div class='sigma-tooltip-header'>{}</div>

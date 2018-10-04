@@ -290,6 +290,6 @@ class GetOrCreateEntity(APIView):
         entity = request.query_params.get('entity2', None)
         uri = request.query_params.get('uri', None)
         ent = GenericRDFParser(uri, entity.title()).get_or_create()
-        res = {'id': ent.pk, 'url': reverse_lazy('entities:generic_entities_edit_view', request=request,
+        res = {'id': ent.pk, 'url': reverse_lazy('apis:apis_entities:generic_entities_edit_view', request=request,
                                             kwargs={'pk': ent.pk, 'entity': entity})}
         return Response(res)

@@ -37,7 +37,7 @@
                 	{% csrf_token %}
                 	{% crispy form %}
                     {% if instance %}
-                        <a class ="btn btn-danger btn-sm" href="{% url 'entities:place_delete' pk=instance.id %}">delete</a>
+                        <a class ="btn btn-danger btn-sm" href="{% url 'apis:apis_entities:place_delete' pk=instance.id %}">delete</a>
                     {% endif %}
                     <input class="btn btn-primary" type="submit" value="create/modify" />
                 
@@ -92,7 +92,7 @@
                             <tr>
                                 <td>{{ x.start_date_written }}</td>
                                 <td>{{ x.relation_type }}</td>
-                                <td>{% if x.related_placeA.pk == instance.pk %}<a href="{% url 'entities:place_edit' x.related_placeB.pk %}">{{x.related_placeB}}</a>{% else %}<a href="{% url 'entities:place_edit' x.related_placeA.pk %}">{{x.related_placeA}}</a>{% endif %}</td>
+                                <td>{% if x.related_placeA.pk == instance.pk %}<a href="{% url 'apis:apis_entities:place_edit' x.related_placeB.pk %}">{{x.related_placeB}}</a>{% else %}<a href="{% url 'apis:apis_entities:place_edit' x.related_placeA.pk %}">{{x.related_placeA}}</a>{% endif %}</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -125,7 +125,7 @@
                             <tr>
                                 <td>{{ x.relation_type.name_reverse }}</td>
                                 <td><a onclick='popupCreateObject("{% url 'admin:relations_personplace_change' x.id %}")'>{{ x.related_person }}</a></td>
-                                <td><a href="{% url 'entities:person_edit' pk=x.related_person.id %}"> reverse</a></td>
+                                <td><a href="{% url 'apis:apis_entities:person_edit' pk=x.related_person.id %}"> reverse</a></td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -259,7 +259,7 @@
 }).addTo(mymap);
         $.ajax({
                 type: 'GET',
-                url: '{% url 'entities:getGeoJson' %}',
+                url: '{% url 'apis:apis_entities:getGeoJson' %}',
                 data: {'object_id': {{instance.pk}}},
                 success: function(data) {
                     console.log(data);

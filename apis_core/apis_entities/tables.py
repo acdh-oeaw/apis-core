@@ -9,9 +9,9 @@ def get_entities_table(entity, edit_v):
 
     class GenericEntitiesTable(tables.Table):
         if edit_v:
-            name = tables.LinkColumn('entities:generic_entities_edit_view', args=[entity.lower(), A('pk')])
+            name = tables.LinkColumn('apis:apis_entities:generic_entities_edit_view', args=[entity.lower(), A('pk')])
         else:
-            name = tables.LinkColumn('entities:generic_entities_detail_view', args=[entity.lower(), A('pk')])
+            name = tables.LinkColumn('apis:apis_entities:generic_entities_detail_view', args=[entity.lower(), A('pk')])
         export_formats = ['csv', 'json', 'xls', 'xlsx']
 
         class Meta:
@@ -34,7 +34,7 @@ def get_entities_table(entity, edit_v):
 
 
 class PersonTable(tables.Table):
-    name = tables.LinkColumn('entities:person_edit', args=[A('pk')])
+    name = tables.LinkColumn('apis:apis_entities:person_edit', args=[A('pk')])
 
     class Meta:
         model = Person
@@ -44,7 +44,7 @@ class PersonTable(tables.Table):
 
 
 class PlaceTable(tables.Table):
-    name = tables.LinkColumn('entities:place_edit', args=[A('pk')])
+    name = tables.LinkColumn('apis:apis_entities:place_edit', args=[A('pk')])
 
     class Meta:
         model = Place
@@ -54,7 +54,7 @@ class PlaceTable(tables.Table):
 
 
 class InstitutionTable(tables.Table):
-    name = tables.LinkColumn('entities:institution_edit', args=[A('pk')])
+    name = tables.LinkColumn('apis:apis_entities:institution_edit', args=[A('pk')])
 
     class Meta:
         model = Institution
@@ -64,7 +64,7 @@ class InstitutionTable(tables.Table):
 
 
 class EventTable(tables.Table):
-    name = tables.LinkColumn('entities:event_edit', args=[A('pk')])
+    name = tables.LinkColumn('apis:apis_entities:event_edit', args=[A('pk')])
 
     class Meta:
         model = Event
@@ -74,7 +74,7 @@ class EventTable(tables.Table):
 
 
 class WorkTable(tables.Table):
-    name = tables.LinkColumn('entities:work_edit', args=[A('pk')])
+    name = tables.LinkColumn('apis:apis_entities:work_edit', args=[A('pk')])
 
     class Meta:
         model = Work

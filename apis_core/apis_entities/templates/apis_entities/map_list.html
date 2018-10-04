@@ -81,7 +81,7 @@
 }).addTo(mymap);
         $.ajax({
                 type: 'GET',
-                url: '{% url 'entities:getGeoJsonList' %}',
+                url: '{% url 'apis:apis_entities:getGeoJsonList' %}',
                 dataType: 'json',
                 'data': {'relation': 'PersonPlace'},
                 success: function(data) {

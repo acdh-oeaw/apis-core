@@ -55,7 +55,7 @@
         $.ApisMaps.PlaceMap = {}
         $.ajax({
                 type: 'GET',
-                url: '{% url 'entities:getGeoJson' %}',
+                url: '{% url 'apis:apis_entities:getGeoJson' %}',
                 data: {'object_id': {{instance.pk}}},
                 success: function(data) {
                     console.log(data);
