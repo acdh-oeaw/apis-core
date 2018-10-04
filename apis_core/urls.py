@@ -27,6 +27,7 @@ from apis_core.apis_vocabularies.api_views import (
     PlaceWorkRelationViewSet, EventWorkRelationViewSet, EventEventRelationViewSet, WorkWorkRelationViewSet,
     PlacePlaceRelationViewSet)
 
+app_name = 'apis_core'
 
 router = routers.DefaultRouter()
 router.register(r'tempentity', TempEntityClassViewSet)
@@ -122,4 +123,3 @@ if settings.DEBUG:
         urlpatterns = [
             url(r'^__debug__/', include(debug_toolbar.urls)),
         ] + urlpatterns
-
