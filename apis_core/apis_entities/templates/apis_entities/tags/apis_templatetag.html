@@ -6,20 +6,6 @@
                         console.log('apScrollTop: init');
                     }
                 });
-                $('#ckeck_edit_views').on('change', function(){
-                  var edit_views = $('#ckeck_edit_views').prop('checked');
-                  $.ajax({
-                    url: "{% url 'webpage:set_user_settings' %}",
-                    data: {'edit_views': edit_views},
-                    success: function(data){
-                      if (data.edit_views) {
-                        $('#check_edit_views').prop('checked', true)
-                      } else {
-                        $('#check_edit_views').prop('checked', false)
-                      }
-                    }
-                  })
-                });
             });
     </script>
     <script type="text/javascript">
