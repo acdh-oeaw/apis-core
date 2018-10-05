@@ -119,7 +119,7 @@
         };
         $.ajax({
                 type: 'POST',
-                url: '{% url 'relations:get_form_ajax' %}',
+                url: '{% url 'apis:apis_relations:get_form_ajax' %}',
                 data: {'FormName':FormName,'SiteID':{{instance.pk}},'ObjectID':ObjectID,'ButtonText':ButtonText},
                 success: function(data) {
                     console.log('yes')

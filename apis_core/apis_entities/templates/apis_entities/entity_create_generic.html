@@ -188,7 +188,7 @@
         };
         return $.ajax({
                 type: 'POST',
-                url: '{% url 'relations:get_form_ajax' %}',
+                url: '{% url 'apis:apis_relations:get_form_ajax' %}',
             beforeSend: function(request) {
               var csrftoken = getCookie('csrftoken');
     request.setRequestHeader("X-CSRFToken", csrftoken);
@@ -328,7 +328,7 @@
         $.ApisHigh.vars.entity_type = '{{entity_type}}';
         $.ApisHigh.vars.instance_pk = '{{instance.pk}}';
         $.ApisHigh.vars.urls = {};
-        $.ApisHigh.vars.urls.get_form_ajax = '{% url 'relations:get_form_ajax' %}';
+        $.ApisHigh.vars.urls.get_form_ajax = '{% url 'apis:apis_relations:get_form_ajax' %}';
         $.ApisHigh.vars.urls.annotatoragreementview = '{% url 'api2:AnnotatorAgreementView' %}';
         $.ApisHigh.vars.urls.showoverlappinghighlights = '{% url 'api2:ShowOverlappingHighlights' %}'
       activate_context_menu_highlighter();
