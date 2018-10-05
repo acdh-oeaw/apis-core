@@ -114,7 +114,10 @@ def get_generic_list_filter(entity):
             for f in self.filters.keys():
                 if type(self.filters[f].field) == ModelMultipleChoiceField:
                     v_name_p = str(self.filters[f].queryset.model.__name__)
-                    if ContentType.objects.get(model=v_name_p.lower()).app_label.lower() == 'vocabularies':
+                    if ContentType.objects.get(app_label__in=[
+                        'apis_entities', 'apis_metainfo', 'apis_relations',
+                        'apis_vocabularies', 'apis_labels'
+                    ], model=v_name_p.lower()).app_label.lower() == 'vocabularies':
                         self.filters[f].field.widget = autocomplete.Select2Multiple(
                             url=reverse('vocabularies:generic_vocabularies_autocomplete', kwargs={
                                 'vocab': v_name_p.lower(),
@@ -143,7 +146,7 @@ class PersonListFilter(django_filters.FilterSet):
         """
         Filter for including the alternative names in the names search. The types of labels included in the query are
         currently hardcoded in a list.
-        
+
         :param queryset: queryset that the filters are applied on
         :param name: name of the attribute to filter on (not used as label types are hardcoded)
         :param value: value for the filter
