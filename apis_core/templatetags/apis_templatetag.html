@@ -1,0 +1,159 @@
+<script type="text/javascript">
+            // Setup plugin with default settings
+            $(document).ready(function() {
+                $.apScrollTop({
+                    'onInit': function(evt) {
+                        console.log('apScrollTop: init');
+                    }
+                });
+                $('#ckeck_edit_views').on('change', function(){
+                  var edit_views = $('#ckeck_edit_views').prop('checked');
+                  $.ajax({
+                    url: "{% url 'webpage:set_user_settings' %}",
+                    data: {'edit_views': edit_views},
+                    success: function(data){
+                      if (data.edit_views) {
+                        $('#check_edit_views').prop('checked', true)
+                      } else {
+                        $('#check_edit_views').prop('checked', false)
+                      }
+                    }
+                  })
+                });
+            });
+    </script>
+    <script type="text/javascript">
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+    </script>
+    <script type="text/javascript">
+      function unbind_ajax_forms(){
+      $(".form.ajax_form").submit(function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            var formData = $(this).serialize();
+            //var button_text = $(this).find(':button').text();
+
+          $.ajax({
+          type: 'POST',
+          url: $(this).attr('action'),
+          data: formData,
+              beforeSend: function(request) {
+              var csrftoken = getCookie('csrftoken');
+    request.setRequestHeader("X-CSRFToken", csrftoken);
+  },
+          //data:formData,
+            })
+          .done(function(response) {
+              window[response.call_function](response)}
+      )})}
+</script>
+        <script type="text/javascript">
+    //script that converts the multi select element of the annotation project menu
+    $(document).ready(function() {
+        $('select.selectmultiple').multiselect({
+            includeSelectAllOption: true,
+            enableFiltering: true
+        });
+        initiate_compare_tooltip();
+    })
+    </script>
+        <script type="application/javascript">
+        $('body').on('mouseenter', '.apis-autocomplete-span:not(.tooltipstered)', function() {
+                    $(this).tooltipster({
+                      theme: 'tooltipster-light',
+                      side: 'left',
+                      contentAsHTML: true,
+
+                      functionBefore: function(instance, helper) {
+                        $('#container2').remove();
+                        instance.content('<div class="autocomplete-vis-container" id="container2" style="height: 200px; width: 200px"></div>');
+                      },
+                      functionReady: function(instance, helper){
+                        var func = 'autocomplete_vis_'+$(helper.origin).data('vis-tooltip');
+                        var res = window[func]($(helper.origin));
+                        console.log(res);
+                      },
+                    })
+                    .tooltipster('reposition')
+                    .tooltipster('open');
+                });
+
+
+        function initiate_compare_tooltip() {
+          //TODO: correctly detach the tooltips before reinitializing them
+        $('.compare_tooltip').tooltipster({
+    content: 'Loading...',
+            contentAsHTML: true,
+    interactive: true,
+    theme: 'tooltipster-light',
+            updateAnimation: null,
+            zIndex: 999,
+    functionBefore: function(instance, helper) {
+        var $origin = $(helper.origin);
+        dataOptions = $origin.attr('data-tooltip');
+        if(dataOptions) {
+
+            dataOptions = JSON.parse(dataOptions);
+            console.log(dataOptions);
+        } else {
+            console.log('didnt read out')
+        }
+        if (typeof $.ApisRev == 'undefined') {
+            $.ApisRev = {}; }
+        $.ApisRev.url = '/entities/compare/'+dataOptions['app']+'/'+dataOptions['kind']+'/'+dataOptions['pk']
+        if ($origin.data('loaded') !== true) {
+            $.get($.ApisRev.url, function(data) {
+                instance.content(data);
+                unbind_compare_forms();
+                $origin.data('loaded', true);
+            });
+        }
+    },
+    functionReady: function (instance, helper) {
+        $.ApisRev.instance = instance;
+        unbind_compare_forms();
+    }
+});};
+        </script>
+        <script type="text/javascript">
+      function unbind_compare_forms(){
+      $("#change-history").parents('form').submit(function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            var formData = $(this).serialize();
+          if ($.ApisRev.url == 'undefined'){
+              var url = '/'
+          } else {
+              var url = $.ApisRev.url
+          };
+          $.ajax({
+          type: 'GET',
+          url: url,
+          data: formData,
+          //data:formData,
+            })
+          .done(function(response) {
+              $.ApisRev.instance.content(response);
+              unbind_compare_forms();
+          }
+      )})}
+</script>
