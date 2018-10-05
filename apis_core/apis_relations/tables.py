@@ -39,7 +39,7 @@ def get_generic_relations_table(relation, entity, detail=None):
                 template_name='apis_relations/delete_button_generic_ajax_form.html'
             )
             self.base_columns['related_'+rel_ent.lower()] = tables.LinkColumn(
-                'apis_entities:generic_entities_edit_view',
+                'apis:apis_entities:generic_entities_edit_view',
                 args=[
                     rel_ent.lower(), A('related_{}.pk'.format(rel_ent.lower()))
                 ])
@@ -71,7 +71,7 @@ def get_generic_relations_table(relation, entity, detail=None):
 
             def __init__(self, *args, entity='None', **kwargs):
                 self.base_columns['related_'+rel_ent.lower()] = tables.LinkColumn(
-                    'apis_entities:generic_entities_detail_view',
+                    'apis:apis_entities:generic_entities_detail_view',
                     args=[
                         rel_ent.lower(), A('related_{}.pk'.format(rel_ent.lower()))
                     ])
@@ -89,23 +89,8 @@ def get_generic_relations_table(relation, entity, detail=None):
         return GenericRelationsTable
 
 
-
-class EntityLabelTable(tables.Table):
-    edit = tables.TemplateColumn(template_name='edit_button_persLabel_ajax_form.html')
-    label2 = tables.Column(accessor='label')
-
-    class Meta:
-        empty_text = empty_text_default
-        model = Label
-        fields = ['isoCode_639_3', 'label_type']
-        sequence = ('label2', 'label_type', 'isoCode_639_3')
-        # add class="paleblue" to <table> tag
-        attrs = {"class": "table table-hover table-striped table-condensed",
-                "id": "PL_conn"}
-
-
 class EntityUriTable(tables.Table):
-    delete = tables.TemplateColumn(template_name='delete_button_Uri_ajax_form.html')
+    delete = tables.TemplateColumn(template_name='apis_relations/delete_button_Uri_ajax_form.html')
 
     class Meta:
         empty_text = empty_text_default
@@ -132,7 +117,7 @@ class EntityDetailViewLabelTable(tables.Table):
 
 
 class EntityLabelTable(tables.Table):
-    edit = tables.TemplateColumn(template_name='edit_button_persLabel_ajax_form.html')
+    edit = tables.TemplateColumn(template_name='apis_relations/edit_button_persLabel_ajax_form.html')
     label2 = tables.Column(accessor='label')
 
     class Meta:

@@ -119,7 +119,7 @@ class GenericEntitiesEditView(View):
         if form.is_valid() and form_text.is_valid():
             entity_2 = form.save()
             form_text.save(entity_2)
-            return redirect(reverse('apis_entities:generic_entities_edit_view', kwargs={
+            return redirect(reverse('apis:apis_entities:generic_entities_edit_view', kwargs={
                 'pk': pk, 'entity': entity
             }))
         else:
@@ -155,7 +155,7 @@ class GenericEntitiesCreateView(View):
         if form.is_valid() and form_text.is_valid():
             entity_2 = form.save()
             form_text.save(entity_2)
-            return redirect(reverse('apis_entities:generic_entities_edit_view', kwargs={
+            return redirect(reverse('apis:apis_entities:generic_entities_edit_view', kwargs={
                 'pk': entity_2.pk, 'entity': entity
             }))
         else:
@@ -181,8 +181,9 @@ class GenericEntitiesCreateStanbolView(View):
         #form = form(request.POST)
         if form.is_valid():
             entity_2 = form.save()
-            entity_2.merge_with(int(ent_merge_pk))
-            return redirect(reverse('apis_entities:generic_entities_edit_view', kwargs={
+            if ent_merge_pk:
+                entity_2.merge_with(int(ent_merge_pk))
+            return redirect(reverse('apis:apis_entities:generic_entities_edit_view', kwargs={
                 'pk': entity_2.pk, 'entity': entity
             }))
         else:
@@ -201,5 +202,5 @@ class GenericEntitiesDeleteView(DeleteView):
 
     def dispatch(self, request, *args, **kwargs):
         entity = kwargs['entity']
-        self.success_url = reverse('apis_entities:generic_entities_list', kwargs={'entity': entity})
+        self.success_url = reverse('apis:apis_entities:generic_entities_list', kwargs={'entity': entity})
         return super(GenericEntitiesDeleteView, self).dispatch(request, *args, **kwargs)

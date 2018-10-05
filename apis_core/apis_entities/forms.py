@@ -62,9 +62,10 @@ def get_entities_form(entity):
             for f in self.fields.keys():
                 if type(self.fields[f]) == ModelMultipleChoiceField:
                     v_name_p = str(self.fields[f].queryset.model.__name__)
-                    if ContentType.objects.get(app_label='apis_entities', model=v_name_p.lower()).app_label.lower() == 'apis_vocabularies':
+                    if ContentType.objects.get(app_label__in=['apis_entities', 'apis_metainfo', 'apis_relations',
+                       'apis_vocabularies', 'apis_labels'], model=v_name_p.lower()).app_label.lower() == 'apis_vocabularies':
                         self.fields[f].widget = autocomplete.Select2Multiple(
-                            url=reverse('vocabularies:generic_vocabularies_autocomplete', kwargs={
+                            url=reverse('apis:apis_vocabularies:generic_vocabularies_autocomplete', kwargs={
                                 'vocab': v_name_p.lower(),
                                 'direct': 'normal'
                             }),
@@ -260,7 +261,7 @@ class NetworkVizFilterForm(forms.Form):
         self.fields['select_kind'] = autocomplete.Select2ListCreateChoiceField(
                                         label='Select kind',
                                         widget=autocomplete.ListSelect2(
-                                            url=reverse('vocabularies:generic_vocabularies_autocomplete',
+                                            url=reverse('apis:apis_vocabularies:generic_vocabularies_autocomplete',
                                                         kwargs={'vocab': 'personplacerelation',
                                                                 'direct': 'normal'}),
                                             attrs=attrs))
