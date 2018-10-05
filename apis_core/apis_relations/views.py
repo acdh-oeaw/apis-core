@@ -123,7 +123,7 @@ def get_form_ajax(request):
     else:
         form = globals()[FormName](**form_dict)
     tab = FormName[:-4]
-    data = {'tab': tab, 'form': render_to_string("_ajax_form.html", {
+    data = {'tab': tab, 'form': render_to_string("apis_relations/_ajax_form.html", {
                 "entity_type": entity_type_str,
                 "form": form,
                 'type1': FormName,

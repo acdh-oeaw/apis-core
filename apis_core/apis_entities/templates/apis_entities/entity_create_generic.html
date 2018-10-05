@@ -1,12 +1,6 @@
 {% extends "webpage/base.html" %}
-{% load staticfiles %}
+{% load static %}
 {% block scriptHeader %}
-<link href="/static/autocomplete_light/vendor/select2/dist/css/select2.css" type="text/css" media="all" rel="stylesheet" />
-<link href="/static/autocomplete_light/select2.css" type="text/css" media="all" rel="stylesheet" />
-<script type="text/javascript" src="/static/autocomplete_light/jquery.init.js"></script>
-<script type="text/javascript" src="/static/autocomplete_light/autocomplete.init.js"></script>
-<script type="text/javascript" src="/static/autocomplete_light/vendor/select2/dist/js/select2.full.js"></script>
-<script type="text/javascript" src="/static/autocomplete_light/select2.js"></script>
 {% if highlighter_active %}
 <script type="text/javascript" src="/static/apis_highlighter/apis_highlighter.js?8"></script>
 {% endif %}

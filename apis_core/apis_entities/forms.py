@@ -111,13 +111,12 @@ class GenericEntitiesStanbolForm(forms.Form):
         self.entity = entity
         self.helper = FormHelper()
         form_kwargs = {'entity': entity}
-        #url = '/entities/autocomplete/{}/remove'.format(entity)
         url = reverse('apis:apis_entities:generic_entities_autocomplete', args=[entity.title(), 'remove'])
         label = 'Create {} from reference resources'.format(entity.title())
         button_label = 'Create'
         if ent_merge_pk:
             form_kwargs['ent_merge_pk'] = ent_merge_pk
-            url = '/entities/autocomplete/{}'.format(entity)
+            url = reverse('apis:apis_entities:generic_entities_autocomplete', args=[entity.title()])
             label = 'Search for {0} in reference resources or db'.format(entity.title())
             button_label = 'Merge'
         self.helper.form_action = reverse('apis:apis_entities:generic_entities_stanbol_create', kwargs=form_kwargs)
