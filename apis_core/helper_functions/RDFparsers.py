@@ -87,7 +87,7 @@ class GenericRDFParser(object):
             obj.save()
         return self.objct
 
-    def merge(self, m_obj, app_label_relations='relations'):
+    def merge(self, m_obj, app_label_relations='apis_relations'):
         """
         :param m_obj: the object to merge with (must be an django model object instance)
         :param app_label_relations: (string) the label of the Django app that contains the relations
@@ -123,7 +123,7 @@ class GenericRDFParser(object):
         Label.objects.create(temp_entity_id=self.objct.pk, label=legacy_name, label_type=lt)
         for col in m_obj.collection.all():
             self.objct.collection.add(col)
-        for ann in m_obj.annotation_set.all():
+        for ann in m_obj.annotation_set.all():  # Todo: needs to work also when highlighter package not installed
             ann.entity_link.remove(m_obj)
             ann.entity_link.add(self.objct)
         for txt in m_obj.text.all():
@@ -147,8 +147,8 @@ class GenericRDFParser(object):
             else:
                 return self.objct
 
-    def __init__(self, uri, kind, app_label_entities="entities",
-                 app_label_relations="relations", app_label_vocabularies="vocabularies", **kwargs):
+    def __init__(self, uri, kind, app_label_entities="apis_entities",
+                 app_label_relations="apis_relations", app_label_vocabularies="apis_vocabularies", **kwargs):
         """
         :param uri: (url) Uri to parse the object from (http://test.at). The uri must start with a base url mentioned in the RDF parser settings file.
         :param kind: (string) Kind of entity (Person, Place, Institution, Work, Event)

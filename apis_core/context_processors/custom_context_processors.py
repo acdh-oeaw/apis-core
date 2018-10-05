@@ -6,8 +6,8 @@ from django.conf import settings
 
 def add_entities(request):
     ent_list = []
-    for name, obj in inspect.getmembers(sys.modules['entities.models'], inspect.isclass):
-        if obj.__module__ == 'entities.models':
+    for name, obj in inspect.getmembers(sys.modules['apis_core.apis_entities.models'], inspect.isclass):
+        if obj.__module__ == 'apis_core.apis_entities.models':
             ent_list.append(str(name).lower())
     res = {
         'entities_list': ent_list,
