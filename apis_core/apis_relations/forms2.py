@@ -11,6 +11,7 @@ from django.db.models import Q
 from django.conf import settings
 from dal import autocomplete
 from django.core.validators import URLValidator
+from django.urls import reverse
 
 from apis_core.apis_metainfo.models import TempEntityClass, Text
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
@@ -163,13 +164,14 @@ class GenericRelationForm(forms.ModelForm):
             self.fields['relation_type'] = autocomplete.Select2ListCreateChoiceField(
                 label='Relation type',
                 widget=autocomplete.ListSelect2(
-                    url='/vocabularies/autocomplete/{}{}relation/normal'.format(
-                        lst_src_target[0].lower(), lst_src_target[1].lower()),
+                    #url='/vocabularies/autocomplete/{}{}relation/normal'.format(lst_src_target[0].lower(), lst_src_target[1].lower()),
+                    url=reverse('apis:apis_vocabularies:generic_vocabularies_autocomplete', args=[''.join([lst_src_target[0].lower(), lst_src_target[1].lower(), 'relation']), 'normal']),
                     attrs=attrs))
             self.fields['target'] = autocomplete.Select2ListCreateChoiceField(
                 label=lst_src_target[1],
                 widget=autocomplete.ListSelect2(
-                    url='/entities/autocomplete/{}'.format(lst_src_target[1].lower()),
+                    #url='/entities/autocomplete/{}'.format(lst_src_target[1].lower()),
+                    url = reverse('apis:apis_entities:generic_entities_autocomplete', args=[lst_src_target[1].lower()]),
                     attrs=attrs),
                 validators=[URLValidator])
         elif entity_type.lower() == lst_src_target[0].lower():
@@ -179,13 +181,14 @@ class GenericRelationForm(forms.ModelForm):
             self.fields['relation_type'] = autocomplete.Select2ListCreateChoiceField(
                 label='Relation type',
                 widget=autocomplete.ListSelect2(
-                    url='/vocabularies/autocomplete/{}{}relation/normal'.format(
-                        lst_src_target[0].lower(), lst_src_target[1].lower()),
+                    #url='/vocabularies/autocomplete/{}{}relation/normal'.format(lst_src_target[0].lower(), lst_src_target[1].lower()),
+                    url=reverse('apis:apis_vocabularies:generic_vocabularies_autocomplete', args=[''.join([lst_src_target[0].lower(), lst_src_target[1].lower(), 'relation']), 'normal']),
                     attrs=attrs))
             self.fields['target'] = autocomplete.Select2ListCreateChoiceField(
                 label=lst_src_target[1],
                 widget=autocomplete.ListSelect2(
-                    url='/entities/autocomplete/{}'.format(lst_src_target[1].lower()),
+                    #url='/entities/autocomplete/{}'.format(lst_src_target[1].lower()),
+                    url = reverse('apis:apis_entities:generic_entities_autocomplete', args=[lst_src_target[1].lower()]),
                     attrs=attrs),
                 validators=[URLValidator])
         elif entity_type.lower() == lst_src_target[1].lower():
@@ -195,13 +198,14 @@ class GenericRelationForm(forms.ModelForm):
             self.fields['relation_type'] = autocomplete.Select2ListCreateChoiceField(
                 label='Relation type',
                 widget=autocomplete.ListSelect2(
-                    url='/vocabularies/autocomplete/{}{}relation/reverse'.format(
-                        lst_src_target[0].lower(), lst_src_target[1].lower()),
+                    #url='/vocabularies/autocomplete/{}{}relation/reverse'.format(lst_src_target[0].lower(), lst_src_target[1].lower()),
+                    url=reverse('apis:apis_vocabularies:generic_vocabularies_autocomplete', args=[''.join([lst_src_target[0].lower(), lst_src_target[1].lower(), 'relation']), 'reverse']),
                     attrs=attrs))
             self.fields['target'] = autocomplete.Select2ListCreateChoiceField(
                 label=lst_src_target[0],
                 widget=autocomplete.ListSelect2(
-                    url='/entities/autocomplete/{}'.format(lst_src_target[0].lower()),
+                    #url='/entities/autocomplete/{}'.format(lst_src_target[0].lower()),
+                    url = reverse('apis:apis_entities:generic_entities_autocomplete', args=[lst_src_target[0].lower()]),
                     attrs=attrs),
                 validators=[URLValidator])
         else:

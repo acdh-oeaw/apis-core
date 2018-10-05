@@ -325,7 +325,7 @@ class GenericVocabulariesAutocomplete(autocomplete.Select2ListView):
         vocab = self.kwargs['vocab']
         direct = self.kwargs['direct']
         q = self.q
-        vocab_model = ContentType.objects.get(app_label='vocabularies', model=vocab).model_class()
+        vocab_model = ContentType.objects.get(app_label='apis_vocabularies', model=vocab).model_class()
         if direct == 'normal':
             if vocab_model.__bases__[0] == VocabsBaseClass:
                 choices = [{'id': x.pk, 'text': x.name} for x in vocab_model.objects.filter(name__icontains=q)]

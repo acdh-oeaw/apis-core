@@ -94,11 +94,11 @@ def get_form_ajax(request):
     if FormName and form_match:
         entity_type_v1 = ContentType.objects.filter(
             model='{}{}'.format(form_match.group(1).lower(), form_match.group(2)).lower(),
-            app_label='relations')
+            app_label='apis_relations')
     elif FormName and form_match2:
         entity_type_v2 = ContentType.objects.filter(
             model='{}'.format(form_match.group(1).lower(),
-            app_label='entities'))
+            app_label='apis_entities'))
     else:
         entity_type_v1 = ContentType.objects.none()
     if ObjectID == 'false' or ObjectID is None or ObjectID == 'None':
