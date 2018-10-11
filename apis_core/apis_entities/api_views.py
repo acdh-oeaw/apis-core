@@ -161,7 +161,7 @@ class NetJsonViewSet(viewsets.ViewSet):
             ann_include_all = True
         else:
             ann_include_all = False
-        q = ContentType.objects.get(app_label='relations', model=''.join(rel.split('-'))).model_class()
+        q = ContentType.objects.get(app_label='apis_relations', model=''.join(rel.split('-'))).model_class()
         rel_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+$)', rel)
         lst_nodes = []
         rel_a = 'related_' + rel.split('-')[0]

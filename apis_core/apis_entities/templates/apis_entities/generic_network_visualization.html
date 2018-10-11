@@ -4,64 +4,64 @@
 {% load crispy_forms_tags %}
 {% block scriptHeader %}
 {{ block.super }}
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/sigma.core.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/conrad.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/utils/sigma.utils.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/utils/sigma.polyfills.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/sigma.settings.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/classes/sigma.classes.dispatcher.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/classes/sigma.classes.configurable.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/classes/sigma.classes.graph.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/classes/sigma.classes.camera.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/classes/sigma.classes.quad.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/captors/sigma.captors.mouse.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/captors/sigma.captors.touch.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/sigma.renderers.canvas.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/sigma.renderers.webgl.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/sigma.renderers.svg.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/sigma.renderers.def.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/webgl/sigma.webgl.nodes.def.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/webgl/sigma.webgl.nodes.fast.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/webgl/sigma.webgl.edges.def.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/webgl/sigma.webgl.edges.fast.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/webgl/sigma.webgl.edges.arrow.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.labels.def.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.hovers.def.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.nodes.def.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edges.def.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edges.curve.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edges.arrow.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edges.curvedArrow.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edgehovers.def.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edgehovers.curve.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edgehovers.arrow.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.extremities.def.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.utils.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.nodes.def.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.edges.def.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.edges.curve.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.edges.curvedArrow.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.labels.def.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.hovers.def.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/middlewares/sigma.middlewares.rescale.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/middlewares/sigma.middlewares.copy.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/misc/sigma.misc.animation.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/misc/sigma.misc.bindEvents.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/misc/sigma.misc.bindDOMEvents.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/misc/sigma.misc.drawHovers.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/sigma.core.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/conrad.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/utils/sigma.utils.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/utils/sigma.polyfills.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/sigma.settings.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/classes/sigma.classes.dispatcher.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/classes/sigma.classes.configurable.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/classes/sigma.classes.graph.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/classes/sigma.classes.camera.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/classes/sigma.classes.quad.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/captors/sigma.captors.mouse.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/captors/sigma.captors.touch.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/sigma.renderers.canvas.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/sigma.renderers.webgl.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/sigma.renderers.svg.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/sigma.renderers.def.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/webgl/sigma.webgl.nodes.def.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/webgl/sigma.webgl.nodes.fast.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/webgl/sigma.webgl.edges.def.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/webgl/sigma.webgl.edges.fast.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/webgl/sigma.webgl.edges.arrow.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.labels.def.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.hovers.def.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.nodes.def.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edges.def.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edges.curve.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edges.arrow.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edges.curvedArrow.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edgehovers.def.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edgehovers.curve.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edgehovers.arrow.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.extremities.def.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.utils.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.nodes.def.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.edges.def.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.edges.curve.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.edges.curvedArrow.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.labels.def.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.hovers.def.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/middlewares/sigma.middlewares.rescale.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/middlewares/sigma.middlewares.copy.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/misc/sigma.misc.animation.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/misc/sigma.misc.bindEvents.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/misc/sigma.misc.bindDOMEvents.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/src/misc/sigma.misc.drawHovers.js' %}"></script>
 <!-- END SIGMA IMPORTS -->
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.parsers.json/sigma.parsers.json.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.parsers.gexf/sigma.parsers.gexf.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.plugins.animate/sigma.plugins.animate.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.layouts.forceLink/worker.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.layouts.forceLink/supervisor.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.plugins.animate/sigma.plugins.animate.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.layouts.fruchtermanReingold/sigma.layout.fruchtermanReingold.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.plugins.tooltips/sigma.plugins.tooltips.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.exporters.json/sigma.exporters.json.js' %}"></script>
-<script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.exporters.graphml/sigma.exporters.graphml.js' %}"></script>
-
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/plugins/sigma.parsers.json/sigma.parsers.json.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/plugins/sigma.parsers.gexf/sigma.parsers.gexf.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/plugins/sigma.plugins.animate/sigma.plugins.animate.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/plugins/sigma.layouts.forceLink/worker.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/plugins/sigma.layouts.forceLink/supervisor.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/plugins/sigma.plugins.animate/sigma.plugins.animate.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/plugins/sigma.layouts.fruchtermanReingold/sigma.layout.fruchtermanReingold.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/plugins/sigma.plugins.tooltips/sigma.plugins.tooltips.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/plugins/sigma.exporters.json/sigma.exporters.json.js' %}"></script>
+<script src="{% static 'apis_webpage/libraries/bower_components/linkurious.js/plugins/sigma.exporters.graphml/sigma.exporters.graphml.js' %}"></script>
+{% include "apis_entities/tags/apis_templatetag.html" %}
 <style type="text/css">
 
       #graph-container {
@@ -188,8 +188,8 @@
     </div>
 </div>
 </div>
-{% endblock %}
 
+{% endblock %}
 {% block scripts %}
 {{block.super}}
 <script type="text/javascript">
@@ -197,7 +197,7 @@
 function download_network_data(formData) {
     $.ajax({
           type: 'POST',
-          url: '{% url "NetJson-list" %}',
+          url: '{% url "apis:NetJson-list" %}',
           data: formData,
           beforeSend: function(request) {
                   var csrftoken = getCookie('csrftoken');
@@ -419,6 +419,7 @@ function unbind_net_viz_form(){
 }
 
 $( document ).ready(function() {
+	console.log('running unbind')
 unbind_net_viz_form();
 unbind_create_file_form();
 $("#graph-container").on("contextmenu", function(e) { e.preventDefault(); });
@@ -468,13 +469,14 @@ var config = {
 $('#id_select_relation').on("change", function(){
     var list_ent = $(this).val().split('-')
     console.log(list_ent);
+    console.log("changed");
     //$('#id_select_kind-autocomplete').yourlabsAutocomplete('destroy');
     //$('#id_select_kind-autocomplete').yourlabsAutocomplete({'url': new_val, 'minimumCharacters': 2});
 
     $('#id_search_source').select2('destroy');
     $('#id_search_source').select2({
           ajax: {
-            url: '/entities/autocomplete-network/'+list_ent[0],
+		  url: "{% url 'apis_core:apis_entities:generic_network_entities_autocomplete' 334488  %}".replace("334488", list_ent[0].toString()),
             dataType: 'json'
             // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
           }
@@ -483,8 +485,8 @@ $('#id_select_relation').on("change", function(){
     $('#id_search_target').select2({
         allowClear: true,
           ajax: {
-            url: '/entities/autocomplete-network/'+list_ent[1],
-            dataType: 'json'
+		  url: "{% url 'apis_core:apis_entities:generic_network_entities_autocomplete' 334488 %}".replace("334488", list_ent[1].toString()),
+            	dataType: 'json'
             // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
           }
         });
@@ -492,7 +494,7 @@ $('#id_select_relation').on("change", function(){
     $('#id_select_kind').select2({
         allowClear: true,
           ajax: {
-            url: '/vocabularies/autocomplete/'+list_ent[0]+list_ent[1]+'relation/normal',
+		  url: "{% url 'apis_core:apis_vocabularies:generic_vocabularies_autocomplete' 223344 'normal' %}".replace("223344", list_ent[0]+list_ent[1]+'relation'),
             dataType: 'json'
             // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
           }

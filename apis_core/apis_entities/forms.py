@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from dal import autocomplete
+from .fields import ListSelect2 
 from django import forms
 from django.urls import reverse_lazy
 from crispy_forms.helper import FormHelper
@@ -241,25 +242,25 @@ class NetworkVizFilterForm(forms.Form):
         super(NetworkVizFilterForm, self).__init__(*args, **kwargs)
         self.fields['select_relation'] = forms.ChoiceField(
             label='Relation type',
-            choices=list(('-'.join(x.name.split()), x.name) for x in ContentType.objects.filter(app_label='relations')),
+            choices=list(('-'.join(x.name.split()), x.name) for x in ContentType.objects.filter(app_label='apis_relations')),
             help_text="Include only relations related to this annotation project \
             (See the include general relations checkbox)")
         self.fields['select_relation'].initial = ('person-place', 'person place')
         self.fields['search_source'] = autocomplete.Select2ListCreateChoiceField(
                                         label='Search source',
-                                        widget=autocomplete.ListSelect2(
+                                        widget=ListSelect2(
                                             url=reverse('apis:apis_entities:generic_network_entities_autocomplete',
                                                         kwargs={'entity': 'person'}),
                                             attrs=attrs))
         self.fields['search_target'] = autocomplete.Select2ListCreateChoiceField(
                                         label='Search target',
-                                        widget=autocomplete.ListSelect2(
+                                        widget=ListSelect2(
                                             url=reverse('apis:apis_entities:generic_network_entities_autocomplete',
                                                         kwargs={'entity': 'place'}),
                                             attrs=attrs))
         self.fields['select_kind'] = autocomplete.Select2ListCreateChoiceField(
                                         label='Select kind',
-                                        widget=autocomplete.ListSelect2(
+                                        widget=ListSelect2(
                                             url=reverse('apis:apis_vocabularies:generic_vocabularies_autocomplete',
                                                         kwargs={'vocab': 'personplacerelation',
                                                                 'direct': 'normal'}),
@@ -273,7 +274,7 @@ class NetworkVizFilterForm(forms.Form):
                 (See the include general relations checkbox)")
         self.helper = FormHelper()
         self.helper.form_class = 'FilterNodesForm'
-        self.helper.form_action = 'NetJson-list'
+        self.helper.form_action = 'apis:NetJson-list'
         self.helper.add_input(Submit('Submit', 'Add nodes'))
         self.order_fields(('select_relation', 'ann_include_all',
                            'annotation_proj', 'search_source', 'select_kind', 'search_target'))
