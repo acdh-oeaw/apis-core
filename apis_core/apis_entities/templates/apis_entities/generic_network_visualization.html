@@ -258,8 +258,8 @@ function process_selected_nodes(e) {
         };
         $.ApisNet.selected_nodes = new Array();
     } else if (e.keyCode == 69 && e.ctrlKey) {
-        event.stopPropagation();
-        event.preventDefault();
+        e.stopPropagation();
+        e.preventDefault();
         if (typeof $.ApisNet.nodes_expand == 'undefined') {
             $.ApisNet.nodes_expand = new Array();
         }
