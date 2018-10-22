@@ -171,7 +171,6 @@ class NetJsonViewSet(viewsets.ViewSet):
         if rel_a == rel_b:
             rel_a += 'A'
             rel_b += 'B'
-            q_list = []
         if 'search_source' in request.data.keys():
             source = request.data['search_source']
             if source.startswith('cl:'):
