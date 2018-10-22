@@ -21,6 +21,8 @@ from apis_core.apis_entities.models import Person, Institution, Place, Event, Wo
 from apis_core.apis_entities.forms import PersonResolveUriForm, GenericEntitiesStanbolForm
 from apis_core.apis_labels.models import Label
 from django.views.decorators.csrf import csrf_exempt
+from .tables import EntityLabelTable
+
 
 
 import json, re
@@ -95,12 +97,15 @@ def get_form_ajax(request):
         entity_type_v1 = ContentType.objects.filter(
             model='{}{}'.format(form_match.group(1).lower(), form_match.group(2)).lower(),
             app_label='apis_relations')
+        entity_type_v2 = ContentType.objects.none()
     elif FormName and form_match2:
         entity_type_v2 = ContentType.objects.filter(
             model='{}'.format(form_match.group(1).lower(),
             app_label='apis_entities'))
+        entity_type_v1 = ContentType.objects.none()
     else:
         entity_type_v1 = ContentType.objects.none()
+        entity_type_v2 = ContentType.objects.none()
     if ObjectID == 'false' or ObjectID is None or ObjectID == 'None':
         ObjectID = False
         form_dict = {'entity_type': entity_type_str}

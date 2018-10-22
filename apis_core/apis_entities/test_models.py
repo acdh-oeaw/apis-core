@@ -2,13 +2,13 @@ from django.test import TestCase
 from django.contrib.auth.models import User, Group
 
 from .models import Person, Place, Institution, Work, Event
-from metainfo.models import Text, Collection, Source, Uri, UriCandidate
-from vocabularies.models import PersonPlaceRelation
-from labels.models import Label
-from relations.models import PersonPlace
+from apis_core.apis_metainfo.models import Text, Collection, Source, Uri, UriCandidate
+from apis_core.apis_vocabularies.models import PersonPlaceRelation
+from apis_core.apis_labels.models import Label
+from apis_core.apis_relations.models import PersonPlace
 from reversion.models import Version
 from reversion import revisions as reversion
-from helper_functions.RDFparsers import GenericRDFParser
+from apis_core.helper_functions.RDFparsers import GenericRDFParser
 
 from datetime import datetime
 from guardian.shortcuts import assign_perm, remove_perm, get_objects_for_user
