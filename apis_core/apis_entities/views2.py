@@ -125,10 +125,14 @@ class GenericEntitiesEditView(View):
         else:
             template = select_template(['apis_entities/{}_create_generic.html'.format(entity),
                                         'apis_entities/entity_create_generic.html'])
-            return HttpResponse(template.render(request=request, context={
+            context = { 
                 'form': form,
                 'form_text': form_text,
-                'instance': instance}))
+                'instance': instance}
+            if entity.lower() != 'place':
+                form_merge_with = GenericEntitiesStanbolForm(entity, ent_merge_pk=pk)
+                context['form_merge_with'] = form_merge_with
+            return HttpResponse(template.render(request=request, context=context))
 
 
 @method_decorator(login_required, name='dispatch')
