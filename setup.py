@@ -11,11 +11,7 @@ bower_json = {
     "dependencies": {
         "jquery": "^3.2.1",
         "bootstrap": "^3.3.7",
-        "bootstrap-multiselect": "^0.9.13",
-        "bootstrap-datepicker": "^1.7.0",
-        "jquery-tablesort": "^0.0.11",
         "leaflet": "^1.1.0",
-        "tooltipster": "^4.2.5",
         "leaflet.markercluster": "Leaflet.markercluster#^1.0.6",
      },
     "resolutions": {
