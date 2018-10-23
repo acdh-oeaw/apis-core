@@ -2,6 +2,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.utils.decorators import method_decorator
 from django.urls import reverse
 from django.views.generic.edit import DeleteView
@@ -144,12 +145,18 @@ class GenericListView(SingleTableView):
         print('Kwargs: {}'.format(self.request))
 
 
-@method_decorator(login_required, name='dispatch')
-class GenericListViewNew(ExportMixin, SingleTableView):
+class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
     formhelper_class = GenericFilterFormHelper
     context_filter_name = 'filter'
     paginate_by = 25
     template_name = 'apis_entities/generic_list.html'
+    login_url = '/accounts/login/'
+
+    def test_func(self):
+        print('HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHh')
+        print(self.request.user)
+        print(dir(self.request.user))
+        return self.request.user.is_authenticated
 
     def get_queryset(self, **kwargs):
         self.entity = self.kwargs.get('entity')
@@ -162,7 +169,11 @@ class GenericListViewNew(ExportMixin, SingleTableView):
 
     def get_table(self, **kwargs):
         self.request = set_session_variables(self.request)
-        edit_v = self.request.session.get('edit_views', False)
+        session = getattr(self.request, 'session', False)
+        if session:
+            edit_v = self.request.session.get('edit_views', False)
+        else:
+            edit_v = False
         self.table_class = get_entities_table(self.entity.title(), edit_v)
         table = super(GenericListViewNew, self).get_table()
         RequestConfig(self.request, paginate={

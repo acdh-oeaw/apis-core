@@ -125,7 +125,7 @@ class GenericEntitiesEditView(View):
         else:
             template = select_template(['apis_entities/{}_create_generic.html'.format(entity),
                                         'apis_entities/entity_create_generic.html'])
-            context = { 
+            context = {
                 'form': form,
                 'form_text': form_text,
                 'instance': instance}

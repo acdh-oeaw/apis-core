@@ -18,17 +18,26 @@
             <div class="card">
                 <div class="card-body">
                     <div id="filter-container">
-                        {% block create_button %}
-                        <div>
-                            <a class="btn btn-primary btn-small" href="/apis/entities/entity/{{entity}}/create">create new {{entity}}</a>
-                        </div>
-                        <hr/>
+                        <h3>{{entity}}</h3>
                         {% load django_tables2 crispy_forms_tags %}
-                        {% crispy entity_create_stanbol  entity_create_stanbol.helper %}
-                        {% endblock %}
+
                     <hr/>
                         {% crispy filter.form filter.form.helper %}
+
                     </div>
+                    {% block create_button %}
+                    {% if user.is_authenticated %}
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>create new {{ entity }}</h4>
+                            </div>
+                            <div class="card-body">
+                                {% crispy entity_create_stanbol  entity_create_stanbol.helper %}
+                                <a class="btn btn-primary btn-small" href="/apis/entities/entity/{{entity}}/create">create new {{entity}}</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% endblock %}
                 </div>
             </div>
         </div>
