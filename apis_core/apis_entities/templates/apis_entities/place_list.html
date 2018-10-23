@@ -2,14 +2,14 @@
 {% block Titel %} See all Places {% endblock %}
 {% block content %}
 
-<div class="panel panel-default">
-	<div class="panel-heading">
+<div class="card card-default">
+	<div class="card-heading">
 		<h1>All Places</h1>
 		<!--<div>
 			<a class="btn btn-primary btn-lg" href="{% url 'apis:apis_entities:place_create' %}">create new Place</a>
 		</div>-->
 	</div>
-	<div class="panel-body">
+	<div class="card-body">
 	<form method='get' action="{% url 'apis:apis_entities:place_list' %}?page=1">
 		{% load crispy_forms_tags %}
 		{% crispy SearchForm SearchForm.helper %}

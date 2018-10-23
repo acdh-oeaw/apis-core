@@ -9,21 +9,21 @@
 <div class="row">
 <form action="" method="post">
     <div class="col-md-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
+        <div class="card card-default">
+            <div class="card-heading">
             	<h3><strong>{{ instance }}</strong></h3>
             </div>
-            <div class="panel-body">
-                <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingOneOne">
-                          <h4 class="panel-title">
+            <div class="card-body">
+                <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingOneOne">
+                          <h4 class="card-title">
                             <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOneOne" aria-expanded="false" aria-controls="collapseFour">
                                 Texts
                             </a>
                           </h4>
                         </div>
-                        <div id="collapseOneOne" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
-                          <div class="panel-body">
+                        <div id="collapseOneOne" class="card-collapse collapse" role="tabcard" aria-labelledby="headingFour">
+                          <div class="card-body">
                           {% if form_text %}
                         
                             {% crispy form_text %}
@@ -47,40 +47,40 @@
 </form>
 
     <div class="col-md-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
+        <div class="card card-default">
+            <div class="card-heading">
                 <h3>related to</h3>
             </div>
-            <div class="panel-body"> 
-                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingOne">
-                            <h4 class="panel-title">
+            <div class="card-body"> 
+                <div class="card-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingOne">
+                            <h4 class="card-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                                     Map
                                 </a>
                             </h4>
                         </div>
                 
-                <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-                            <div id="tab_Map" class="panel-body">
+                <div id="collapseOne" class="card-collapse collapse in" role="tabcard" aria-labelledby="headingOne">
+                            <div id="tab_Map" class="card-body">
                                 <div id="map" style="height: 400px;"></div>
                 </div>
                         </div>
                     </div>
                 <hr/>
-                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingOne">
-                            <h4 class="panel-title">
+                <div class="card-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingOne">
+                            <h4 class="card-title">
                                 <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
                                     Places
                                 </a>
                             </h4>
                         </div>
                 
-                <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-                            <div id="tab_placePlace" class="panel-body">
+                <div id="collapseTwo" class="card-collapse collapse" role="tabcard" aria-labelledby="headingTwo">
+                            <div id="tab_placePlace" class="card-body">
                                 {% if object_place %}
                 <table class="table table-bordered">
 <!--                     <thead>
@@ -102,18 +102,18 @@
                         </div>
                     </div>
                 <hr/>
-                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingThree">
-                            <h4 class="panel-title">
+                <div class="card-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingThree">
+                            <h4 class="card-title">
                                 <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
                                     Persons
                                 </a>
                             </h4>
                         </div>
                 
-                <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                            <div id="tab_placePerson" class="panel-body">
+                <div id="collapseThree" class="card-collapse collapse" role="tabcard" aria-labelledby="headingThree">
+                            <div id="tab_placePerson" class="card-body">
                 {% if object_person %} 
                 <table class="table table-bordered">
 <!--                     <thead>
@@ -137,18 +137,18 @@
                     </div>
                 <hr/>
 
-                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingFour">
-                            <h4 class="panel-title">
+                <div class="card-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingFour">
+                            <h4 class="card-title">
                                 <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
                                     Institutions
                                 </a>
                             </h4>
                         </div>
                 
-                <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">
-                            <div id="tab_placeInstitution" class="panel-body">
+                <div id="collapseFour" class="card-collapse collapse" role="tabcard" aria-labelledby="headingOne">
+                            <div id="tab_placeInstitution" class="card-body">
                                 {% if object_institution %} 
                 <table class="table table-bordered">
 <!--                     <thead>
@@ -169,18 +169,18 @@
                         </div>
                     </div>
                 <hr/>               
-                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingFive">
-                            <h4 class="panel-title">
+                <div class="card-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingFive">
+                            <h4 class="card-title">
                                 <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
                                     Events
                                 </a>
                             </h4>
                         </div>
                 
-                <div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
-                            <div id="tab_placeEvent" class="panel-body">
+                <div id="collapseFive" class="card-collapse collapse" role="tabcard" aria-labelledby="headingFive">
+                            <div id="tab_placeEvent" class="card-body">
                                 {% if object_event %}
                 <table class="table table-bordered">
                     <!-- <thead>
@@ -202,18 +202,18 @@
                     </div>
                 <hr/>                
                 
-                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingSix">
-                            <h4 class="panel-title">
+                <div class="card-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingSix">
+                            <h4 class="card-title">
                                 <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="true" aria-controls="collapseSix">
                                     LOD
                                 </a>
                             </h4>
                         </div>
                 
-                <div id="collapseSix" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
-                            <div id="tab_LOD" class="panel-body">
+                <div id="collapseSix" class="card-collapse collapse" role="tabcard" aria-labelledby="headingSix">
+                            <div id="tab_LOD" class="card-body">
                                 {% if uri %}
                 <p>
                 <b>distinct Uri:</b>&nbsp;<a href="{{ uri.0.uri }}">{{ uri.0.uri }}</a>

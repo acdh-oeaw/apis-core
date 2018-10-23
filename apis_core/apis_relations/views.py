@@ -184,7 +184,7 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
             instance = form.save(instance=ObjectID, site_instance=site_instance)
         else:
             instance = form.save(site_instance=site_instance)
-        right_panel = True
+        right_card = True
         if test_form_relations.count() > 0:
             table_html = form.get_html_table(entity_type_str, request, site_instance, form_match)
         if 'Highlighter' in tab or form_match.group(3) == 'Highlighter':
@@ -210,7 +210,7 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
 
         elif tab == 'AddRelationHighlighterPerson' or tab == 'PlaceHighlighter' or tab == 'PersonHighlighter':
             table_html = None
-            right_panel = False
+            right_card = False
             call_function = 'PAddRelation_response'
             instance = None
         if instance:
@@ -225,7 +225,7 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
                 'instance': instance2,
                 'table_html': table_html2,
                 'text': hl_text,
-                'right_panel': right_panel}
+                'right_card': right_card}
     else:
         if 'Highlighter' in tab:
             call_function = 'HighlForm_response'

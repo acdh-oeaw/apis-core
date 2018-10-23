@@ -148,9 +148,9 @@
     </style>
 {% endblock %}
 {% block content %}
-<div class="panel panel-default panel-fixed">
-<div class="panel-heading"><h2>Network Visualization</h2></div>
-<div class="panel-body">
+<div class="card card-default card-fixed">
+<div class="card-heading"><h2>Network Visualization</h2></div>
+<div class="card-body">
     <div class="row">
         <div class="col-md-4">
             <div id="filter-container">
@@ -344,7 +344,7 @@ function add_file_list(data, s, xhr) {
         html += '">'+file_name+'</a></li>'
         $('#list_created_graphs').append(html)
     } else {
-        var html = '<div class="panel panel-default top-buffer"><div class="panel-heading">Files</div><div class="panel-body"><ul class="list-group" id="list_created_graphs">'
+        var html = '<div class="card card-default top-buffer"><div class="card-heading">Files</div><div class="card-body"><ul class="list-group" id="list_created_graphs">'
         html += '<li class="list-group-item"><a href="'
         html += data['file_name']
         html += '">'+file_name+'</a></li></ul></div></div>'

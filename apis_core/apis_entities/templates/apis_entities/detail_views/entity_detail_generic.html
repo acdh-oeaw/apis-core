@@ -12,8 +12,8 @@
 {% endblock scriptHeader %}
 {% block content %}
 <div class="row" xmlns="http://www.w3.org/1999/html">
-    <div class="panel panel-default procustom-panel-create">
-        <div class="panel-heading procustom-panel-heading">
+    <div class="card card-default procustom-card-create">
+        <div class="card-heading procustom-card-heading">
             <div class="row">
                 <div class="col-md-2">
                 {% if object.get_prev %}
@@ -44,7 +44,7 @@
         </div>
         <div class="row">
             <div class="col-md-6">
-                <div class="panel-body">
+                <div class="card-body">
                     <legend>General Info</legend>
                     {% block info-table %}
                     <table class="table table-bordered table-hover">
@@ -83,14 +83,14 @@
                     {% endblock info-table %}
                     <legend>Relations</legend>
                     {% block relations %}
-                    {% for obj in right_panel %}
+                    {% for obj in right_card %}
                         {% if obj.1.data|length > 0 %}
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"> {{ obj.0 }}</h4>
+                            <div class="card card-default">
+                                <div class="card-heading">
+                                    <h4 class="card-title"> {{ obj.0 }}</h4>
                                 </div>
-                                <div class="panel-body">
-                                    <div id="tab_{{ obj.2 }}" class="panel-body">
+                                <div class="card-body">
+                                    <div id="tab_{{ obj.2 }}" class="card-body">
                                             {% render_table obj.1 %}
                                     </div>
                                 </div>
@@ -115,9 +115,9 @@
             <div class="col-md-6">
               {% block right-pane-additional %}
               {% endblock right-pane-additional %}
-              {% block right-panel-text %}
+              {% block right-card-text %}
                 {% if object.text.all %}
-                    <div class="panel-body">
+                    <div class="card-body">
                         <legend>
                             Texts
                         </legend>
@@ -127,12 +127,12 @@
                             hansi
                         </div>
                         {% endif %}
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <h4 class="panel-title"> {{ x.kind }}</h4>
+                            <div class="card card-default">
+                                <div class="card-heading">
+                                    <h4 class="card-title"> {{ x.kind }}</h4>
                                 </div>
-                                <div class="panel-body">
-                                    <div class="panel-body" {% if "<text" in x.text %}id="sourctei"{% endif %}>
+                                <div class="card-body">
+                                    <div class="card-body" {% if "<text" in x.text %}id="sourctei"{% endif %}>
                                             {{ x.text }}
                                     </div>
                                 </div>
@@ -140,11 +140,11 @@
                         {% endfor %}
                     </div>
                 {% else %}
-                    <div class="panel-body">
+                    <div class="card-body">
                         <legend>No text provided for this {{entity}}</legend>
                     </div>
                 {% endif %}
-                {% endblock right-panel-text %}
+                {% endblock right-card-text %}
             </div>
         </div>
     </div>

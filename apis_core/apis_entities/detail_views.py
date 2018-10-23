@@ -31,9 +31,9 @@ class GenericEntitiesDetailView(View):
             match = str(rel).split()
             prefix = "{}{}-".format(match[0].title()[:2], match[1].title()[:2])
             table = get_generic_relations_table(''.join(match), entity, detail=True)
-            title_panel = ''
+            title_card = ''
             if match[0] == match[1]:
-                title_panel = entity.title()
+                title_card = entity.title()
                 dict_1 = {'related_' + entity.lower() + 'A': instance}
                 dict_2 = {'related_' + entity.lower() + 'B': instance}
                 if 'apis_highlighter' in settings.INSTALLED_APPS:
@@ -47,9 +47,9 @@ class GenericEntitiesDetailView(View):
                     objects.append(x.get_table_dict(instance))
             else:
                 if match[0].lower() == entity.lower():
-                    title_panel = match[1].title()
+                    title_card = match[1].title()
                 else:
-                    title_panel = match[0].title()
+                    title_card = match[0].title()
                 dict_1 = {'related_' + entity.lower(): instance}
                 if 'apis_highlighter' in settings.INSTALLED_APPS:
                     objects = list(rel.model_class()
@@ -61,7 +61,7 @@ class GenericEntitiesDetailView(View):
             tb_object_open = request.GET.get(prefix + 'page', None)
             RequestConfig(request, paginate={"per_page": 10}).configure(tb_object)
             side_bar.append(
-                (title_panel, tb_object, ''.join([x.title() for x in match]), tb_object_open)
+                (title_card, tb_object, ''.join([x.title() for x in match]), tb_object_open)
             )
         object_lod = Uri.objects.filter(entity=instance)
         object_texts, ann_proj_form = get_highlighted_texts(request, instance)
@@ -78,7 +78,7 @@ class GenericEntitiesDetailView(View):
             request=request, context={
                 'entity_type': entity,
                 'object': instance,
-                'right_panel': side_bar,
+                'right_card': side_bar,
                 'object_texts': object_texts,
                 'object_lod': object_lod
                 }

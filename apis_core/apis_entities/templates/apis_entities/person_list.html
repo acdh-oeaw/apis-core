@@ -2,14 +2,14 @@
 {% block Titel %} See all Persons {% endblock %}
 {% block content %}
 
-<div class="panel panel-default">
-	<div class="panel-heading">
+<div class="card card-default">
+	<div class="card-heading">
 		<h1>All Persons</h1>
 		<div>
 			<a class="btn btn-primary btn-lg" href="{% url 'apis:apis_entities:person_create' %}">create new Person</a>
 		</div>
 	</div>
-	<div class="panel-body">
+	<div class="card-body">
 		{% if object_list %}
 		<table class="table table-striped">
 			<thead>

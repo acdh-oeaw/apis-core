@@ -2,17 +2,17 @@
 {% load guardian_tags %}
 {% block Titel %}Create/Edit a Place{% endblock %}
 {% block additional_accordion %}
-<div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingOne">
-                            <h4 class="panel-title">
+<div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingOne">
+                            <h4 class="card-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                                     Map
                                 </a>
                             </h4>
                         </div>
 
-                <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-                            <div id="tab_Map" class="panel-body">
+                <div id="collapseOne" class="card-collapse collapse in" role="tabcard" aria-labelledby="headingOne">
+                            <div id="tab_Map" class="card-body">
                             <div class="input-group">
                                 <input type="text" class="form-control" id="place_search" placeholder="Search for...">
                                 <span class="input-group-btn">
@@ -20,7 +20,7 @@
                                 </span>
                             </div>
                                 <div id="map" style="height: 400px;"></div>
-                                <div class="panel panel-default">
+                                <div class="card card-default">
                                 <p>Use sequences of search terms (delimiter: ,) to limit the search to certain administrative divisions. E.g. "Österreich,Oberösterreich,Steyr". Use square brackets to set the min score difference to slice results. "Wien" will only show the capital of Austria, "Wien[30]" shows also a town in India.</p>
                                 </div>
                 </div>
@@ -123,7 +123,7 @@ function check_perms_relation(){
 <script type="text/javascript">
 
     $(function(){
-        {% for obj in right_panel %}
+        {% for obj in right_card %}
         GetFormAjax("{{obj.2|add:'Form'}}");
         //unbind_ajax_forms();
         {% endfor %}

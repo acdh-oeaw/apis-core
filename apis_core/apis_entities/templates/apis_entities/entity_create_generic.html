@@ -14,29 +14,31 @@
 {% load crispy_forms_tags %}
 {% load django_tables2 %}
 {% if instance %}
+<div class="container">
+
 <div class="row" xmlns="http://www.w3.org/1999/html">
     <div class="col-md-5">
 {% endif %}
-        <div class="panel panel-default">
-            <div class="panel-heading">
+        <div class="card card-default">
+            <div class="card-heading">
             	{% if instance %}
                     <h3><strong>{{ instance }}</strong></h3>
                 {% else %}
                     <h2><small>create new object type:</small> <strong>{{ entity_type|title }}</strong></h2>
                 {% endif %}
             </div>
-            <div class="panel-body">
+            <div class="card-body">
                 <form action="" method="post">
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingFour">
-                          <h4 class="panel-title">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingFour">
+                          <h4 class="card-title">
                             <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
                                 Texts
                             </a>
                           </h4>
                         </div>
-                        <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
-                          <div class="panel-body">
+                        <div id="collapseFour" class="card-collapse collapse" role="tabcard" aria-labelledby="headingFour">
+                          <div class="card-body">
                             {% block texts %}
                             {% crispy form_text %}
                             {% endblock %}
@@ -65,16 +67,16 @@
                 {% block linkedOpenData %}
                 {% if object_lod %}
                 <p></p>
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingSix">
-                            <h4 class="panel-title">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingSix">
+                            <h4 class="card-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne3" aria-expanded="false" aria-controls="collapseOne3">
                                     Linked Open Data
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseOne3" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingSix">
-                            <div id="tab_Revisions" class="panel-body">
+                        <div id="collapseOne3" class="card-collapse collapse" role="tabcard" aria-labelledby="headingSix">
+                            <div id="tab_Revisions" class="card-body">
                                 <p>{% for lod in object_lod %}{% if forloop.last %}<a href="{{ lod.uri }}">{{ lod.uri }}</a>{% else %}<a href="{{ lod.uri }}">{{ lod.uri }}</a>, {% endif %}{% endfor %}</p>
                             </div>
                         </div>
@@ -88,25 +90,25 @@
 {% endif %}
 {% if instance %}
     <div class="col-md-7">
-        <div class="panel panel-default">
-            <div class="panel-heading">
+        <div class="card card-default">
+            <div class="card-heading">
                 <h3>related to</h3>
             </div>
-            <div class="panel-body">
-                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+            <div class="card-body">
+                <div class="card" id="accordion" role="tablist" aria-multiselectable="true">
                 {% block additional_accordion %}
                 {% endblock %}
-                {% for obj in right_panel %}
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="heading{{forloop.counter}}">
-                            <h4 class="panel-title">
+                {% for obj in right_card %}
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="heading{{forloop.counter}}">
+                            <h4 class="card-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{forloop.counter}}" aria-expanded="true" aria-controls="collapse{{forloop.counter}}">
                                     {{ obj.0 }}
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapse{{forloop.counter}}" class="panel-collapse collapse{% if obj.3 %} in{% endif %}" role="tabpanel" aria-labelledby="heading{{forloop.counter}}">
-                            <div id="tab_{{ obj.2 }}" class="panel-body">
+                        <div id="collapse{{forloop.counter}}" class="card-collapse collapse{% if obj.3 %} in{% endif %}" role="tabcard" aria-labelledby="heading{{forloop.counter}}">
+                            <div id="tab_{{ obj.2 }}" class="card-body">
                                 {% render_table obj.1 %}
                             </div>
                         </div>
@@ -123,7 +125,7 @@
         {% if form_ann_agreement %}
     <div class="row">
 <div class="col-md-12">
-<div class="panel panel-default">
+<div class="card card-default">
     {% crispy form_ann_agreement form_ann_agreement.helper %}
     <div id="ann_agreement_tables"></div>
 </div>
@@ -134,20 +136,21 @@
 <div class="row">
 <div class="col-md-12">
   {% if ann_proj_form %}
-<div class="panel panel-default">
+<div class="card card-default">
 {% crispy ann_proj_form ann_proj_form.helper %}
 </div>
 {% endif %}
 {% for txt in object_texts %}
 
-<div class="panel panel-default">
-<div class="panel-body">
+<div class="card card-default">
+<div class="card-body">
     <div class="txt {{txt.kind|slugify}}" id="htxt_{{txt.id}}">{{txt.text|safe}}</div>
 
     <div class="agreement" id="agrm_{{txt.id}}"></div>
 </div>
 </div>
 {% endfor %}
+</div>
 </div>
 </div>
 {% endif %}
@@ -218,7 +221,7 @@
              initiate_compare_tooltip();
              {% if instance %}
              if (check_perms_relation()){
-             if (response.right_panel) {
+             if (response.right_card) {
                  console.log('fetching form');
                  console.log(response.tab+'Form');
              GetFormAjax(response.tab+'Form');};
@@ -311,7 +314,7 @@
 </script>
 <script type="text/javascript">
  function activate_editing(){
-        {% for obj in right_panel %}
+        {% for obj in right_card %}
         GetFormAjax("{{obj.2|add:'Form'}}");
         //unbind_ajax_forms();
         {% endfor %}

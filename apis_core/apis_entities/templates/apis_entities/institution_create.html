@@ -9,22 +9,22 @@
 <div class="row">
 
     <div class="col-md-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
+        <div class="card card-default">
+            <div class="card-heading">
             	<h3><strong>{{ instance }}</strong></h3>
             </div>
-            <div class="panel-body">
+            <div class="card-body">
             <form action="" method="post">
-                <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingFour">
-                          <h4 class="panel-title">
+                <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingFour">
+                          <h4 class="card-title">
                             <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
                                 Texts
                             </a>
                           </h4>
                         </div>
-                        <div id="collapseFour" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFour">
-                          <div class="panel-body">
+                        <div id="collapseFour" class="card-collapse collapse" role="tabcard" aria-labelledby="headingFour">
+                          <div class="card-body">
                         
                             {% if form_text %}
                         
@@ -52,16 +52,16 @@
                 </form>
                 {% if object_revisions %}
                 <p></p>
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingEight">
-                            <h4 class="panel-title">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingEight">
+                            <h4 class="card-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree2" aria-expanded="false" aria-controls="collapseThree2">
                                     Revisions
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseThree2" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingEight">
-                            <div id="tab_Revisions" class="panel-body">
+                        <div id="collapseThree2" class="card-collapse collapse in" role="tabcard" aria-labelledby="headingEight">
+                            <div id="tab_Revisions" class="card-body">
                                 <table class="table table-bordered">
                                     {% for rev in object_revisions %}
                                     <tr><td>{{ rev.revision.date_created }}</td><td>{{ rev.revision.user }}</td></tr>
@@ -81,22 +81,22 @@
     
     
     <div class="col-md-6">
-        <div class="panel panel-default">
-            <div class="panel-heading">
+        <div class="card card-default">
+            <div class="card-heading">
                 <h3>related to</h3>
             </div>
-            <div class="panel-body"> 
-                <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingOne">
-                            <h4 class="panel-title">
+            <div class="card-body"> 
+                <div class="card-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingOne">
+                            <h4 class="card-title">
                                 <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                                     Places
                                 </a>
                             </h4>
                         </div>
-                        <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
-                            <div id="tab_InstitutionPlace" class="panel-body">
+                        <div id="collapseOne" class="card-collapse collapse in" role="tabcard" aria-labelledby="headingOne">
+                            <div id="tab_InstitutionPlace" class="card-body">
                             
                                 <table class="table table-bordered">
                                     {% for x in object_place %}
@@ -118,16 +118,16 @@
                             </div>
                         </div>
                     </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingTwo">
-                            <h4 class="panel-title">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingTwo">
+                            <h4 class="card-title">
                                 <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                                     Persons
                                 </a>
                             </h4>
                         </div>
-                    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-                        <div id="tab_InstitutionPerson" class="panel-body">
+                    <div id="collapseTwo" class="card-collapse collapse" role="tabcard" aria-labelledby="headingTwo">
+                        <div id="tab_InstitutionPerson" class="card-body">
                         
                             <table class="table table-bordered">
                                 {% for x in object_person %}
@@ -156,16 +156,16 @@
                         </div>
                         </div>
                       </div>
-                      <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingThree">
-                          <h4 class="panel-title">
+                      <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingThree">
+                          <h4 class="card-title">
                             <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
                                 Institutions
                             </a>
                           </h4>
                         </div>
-                        <div id="collapseThree" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingThree">
-                          <div id="tab_InstitutionInstitution" class="panel-body">
+                        <div id="collapseThree" class="card-collapse collapse" role="tabcard" aria-labelledby="headingThree">
+                          <div id="tab_InstitutionInstitution" class="card-body">
                             
                                 <table class="table table-bordered">
                                     {% for x in object_institutionA %}
@@ -197,16 +197,16 @@
                           </div>
                         </div>
                       </div>
-                      <div class="panel panel-default">
-                          <div class="panel-heading" role="tab" id="headingSix">
-                              <h4 class="panel-title">
+                      <div class="card card-default">
+                          <div class="card-heading" role="tab" id="headingSix">
+                              <h4 class="card-title">
                                   <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="true" aria-controls="collapseSix">
                                       Labels
                                   </a>
                               </h4>
                           </div>
-                          <div id="collapseSix" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingSix">
-                          <div id="tab_InstitutionLabel" class="panel-body">
+                          <div id="collapseSix" class="card-collapse collapse in" role="tabcard" aria-labelledby="headingSix">
+                          <div id="tab_InstitutionLabel" class="card-body">
                               <table class="table table-bordered">
                                     {% for x in object_labels %}
                                     <tr id="label_{{x.pk}}">
@@ -222,16 +222,16 @@
                             </div>
                           </div>
                       </div>
-                      <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingFive">
-                          <h4 class="panel-title">
+                      <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingFive">
+                          <h4 class="card-title">
                             <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
                                 Events
                             </a>
                           </h4>
                         </div>
-                        <div id="collapseFive" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFive">
-                          <div class="panel-body">
+                        <div id="collapseFive" class="card-collapse collapse" role="tabcard" aria-labelledby="headingFive">
+                          <div class="card-body">
                             {% if object_event %}
                                 <table class="table table-bordered">
                                     <tbody>

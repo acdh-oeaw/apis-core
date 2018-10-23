@@ -40,9 +40,9 @@ class GenericEntitiesEditView(View):
             match = str(rel).split()
             prefix = "{}{}-".format(match[0].title()[:2], match[1].title()[:2])
             table = get_generic_relations_table(''.join(match), entity)
-            title_panel = ''
+            title_card = ''
             if match[0] == match[1]:
-                title_panel = entity.title()
+                title_card = entity.title()
                 dict_1 = {'related_' + entity.lower() + 'A': instance}
                 dict_2 = {'related_' + entity.lower() + 'B': instance}
                 if 'apis_highlighter' in settings.INSTALLED_APPS:
@@ -56,9 +56,9 @@ class GenericEntitiesEditView(View):
                     objects.append(x.get_table_dict(instance))
             else:
                 if match[0].lower() == entity.lower():
-                    title_panel = match[1].title()
+                    title_card = match[1].title()
                 else:
-                    title_panel = match[0].title()
+                    title_card = match[0].title()
                 dict_1 = {'related_' + entity.lower(): instance}
                 if 'apis_highlighter' in settings.INSTALLED_APPS:
                     objects = list(rel.model_class()
@@ -69,7 +69,7 @@ class GenericEntitiesEditView(View):
             tb_object = table(objects, prefix=prefix)
             tb_object_open = request.GET.get(prefix + 'page', None)
             RequestConfig(request, paginate={"per_page": 10}).configure(tb_object)
-            side_bar.append((title_panel, tb_object, ''.join([x.title() for x in match]), tb_object_open))
+            side_bar.append((title_card, tb_object, ''.join([x.title() for x in match]), tb_object_open))
         form = get_entities_form(entity.title())
         form = form(instance=instance)
         form_text = FullTextForm(entity=entity.title(), instance=instance)
@@ -96,7 +96,7 @@ class GenericEntitiesEditView(View):
             'form': form,
             'form_text': form_text,
             'instance': instance,
-            'right_panel': side_bar,
+            'right_card': side_bar,
             'object_revisions': object_revisions,
             'object_texts': object_texts,
             'object_lod': object_lod,
