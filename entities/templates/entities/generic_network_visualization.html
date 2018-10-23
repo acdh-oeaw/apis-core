@@ -64,8 +64,17 @@
 
 <style type="text/css">
 
+html, body, #content, #content > .panel, .panel-body, div.row {
+   	width: 100%;
+	height: 100%;
+   }
+div.col-md-9 {
+	height: 100%;
+}
       #graph-container {
-      height: 1000px;
+      width:100%;
+      height:100%;
+      margin:auto;
     }
 
     ul.dropdown-menu {
@@ -153,7 +162,7 @@
 <div class="panel-heading"><h2>Network Visualization</h2></div>
 <div class="panel-body">
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div id="filter-container">
                 {% crispy form %}
             </div>
@@ -182,7 +191,7 @@
         <hr/>
       </div>
 
-        <div class="col-md-8">
+        <div class="col-md-9">
             <div id="graph-container"></div>
         </div>
     </div>
