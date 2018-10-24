@@ -237,12 +237,51 @@ div.col-md-9 {
 <script type="text/javascript">
 $( "div#content" ).on( "click", "#filter2-button", function(e) {
 	e.preventDefault();
+$.ApisNet.selected_nodes = new Array();
 	console.log("click worked");
-	var sel = $('#filter2-type').val();
-	$.ApisNet.filter.filter.nodesBy(function(n) {
-  console.log(n.type);
-		return n.type == sel;
-}, 'node-type').apply();
+	var filters = new Object();
+	for (var f in $.ApisNet.filter.list_node_filters) {
+		filters[f] = $('#filter2-'+f).val()
+	}
+	console.log(filters);
+        $.ApisNet.instance.graph.nodes().forEach(function (n) {
+		var test = false;
+		for (var f2 in filters){
+			if (f2 == 'type') {
+			var d = n
+			} else {
+			var d = n.data
+			}
+			if (filters[f2] != null) {
+				var test2 = false
+				if ($.isArray(d[f2])){
+				for (var i = 0; i < d[f2].length; i++){
+					if (filters[f2].includes(d[f2][i])){
+					test2 = true
+					}
+				}
+				} else {
+					if (filters[f2].includes(d[f2])){
+					test2 = true
+					}	
+				}
+				if (test2){
+				test = true
+				} else {
+				test = false;
+				break;
+				}
+			}
+		}
+		if (test) {
+		n.color = '#f4e242';
+		$.ApisNet.selected_nodes.push(n);
+		}
+	
+	}
+)
+
+     $.ApisNet.instance.refresh();
 })
 function download_network_data(formData) {
     $.ajax({
@@ -320,8 +359,8 @@ function download_network_data(formData) {
 function delete_nodes(e) {
     $.ApisNet.instance.graph.dropNode(e.data['node']['id']);
     $.ApisNet.instance.refresh();
-    event.stopPropagation();
-    event.preventDefault();
+    e.stopPropagation();
+    e.preventDefault();
 
 };
 
@@ -337,8 +376,8 @@ function process_selected_nodes(e) {
         };
         $.ApisNet.selected_nodes = new Array();
     } else if (e.keyCode == 69 && e.ctrlKey) {
-        event.stopPropagation();
-        event.preventDefault();
+        e.stopPropagation();
+        e.preventDefault();
         if (typeof $.ApisNet.nodes_expand == 'undefined') {
             $.ApisNet.nodes_expand = new Array();
         }
