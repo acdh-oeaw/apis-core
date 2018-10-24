@@ -1,164 +1,161 @@
 {% extends "webpage/base.html" %}
 {% load staticfiles %}
 {% load django_tables2 %}
-{% block Titel %} {{ object.id }} {% endblock %}
+{% block title %} {{ object }} {% endblock %}
 {% block scriptHeader %}
 {{ block.super }}
-<link rel="stylesheet" href="http://teic.github.io/CETEIcean/css/CETEIcean.css" media="screen" charset="utf-8">
-<script src="http://teic.github.io/CETEIcean/js/CETEI.js"></script>
-<style>
-  html {margin: 0; padding: 0}
-</style>
 {% endblock scriptHeader %}
 {% block content %}
-<div class="row" xmlns="http://www.w3.org/1999/html">
-    <div class="card card-default procustom-card-create">
-        <div class="card-heading procustom-card-heading">
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
             <div class="row">
                 <div class="col-md-2">
-                {% if object.get_prev %}
-                    <h2>
-                        <a href="{% url 'apis:apis_entities:generic_entities_detail_view' entity=entity_type pk=object.get_prev %}"><span class="glyphicon glyphicon-chevron-left" aria-hidden="true" title="previous"></span></a>
+                    {% if object.get_prev %}
+                        <h2>
+                            <a href="{{ object.get_prev }}">
+                                <i class="fas fa-chevron-left" title="previous"></i>
+                            </a>
+                        </h2>
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <h2 style="text-align: center;">
+                        {{ object }}
+                        {% if user.is_authenticated %}
+                            <small>
+                                <a href="{{ object.get_edit_url }}">
+                                    <i class="far fa-edit" title="edit"></i>
+                                </a>
+                            </small>
+                            |
+                            <small>
+                                <a href="{{ object.get_delete_url }}">
+                                    <i class="far fa-trash-alt" title="delete"></i>
+                                </a>
+                            </small>
+                        {% endif %}
                     </h2>
+                </div>
+            <div class="col-md-2">
+                <h2>
+                    {% if object.get_next %}
+                    <a href="{{ object.get_next }}" style="float:right">
+                        <i class="fas fa-chevron-right" title="next"></i>
+                    </a>
+                </h2>
                 {% endif %}
-                </div>
-                <div class="col-md-8" style="text-align: center;">
-                    <h1>
-                      {{ object }}
-                      {% if user.is_authenticated %}
-                         <a href="{% url 'apis:apis_entities:generic_entities_edit_view' entity_type object.id %}">
-                            <span class="glyphicon glyphicon-pencil" aria-hidden="true" title="edit">
-                         </a>
-                     {% endif %}
-                    </h1>
-                    <small><a href="{% url 'apis:apis_entities:generic_entities_list' entity_type %}">see all {{entity_type}}</a></small>
-                </div>
-                <div class="col-md-2">
-                {% if object.get_next %}
-                    <h2>
-                        <a href="{% url 'apis:apis_entities:generic_entities_detail_view' entity=entity_type pk=object.get_next %}" style="float:right"><span class="glyphicon glyphicon-chevron-right" aria-hidden="true" title="next"></span></a>
-                    </h2>
-                {% endif %}
-                </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card-body">
-                    <legend>General Info</legend>
-                    {% block info-table %}
-                    <table class="table table-bordered table-hover">
-                        <tr>
-                            <th>
-                                Titel
-                            </th>
-                            <td>
-                                {{ object.name }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <th>
-                                Type
-                            </th>
-                            <td>
-                                {{ object.kind}}
-                            </td>
-                        </tr>
-                        {% if object.start_date or object.end_date %}
-                        <tr>
-                            <th>
-                                Date
-                            </th>
-                            <td>
-                                {% if object.start_date %}
-                                    <abbr title="{{ object.start_date_written }}">{{ object.start_date }}</abbr>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>General Info</h3>
+                        </div>
+                        <div class="card-body">
+                            {% block info-table %}
+                            <table class="table table-bordered table-hover">
+                                <tr>
+                                    <th>
+                                        Titel
+                                    </th>
+                                    <td>
+                                        {{ object.name }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Type
+                                    </th>
+                                    <td>
+                                        {{ object.kind}}
+                                    </td>
+                                </tr>
+                                {% if object.start_date or object.end_date %}
+                                <tr>
+                                    <th>
+                                        Date
+                                    </th>
+                                    <td>
+                                        {% if object.start_date %}
+                                            <abbr title="{{ object.start_date_written }}">{{ object.start_date }}</abbr>
+                                        {% endif %}
+                                        {% if object.end_date %}
+                                            - <abbr title="{{ object.end_date_written }}">{{ object.end_date }}</abbr>
+                                        {% endif %}
+                                    </td>
+                                </tr>
                                 {% endif %}
-                                {% if object.end_date %}
-                                    - <abbr title="{{ object.end_date_written }}">{{ object.end_date }}</abbr>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endif %}
-                    </table>
-                    {% endblock info-table %}
-                    <legend>Relations</legend>
-                    {% block relations %}
-                    {% for obj in right_card %}
-                        {% if obj.1.data|length > 0 %}
-                            <div class="card card-default">
-                                <div class="card-heading">
-                                    <h4 class="card-title"> {{ obj.0 }}</h4>
-                                </div>
-                                <div class="card-body">
-                                    <div id="tab_{{ obj.2 }}" class="card-body">
-                                            {% render_table obj.1 %}
-                                    </div>
-                                </div>
-                            </div>
-                        {% endif %}
-                    {% endfor %}
-                    {% endblock relations %}
-                    {% block images %}
-                    {% if object.work_depicted_by.all %}
-                        <legend>Images</legend>
-                        {% for x in object.work_depicted_by.all %}
-                            <li>
-                                {{ x }}
-                            </li>
-                        {% endfor %}
-                    {% endif %}
-                    {% endblock images %}
-                    {% block left-pane-additional %}
-                    {% endblock left-pane-additional %}
+                            </table>
+                            {% endblock info-table %}
+                            {% block left-pane-additional %}
+                            {% endblock left-pane-additional %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Relations</h3>
+                        </div>
+                        <div class="card-body">
+                            {% block relations %}
+                                {% for obj in right_card %}
+                                    {% if obj.1.data|length > 0 %}
+                                        <div class="card card-default">
+                                            <div class="card-heading">
+                                                <h4 class="card-title"> {{ obj.0 }}</h4>
+                                            </div>
+                                            <div class="card-body">
+                                                <div id="tab_{{ obj.2 }}" class="card-body">
+                                                        {% render_table obj.1 %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endblock relations %}
+                        </div>
                 </div>
             </div>
-            <div class="col-md-6">
-              {% block right-pane-additional %}
-              {% endblock right-pane-additional %}
-              {% block right-card-text %}
-                {% if object.text.all %}
-                    <div class="card-body">
-                        <legend>
-                            Texts
-                        </legend>
-                        {% for x in object.text.all %}
-                        {% if "<text" in x.text %}
-                        <div id="TEI">
-                            hansi
-                        </div>
-                        {% endif %}
-                            <div class="card card-default">
-                                <div class="card-heading">
-                                    <h4 class="card-title"> {{ x.kind }}</h4>
-                                </div>
-                                <div class="card-body">
-                                    <div class="card-body" {% if "<text" in x.text %}id="sourctei"{% endif %}>
-                                            {{ x.text }}
-                                    </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h2>Texts</h2>
+        </div>
+        <div class="card-body">
+            {% if object.text.all %}
+                <div class="card-body">
+                    <legend>
+                        Texts
+                    </legend>
+                    {% for x in object.text.all %}
+                        <div class="card card-default">
+                            <div class="card-heading">
+                                <h4 class="card-title"> {{ x.kind }}</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="card-body" {% if "<text" in x.text %}id="sourctei"{% endif %}>
+                                        {{ x.text }}
                                 </div>
                             </div>
-                        {% endfor %}
-                    </div>
-                {% else %}
-                    <div class="card-body">
-                        <legend>No text provided for this {{entity}}</legend>
-                    </div>
-                {% endif %}
-                {% endblock right-card-text %}
-            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="card-body">
+                    <legend>No text provided for this {{entity}}</legend>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
 {% endblock content %}
 {% block scripts %}
-{{block.super}}
-<script type="text/javascript">
-    var CETEIcean = new CETEI();
-    var teiString = $("#sourctei").text();
-    CETEIcean.makeHTML5(teiString, function(data) {
-        document.getElementById("TEI").innerHTML = "";
-        document.getElementById("TEI").appendChild(data);
-        CETEIcean.addStyle(document, data);
-    });
-</script>
+    {{block.super}}
 {% endblock scripts %}
