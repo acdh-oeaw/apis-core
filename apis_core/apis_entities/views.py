@@ -20,6 +20,8 @@ from reversion_compare.views import HistoryCompareDetailView
 import reversion
 from django_tables2.export.views import ExportMixin
 
+from apis_core.helper_functions.utils import access_for_all
+
 from .models import Person, Place, Institution, Event, Work
 from .forms import (
     FullTextForm, SearchForm, GenericFilterFormHelper,
@@ -153,10 +155,8 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
     login_url = '/accounts/login/'
 
     def test_func(self):
-        print('HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHh')
-        print(self.request.user)
-        print(dir(self.request.user))
-        return self.request.user.is_authenticated
+        access = access_for_all(self, viewtype="list")
+        return access
 
     def get_queryset(self, **kwargs):
         self.entity = self.kwargs.get('entity')
@@ -179,6 +179,7 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
         RequestConfig(self.request, paginate={
             'page': 1, 'per_page': self.paginate_by}).configure(table)
         return table
+        # return {'rows': [1, 2, 3]}
 
     def get_context_data(self, **kwargs):
         context = super(GenericListViewNew, self).get_context_data()
@@ -186,7 +187,6 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
         context['entity'] = self.entity
         context['entity_create_stanbol'] = GenericEntitiesStanbolForm(self.entity)
         return context
-
 
 
 ############################################################################
@@ -200,7 +200,7 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
 @login_required
 def getGeoJson(request):
     '''Used to retrieve GeoJsons for single objects'''
-    #if request.is_ajax():
+    # if request.is_ajax():
     pk_obj = request.GET.get("object_id")
     instance = get_object_or_404(Place, pk=pk_obj)
     uria = Uri.objects.filter(entity=instance)

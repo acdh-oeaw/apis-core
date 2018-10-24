@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db.models import Q
 from django.http import HttpResponse
 from django.template.loader import select_template
@@ -10,19 +11,30 @@ from django.shortcuts import get_object_or_404
 from django_tables2 import RequestConfig
 from django.conf import settings
 
+from apis_core.helper_functions.utils import access_for_all
+
 from .views import get_highlighted_texts
 from .models import Work
 from apis_core.apis_labels.models import Label
 from apis_core.apis_metainfo.models import Uri
-from apis_core.apis_relations.tables import get_generic_relations_table, EntityLabelTable, EntityDetailViewLabelTable
+from apis_core.apis_relations.tables import (
+    get_generic_relations_table, EntityLabelTable, EntityDetailViewLabelTable
+)
 
 
-class GenericEntitiesDetailView(View):
+class GenericEntitiesDetailView(UserPassesTestMixin, View):
+
+    login_url = '/accounts/login/'
+
+    def test_func(self):
+        access = access_for_all(self, viewtype="detail")
+        return access
 
     def get(self, request, *args, **kwargs):
         entity = kwargs['entity'].lower()
         pk = kwargs['pk']
-        entity_model = ContentType.objects.get(app_label='apis_entities', model=entity).model_class()
+        entity_model = ContentType.objects.get(
+            app_label='apis_entities', model=entity).model_class()
         instance = get_object_or_404(entity_model, pk=pk)
         relations = ContentType.objects.filter(app_label='apis_relations', model__icontains=entity)
         side_bar = []

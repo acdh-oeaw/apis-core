@@ -31,7 +31,8 @@ class GenericEntitiesEditView(View):
     def get(self, request, *args, **kwargs):
         entity = kwargs['entity']
         pk = kwargs['pk']
-        entity_model = ContentType.objects.get(app_label='apis_entities', model=entity).model_class()
+        entity_model = ContentType.objects.get(
+            app_label='apis_entities', model=entity).model_class()
         instance = get_object_or_404(entity_model, pk=pk)
         request = set_session_variables(request)
         relations = ContentType.objects.filter(app_label='apis_relations', model__icontains=entity)
