@@ -59,6 +59,19 @@ things which needs to be added to the project's settings and urls files
 ...
 ```
 
+## add apis specific context_processors
+
+```
+'OPTIONS': {
+    'context_processors': [
+        ...
+        'webpage.webpage_content_processors.is_dev_version',
+        'apis_core.context_processors.custom_context_processors.add_entities',
+        ...
+    ],
+},
+```
+
 ## APIS_ENTITIES
 
 ## optional:

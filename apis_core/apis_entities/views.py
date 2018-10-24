@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.utils.decorators import method_decorator
 from django.urls import reverse
@@ -48,6 +48,8 @@ from .filters import (
     get_generic_list_filter
 )
 
+from apis_core.helper_functions.utils import access_for_all, access_for_all_function
+
 
 import json
 
@@ -64,13 +66,12 @@ if 'apis_highlighter' in settings.INSTALLED_APPS:
 ############################################################################
 ############################################################################
 
-@login_required
+@user_passes_test(access_for_all_function)
 def set_session_variables(request):
     ann_proj_pk = request.GET.get('project', None)
     types = request.GET.getlist('types', None)
     users_show = request.GET.getlist('users_show', None)
     edit_views = request.GET.get('edit_views', False)
-    print('edit views: {}'.format(edit_views))
     if types:
         request.session['entity_types_highlighter'] = types
     if users_show:
@@ -83,7 +84,7 @@ def set_session_variables(request):
     return request
 
 
-@login_required
+@user_passes_test(access_for_all_function)
 def get_highlighted_texts(request, instance):
     if 'apis_highlighter' in settings.INSTALLED_APPS:
         set_ann_proj = request.session.get('annotation_project', 1)
@@ -156,6 +157,8 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
 
     def test_func(self):
         access = access_for_all(self, viewtype="list")
+        if access:
+            self.request = set_session_variables(self.request)
         return access
 
     def get_queryset(self, **kwargs):
@@ -168,7 +171,7 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
         return self.filter.qs
 
     def get_table(self, **kwargs):
-        self.request = set_session_variables(self.request)
+        #self.request = set_session_variables(self.request)
         session = getattr(self.request, 'session', False)
         if session:
             edit_v = self.request.session.get('edit_views', False)
@@ -176,6 +179,9 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
             edit_v = False
         self.table_class = get_entities_table(self.entity.title(), edit_v)
         table = super(GenericListViewNew, self).get_table()
+        print(dir(self.request))
+        print(self.request)
+
         RequestConfig(self.request, paginate={
             'page': 1, 'per_page': self.paginate_by}).configure(table)
         return table

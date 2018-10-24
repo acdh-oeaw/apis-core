@@ -9,10 +9,20 @@ def access_for_all(self, viewtype="list"):
             access = settings.APIS_LIST_VIEWS_ALLOWED
         except AttributeError:
             access = False
+            return access
         return access
     else:
         try:
-            access = settings.APIS_DETAILKJL_VIEWS_ALLOWED
+            access = settings.APIS_DETAIL_VIEWS_ALLOWED
         except AttributeError:
             access = False
+            return access
         return access
+
+
+def access_for_all_function(user):
+    if user.is_anonymous:
+        print(getattr(settings, 'APIS_DETAIL_VIEWS_ALLOWED', False))
+        return getattr(settings, 'APIS_DETAIL_VIEWS_ALLOWED', False)
+    else:
+        return True
