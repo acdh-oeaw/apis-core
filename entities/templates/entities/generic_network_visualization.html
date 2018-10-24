@@ -54,6 +54,7 @@
 <script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.parsers.json/sigma.parsers.json.js' %}"></script>
 <script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.parsers.gexf/sigma.parsers.gexf.js' %}"></script>
 <script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.plugins.animate/sigma.plugins.animate.js' %}"></script>
+<script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.plugins.filter/sigma.plugins.filter.js' %}"></script>
 <script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.layouts.forceLink/worker.js' %}"></script>
 <script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.layouts.forceLink/supervisor.js' %}"></script>
 <script src="{% static 'webpage/libraries/bower_components/linkurious.js/plugins/sigma.plugins.animate/sigma.plugins.animate.js' %}"></script>
@@ -155,6 +156,16 @@ div.col-md-9 {
       border-right-color: rgb(249, 247, 237);
       border-left-width: 0;
     }
+    #filter_network {
+    position: absolute;
+    top:10px;
+    right: 5px;
+    z-index:1000;
+    }
+    #filter_network option, #filter_network label {
+    text-transform:capitalize;
+}
+
     </style>
 {% endblock %}
 {% block content %}
@@ -192,7 +203,29 @@ div.col-md-9 {
       </div>
 
         <div class="col-md-9">
-            <div id="graph-container"></div>
+		<div id="graph-container"><div id="filter_network">
+                    <div class="panel panel-default">
+                        <div class="panel-heading" role="tab" id="headingNetworkFilter">
+                          <h4 class="panel-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseNetworkFilter" aria-expanded="false" aria-controls="collapseNetworkFilter">
+                                Filter
+                            </a>
+                          </h4>
+                        </div>
+                        <div id="collapseNetworkFilter" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingNetworkFilter">
+                          <div class="panel-body">
+                            
+				<form class="form" id="filter2-form">
+					
+				    <div class="form-group">
+					<label for="filter2-name">Name contains</label>
+					<input class="form-control" id="filter2-name">
+				    </div>
+				</form>
+                          </div>
+                        </div>
+                      </div>
+			</div></div>
         </div>
     </div>
 </div>
@@ -202,7 +235,15 @@ div.col-md-9 {
 {% block scripts %}
 {{block.super}}
 <script type="text/javascript">
-
+$( "div#content" ).on( "click", "#filter2-button", function(e) {
+	e.preventDefault();
+	console.log("click worked");
+	var sel = $('#filter2-type').val();
+	$.ApisNet.filter.filter.nodesBy(function(n) {
+  console.log(n.type);
+		return n.type == sel;
+}, 'node-type').apply();
+})
 function download_network_data(formData) {
     $.ajax({
           type: 'POST',
@@ -231,6 +272,29 @@ function download_network_data(formData) {
       } else {
           n.color = '#a8a8a8'
       };
+		      console.log(n);
+		      for (var key in $.ApisNet.filter.list_node_filters) {
+			      if (key in n.data){
+				      if ($.isArray(n.data[key])){
+					      for (var i3 = 0; i3 < n.data[key].length; i3++) {
+			      if (!$.ApisNet.filter.list_node_filters[key].values.includes(n.data[key][i3])) {
+			     				$.ApisNet.filter.list_node_filters[key].values.push(n.data[key][i3]);
+				      			$.ApisNet.filter.list_node_filters[key].select2.push({id: n.data[key][i3], text: n.data[key][i3]})
+			      }}
+				      }
+				      else {
+			      if (!$.ApisNet.filter.list_node_filters[key].values.includes(n.data[key])) {
+			      $.ApisNet.filter.list_node_filters[key].values.push(n.data[key]);
+				      $.ApisNet.filter.list_node_filters[key].select2.push({id: n.data[key], text: n.data[key]})}}
+			      } else if (key == 'type') {
+			      if (!$.ApisNet.filter.list_node_filters[key].values.includes(n[key])) {
+			      $.ApisNet.filter.list_node_filters[key].values.push(n[key]);
+				      $.ApisNet.filter.list_node_filters[key].select2.push({id: n[key], text: n[key]})
+			      };
+			      
+			      }
+
+			      };
 
   });
        if (typeof $.ApisNet.form_data_load !== 'undefined'){
@@ -242,6 +306,12 @@ function download_network_data(formData) {
 
      $.ApisNet.instance.refresh();
      sigma.layouts.startForceLink($.ApisNet.instance);
+		  for (var key in $.ApisNet.filter.list_node_filters) {
+		  
+		$("#filter2-"+key).select2({
+		data: $.ApisNet.filter.list_node_filters[key].select2
+		})
+		  }
           }
 
     })
@@ -428,6 +498,7 @@ function unbind_net_viz_form(){
 }
 
 $( document ).ready(function() {
+var list_filters_2 = ['type', 'profession', 'gender']
 unbind_net_viz_form();
 unbind_create_file_form();
 $("#graph-container").on("contextmenu", function(e) { e.preventDefault(); });
@@ -445,6 +516,22 @@ if (!$.ApisNet) {
   skip_existing_nodes: true,
   skip_existing_edges: true
 })
+    $.ApisNet.filter = new Object();
+    $.ApisNet.filter.list_node_filters = new Object();
+	var i;
+	for (i = 0; i < list_filters_2.length; i++){
+		$.ApisNet.filter.list_node_filters[list_filters_2[i]] = {values: [], select2: []}
+		$('#filter2-form').append('<div class="form-group">\
+					<label for="filter2-'+list_filters_2[i]+'">'+list_filters_2[i]+'</label>\
+					<select class="form-control" id="filter2-'+list_filters_2[i]+'" multiple="multiple">\
+					</select>\
+				    </div>')
+		console.log(list_filters_2[i])
+	}
+			$('#filter2-form').append('<div class="form-group">\
+					<button type="filter" class="btn btn-default" id="filter2-button">Filter</button>\
+				    </div>')
+    $.ApisNet.filter.filter = new sigma.plugins.filter($.ApisNet.instance);
     sigma.layouts.configForceLink($.ApisNet.instance, {
       worker: true,
       barnesHutOptimize: false,
