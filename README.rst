@@ -38,3 +38,35 @@ All documentation and images unless otherwise noted are licensed under the terms
 .. _Stanbol: https://stanbol.apache.org/
 .. _RDFs: https://en.wikipedia.org/wiki/Resource_Description_Framework
 .. _docs: https://acdh-oeaw.github.io/apis-core/
+
+
+Install the package
+------------
+
+things which needs to be added to the project's settings and urls files
+
+# mandatory:
+
+## add apis-apps to `INSTALLED_APPS`
+
+```
+...
+'apis_core.apis_entities',
+'apis_core.apis_metainfo',
+'apis_core.apis_relations',
+'apis_core.apis_vocabularies',
+'apis_core.apis_labels',
+...
+```
+
+## APIS_ENTITIES
+
+## optional:
+
+## log-in-restrictions
+If theese settings are missing or set to `False` not logged in users will be redirected to log-in page
+
+```
+APIS_LIST_VIEWS_ALLOWED = True
+APIS_DETAILKJL_VIEWS_ALLOWED = True
+```
