@@ -1,5 +1,6 @@
 from django.db import models
 import requests
+from django.urls import reverse
 #from reversion import revisions as reversion
 import reversion
 from django.db.models.signals import post_save, m2m_changed
@@ -113,6 +114,42 @@ class TempEntityClass(models.Model):
         super(TempEntityClass, self).save(*args, **kwargs)
         return self
 
+    @classmethod
+    def get_listview_url(self):
+        entity = self.__name__.lower()
+        return reverse(
+            'apis_core:apis_entities:generic_entities_list',
+            kwargs={'entity': entity}
+        )
+
+    @classmethod
+    def get_createview_url(self):
+        entity = self.__name__.lower()
+        return reverse(
+            'apis_core:apis_entities:generic_entities_create_view',
+            kwargs={'entity': entity}
+        )
+
+    def get_edit_url(self):
+        entity = self.__class__.__name__.lower()
+        return reverse(
+            'apis_core:apis_entities:generic_entities_edit_view',
+            kwargs={
+                'entity': entity,
+                'pk': self.id
+            }
+        )
+
+    def get_delete_url(self):
+        entity = self.__class__.__name__.lower()
+        return reverse(
+            'apis_core:apis_entities:generic_entities_delete_view',
+            kwargs={
+                'entity': entity,
+                'pk': self.id
+            }
+        )
+
     def merge_with(self, entities):
         e_a = type(self).__name__
         self_model_class = ContentType.objects.get(
@@ -122,7 +159,9 @@ class TempEntityClass(models.Model):
             entities = self_model_class.objects.get(pk=entities)
         if not isinstance(entities, list):
             entities = [entities]
-        entities = [self_model_class.objects.get(pk=ent) if type(ent) == int else ent for ent in entities]
+        entities = [
+            self_model_class.objects.get(pk=ent) if type(ent) == int else ent for ent in entities
+        ]
         rels = ContentType.objects.filter(
             app_label='apis_relations', model__icontains=e_a)
         print(rels)

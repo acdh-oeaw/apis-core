@@ -202,10 +202,15 @@ class GenericEntitiesCreateStanbolView(View):
 
 @method_decorator(login_required, name='dispatch')
 class GenericEntitiesDeleteView(DeleteView):
-    model = ContentType.objects.get(app_label='apis_metainfo', model='tempentityclass').model_class()
-    template_name = 'apis_templates/confirm_delete.html'
+    model = ContentType.objects.get(
+        app_label='apis_metainfo', model='tempentityclass').model_class()
+    template_name = getattr(
+        settings, 'APIS_DELETE_VIEW_TEMPLATE', 'apis_entities/confirm_delete.html'
+    )
 
     def dispatch(self, request, *args, **kwargs):
         entity = kwargs['entity']
-        self.success_url = reverse('apis:apis_entities:generic_entities_list', kwargs={'entity': entity})
+        self.success_url = reverse(
+            'apis_core:apis_entities:generic_entities_list', kwargs={'entity': entity}
+        )
         return super(GenericEntitiesDeleteView, self).dispatch(request, *args, **kwargs)
