@@ -1,6 +1,6 @@
 from django.db import models
 import requests
-from django.urls import reverse
+from django.urls import reverse, NoReverseMatch
 #from reversion import revisions as reversion
 import reversion
 from django.db.models.signals import post_save, m2m_changed
@@ -117,38 +117,50 @@ class TempEntityClass(models.Model):
     @classmethod
     def get_listview_url(self):
         entity = self.__name__.lower()
-        return reverse(
-            'apis_core:apis_entities:generic_entities_list',
-            kwargs={'entity': entity}
-        )
+        try:
+            return reverse(
+                'apis_core:apis_entities:generic_entities_list',
+                kwargs={'entity': entity}
+            )
+        except NoReverseMatch:
+            return None
 
     @classmethod
     def get_createview_url(self):
         entity = self.__name__.lower()
-        return reverse(
-            'apis_core:apis_entities:generic_entities_create_view',
-            kwargs={'entity': entity}
-        )
+        try:
+            return reverse(
+                'apis_core:apis_entities:generic_entities_create_view',
+                kwargs={'entity': entity}
+            )
+        except NoReverseMatch:
+            return None
 
     def get_edit_url(self):
         entity = self.__class__.__name__.lower()
-        return reverse(
-            'apis_core:apis_entities:generic_entities_edit_view',
-            kwargs={
-                'entity': entity,
-                'pk': self.id
-            }
-        )
+        try:
+            return reverse(
+                'apis_core:apis_entities:generic_entities_edit_view',
+                kwargs={
+                    'entity': entity,
+                    'pk': self.id
+                }
+            )
+        except NoReverseMatch:
+            return None
 
     def get_delete_url(self):
         entity = self.__class__.__name__.lower()
-        return reverse(
-            'apis_core:apis_entities:generic_entities_delete_view',
-            kwargs={
-                'entity': entity,
-                'pk': self.id
-            }
-        )
+        try:
+            return reverse(
+                'apis_core:apis_entities:generic_entities_delete_view',
+                kwargs={
+                    'entity': entity,
+                    'pk': self.id
+                }
+            )
+        except NoReverseMatch:
+            return None
 
     def merge_with(self, entities):
         e_a = type(self).__name__

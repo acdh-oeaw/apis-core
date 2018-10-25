@@ -21,19 +21,30 @@
                 </div>
                 <div class="col-md-8">
                     <h2 style="text-align: center;">
+                        {% if object.get_listview_url %}
+                            <a href="{{ object.get_listview_url }}">
+                                <small>{{ entity_type }}s</small>
+                            </a>
+                        {% else %}
+                            <small>{{ entity_type }}s</small>
+                        {% endif %}
                         {{ object }}
                         {% if user.is_authenticated %}
-                            <small>
-                                <a href="{{ object.get_edit_url }}">
-                                    <i class="far fa-edit" title="edit"></i>
-                                </a>
-                            </small>
-                            |
-                            <small>
-                                <a href="{{ object.get_delete_url }}">
-                                    <i class="far fa-trash-alt" title="delete"></i>
-                                </a>
-                            </small>
+                            {% if object.get_edit_url %}
+                                <small>
+                                    <a href="{{ object.get_edit_url }}">
+                                        <i class="far fa-edit" title="edit"></i>
+                                    </a>
+                                </small>
+                            {% endif %}
+                            {% if object.get_delete_url %}
+                                |
+                                <small>
+                                    <a href="{{ object.get_delete_url }}">
+                                        <i class="far fa-trash-alt" title="delete"></i>
+                                    </a>
+                                </small>
+                            {% endif %}
                         {% endif %}
                     </h2>
                 </div>

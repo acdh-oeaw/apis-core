@@ -160,7 +160,7 @@ class GenericEntitiesCreateView(View):
         if form.is_valid() and form_text.is_valid():
             entity_2 = form.save()
             form_text.save(entity_2)
-            return redirect(reverse('apis:apis_entities:generic_entities_edit_view', kwargs={
+            return redirect(reverse('apis:apis_entities:generic_entities_detail_view', kwargs={
                 'pk': entity_2.pk, 'entity': entity
             }))
         else:
