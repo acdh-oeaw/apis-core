@@ -74,7 +74,7 @@ things which needs to be added to the project's settings and urls files
 
 ## APIS_ENTITIES
 
-## optional:
+# optional:
 
 ## log-in-restrictions
 If theese settings are missing or set to `False` not logged in users will be redirected to log-in page
@@ -83,3 +83,9 @@ If theese settings are missing or set to `False` not logged in users will be red
 APIS_LIST_VIEWS_ALLOWED = True
 APIS_DETAILKJL_VIEWS_ALLOWED = True
 ```
+
+## Override the entities' list view template:
+
+Change the template name in the project's settings file by adding the following variable 
+
+`APIS_LIST_VIEW_TEMPLATE = "browsing/generic_list.html"`

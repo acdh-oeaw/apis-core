@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-#from reversion import revisions as reversion
+# from reversion import revisions as reversion
 import reversion
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
@@ -10,7 +10,8 @@ from django.contrib.auth.models import Group
 
 from apis_core.apis_metainfo.models import TempEntityClass, Uri, Text, Collection
 from apis_core.apis_labels.models import Label
-from apis_core.apis_vocabularies.models import (ProfessionType, PlaceType, InstitutionType,
+from apis_core.apis_vocabularies.models import (
+    ProfessionType, PlaceType, InstitutionType,
     EventType, Title, WorkType)
 
 import re
@@ -18,6 +19,7 @@ import unicodedata
 
 
 BASE_URI = getattr(settings, "APIS_BASE_URI", 'http://apis.info')
+
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class Person(TempEntityClass):
@@ -57,7 +59,8 @@ class Person(TempEntityClass):
 
     def save(self, *args, **kwargs):
         if self.first_name:
-            if self.first_name != unicodedata.normalize('NFC', self.first_name):    #secure correct unicode encoding
+            # secure correct unicode encoding
+            if self.first_name != unicodedata.normalize('NFC', self.first_name):
                 self.first_name = unicodedata.normalize('NFC', self.first_name)
         super(Person, self).save(*args, **kwargs)
         return self

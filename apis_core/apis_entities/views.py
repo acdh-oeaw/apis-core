@@ -119,41 +119,48 @@ def get_highlighted_texts(request, instance):
 ############################################################################
 
 
-@method_decorator(login_required, name='dispatch')
-class GenericListView(SingleTableView):
-    filter_class = None
-    formhelper_class = None
-    context_filter_name = 'filter'
-    paginate_by = 25
-
-    def get_queryset(self, **kwargs):
-        qs = super(GenericListView, self).get_queryset()
-        self.filter = self.filter_class(self.request.GET, queryset=qs)
-        self.filter.form.helper = self.formhelper_class()
-        return self.filter.qs
-
-    def get_table(self, **kwargs):
-        table = super(GenericListView, self).get_table()
-        RequestConfig(self.request, paginate={
-            'page': 1, 'per_page': self.paginate_by}).configure(table)
-        return table
-
-    def get_context_data(self, **kwargs):
-        context = super(GenericListView, self).get_context_data()
-        context[self.context_filter_name] = self.filter
-        return context
-
-    def __init__(self, *args, **kwargs):
-        super(GenericListView, self).__init__(*args, **kwargs)
-        print('Kwargs: {}'.format(self.request))
+# @method_decorator(login_required, name='dispatch')
+# class GenericListView(SingleTableView):
+#     filter_class = None
+#     formhelper_class = None
+#     context_filter_name = 'filter'
+#     paginate_by = 25
+#
+#     def get_queryset(self, **kwargs):
+#         qs = super(GenericListView, self).get_queryset()
+#         self.filter = self.filter_class(self.request.GET, queryset=qs)
+#         self.filter.form.helper = self.formhelper_class()
+#         return self.filter.qs
+#
+#     def get_table(self, **kwargs):
+#         table = super(GenericListView, self).get_table()
+#         RequestConfig(self.request, paginate={
+#             'page': 1, 'per_page': self.paginate_by}).configure(table)
+#         return table
+#
+#     def get_context_data(self, **kwargs):
+#         context = super(GenericListView, self).get_context_data()
+#         context[self.context_filter_name] = self.filter
+#         return context
+#
+#     def __init__(self, *args, **kwargs):
+#         super(GenericListView, self).__init__(*args, **kwargs)
+#         print('Kwargs: {}'.format(self.request))
 
 
 class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
     formhelper_class = GenericFilterFormHelper
     context_filter_name = 'filter'
     paginate_by = 25
-    template_name = 'apis_entities/generic_list.html'
+    # template_name = 'apis_entities/generic_list.html'
+    template_name = getattr(settings, 'APIS_LIST_VIEW_TEMPLATE', 'apis_entities/generic_list.html')
     login_url = '/accounts/login/'
+
+    def get_model(self):
+        model = ContentType.objects.get(
+            app_label='apis_entities', model=self.entity.lower()
+        ).model_class()
+        return model
 
     def test_func(self):
         access = access_for_all(self, viewtype="list")
@@ -171,7 +178,6 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
         return self.filter.qs
 
     def get_table(self, **kwargs):
-        #self.request = set_session_variables(self.request)
         session = getattr(self.request, 'session', False)
         if session:
             edit_v = self.request.session.get('edit_views', False)
@@ -179,20 +185,81 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
             edit_v = False
         self.table_class = get_entities_table(self.entity.title(), edit_v)
         table = super(GenericListViewNew, self).get_table()
-        print(dir(self.request))
-        print(self.request)
-
         RequestConfig(self.request, paginate={
             'page': 1, 'per_page': self.paginate_by}).configure(table)
         return table
-        # return {'rows': [1, 2, 3]}
 
     def get_context_data(self, **kwargs):
+        model = self.get_model()
         context = super(GenericListViewNew, self).get_context_data()
         context[self.context_filter_name] = self.filter
         context['entity'] = self.entity
         context['entity_create_stanbol'] = GenericEntitiesStanbolForm(self.entity)
+        if 'browsing' in settings.INSTALLED_APPS:
+            from browsing.models import BrowsConf
+            context['conf_items'] = list(
+                BrowsConf.objects.filter(model_name=self.entity)
+                .values_list('field_path', 'label')
+            )
+        context['docstring'] = "{}".format(model.__doc__)
+        if model._meta.verbose_name_plural:
+            context['class_name'] = "{}".format(model._meta.verbose_name.title())
+        else:
+            if model.__name__.endswith('s'):
+                context['class_name'] = "{}".format(model.__name__)
+            else:
+                context['class_name'] = "{}s".format(model.__name__)
+        try:
+            context['get_arche_dump'] = model.get_arche_dump()
+        except AttributeError:
+            context['get_arche_dump'] = None
+        try:
+            context['create_view_link'] = model.get_createview_url()
+        except AttributeError:
+            context['create_view_link'] = None
         return context
+
+    def render_to_response(self, context, **kwargs):
+        download = self.request.GET.get('sep', None)
+        if download and 'browsing' in settings.INSTALLED_APPS:
+            import datetime
+            import time
+            import pandas as pd
+            sep = self.request.GET.get('sep', ',')
+            timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d-%H-%M-%S')
+            filename = "export_{}".format(timestamp)
+            response = HttpResponse(content_type='text/csv')
+            if context['conf_items']:
+                conf_items = context['conf_items']
+                print(dir(self))
+                try:
+                    df = pd.DataFrame(
+                        list(
+                            self.get_queryset().values_list(*[x[0] for x in conf_items])
+                        ),
+                        columns=[x[1] for x in conf_items]
+                    )
+                except AssertionError:
+                    response['Content-Disposition'] = 'attachment; filename="{}.csv"'.format(
+                        filename
+                    )
+                    return response
+            else:
+                response['Content-Disposition'] = 'attachment; filename="{}.csv"'.format(filename)
+                return response
+            if sep == "comma":
+                df.to_csv(response, sep=',', index=False)
+            elif sep == "semicolon":
+                df.to_csv(response, sep=';', index=False)
+            elif sep == "tab":
+                df.to_csv(response, sep='\t', index=False)
+            else:
+                df.to_csv(response, sep=',', index=False)
+            response['Content-Disposition'] = 'attachment; filename="{}.csv"'.format(filename)
+            return response
+        else:
+            response = super(GenericListViewNew, self).render_to_response(context)
+            return response
 
 
 ############################################################################

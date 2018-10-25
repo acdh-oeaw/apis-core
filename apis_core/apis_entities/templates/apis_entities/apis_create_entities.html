@@ -1,0 +1,11 @@
+{% load django_tables2 crispy_forms_tags %}
+
+    <div class="card">
+        <div class="card-header">
+            <h4>create new {{ entity }}</h4>
+        </div>
+        <div class="card-body">
+            {% crispy entity_create_stanbol  entity_create_stanbol.helper %}
+            <a class="btn btn-primary btn-small" href="/apis/entities/entity/{{entity}}/create">create new {{entity}}</a>
+        </div>
+    </div>
