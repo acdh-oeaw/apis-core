@@ -130,8 +130,10 @@ function check_perms_relation(){
     })
 </script>
 <script type="text/javascript">
-    init_apis_highlighter(1, {{instance.pk}})
-    $('span.highlight').on("click", highlight_detail)
+    {% if highlighter_active %}
+        init_apis_highlighter(1, {{instance.pk}})
+        $('span.highlight').on("click", highlight_detail)
+    {% endif %}
 </script>
 {% else %}
 <script type="text/javascript">
