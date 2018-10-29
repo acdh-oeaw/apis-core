@@ -1,3 +1,7 @@
+import json
+import re
+from copy import deepcopy
+
 from django.http import HttpResponse, Http404
 from django.template.loader import render_to_string
 from django.template import RequestContext
@@ -11,22 +15,19 @@ from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 
 from .forms2 import GenericRelationForm
-#from entities.forms import (PlaceHighlighterForm, PersonHighlighterForm)
+# from entities.forms import (PlaceHighlighterForm, PersonHighlighterForm)
 from .forms import PersonLabelForm
-from .models import (PersonPlace, PersonPerson, PersonInstitution, InstitutionPlace,
-                     InstitutionInstitution, PlacePlace, PersonEvent, InstitutionEvent, PlaceEvent, PersonWork,
-                     InstitutionWork, PlaceWork, EventWork, WorkWork)
+from .models import (
+    PersonPlace, PersonPerson, PersonInstitution, InstitutionPlace,
+    InstitutionInstitution, PlacePlace, PersonEvent, InstitutionEvent, PlaceEvent, PersonWork,
+    InstitutionWork, PlaceWork, EventWork, WorkWork
+)
 from apis_core.apis_metainfo.models import Uri
 from apis_core.apis_entities.models import Person, Institution, Place, Event, Work
 from apis_core.apis_entities.forms import PersonResolveUriForm, GenericEntitiesStanbolForm
 from apis_core.apis_labels.models import Label
 from django.views.decorators.csrf import csrf_exempt
 from .tables import EntityLabelTable
-
-
-
-import json, re
-from copy import deepcopy
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_core.helper_functions.highlighter import highlight_text
@@ -43,7 +44,6 @@ if 'apis_highlighter' in settings.INSTALLED_APPS:
 ######################################################
 # test for class-ignoring _ajax_form-functions
 ######################################################
-
 
 
 # Model-classes must be registered together with their ModelForm-classes
@@ -76,8 +76,8 @@ registered_forms = {'WorkWorkForm': [WorkWork, Work, Work],
                     'EventLabelForm': [Label, Event, Label],
                     'PersonResolveUriForm': [Uri, Person, Uri],
                     'AddRelationHighlighterPersonForm': [],
-                    #'PlaceHighlighterForm': [Annotation, ],
-                    #'PersonHighlighterForm': [Annotation, ]
+                    # 'PlaceHighlighterForm': [Annotation, ],
+                    # 'PersonHighlighterForm': [Annotation, ]
                     }
 
 
@@ -100,8 +100,9 @@ def get_form_ajax(request):
         entity_type_v2 = ContentType.objects.none()
     elif FormName and form_match2:
         entity_type_v2 = ContentType.objects.filter(
-            model='{}'.format(form_match.group(1).lower(),
-            app_label='apis_entities'))
+            model='{}'.format(
+                form_match.group(1).lower(),
+                app_label='apis_entities'))
         entity_type_v1 = ContentType.objects.none()
     else:
         entity_type_v1 = ContentType.objects.none()
@@ -153,7 +154,8 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
     else:
         instance_id = ObjectID
     entity_type_str = entity_type
-    entity_type = ContentType.objects.get(model=entity_type.lower()).model_class()
+    entity_type = ContentType.objects.get(
+        app_label__startswith="apis_", model=entity_type.lower()).model_class()
     form_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+)(Highlighter)?Form', kind_form)
     form_dict = {'data': request.POST,
                  'entity_type': entity_type,
@@ -205,7 +207,7 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
         elif tab == 'PersonResolveUri':
             table_html = EntityUriTable(
                 Uri.objects.filter(entity=site_instance),
-                prefix = 'PURI-'
+                prefix='PURI-'
             )
 
         elif tab == 'AddRelationHighlighterPerson' or tab == 'PlaceHighlighter' or tab == 'PersonHighlighter':
