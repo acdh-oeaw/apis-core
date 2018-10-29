@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from dal import autocomplete
-from .fields import ListSelect2 
+from .fields import ListSelect2
 from django import forms
 from django.urls import reverse_lazy
 from crispy_forms.helper import FormHelper
@@ -41,7 +41,8 @@ class SearchForm(forms.Form):
 def get_entities_form(entity):
     class GenericEntitiesForm(forms.ModelForm):
         class Meta:
-            model = ContentType.objects.get(app_label='apis_entities', model=entity.lower()).model_class()
+            model = ContentType.objects.get(
+                app_label='apis_entities', model=entity.lower()).model_class()
             exclude = ['start_date', 'end_date', 'text', 'source']
 
         def __init__(self, *args, **kwargs):
@@ -63,13 +64,21 @@ def get_entities_form(entity):
             for f in self.fields.keys():
                 if type(self.fields[f]) == ModelMultipleChoiceField:
                     v_name_p = str(self.fields[f].queryset.model.__name__)
-                    if ContentType.objects.get(app_label__in=['apis_entities', 'apis_metainfo', 'apis_relations',
-                       'apis_vocabularies', 'apis_labels'], model=v_name_p.lower()).app_label.lower() == 'apis_vocabularies':
+                    if ContentType.objects.get(app_label__in=[
+                        'apis_entities',
+                        'apis_metainfo',
+                        'apis_relations',
+                        'apis_vocabularies',
+                        'apis_labels'
+                    ], model=v_name_p.lower()).app_label.lower() == 'apis_vocabularies':
                         self.fields[f].widget = autocomplete.Select2Multiple(
-                            url=reverse('apis:apis_vocabularies:generic_vocabularies_autocomplete', kwargs={
-                                'vocab': v_name_p.lower(),
-                                'direct': 'normal'
-                            }),
+                            url=reverse(
+                                'apis:apis_vocabularies:generic_vocabularies_autocomplete',
+                                kwargs={
+                                    'vocab': v_name_p.lower(),
+                                    'direct': 'normal'
+                                    }
+                                ),
                             attrs=attrs)
                         if self.instance:
                             res = []
@@ -112,7 +121,9 @@ class GenericEntitiesStanbolForm(forms.Form):
         self.entity = entity
         self.helper = FormHelper()
         form_kwargs = {'entity': entity}
-        url = reverse('apis:apis_entities:generic_entities_autocomplete', args=[entity.title(), 'remove'])
+        url = reverse(
+            'apis:apis_entities:generic_entities_autocomplete', args=[entity.title(), 'remove']
+        )
         label = 'Create {} from reference resources'.format(entity.title())
         button_label = 'Create'
         if ent_merge_pk:
@@ -120,7 +131,9 @@ class GenericEntitiesStanbolForm(forms.Form):
             url = reverse('apis:apis_entities:generic_entities_autocomplete', args=[entity.title()])
             label = 'Search for {0} in reference resources or db'.format(entity.title())
             button_label = 'Merge'
-        self.helper.form_action = reverse('apis:apis_entities:generic_entities_stanbol_create', kwargs=form_kwargs)
+        self.helper.form_action = reverse(
+            'apis:apis_entities:generic_entities_stanbol_create', kwargs=form_kwargs
+        )
         self.helper.add_input(Submit('submit', button_label))
         self.fields['entity'] = autocomplete.Select2ListCreateChoiceField(
                 label=label,
@@ -187,7 +200,7 @@ class FullTextForm(forms.Form):
 
 
 class PersonResolveUriForm(forms.Form):
-    #person = forms.CharField(label=False, widget=al.TextWidget('PersonAutocomplete'))
+    # person = forms.CharField(label=False, widget=al.TextWidget('PersonAutocomplete'))
     person = forms.CharField(label=False)
     person_uri = forms.CharField(required=False, widget=forms.HiddenInput())
 
@@ -216,12 +229,12 @@ class PersonResolveUriForm(forms.Form):
 
 
 class NetworkVizFilterForm(forms.Form):
-    #select_relation = forms.ChoiceField(choices=choices)
-    #search_source = forms.CharField(widget=al.ChoiceWidget('DB_PersonAutocomplete'), required=False)
-    #search_source = forms.CharField(required=False)
-    #select_kind = forms.CharField(widget=al.ChoiceWidget('VCPersonPlaceAutocomplete'), required=False)
-    #search_target = forms.CharField(required=False)
-    #search_target = forms.CharField(widget=al.ChoiceWidget('DB_PlaceAutocomplete'), required=False)
+    # select_relation = forms.ChoiceField(choices=choices)
+    # search_source = forms.CharField(widget=al.ChoiceWidget('DB_PersonAutocomplete'), required=False)
+    # search_source = forms.CharField(required=False)
+    # select_kind = forms.CharField(widget=al.ChoiceWidget('VCPersonPlaceAutocomplete'), required=False)
+    # search_target = forms.CharField(required=False)
+    # search_target = forms.CharField(widget=al.ChoiceWidget('DB_PlaceAutocomplete'), required=False)
     ann_include_all = forms.BooleanField(required=False, label='Include general relations',
                                         help_text="""Not all relations are connected to an annotation.\
                                         If checked relations that are not attached to an annotation are include.\
