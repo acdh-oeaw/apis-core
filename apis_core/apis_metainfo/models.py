@@ -1,7 +1,7 @@
 from django.db import models
 import requests
 from django.urls import reverse, NoReverseMatch
-#from reversion import revisions as reversion
+# from reversion import revisions as reversion
 import reversion
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
@@ -117,28 +117,31 @@ class TempEntityClass(models.Model):
     @classmethod
     def get_listview_url(self):
         entity = self.__name__.lower()
-        try:
+        if entity == 'institution' or len(entity) < 10:
             return reverse(
                 'apis_core:apis_entities:generic_entities_list',
                 kwargs={'entity': entity}
             )
-        except NoReverseMatch:
-            return None
+        else:
+            return reverse(
+                'apis_core:apis_relations:generic_relations_list',
+                kwargs={'entity': entity}
+            )
 
     @classmethod
     def get_createview_url(self):
         entity = self.__name__.lower()
-        try:
+        if entity == 'institution' or len(entity) < 10:
             return reverse(
                 'apis_core:apis_entities:generic_entities_create_view',
                 kwargs={'entity': entity}
             )
-        except NoReverseMatch:
+        else:
             return None
 
     def get_edit_url(self):
         entity = self.__class__.__name__.lower()
-        try:
+        if entity == 'institution' or len(entity) < 10:
             return reverse(
                 'apis_core:apis_entities:generic_entities_edit_view',
                 kwargs={
@@ -146,12 +149,31 @@ class TempEntityClass(models.Model):
                     'pk': self.id
                 }
             )
-        except NoReverseMatch:
+        else:
             return None
+
+    def get_absolute_url(self):
+        entity = self.__class__.__name__.lower()
+        if entity == 'institution' or len(entity) < 10:
+            return reverse(
+                'apis_core:apis_entities:generic_entities_detail_view',
+                kwargs={
+                    'entity': entity,
+                    'pk': self.id
+                }
+            )
+        else:
+            return reverse(
+                'apis_core:apis_relations:generic_entities_detail_view',
+                kwargs={
+                    'entity': entity,
+                    'pk': self.id
+                }
+            )
 
     def get_delete_url(self):
         entity = self.__class__.__name__.lower()
-        try:
+        if entity == 'institution' or len(entity) < 10:
             return reverse(
                 'apis_core:apis_entities:generic_entities_delete_view',
                 kwargs={
@@ -159,7 +181,7 @@ class TempEntityClass(models.Model):
                     'pk': self.id
                 }
             )
-        except NoReverseMatch:
+        else:
             return None
 
     def merge_with(self, entities):

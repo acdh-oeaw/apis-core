@@ -3,6 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.mixins import UserPassesTestMixin
+from django.core.exceptions import FieldError
 from django.utils.decorators import method_decorator
 from django.urls import reverse
 from django.views.generic.edit import DeleteView
@@ -28,12 +29,7 @@ from .forms import (
     NetworkVizFilterForm, PersonResolveUriForm,
     get_entities_form, GenericEntitiesStanbolForm
 )
-from apis_core.apis_relations.models import (
-    PersonPerson, PersonInstitution, PersonEvent,
-    PersonPlace, InstitutionEvent, InstitutionPlace,
-    InstitutionInstitution, PlacePlace, PlaceEvent, PersonWork,
-    InstitutionWork, PlaceWork, EventWork
-)
+
 from apis_core.apis_vocabularies.models import LabelType
 from apis_core.apis_metainfo.models import Uri, UriCandidate, TempEntityClass, Text
 from apis_core.helper_functions.stanbolQueries import retrieve_obj
@@ -57,7 +53,9 @@ if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.forms import SelectAnnotationProject, SelectAnnotatorAgreement
     from helper_functions.highlighter import highlight_text
 
-
+if 'charts' in settings.INSTALLED_APPS:
+    from charts.models import ChartConfig
+    from charts.views import create_payload
 ############################################################################
 ############################################################################
 #
@@ -65,6 +63,7 @@ if 'apis_highlighter' in settings.INSTALLED_APPS:
 #
 ############################################################################
 ############################################################################
+
 
 @user_passes_test(access_for_all_function)
 def set_session_variables(request):
@@ -119,35 +118,6 @@ def get_highlighted_texts(request, instance):
 ############################################################################
 
 
-# @method_decorator(login_required, name='dispatch')
-# class GenericListView(SingleTableView):
-#     filter_class = None
-#     formhelper_class = None
-#     context_filter_name = 'filter'
-#     paginate_by = 25
-#
-#     def get_queryset(self, **kwargs):
-#         qs = super(GenericListView, self).get_queryset()
-#         self.filter = self.filter_class(self.request.GET, queryset=qs)
-#         self.filter.form.helper = self.formhelper_class()
-#         return self.filter.qs
-#
-#     def get_table(self, **kwargs):
-#         table = super(GenericListView, self).get_table()
-#         RequestConfig(self.request, paginate={
-#             'page': 1, 'per_page': self.paginate_by}).configure(table)
-#         return table
-#
-#     def get_context_data(self, **kwargs):
-#         context = super(GenericListView, self).get_context_data()
-#         context[self.context_filter_name] = self.filter
-#         return context
-#
-#     def __init__(self, *args, **kwargs):
-#         super(GenericListView, self).__init__(*args, **kwargs)
-#         print('Kwargs: {}'.format(self.request))
-
-
 class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
     formhelper_class = GenericFilterFormHelper
     context_filter_name = 'filter'
@@ -157,7 +127,7 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
 
     def get_model(self):
         model = ContentType.objects.get(
-            app_label='apis_entities', model=self.entity.lower()
+            app_label__startswith='apis_', model=self.entity.lower()
         ).model_class()
         return model
 
@@ -170,7 +140,7 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
     def get_queryset(self, **kwargs):
         self.entity = self.kwargs.get('entity')
         qs = ContentType.objects.get(
-            app_label='apis_entities', model=self.entity.lower()
+            app_label__startswith='apis_', model=self.entity.lower()
         ).model_class().objects.all()
         self.filter = get_generic_list_filter(self.entity.title())(self.request.GET, queryset=qs)
         self.filter.form.helper = self.formhelper_class()
@@ -216,6 +186,25 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
             context['create_view_link'] = model.get_createview_url()
         except AttributeError:
             context['create_view_link'] = None
+        if 'charts' in settings.INSTALLED_APPS:
+            app_label = model._meta.app_label
+            filtered_objs = ChartConfig.objects.filter(
+                model_name=model.__name__.lower(),
+                app_name=app_label
+            )
+            context['vis_list'] = filtered_objs
+            context['property_name'] = self.request.GET.get('property')
+            context['charttype'] = self.request.GET.get('charttype')
+            if context['charttype'] and context['property_name']:
+                qs = self.get_queryset()
+                chartdata = create_payload(
+                    context['entity'],
+                    context['property_name'],
+                    context['charttype'],
+                    qs,
+                    app_label=app_label
+                )
+                context = dict(context, **chartdata)
         return context
 
     def render_to_response(self, context, **kwargs):

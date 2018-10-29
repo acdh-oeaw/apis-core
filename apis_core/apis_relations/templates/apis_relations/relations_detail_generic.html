@@ -1,0 +1,117 @@
+{% extends "webpage/base.html" %}
+{% load staticfiles %}
+{% block title %} {{ object }} {% endblock %}
+{% block scriptHeader %}
+{{ block.super }}
+{% endblock scriptHeader %}
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-2">
+                    {% if object.get_prev %}
+                        <h2>
+                            <a href="{{ object.get_prev }}">
+                                <i class="fas fa-chevron-left" title="previous"></i>
+                            </a>
+                        </h2>
+                    {% endif %}
+                </div>
+                <div class="col-md-8">
+                    <h2 style="text-align: center;">
+                        {% if object.get_listview_url %}
+                            <a href="{{ object.get_listview_url }}">
+                                <small>{{ entity_type }}s</small>
+                            </a>
+                        {% else %}
+                            <small>{{ entity_type }}s</small>
+                        {% endif %}
+                        {{ object }}
+                        {% if user.is_authenticated %}
+                            {% if object.get_edit_url %}
+                                <small>
+                                    <a href="{{ object.get_edit_url }}">
+                                        <i class="far fa-edit" title="edit"></i>
+                                    </a>
+                                </small>
+                            {% endif %}
+                            {% if object.get_delete_url %}
+                                |
+                                <small>
+                                    <a href="{{ object.get_delete_url }}">
+                                        <i class="far fa-trash-alt" title="delete"></i>
+                                    </a>
+                                </small>
+                            {% endif %}
+                        {% endif %}
+                    </h2>
+                </div>
+            <div class="col-md-2">
+                <h2>
+                    {% if object.get_next %}
+                    <a href="{{ object.get_next }}" style="float:right">
+                        <i class="fas fa-chevron-right" title="next"></i>
+                    </a>
+                </h2>
+                {% endif %}
+            </div>
+        </div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>General Info</h3>
+                        </div>
+                        <div class="card-body">
+                            {% block info-table %}
+                            <table class="table table-bordered table-hover">
+                                <tr>
+                                    <th>
+                                        Titel
+                                    </th>
+                                    <td>
+                                        {{ object.name }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Type
+                                    </th>
+                                    <td>
+                                        {{ object.kind}}
+                                    </td>
+                                </tr>
+                                {% if object.start_date or object.end_date %}
+                                <tr>
+                                    <th>
+                                        Date
+                                    </th>
+                                    <td>
+                                        {% if object.start_date %}
+                                            <abbr title="{{ object.start_date_written }}">{{ object.start_date }}</abbr>
+                                        {% endif %}
+                                        {% if object.end_date %}
+                                            - <abbr title="{{ object.end_date_written }}">{{ object.end_date }}</abbr>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                            {% endblock info-table %}
+                            {% block left-pane-additional %}
+                            {% endblock left-pane-additional %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-8"></div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+{% block scripts %}
+    {{block.super}}
+{% endblock scripts %}

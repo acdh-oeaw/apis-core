@@ -85,9 +85,12 @@ def get_generic_list_filter(entity):
             return queryset.filter(**{f: value})
 
         class Meta:
-            model = ContentType.objects.get(app_label='apis_entities', model=entity.lower()).model_class()
+            model = ContentType.objects.get(
+                app_label__startswith='apis_', model=entity.lower()).model_class()
             if 'list_filters' in settings.APIS_ENTITIES[entity.title()].keys():
-                fields = [x[0] for x in settings.APIS_ENTITIES[entity.title()]['list_filters']]
+                fields = [
+                    x[0] for x in settings.APIS_ENTITIES[entity.title()]['list_filters']
+                ]
             else:
                 exclude = ('MetaInfo',
                            'collection',
@@ -124,7 +127,6 @@ def get_generic_list_filter(entity):
                                 'direct': 'normal'
                             }),
                             attrs=attrs)
-
 
     return GenericListFilter
 

@@ -9,26 +9,40 @@ def get_entities_table(entity, edit_v):
 
     class GenericEntitiesTable(tables.Table):
         if edit_v:
-            name = tables.LinkColumn('apis:apis_entities:generic_entities_edit_view', args=[entity.lower(), A('pk')])
+            name = tables.LinkColumn(
+                'apis:apis_entities:generic_entities_edit_view',
+                args=[entity.lower(), A('pk')]
+            )
         else:
-            name = tables.LinkColumn('apis:apis_entities:generic_entities_detail_view', args=[entity.lower(), A('pk')])
-        export_formats = ['csv', 'json', 'xls', 'xlsx']
+            name = tables.LinkColumn(
+                'apis:apis_entities:generic_entities_detail_view',
+                args=[entity.lower(), A('pk')]
+            )
+            id = tables.LinkColumn()
+        export_formats = [
+            'csv',
+            'json',
+            'xls',
+            'xlsx',
+        ]
 
         class Meta:
-            model = ContentType.objects.get(app_label='apis_entities', model=entity.lower()).model_class()
+            model = ContentType.objects.get(
+                app_label__startswith='apis_', model=entity.lower()).model_class()
             if 'table_fields' in settings.APIS_ENTITIES[entity.title()]:
                 fields = settings.APIS_ENTITIES[entity.title()]['table_fields']
             else:
-                exclude = ('MetaInfo',
-                           'collection',
-                           'references',
-                           'notes',
-                           'review',
-                           'start_date',
-                           'end_date',
-                           'source',
-                           'tempentityclass_ptr',
-                           'id')
+                exclude = (
+                    'MetaInfo',
+                    'collection',
+                    'references',
+                    'notes',
+                    'review',
+                    'start_date',
+                    'end_date',
+                    'source',
+                    'tempentityclass_ptr',
+                )
             attrs = {"class": "table table-hover table-striped table-condensed"}
     return GenericEntitiesTable
 
