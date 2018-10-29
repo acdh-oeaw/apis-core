@@ -1,9 +1,12 @@
 {% extends "webpage/base.html" %}
-{% load staticfiles %}
 {% load static %}
 {% load crispy_forms_tags %}
 {% block scriptHeader %}
 {{ block.super }}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.2.1/bootstrap-slider.min.js" integrity="sha256-rjNVc4p9W5ytzudhfdvmen38QnQTPHD6izDAF9nA95w=" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.2.1/css/bootstrap-slider.css" integrity="sha256-fyvdwFZ10EzDoLhbbG8gpn2ll8lqkABsEbGWrG18WOU=" crossorigin="anonymous" />
 <script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/sigma.core.js' %}"></script>
 <script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/conrad.js' %}"></script>
 <script src="{% static 'webpage/libraries/bower_components/linkurious.js/src/utils/sigma.utils.js' %}"></script>
@@ -161,7 +164,14 @@ div.col-md-9 {
     top:10px;
     right: 5px;
     z-index:1000;
+    max-width: 500px;
     }
+    span.select2 {
+    max-width: 480px;
+    }
+    #label-threshold .slider-selection {
+	background: #BABABA;
+}
     #filter_network option, #filter_network label {
     text-transform:capitalize;
 }
@@ -177,6 +187,11 @@ div.col-md-9 {
             <div id="filter-container">
                 {% crispy form %}
             </div>
+	    <hr/>
+	    <div id="interaction-form">
+		    <input id="label-threshold" data-slider-id='threhSlider' type="text" data-slider-min="1" data-slider-max="30" data-slider-step="1" data-slider-value="8"/>
+		    <button type="submit" class="btn btn-default" id="toggle-force-link">Start Forcelink</button>
+	    </div>
             <hr/>
             <div id="export-form">
                 <form class="form-inline" id="create-file-form">
@@ -218,8 +233,8 @@ div.col-md-9 {
 				<form class="form" id="filter2-form">
 					
 				    <div class="form-group">
-					<label for="filter2-name">Name contains</label>
-					<input class="form-control" id="filter2-name">
+					<label for="filter3-label">Name contains</label>
+					<input class="form-control" id="filter3-label">
 				    </div>
 				</form>
                           </div>
@@ -235,6 +250,16 @@ div.col-md-9 {
 {% block scripts %}
 {{block.super}}
 <script type="text/javascript">
+	$("#interaction-form").on( "click", "#toggle-force-link", function(e) {
+		e.preventDefault();
+		sigma.layouts.startForceLink($.ApisNet.instance);
+	});
+$('#interaction-form').on("change", "#label-threshold", function(e){
+	e.preventDefault();
+	var threshold = $('#label-threshold').val()
+	$.ApisNet.instance.settings({'labelThreshold': threshold});
+	$.ApisNet.instance.refresh();
+});
 $( "div#content" ).on( "click", "#filter2-button", function(e) {
 	e.preventDefault();
 $.ApisNet.selected_nodes = new Array();
@@ -245,7 +270,16 @@ $.ApisNet.selected_nodes = new Array();
 	}
 	console.log(filters);
         $.ApisNet.instance.graph.nodes().forEach(function (n) {
-		var test = false;
+		var test = false;	
+		var label_contains = $('#filter3-label').val()
+		if (label_contains != null) {
+			if (n.label.includes(label_contains)) {
+			test = true;
+			} else {
+			test = false;
+			return;
+			}
+		}
 		for (var f2 in filters){
 			if (f2 == 'type') {
 			var d = n
@@ -600,6 +634,12 @@ var config = {
     $.ApisNet.instance.bind("rightClickNode", select_unselect_node);
 
 };
+$('#label-threshold').slider({
+	value: $.ApisNet.instance.settings('labelThreshold'),
+	formatter: function(value) {
+		return 'Current value: ' + value;
+	}
+});
 $('#id_select_relation').on("change", function(){
     var list_ent = $(this).val().split('-')
     console.log(list_ent);
