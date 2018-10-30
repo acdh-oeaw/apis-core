@@ -2,9 +2,12 @@ from django.conf import settings
 from django.views.generic.detail import DetailView
 from django.contrib.contenttypes.models import ContentType
 
+from django_tables2 import RequestConfig
+
 from apis_core.apis_entities.views import GenericListViewNew
 from . forms2 import GenericRelationForm
 from . rel_forms import PersonPlaceFilterFormHelper
+from . tables import get_generic_relation_listview_table
 
 
 class GenericRelationView(GenericListViewNew):
@@ -21,6 +24,14 @@ class GenericRelationView(GenericListViewNew):
 
     def get_formhelper(self):
         return PersonPlaceFilterFormHelper
+
+    def get_table(self, **kwargs):
+        relation = self.kwargs['entity'].lower()
+        self.table_class = get_generic_relation_listview_table(relation)
+        table = super(GenericListViewNew, self).get_table()
+        RequestConfig(self.request, paginate={
+            'page': 1, 'per_page': self.paginate_by}).configure(table)
+        return table
 
 
 class GenericRelationDetailView(DetailView):

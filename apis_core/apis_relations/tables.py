@@ -2,13 +2,39 @@ import django_tables2 as tables
 from django.contrib.contenttypes.models import ContentType
 from django_tables2.utils import A
 
-from .models import (PersonInstitution, PersonPlace, PersonPerson, PersonEvent, InstitutionEvent, PlaceEvent,
-                     PersonWork, InstitutionWork, InstitutionPlace, PlaceWork, EventWork)
+from .models import (
+    PersonInstitution, PersonPlace, PersonPerson, PersonEvent, InstitutionEvent, PlaceEvent,
+    PersonWork, InstitutionWork, InstitutionPlace, PlaceWork, EventWork
+)
 from apis_core.apis_labels.models import Label
 from apis_core.apis_metainfo.models import Uri
 
 
 empty_text_default = 'There are currently no relations'
+
+
+def get_generic_relation_listview_table(relation):
+    ct = ContentType.objects.get(app_label='apis_relations', model=relation.lower())
+    relation_model_class = ct.model_class()
+    model_fields = relation_model_class._meta.get_fields(include_parents=False)
+    field_names = [x.name for x in model_fields[1:]]
+    all_field_names = field_names + ['start_date', 'end_date']
+
+    class GenericRelationListViewTable(tables.Table):
+
+        class Meta:
+            model = relation_model_class
+            fields = all_field_names
+            attrs = {"class": "table table-hover table-striped table-condensed"}
+
+        def __init__(self, *args, **kwargs):
+            ent_first = all_field_names[1]
+            ent_second = all_field_names[2]
+            self.base_columns[all_field_names[1]] = tables.LinkColumn()
+            self.base_columns[all_field_names[2]] = tables.LinkColumn()
+            super(GenericRelationListViewTable, self).__init__(*args, **kwargs)
+
+    return GenericRelationListViewTable
 
 
 def get_generic_relations_table(relation, entity, detail=None):
@@ -128,4 +154,3 @@ class EntityLabelTable(tables.Table):
         # add class="paleblue" to <table> tag
         attrs = {"class": "table table-hover table-striped table-condensed",
                 "id": "PL_conn"}
-
