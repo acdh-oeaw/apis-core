@@ -164,7 +164,7 @@ class TempEntityClass(models.Model):
             )
         else:
             return reverse(
-                'apis_core:apis_relations:generic_entities_detail_view',
+                'apis_core:apis_relations:generic_relations_detail_view',
                 kwargs={
                     'entity': entity,
                     'pk': self.id

@@ -14,5 +14,5 @@ urlpatterns = [
         rel_views.GenericRelationView.as_view(), name='generic_relations_list'),
     url(r'^(?P<entity>[a-z]+)/(?P<pk>[0-9]+)/detail$',
         rel_views.GenericRelationDetailView.as_view(),
-        name='generic_entities_detail_view'),
+        name='generic_relations_detail_view'),
 ]

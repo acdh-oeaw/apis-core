@@ -59,7 +59,7 @@
 
 
             //add the feature to the layer
-            lg.addLayer(layer); 
+            lg.addLayer(layer);
             //mymap.fitBounds(lg.getBounds(), {'maxZoom': 12});
 
             if (feature.properties && feature.properties.popupContent) {
@@ -83,19 +83,19 @@
                 type: 'GET',
                 url: '{% url 'apis:apis_entities:getGeoJsonList' %}',
                 dataType: 'json',
-                'data': {'relation': 'PersonPlace'},
+                'data': {'relation': 'personplace'},
                 success: function(data) {
-                    
+
 
                     //L.geoJson(data, {onEachFeature: onEachFeature});
-                    
+
                     var geoJsonLayer = L.geoJson(data, {onEachFeature: onEachFeature});
                     markers.addLayer(geoJsonLayer);
                     mymap.addLayer(markers);
                     mymap.fitBounds(markers.getBounds(), {'maxZoom': 12});
 
-                    
-                    
+
+
                 }
             });
 

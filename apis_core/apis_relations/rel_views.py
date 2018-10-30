@@ -33,9 +33,11 @@ class GenericRelationDetailView(DetailView):
 
     def get_object(self):
         entity = self.kwargs['entity'].lower()
+        instance = self.kwargs['pk'].lower()
         entity_model = ContentType.objects.get(
             app_label='apis_relations', model=entity).model_class()
-        return entity_model
+        instance = entity_model.objects.get(pk=instance)
+        return instance
 
     def get_context_data(self, **kwargs):
         context = super(GenericRelationDetailView, self).get_context_data()
