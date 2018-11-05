@@ -231,14 +231,14 @@ sett_RDF_generic = {
             [
             {
                 'type': 'Place',
-                'kind': 'place of birth',
+                'kind': 'born in',
                 'object': (
                     ('place of birth', None),
             )
             },
             {
                 'type': 'Place',
-                'kind': 'place of death',
+                'kind': 'died in',
                 'object': (
                     ('place of death', None),
             )
