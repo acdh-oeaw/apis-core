@@ -1,5 +1,8 @@
+from dal import autocomplete
+
 from django.contrib import admin
 from django.apps import apps
+from django.urls import reverse
 from .models import PersonInstitutionRelation
 
 
@@ -30,9 +33,11 @@ class BaseAdminVocabularies(admin.ModelAdmin):
 class VocabsRelationAdmin(BaseAdminVocabularies):
     list_display = ('name', 'label')
     search_fields = ('name', 'parent_class__name')
-    #autocomplete_fields = ('parent_class',)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        attrs = {'data-placeholder': 'Type to get suggestions',
+                 'data-minimum-input-length': 3,
+                 'data-html': True}
         c_name = db_field.model.__name__
         qs = super(BaseAdminVocabularies, self).get_queryset(request)
         if c_name.endswith('Relation') and db_field.name == 'parent_class':
@@ -41,8 +46,18 @@ class VocabsRelationAdmin(BaseAdminVocabularies):
             kwargs["queryset"] = qs.all()
         elif db_field.name == "parent_class":
             kwargs["queryset"] = qs.filter(userAdded__groups__in=request.user.groups.all())
+        kwargs['widget'] = autocomplete.Select2(
+            url=reverse(
+                'apis:apis_vocabularies:generic_vocabularies_autocomplete',
+                kwargs={
+                    'vocab': self.model.__name__.lower(),
+                    'direct': 'normal'
+                    }
+                ), attrs=attrs)
 
-        return super(VocabsRelationAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+        return super(VocabsRelationAdmin, self).formfield_for_foreignkey(
+            db_field, request, **kwargs
+        )
 
 
 app = apps.get_app_config('apis_vocabularies')
@@ -54,5 +69,3 @@ for model_name, model in app.models.items():
         admin.site.register(model, VocabsRelationAdmin)
     else:
         admin.site.register(model, BaseAdminVocabularies)
-
-
