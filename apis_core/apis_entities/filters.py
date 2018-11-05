@@ -87,11 +87,13 @@ def get_generic_list_filter(entity):
         class Meta:
             model = ContentType.objects.get(
                 app_label__startswith='apis_', model=entity.lower()).model_class()
-            if 'list_filters' in settings.APIS_ENTITIES[entity.title()].keys():
-                fields = [
-                    x[0] for x in settings.APIS_ENTITIES[entity.title()]['list_filters']
-                ]
-            else:
+
+            try:
+                if 'list_filters' in settings.APIS_ENTITIES[entity.title()].keys():
+                    fields = [
+                        x[0] for x in settings.APIS_ENTITIES[entity.title()]['list_filters']
+                    ]
+            except KeyError:
                 exclude = ('MetaInfo',
                            'collection',
                            'references',
@@ -110,10 +112,13 @@ def get_generic_list_filter(entity):
                      'data-minimum-input-length': 3,
                      'data-html': True}
             super(GenericListFilter, self).__init__(*args, **kwargs)
-            if 'list_filters' in settings.APIS_ENTITIES[entity.title()].keys():
-                for f in settings.APIS_ENTITIES[entity.title()]['list_filters']:
-                    for ff in f[1].keys():
-                        setattr(self.filters[f[0]], ff, f[1][ff])
+            try:
+                if 'list_filters' in settings.APIS_ENTITIES[entity.title()].keys():
+                    for f in settings.APIS_ENTITIES[entity.title()]['list_filters']:
+                        for ff in f[1].keys():
+                            setattr(self.filters[f[0]], ff, f[1][ff])
+            except KeyError:
+                pass
             for f in self.filters.keys():
                 if type(self.filters[f].field) == ModelMultipleChoiceField:
                     v_name_p = str(self.filters[f].queryset.model.__name__)

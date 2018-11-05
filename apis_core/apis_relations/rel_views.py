@@ -22,9 +22,6 @@ class GenericRelationView(GenericListViewNew):
     )
     login_url = '/accounts/login/'
 
-    def get_formhelper(self):
-        return PersonPlaceFilterFormHelper
-
     def get_table(self, **kwargs):
         relation = self.kwargs['entity'].lower()
         self.table_class = get_generic_relation_listview_table(relation)
