@@ -74,7 +74,15 @@ things which needs to be added to the project's settings and urls files
 
 ## APIS_ENTITIES
 
+todo!
+
 # optional:
+
+## APIS_BASE_URI
+
+this parameter is used to construct URIs for Apis Entities in case no external URIs (like geonames or gnd) are provided, defaults to `http://apis.info`
+
+e.g. `APIS_BASE_URI = 'https://myprocect/objects/'` will create a URI like `https://myprocect/objects/1234`
 
 ## log-in-restrictions
 If theese settings are missing or set to `False` not logged in users will be redirected to log-in page

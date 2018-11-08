@@ -18,7 +18,7 @@ import re
 import unicodedata
 
 
-BASE_URI = getattr(settings, "APIS_BASE_URI", 'http://apis.info')
+BASE_URI = getattr(settings, "APIS_BASE_URI", 'http://apis.info/')
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
