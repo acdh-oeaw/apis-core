@@ -11,9 +11,9 @@
         <div class="card-header">
             <div class="row">
                 <div class="col-md-2">
-                    {% if object.get_prev %}
+                    {% if object.get_prev_url %}
                         <h2>
-                            <a href="/apis/entities/entity/{{entity_type}}/{{object.get_prev}}/detail" style="float:left">
+                            <a href="{{ object.get_prev_url }}" style="float:right">
                                 <i class="fas fa-chevron-left" title="previous"></i>
                             </a>
                         </h2>
@@ -49,9 +49,9 @@
                     </h2>
                 </div>
             <div class="col-md-2">
-                {% if object.get_next %}
+                {% if object.get_next_url %}
                     <h2>
-                        <a href="/apis/entities/entity/{{entity_type}}/{{object.get_prev}}/detail" style="float:right">
+                        <a href="{{ object.get_next_url}}" style="float:left">
                             <i class="fas fa-chevron-right" title="next"></i>
                         </a>
                     </h2>

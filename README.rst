@@ -78,9 +78,14 @@ todo!
 
 # optional:
 
+## APIS_NEXT_PREV
+
+In case you set this parameter to `False` then `apis_core.apis_metainfo.TempEntityClass.get_prev_url()` and `apis_core.apis_metainfo.TempEntityClass.get_next_url()` methods return `False`. Set this param to deactivate the prev/next browsing function in the entitie's detail view. Default (if not set) is `True`
+
+
 ## APIS_BASE_URI
 
-this parameter is used to construct URIs for Apis Entities in case no external URIs (like geonames or gnd) are provided, defaults to `http://apis.info`
+This parameter is used to construct URIs for Apis Entities in case no external URIs (like geonames or gnd) are provided, defaults to `http://apis.info`
 
 e.g. `APIS_BASE_URI = 'https://myprocect/objects/'` will create a URI like `https://myprocect/objects/1234`
 

@@ -18,6 +18,20 @@ def add_entities(request):
     return res
 
 
+def add_relations(request):
+    relations_list = []
+    for name, obj in inspect.getmembers(
+        sys.modules['apis_core.apis_relations.models'], inspect.isclass
+    ):
+        if obj.__module__ == 'apis_core.apis_relations.models':
+            relations_list.append(str(name).lower())
+    res = {
+        'relations_list': relations_list,
+        'request': request
+    }
+    return res
+
+
 def add_apis_settings(request):
     """adds the custom settings to the templates"""
     res = {

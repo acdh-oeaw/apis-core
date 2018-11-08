@@ -22,6 +22,8 @@ from difflib import SequenceMatcher
 # from helper_functions.highlighter import highlight_text
 from apis_core.default_settings.NER_settings import autocomp_settings
 
+NEXT_PREV = getattr(settings, "APIS_NEXT_PREV", True)
+
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.models import Annotation
@@ -170,6 +172,58 @@ class TempEntityClass(models.Model):
                     'pk': self.id
                 }
             )
+
+    def get_prev_url(self):
+        entity = self.__class__.__name__.lower()
+        if NEXT_PREV:
+            prev = self.__class__.objects.filter(id__lt=self.id).order_by('-id')
+        else:
+            return False
+        if prev:
+            if entity == 'institution' or len(entity) < 10:
+                return reverse(
+                    'apis_core:apis_entities:generic_entities_detail_view',
+                    kwargs={
+                        'entity': entity,
+                        'pk': prev.first().id
+                    }
+                )
+            else:
+                return reverse(
+                    'apis_core:apis_relations:generic_relations_detail_view',
+                    kwargs={
+                        'entity': entity,
+                        'pk': prev.first().id
+                    }
+                )
+        else:
+            return False
+
+    def get_next_url(self):
+        entity = self.__class__.__name__.lower()
+        if NEXT_PREV:
+            next = self.__class__.objects.filter(id__gt=self.id)
+        else:
+            return False
+        if next:
+            if entity == 'institution' or len(entity) < 10:
+                return reverse(
+                    'apis_core:apis_entities:generic_entities_detail_view',
+                    kwargs={
+                        'entity': entity,
+                        'pk': next.first().id
+                    }
+                )
+            else:
+                return reverse(
+                    'apis_core:apis_relations:generic_relations_detail_view',
+                    kwargs={
+                        'entity': entity,
+                        'pk': next.first().id
+                    }
+                )
+        else:
+            return False
 
     def get_delete_url(self):
         entity = self.__class__.__name__.lower()
