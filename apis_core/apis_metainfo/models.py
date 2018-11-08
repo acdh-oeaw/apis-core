@@ -357,6 +357,7 @@ class UriCandidate(models.Model):
                 label = res.json()['representation'][endp['fields']['name'][0]][0]['value']
                 return (label, desc)
 
+
 @receiver(post_save, sender=Uri, dispatch_uid="remove_default_uri")
 def remove_default_uri(sender, instance, **kwargs):
     if Uri.objects.filter(entity=instance.entity).count() > 1:

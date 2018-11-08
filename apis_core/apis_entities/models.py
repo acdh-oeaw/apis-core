@@ -65,6 +65,18 @@ class Person(TempEntityClass):
         super(Person, self).save(*args, **kwargs)
         return self
 
+    def get_next(self):
+        next = Person.objects.filter(id__gt=self.id)
+        if next:
+            return next.first().id
+        return False
+
+    def get_prev(self):
+        prev = Person.objects.filter(id__lt=self.id).order_by('-id')
+        if prev:
+            return prev.first().id
+        return False
+
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class Place(TempEntityClass):
