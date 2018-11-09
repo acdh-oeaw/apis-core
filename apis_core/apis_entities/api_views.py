@@ -10,13 +10,14 @@ from django.contrib.contenttypes.models import ContentType
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
 from .serializers import (
     InstitutionSerializer, PersonSerializer, PlaceSerializer, EventSerializer, WorkSerializer,
-    GeoJsonSerializer, NetJsonEdgeSerializer, NetJsonNodeSerializer
+    GeoJsonSerializer, NetJsonEdgeSerializer, NetJsonNodeSerializer, EntitySerializer
 )
 from .models import Institution, Person, Place, Event, Work
 from apis_core.apis_vocabularies.models import VocabsBaseClass
 from apis_core.helper_functions.stanbolQueries import find_loc
 from apis_core.default_settings.NER_settings import autocomp_settings, stb_base
 from apis_core.apis_metainfo.api_renderers import PaginatedCSVRenderer
+from apis_core.apis_metainfo.models import TempEntityClass
 from rest_framework.settings import api_settings
 from rest_framework.permissions import DjangoObjectPermissions, AllowAny
 from rest_framework.pagination import PageNumberPagination
@@ -37,6 +38,21 @@ class StandardResultsSetPagination(PageNumberPagination):
     page_size = 25
     page_size_query_param = 'page_size'
     max_page_size = 1000
+
+
+class GetEntityGeneric(APIView):
+    serializer_class = EntitySerializer
+    
+    def get_object(self, pk):
+        try:
+            return TempEntityClass.objects_inheritance.get_subclass(pk=pk)
+        except TempEntityClass.DoesNotExist:
+            raise Http404
+
+    def get(self, request, pk):
+        ent = self.get_object(pk)
+        res = EntitySerializer(ent)
+        return Response(res.data)
 
 
 class InstitutionViewSet(viewsets.ModelViewSet):

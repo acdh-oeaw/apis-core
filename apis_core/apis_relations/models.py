@@ -450,10 +450,10 @@ class PlacePlace(TempEntityClass):
     relation_type = models.ForeignKey(PlacePlaceRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
     related_placeA = models.ForeignKey(
-        Place, blank=True, null=True, related_name="related_place_placeA",
+        Place, blank=True, null=True, related_name="related_placeA",
         on_delete=models.CASCADE)
     related_placeB = models.ForeignKey(
-        Place, blank=True, null=True, related_name="related_place_placeB",
+        Place, blank=True, null=True, related_name="related_placeB",
         on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
