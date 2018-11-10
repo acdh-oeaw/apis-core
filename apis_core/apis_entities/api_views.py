@@ -31,7 +31,7 @@ import os
 from io import TextIOWrapper
 import requests
 from datetime import datetime
-#from metainfo.models import TempEntityClass
+# from metainfo.models import TempEntityClass
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -42,7 +42,7 @@ class StandardResultsSetPagination(PageNumberPagination):
 
 class GetEntityGeneric(APIView):
     serializer_class = EntitySerializer
-    
+
     def get_object(self, pk):
         try:
             return TempEntityClass.objects_inheritance.get_subclass(pk=pk)
@@ -79,7 +79,10 @@ class PersonViewSet(viewsets.ModelViewSet):
     pagination_class = StandardResultsSetPagination
     depth = 2
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    filter_fields = ('name', 'first_name', 'gender', 'profession__name', 'collection__name', 'uri__uri')
+    filter_fields = (
+        'name', 'first_name', 'gender', 'profession__name',
+        'collection__name', 'uri__uri'
+    )
     search_fields = ('name', 'first_name')
 
 
@@ -140,7 +143,9 @@ class PlaceGeoJsonViewSet(viewsets.ViewSet):
                     if site:
                         params = {'id': 'http://sws.geonames.org/{}/'.format(match_url.group(1))}
                         headers = {'Content-Type': 'application/json'}
-                        w = requests.get(stb_base+site.group(1)+'/entity', params=params, headers=headers)
+                        w = requests.get(
+                            stb_base+site.group(1)+'/entity', params=params, headers=headers
+                        )
                         if w.status_code == 200:
                             if 'representation' in w.json().keys():
                                 res = [True, w.json()['representation']]
@@ -154,10 +159,14 @@ class PlaceGeoJsonViewSet(viewsets.ViewSet):
             res = False, False
         if res[1]:
             if type(res[1]) is not list:
-                res = (res[0], [res[1],])
-            serializer = GeoJsonSerializer(res[1], many=True, context={'p_pk': request.query_params.get('p_pk', None)})
+                res = (res[0], [res[1], ])
+            serializer = GeoJsonSerializer(res[1], many=True, context={
+                'p_pk': request.query_params.get('p_pk', None)}
+            )
         else:
-            serializer = GeoJsonSerializer([], many=True, context={'p_pk': request.query_params.get('p_pk', None)})
+            serializer = GeoJsonSerializer(
+                [], many=True, context={'p_pk': request.query_params.get('p_pk', None)}
+            )
         return Response(serializer.data)
 
 
@@ -177,7 +186,8 @@ class NetJsonViewSet(viewsets.ViewSet):
             ann_include_all = True
         else:
             ann_include_all = False
-        q = ContentType.objects.get(app_label='apis_relations', model=''.join(rel.split('-'))).model_class()
+        q = ContentType.objects.get(
+            app_label='apis_relations', model=''.join(rel.split('-'))).model_class()
         rel_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+$)', rel)
         lst_nodes = []
         rel_a = 'related_' + rel.split('-')[0]
@@ -197,13 +207,19 @@ class NetJsonViewSet(viewsets.ViewSet):
                     q_dict[rel_a+'__collection__id'] = int(source[3:])
             else:
                 if q_list is not None:
-                    q_list.append(Q(**{rel_a + '_id': int(source)}) | Q(**{rel_b + '_id': int(source)}))
+                    q_list.append(
+                        Q(**{rel_a + '_id': int(source)}) | Q(**{rel_b + '_id': int(source)})
+                    )
                 else:
                     q_dict[rel_a + '_id'] = int(source)
         elif'search_source-autocomplete' in request.data.keys():
             source = request.data['search_source-autocomplete']
             if q_list is not None:
-                q_list.append(Q(**{rel_a + '__name__icontains': source})|Q(**{rel_b + '__name__icontains': source}))
+                q_list.append(
+                    Q(**{rel_a + '__name__icontains': source}) | Q(
+                        **{rel_b + '__name__icontains': source}
+                    )
+                )
             else:
                 q_dict[rel_a + '__name__icontains'] = source
         if 'search_target' in request.data.keys():
@@ -216,7 +232,9 @@ class NetJsonViewSet(viewsets.ViewSet):
                     q_dict[rel_b+'__collection__id'] = int(target[3:])
             else:
                 if q_list is not None:
-                    q_list.append(Q(**{rel_a + '_id': int(target)}) | Q(**{rel_b + '_id': int(target)}))
+                    q_list.append(
+                        Q(**{rel_a + '_id': int(target)}) | Q(**{rel_b + '_id': int(target)})
+                    )
                 else:
                     q_dict[rel_b + '_id'] = target
         elif 'search_target-autocomplete' in request.data.keys():
@@ -224,7 +242,9 @@ class NetJsonViewSet(viewsets.ViewSet):
                 target = request.data['search_target-autocomplete']
                 if q_list is not None:
                     q_list.append(
-                        Q(**{rel_a + '__name__icontains': target}) | Q(**{rel_b + '__name__icontains': target}))
+                        Q(**{rel_a + '__name__icontains': target}) | Q(
+                            **{rel_b + '__name__icontains': target})
+                        )
                 else:
                     q_dict[rel_b + '__name__icontains'] = target
         if kind:
@@ -232,7 +252,8 @@ class NetJsonViewSet(viewsets.ViewSet):
             kind_ids_res = [int(kind.strip())]
             while len(kind_ids) > 0:
                 id_a = kind_ids.pop()
-                ids_b = VocabsBaseClass.objects.filter(parent_class_id=id_a).values_list('pk', flat=True)
+                ids_b = VocabsBaseClass.objects.filter(
+                    parent_class_id=id_a).values_list('pk', flat=True)
                 kind_ids.extend(ids_b)
                 kind_ids_res.extend(ids_b)
             q_dict['relation_type_id__in'] = kind_ids_res
@@ -276,7 +297,9 @@ class SaveNetworkFiles(APIView):
         nmb = False
         for file in os.listdir('downloads/'):
             print(file)
-            if fnmatch.fnmatch(file, file_name_list[0]+'_*.'+file_name_list[1]) or file == file_name:
+            if fnmatch.fnmatch(
+                file, file_name_list[0]+'_*.'+file_name_list[1]
+            ) or file == file_name:
                 if nmb:
                     nmb += 1
                 else:
@@ -305,6 +328,11 @@ class GetOrCreateEntity(APIView):
         entity = request.query_params.get('entity2', None)
         uri = request.query_params.get('uri', None)
         ent = GenericRDFParser(uri, entity.title()).get_or_create()
-        res = {'id': ent.pk, 'url': reverse_lazy('apis:apis_entities:generic_entities_edit_view', request=request,
-                                            kwargs={'pk': ent.pk, 'entity': entity})}
+        res = {
+            'id': ent.pk,
+            'url': reverse_lazy(
+                'apis:apis_entities:generic_entities_edit_view',
+                request=request,
+                kwargs={'pk': ent.pk, 'entity': entity})
+            }
         return Response(res)
