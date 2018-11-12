@@ -19,9 +19,31 @@ class TeiEntCreator():
             for x in self.ent_dict.get('uris'):
                 idno = ET.Element("idno")
                 idno.attrib['type'] = 'URL'
+                if "d-nb.info" in x.get('uri'):
+                    idno.attrib['subtype'] = "GND"
                 idno.text = x.get('uri')
                 uris.append(idno)
         return uris
+
+    def create_place_node(self):
+        place = ET.Element("{http://www.tei-c.org/ns/1.0}place")
+        place.attrib['{http://www.w3.org/XML/1998/namespace}id'] = "place__{}".format(
+            self.ent_apis_id
+        )
+        placeName = ET.Element("placeName")
+        placeName.text = self.ent_dict.get('name')
+        place.append(placeName)
+        if self.uris_to_idnos():
+            for x in self.uris_to_idnos():
+                place.append(x)
+        if self.ent_dict.get('lat'):
+            coords = "{} {}".format(self.ent_dict['lat'], self.ent_dict['lng'])
+            location = ET.Element('location')
+            geo = ET.Element('geo')
+            geo.text = coords
+            location.append(geo)
+            place.append(location)
+        return place
 
     def create_person_node(self):
         person = ET.Element("{http://www.tei-c.org/ns/1.0}person")
@@ -63,7 +85,10 @@ class TeiEntCreator():
 
     def create_full_doc(self):
         doc = self.create_header_node()
-        item = self.create_person_node()
+        if self.ent_type == "Person":
+            item = self.create_person_node()
+        elif self.ent_type == "Place":
+            item = self.create_place_node()
         body = doc.xpath("//tei:body", namespaces=self.nsmap)[0]
         body.append(item)
         return doc
