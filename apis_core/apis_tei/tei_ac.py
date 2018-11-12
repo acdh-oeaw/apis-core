@@ -12,6 +12,8 @@ class TeiEntAc(autocomplete.Select2ListView):
         page_size = 200
         offset = (int(self.request.GET.get('page', 1))-1)*page_size
         ac_type = self.kwargs['entity']
+        if ac_type == "org":
+            ac_type = "institution"
         choices = []
         headers = {'Content-Type': 'application/json'}
         ent_model = ContentType.objects.get(
@@ -24,7 +26,10 @@ class TeiEntAc(autocomplete.Select2ListView):
             dates = "time: {} - {}".format(r.start_date, r.end_date)
             f = dict()
             f['id'] = "{}".format(str(r.id))
-            f['type'] = "{}".format(ac_type)
+            if ac_type == 'institution':
+                f['type'] = "org"
+            else:
+                f['type'] = "{}".format(ac_type)
             f['name'] = "{}".format(str(r))
             f['description'] = "{}".format(dates)
             choices.append(f)
