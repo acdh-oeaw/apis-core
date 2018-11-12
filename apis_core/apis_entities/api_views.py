@@ -33,6 +33,8 @@ import requests
 from datetime import datetime
 # from metainfo.models import TempEntityClass
 
+from . api_renderers import EntityToTEI
+
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 25
@@ -42,6 +44,8 @@ class StandardResultsSetPagination(PageNumberPagination):
 
 class GetEntityGeneric(APIView):
     serializer_class = EntitySerializer
+    renderer_classes = tuple(
+        api_settings.DEFAULT_RENDERER_CLASSES) + (EntityToTEI, )
 
     def get_object(self, pk):
         try:
