@@ -18,15 +18,18 @@ class TeiEntCreator():
 
     def relation_groups(self):
         ent_dict = self.ent_dict
-        ent_types = [x for x in ent_dict['relations']]
+        ent_types = list(ent_dict['relations'].keys())
+        self_type = "{}s".format(ent_dict['entity_type'].lower())
         relations = []
         for x in ent_types:
             group = []
             for y in ent_dict['relations'][x]:
+                ent_key = list(y.keys())[2]
                 rel = {}
                 rel['rel_type'] = x
                 rel['rel_label'] = slugify(y['relation_label'])
-                rel['target'] = y[x[:-1]]['id']
+                rel['target'] = y[ent_key]['id']
+                rel['target_name'] = y[ent_key]['name']
                 group.append(rel)
             if group:
                 relations.append(group)
@@ -57,6 +60,17 @@ class TeiEntCreator():
                 idno.text = x.get('uri')
                 uris.append(idno)
         return uris
+
+    def create_work_node(self):
+        work = ET.Element("{http://www.tei-c.org/ns/1.0}item")
+        work.attrib['{http://www.w3.org/XML/1998/namespace}id'] = "work__{}".format(
+            self.ent_apis_id
+        )
+        work.text = self.ent_dict.get('name')
+        for x in self.relation_notes():
+            work.append(x)
+
+        return work
 
     def create_event_node(self):
         event = ET.Element("{http://www.tei-c.org/ns/1.0}event")
@@ -91,9 +105,9 @@ class TeiEntCreator():
         org.append(orgName)
         for x in self.relation_notes():
             org.append(x)
-            if self.uris_to_idnos():
-                for x in self.uris_to_idnos():
-                    org.append(x)
+        if self.uris_to_idnos():
+            for x in self.uris_to_idnos():
+                org.append(x)
         return org
 
     def create_place_node(self):
@@ -176,6 +190,9 @@ class TeiEntCreator():
         elif self.ent_type == "Event":
             item = self.create_event_node()
             ent_list = ET.Element("listEvent")
+        elif self.ent_type == "Work":
+            item = self.create_work_node()
+            ent_list = ET.Element("list")
         body = doc.xpath("//tei:body", namespaces=self.nsmap)[0]
         body.append(ent_list)
         ent_list.append(item)
