@@ -1,5 +1,7 @@
 import lxml.etree as ET
 
+from django.utils.text import slugify
+
 from . partials import TEI_NSMAP, tei_gen_header
 
 
@@ -7,11 +9,42 @@ class TeiEntCreator():
     def __init__(self, ent_dict):
         self.nsmap = TEI_NSMAP
         self.project = "APIS"
+        self.base_url = "/apis/api2/entity/"
         self.ent_dict = ent_dict
         self.ent_name = ent_dict.get('name', 'No name provided')
         self.ent_type = ent_dict.get('entity_type')
         self.ent_apis_id = ent_dict.get('id')
         self.gen_tei_header = tei_gen_header
+
+    def relation_groups(self):
+        ent_dict = self.ent_dict
+        ent_types = [x for x in ent_dict['relations']]
+        relations = []
+        for x in ent_types:
+            group = []
+            for y in ent_dict['relations'][x]:
+                rel = {}
+                rel['rel_type'] = x
+                rel['rel_label'] = slugify(y['relation_label'])
+                rel['target'] = y[x[:-1]]['id']
+                group.append(rel)
+            if group:
+                relations.append(group)
+        return relations
+
+    def relation_notes(self):
+        notes = []
+        for group in self.relation_groups():
+            note = ET.Element("{http://www.tei-c.org/ns/1.0}note")
+            note_type = group[0]['rel_type']
+            note.attrib['type'] = note_type
+            for item in group:
+                ptr = ET.Element("ptr")
+                ptr.attrib['type'] = item['rel_label']
+                ptr.attrib['target'] = "{}{}".format(self.base_url, item['target'])
+                note.append(ptr)
+            notes.append(note)
+        return notes
 
     def uris_to_idnos(self):
         uris = []
@@ -34,6 +67,8 @@ class TeiEntCreator():
             event.attrib['notBefore'] = self.ent_dict.get('start_date')
         if self.ent_dict.get('end_date'):
             event.attrib['notAfter'] = self.ent_dict.get('end_date')
+        for x in self.relation_notes():
+            event.append(x)
         label = ET.Element("label")
         label.text = self.ent_dict.get('name')
         event.append(label)
@@ -54,9 +89,11 @@ class TeiEntCreator():
         if self.ent_dict.get('end_date'):
             orgName.attrib['notAfter'] = self.ent_dict.get('end_date')
         org.append(orgName)
-        if self.uris_to_idnos():
-            for x in self.uris_to_idnos():
-                org.append(x)
+        for x in self.relation_notes():
+            org.append(x)
+            if self.uris_to_idnos():
+                for x in self.uris_to_idnos():
+                    org.append(x)
         return org
 
     def create_place_node(self):
@@ -71,6 +108,8 @@ class TeiEntCreator():
         if self.ent_dict.get('end_date'):
             placeName.attrib['notAfter'] = self.ent_dict.get('end_date')
         place.append(placeName)
+        for x in self.relation_notes():
+            place.append(x)
         if self.uris_to_idnos():
             for x in self.uris_to_idnos():
                 place.append(x)
@@ -107,6 +146,8 @@ class TeiEntCreator():
             death.attrib['when'] = self.ent_dict.get('end_date')
             death.text = self.ent_dict.get('end_date_written')
             person.append(death)
+        for x in self.relation_notes():
+            person.append(x)
         if self.uris_to_idnos():
             for x in self.uris_to_idnos():
                 person.append(x)
