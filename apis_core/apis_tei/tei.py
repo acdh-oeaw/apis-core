@@ -25,6 +25,40 @@ class TeiEntCreator():
                 uris.append(idno)
         return uris
 
+    def create_event_node(self):
+        event = ET.Element("{http://www.tei-c.org/ns/1.0}event")
+        event.attrib['{http://www.w3.org/XML/1998/namespace}id'] = "event__{}".format(
+            self.ent_apis_id
+        )
+        if self.ent_dict.get('start_date'):
+            event.attrib['notBefore'] = self.ent_dict.get('start_date')
+        if self.ent_dict.get('end_date'):
+            event.attrib['notAfter'] = self.ent_dict.get('end_date')
+        label = ET.Element("label")
+        label.text = self.ent_dict.get('name')
+        event.append(label)
+        if self.ent_dict.get('uris'):
+            for x in self.ent_dict.get('uris'):
+                event.attrib['ref'] = x.get('uri')
+        return event
+
+    def create_org_node(self):
+        org = ET.Element("{http://www.tei-c.org/ns/1.0}org")
+        org.attrib['{http://www.w3.org/XML/1998/namespace}id'] = "org__{}".format(
+            self.ent_apis_id
+        )
+        orgName = ET.Element("orgName")
+        orgName.text = self.ent_dict.get('name')
+        if self.ent_dict.get('start_date'):
+            orgName.attrib['notBefore'] = self.ent_dict.get('start_date')
+        if self.ent_dict.get('end_date'):
+            orgName.attrib['notAfter'] = self.ent_dict.get('end_date')
+        org.append(orgName)
+        if self.uris_to_idnos():
+            for x in self.uris_to_idnos():
+                org.append(x)
+        return org
+
     def create_place_node(self):
         place = ET.Element("{http://www.tei-c.org/ns/1.0}place")
         place.attrib['{http://www.w3.org/XML/1998/namespace}id'] = "place__{}".format(
@@ -32,6 +66,10 @@ class TeiEntCreator():
         )
         placeName = ET.Element("placeName")
         placeName.text = self.ent_dict.get('name')
+        if self.ent_dict.get('start_date'):
+            placeName.attrib['notBefore'] = self.ent_dict.get('start_date')
+        if self.ent_dict.get('end_date'):
+            placeName.attrib['notAfter'] = self.ent_dict.get('end_date')
         place.append(placeName)
         if self.uris_to_idnos():
             for x in self.uris_to_idnos():
@@ -87,10 +125,19 @@ class TeiEntCreator():
         doc = self.create_header_node()
         if self.ent_type == "Person":
             item = self.create_person_node()
+            ent_list = ET.Element("listPerson")
         elif self.ent_type == "Place":
             item = self.create_place_node()
+            ent_list = ET.Element("listPlace")
+        elif self.ent_type == "Institution":
+            item = self.create_org_node()
+            ent_list = ET.Element("listOrg")
+        elif self.ent_type == "Event":
+            item = self.create_event_node()
+            ent_list = ET.Element("listEvent")
         body = doc.xpath("//tei:body", namespaces=self.nsmap)[0]
-        body.append(item)
+        body.append(ent_list)
+        ent_list.append(item)
         return doc
 
     def serialize_full_doc(self):
