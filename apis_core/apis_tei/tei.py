@@ -12,10 +12,10 @@ def custom_escape(somestring):
 
 
 class TeiEntCreator():
-    def __init__(self, ent_dict):
+    def __init__(self, ent_dict, base_url='https://provide/some/base/url/'):
         self.nsmap = TEI_NSMAP
         self.project = "APIS"
-        self.base_url = "/apis/api2/entity/"
+        self.base_url = base_url
         self.ent_dict = ent_dict
         self.ent_name = custom_escape(ent_dict.get('name', 'No name provided'))
         self.ent_type = ent_dict.get('entity_type')

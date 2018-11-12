@@ -1,3 +1,4 @@
+from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets, generics, filters
 from rest_framework.reverse import reverse_lazy
