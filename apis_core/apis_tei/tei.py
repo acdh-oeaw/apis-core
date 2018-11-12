@@ -1,8 +1,14 @@
 import lxml.etree as ET
+from xml.sax.saxutils import escape, unescape
 
 from django.utils.text import slugify
 
 from . partials import TEI_NSMAP, tei_gen_header
+
+
+def custom_escape(somestring):
+    un_escaped = unescape(somestring)
+    return escape(un_escaped)
 
 
 class TeiEntCreator():
@@ -11,7 +17,7 @@ class TeiEntCreator():
         self.project = "APIS"
         self.base_url = "/apis/api2/entity/"
         self.ent_dict = ent_dict
-        self.ent_name = ent_dict.get('name', 'No name provided')
+        self.ent_name = custom_escape(ent_dict.get('name', 'No name provided'))
         self.ent_type = ent_dict.get('entity_type')
         self.ent_apis_id = ent_dict.get('id')
         self.gen_tei_header = tei_gen_header
@@ -66,7 +72,7 @@ class TeiEntCreator():
         work.attrib['{http://www.w3.org/XML/1998/namespace}id'] = "work__{}".format(
             self.ent_apis_id
         )
-        work.text = self.ent_dict.get('name')
+        work.text = custom_escape(self.ent_dict.get('name'))
         for x in self.relation_notes():
             work.append(x)
 
@@ -84,7 +90,7 @@ class TeiEntCreator():
         for x in self.relation_notes():
             event.append(x)
         label = ET.Element("label")
-        label.text = self.ent_dict.get('name')
+        label.text = self.ent_name
         event.append(label)
         if self.ent_dict.get('uris'):
             for x in self.ent_dict.get('uris'):
