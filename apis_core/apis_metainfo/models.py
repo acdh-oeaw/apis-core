@@ -14,6 +14,7 @@ from model_utils.managers import InheritanceManager
 from apis_core.apis_vocabularies.models import CollectionType, TextType, LabelType
 from apis_core.apis_labels.models import Label
 from .validators import date_validator
+from apis_core.apis_entities.serializers_generic import EntitySerializer
 
 from datetime import datetime
 import re
@@ -287,6 +288,9 @@ class TempEntityClass(models.Model):
                         setattr(t, 'related_{}'.format(e_a.lower()), self)
                         t.save()
             ent.delete()
+    
+    def get_serialization(self):
+        return EntitySerializer(self)
 
 
 @reversion.register()

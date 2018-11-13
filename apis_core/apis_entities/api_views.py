@@ -11,8 +11,9 @@ from django.contrib.contenttypes.models import ContentType
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
 from .serializers import (
     InstitutionSerializer, PersonSerializer, PlaceSerializer, EventSerializer, WorkSerializer,
-    GeoJsonSerializer, NetJsonEdgeSerializer, NetJsonNodeSerializer, EntitySerializer
+    GeoJsonSerializer, NetJsonEdgeSerializer, NetJsonNodeSerializer 
 )
+from .serializers_generic import EntitySerializer
 from .models import Institution, Person, Place, Event, Work
 from apis_core.apis_vocabularies.models import VocabsBaseClass
 from apis_core.helper_functions.stanbolQueries import find_loc
