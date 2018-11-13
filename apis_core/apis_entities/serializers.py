@@ -2,6 +2,7 @@ from django.urls import reverse_lazy
 from rest_framework import serializers
 from .models import Institution, Person, Place, Event, Work
 from django.contrib.contenttypes.models import ContentType
+from django.urls import reverse
 
 import re
 
@@ -9,6 +10,7 @@ import re
 class EntityUriSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     uri = serializers.URLField()
+
 
 class EntitySerializer(serializers.Serializer):
     id = serializers.IntegerField()
@@ -27,7 +29,7 @@ class EntitySerializer(serializers.Serializer):
             res['{}s'.format(mk2.group(1))] = []
             if mk2.group(1).lower() != mk.lower():
                 for rel2 in getattr(obj, '{}_set'.format(rel.model)).all():
-                    res['{}s'.format(mk2.group(1))].append(RelationEntitySerializer(rel2, own_class=mk, read_only=True).data)
+                    res['{}s'.format(mk2.group(1))].append(RelationEntitySerializer(rel2, own_class=mk, read_only=True, context=self.context).data)
             else:
                 for t in ['A', 'B']:
                     for rel2 in getattr(obj, 'related_{}{}'.format(mk.lower(), t)).all():
@@ -35,15 +37,14 @@ class EntitySerializer(serializers.Serializer):
                             ok = '{}A'.format(mk.lower())
                         else:
                             ok = '{}B'.format(mk.lower())
-                        res['{}s'.format(mk2.group(1))].append(RelationEntitySerializer(rel2, own_class=ok, read_only=True).data)
+                        res['{}s'.format(mk2.group(1))].append(RelationEntitySerializer(rel2, own_class=ok, read_only=True, context=self.context).data)
         return res
 
     def add_entity_type(self, obj):
         return str(obj.__class__.__name__)
 
     def __init__(self, *args, depth_ent=1, **kwargs):
-        super(EntitySerializer, self).__init__(*args, **kwargs)
-        
+        super(EntitySerializer, self).__init__(*args, **kwargs) 
         for f in self.instance._meta.fields:
             field_name = re.search(r'([A-Za-z]+)\'>', str(f.__class__)).group(1)
             if field_name in ['CharField', 'DateField', 'DateTimeField', 'IntegerField', 'FloatField']:
@@ -55,13 +56,28 @@ class EntitySerializer(serializers.Serializer):
 
 class RelationEntitySerializer(serializers.Serializer):
     id = serializers.IntegerField()
-    relation_label = serializers.CharField(source="relation_type.label")
+    relation_type = serializers.SerializerMethodField(method_name="add_relation_label")
 
     def add_entity(self, obj):
         return EntitySerializer(getattr(obj, "related_{}".format(self.entity_type)), depth_ent=0).data
     
+    def add_relation_label(self, obj):
+        cm = obj.__class__.__name__
+        cm_match_1 = re.match(r'{}.*'.format(self.own_class), cm)
+        cm_match_2 = re.match(r'.*{}'.format(self.own_class), cm)
+        res_1 = dict()
+        res_1['url'] =  self.context['request'].build_absolute_uri(reverse("apis_core:{}relation-detail".format(cm).lower(), kwargs={'pk':obj.relation_type.pk})) 
+        if cm_match_1:
+            res_1['label'] =  obj.relation_type.label
+        elif cm_match_2:
+            res_1['label'] = obj.relation_type.label_reverse
+        else:
+            res_1['label'] =  "({})".format(obj.relation_type.label)
+        return res_1
+
     def __init__(self, *args, own_class=None, **kwargs):
         super(RelationEntitySerializer, self).__init__(*args, **kwargs)
+        self.own_class = own_class
         if self.instance is not None:
             for f in self.instance._meta.fields:
                 if f.name.startswith('related_'):

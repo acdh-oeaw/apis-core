@@ -51,7 +51,7 @@ class GetEntityGeneric(APIView):
 
     def get(self, request, pk):
         ent = self.get_object(pk)
-        res = EntitySerializer(ent)
+        res = EntitySerializer(ent, context={'request': request})
         return Response(res.data)
 
 
