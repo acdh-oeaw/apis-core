@@ -290,7 +290,7 @@ class TempEntityClass(models.Model):
             ent.delete()
     
     def get_serialization(self):
-        return EntitySerializer(self)
+        return EntitySerializer(self).data
 
 
 @reversion.register()
