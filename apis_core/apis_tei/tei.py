@@ -33,7 +33,7 @@ class TeiEntCreator():
                 ent_key = list(y.keys())[2]
                 rel = {}
                 rel['rel_type'] = x
-                rel['rel_label'] = slugify(y['relation_label'])
+                rel['rel_label'] = slugify(y['relation_type']['label'])
                 rel['target'] = y[ent_key]['id']
                 rel['target_name'] = y[ent_key]['name']
                 group.append(rel)
@@ -183,7 +183,9 @@ class TeiEntCreator():
         return header
 
     def create_full_doc(self):
+        ent_list = []
         doc = self.create_header_node()
+        item = None
         if self.ent_type == "Person":
             item = self.create_person_node()
             ent_list = ET.Element("listPerson")
@@ -200,7 +202,10 @@ class TeiEntCreator():
             item = self.create_work_node()
             ent_list = ET.Element("list")
         body = doc.xpath("//tei:body", namespaces=self.nsmap)[0]
-        body.append(ent_list)
+        try:
+            body.append(ent_list)
+        except TypeError:
+            pass
         ent_list.append(item)
         return doc
 
