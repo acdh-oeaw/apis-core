@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from rest_framework import serializers
+from django.db.models.query import QuerySet
 
 import re
 
@@ -43,8 +44,12 @@ class EntitySerializer(serializers.Serializer):
         return str(obj.__class__.__name__)
 
     def __init__(self, *args, depth_ent=1, **kwargs):
-        super(EntitySerializer, self).__init__(*args, **kwargs) 
-        for f in self.instance._meta.fields:
+        super(EntitySerializer, self).__init__(*args, **kwargs)
+        if type(self.instance) == QuerySet:
+            inst = self.instance[0]
+        else:
+            inst = self.instance
+        for f in inst._meta.fields:
             field_name = re.search(r'([A-Za-z]+)\'>', str(f.__class__)).group(1)
             if field_name in [
                 'CharField', 'DateField', 'DateTimeField', 'IntegerField', 'FloatField'
