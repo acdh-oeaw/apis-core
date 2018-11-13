@@ -33,7 +33,7 @@ class TeiEntCreator():
                 ent_key = list(y.keys())[2]
                 rel = {}
                 rel['rel_type'] = x
-                rel['rel_label'] = slugify(y['relation_label'])
+                rel['rel_label'] = slugify(y['relation_type']['label'])
                 rel['target'] = y[ent_key]['id']
                 rel['target_name'] = y[ent_key]['name']
                 group.append(rel)
