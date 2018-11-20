@@ -81,7 +81,7 @@
             var query = $(this).parent().parent().find('#place_search').val()
             $.ajax({
                 type: 'GET',
-                url: '/api/GeoJsonPlace/',
+                url: '/apis/api/GeoJsonPlace/',
                 data: {'q': query,'p_pk': {{instance.pk}}},
                 success: function(data) {
                     //var geoJsonLayer = L.geoJson(data, {onEachFeature: onEachFeature});
