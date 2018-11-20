@@ -8,29 +8,32 @@ with open(os.path.join(os.path.dirname(__file__), 'README.rst')) as readme:
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 bower_json = {
-    "dependencies": {
-        "jquery": "^3.2.1",
-        "bootstrap": "^3.3.7",
-        "leaflet": "^1.1.0",
-        "leaflet.markercluster": "Leaflet.markercluster#^1.0.6",
-     },
-    "resolutions": {
-        "jquery": "1.9.1 - 3"
-    }
+"dependencies": {
+    "jquery": "^3.2.1",
+    "bootstrap": "^3.3.7",
+    "bootstrap-multiselect": "^0.9.13",
+    "bootstrap-datepicker": "^1.7.0",
+    "jquery-tablesort": "^0.0.11",
+    "leaflet": "^1.1.0",
+    "tooltipster": "^4.2.5",
+    "leaflet.markercluster": "Leaflet.markercluster#^1.0.6",
+  },
+  "resolutions": {
+    "jquery": "1.9.1 - 3"
+  }
 }
 
 setup(
     name='apis-core',
-    version='0.8',
+    version='0.9.1',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',  # example license
-    description='APIS core package. Includes entities, relations, vocabularies,\
-    labels and the helper scripts for RDF parsing.',
+    description='APIS core package. Includes entities, relations, vocabularies, labels and the helper scripts for RDF parsing.',
     long_description=README,
     url='https://www.apis.acdh.oeaw.ac.at/',
-    author='Matthias Schlögl',
-    author_email='matthias.schloegl@oeaw.ac.at',
+    author='Matthias Schlögl, Peter Andorfer',
+    author_email='matthias.schloegl@oeaw.ac.at, peter.andorfer@oeaw.ac.at',
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
@@ -64,7 +67,6 @@ setup(
         'python-dateutil>=2.7.0',
         'rdflib>=4.2.2',
         'requests>=2.18.4',
-        'tablib>=0.12.1',
     ],
     bower_json=bower_json,
 )

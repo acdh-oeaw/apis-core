@@ -22,7 +22,6 @@ class Select2WidgetMixin(DALSelect2WidgetMixin):
         except ValueError:
             print('Error')
             pass
-        print(forms.Media(css=m._css, js=js))
         return forms.Media(css=m._css, js=js)
 
 
