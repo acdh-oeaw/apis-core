@@ -125,7 +125,7 @@ class GenericRDFParser(object):
         for col in m_obj.collection.all():
             self.objct.collection.add(col)
         if 'apis_highlighter' in settings.INSTALLED_APPS:
-            for ann in m_obj.annotation_set.all():  # Todo: needs to work also when highlighter package not installed
+            for ann in m_obj.annotation_set.all():  # Todo: check if this works now with highlighter
                 ann.entity_link.remove(m_obj)
                 ann.entity_link.add(self.objct)
         for txt in m_obj.text.all():
