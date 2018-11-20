@@ -430,13 +430,7 @@ def resolve_ambigue_place(request, pk, uri):
         pl_n = GenericRDFParser(uri, kind='Place')
         pl_n_1 = pl_n.save()
         pl_n_1 = pl_n.merge(entity)
-        url = reverse_lazy(
-            'apis_entities:generic_entities_edit_view',
-            kwargs={
-                'entity': 'place',
-                'pk': str(pl_n_1.pk),
-            }
-        )
+        url = pl_n_1.get_absolute_url()
         if pl_n.created:
             pl_n_1.status = 'distinct (manually resolved)'
             pl_n_1.save()

@@ -22,6 +22,7 @@ from datetime import datetime
 import types
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
 from django.core.exceptions import FieldError
 
 
@@ -123,9 +124,10 @@ class GenericRDFParser(object):
         Label.objects.create(temp_entity_id=self.objct.pk, label=legacy_name, label_type=lt)
         for col in m_obj.collection.all():
             self.objct.collection.add(col)
-        for ann in m_obj.annotation_set.all():  # Todo: needs to work also when highlighter package not installed
-            ann.entity_link.remove(m_obj)
-            ann.entity_link.add(self.objct)
+        if 'apis_highlighter' in settings.INSTALLED_APPS:
+            for ann in m_obj.annotation_set.all():  # Todo: needs to work also when highlighter package not installed
+                ann.entity_link.remove(m_obj)
+                ann.entity_link.add(self.objct)
         for txt in m_obj.text.all():
             self.objct.text.add(txt)
         if m_obj.source:
