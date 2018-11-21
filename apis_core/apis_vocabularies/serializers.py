@@ -6,7 +6,7 @@ from .models import (
     InstitutionType, ProfessionType, PlaceType, PersonInstitutionRelation, InstitutionPlaceRelation,
     PersonPlaceRelation, VocabNames, PersonPersonRelation, PersonEventRelation, PersonWorkRelation,
     InstitutionEventRelation, InstitutionWorkRelation, PlaceEventRelation, PlaceWorkRelation, PlacePlaceRelation,
-    EventWorkRelation, EventEventRelation, WorkWorkRelation, EventType, WorkType)
+    EventWorkRelation, EventEventRelation, WorkWorkRelation, EventType, WorkType, LabelType)
 
 
 ###########################################################
@@ -92,6 +92,12 @@ class WorkTypeSerializer(serializers.HyperlinkedModelSerializer):
         fields = '__all__'
         model = WorkType
 
+
+class LabelTypeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = ('id', 'name')
+        model = LabelType
 
 #####################################################################
 #

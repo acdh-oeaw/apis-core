@@ -2,8 +2,23 @@ from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from rest_framework import serializers
 from django.db.models.query import QuerySet
+from apis_core.apis_labels.serializers import LabelSerializer
+from apis_core.apis_vocabularies.models import ProfessionType
+
 
 import re
+
+
+class CollectionSerializer(serializers.Serializer): 
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+
+
+class ProfessionTypeSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = ProfessionType
+        fields = ('id', 'name', 'label')
 
 
 class EntityUriSerializer(serializers.Serializer):
@@ -17,6 +32,7 @@ class EntitySerializer(serializers.Serializer):
     start_date = serializers.DateField()
     end_date = serializers.DateField()
     uris = EntityUriSerializer(source="uri_set", many=True)
+    labels = LabelSerializer(source="label_set", many=True)
 
     def add_relations(self, obj):
         res = {}
@@ -55,6 +71,11 @@ class EntitySerializer(serializers.Serializer):
                 'CharField', 'DateField', 'DateTimeField', 'IntegerField', 'FloatField'
             ]:
                 self.fields[f.name] = getattr(serializers, field_name)()
+        for f in inst._meta.many_to_many:
+            if f.name == 'profession':
+                self.fields['profession'] = ProfessionTypeSerializer(many=True)
+            elif f.name == 'collection':
+                self.fields['collection'] = CollectionSerializer(many=True)
         self.fields['entity_type'] = serializers.SerializerMethodField(
             method_name="add_entity_type"
         )
