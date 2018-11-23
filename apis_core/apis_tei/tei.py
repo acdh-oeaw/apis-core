@@ -104,6 +104,22 @@ class TeiEntCreator():
         )
         orgName = ET.Element("orgName")
         orgName.text = self.ent_dict.get('name')
+        if self.ent_dict.get('labels'):
+            for x in self.ent_dict.get('labels'):
+                node = ET.Element("orgName")
+                node.attrib['type'] = 'alt'
+                try:
+                    node.attrib['subtype'] = "{}".format(x['label_type']['name'])
+                except KeyError:
+                    pass
+                try:
+                    node.attrib['{http://www.w3.org/XML/1998/namespace}lang'] = "{}".format(
+                        x['isoCode_639_3']
+                    )
+                except KeyError:
+                    pass
+                node.text = x['label']
+                org.append(node)
         if self.ent_dict.get('start_date'):
             orgName.attrib['notBefore'] = self.ent_dict.get('start_date')
         if self.ent_dict.get('end_date'):
@@ -128,6 +144,22 @@ class TeiEntCreator():
         if self.ent_dict.get('end_date'):
             placeName.attrib['notAfter'] = self.ent_dict.get('end_date')
         place.append(placeName)
+        if self.ent_dict.get('labels'):
+            for x in self.ent_dict.get('labels'):
+                node = ET.Element("placeName")
+                node.attrib['type'] = 'alt'
+                try:
+                    node.attrib['subtype'] = "{}".format(x['label_type']['name'])
+                except KeyError:
+                    pass
+                try:
+                    node.attrib['{http://www.w3.org/XML/1998/namespace}lang'] = "{}".format(
+                        x['isoCode_639_3']
+                    )
+                except KeyError:
+                    pass
+                node.text = x['label']
+                place.append(node)
         for x in self.relation_notes():
             place.append(x)
         if self.uris_to_idnos():
@@ -156,6 +188,22 @@ class TeiEntCreator():
             forename.text = self.ent_dict.get('first_name')
             persName.append(forename)
         person.append(persName)
+        if self.ent_dict.get('labels'):
+            for x in self.ent_dict.get('labels'):
+                node = ET.Element("persName")
+                node.attrib['type'] = 'alt'
+                try:
+                    node.attrib['subtype'] = "{}".format(x['label_type']['name'])
+                except KeyError:
+                    pass
+                try:
+                    node.attrib['{http://www.w3.org/XML/1998/namespace}lang'] = "{}".format(
+                        x['isoCode_639_3']
+                    )
+                except KeyError:
+                    pass
+                node.text = x['label']
+                person.append(node)
         if self.ent_dict.get('start_date'):
             birth = ET.Element("birth")
             birth.attrib['when'] = self.ent_dict.get('start_date')
