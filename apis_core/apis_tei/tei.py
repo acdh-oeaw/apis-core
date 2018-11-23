@@ -166,6 +166,13 @@ class TeiEntCreator():
             death.attrib['when'] = self.ent_dict.get('end_date')
             death.text = self.ent_dict.get('end_date_written')
             person.append(death)
+        if self.ent_dict.get('profession'):
+            for x in self.ent_dict.get('profession'):
+                node = ET.Element("occupation")
+                node.attrib['scheme'] = '#apis_vocabularies/professiontype/'
+                node.attrib['code'] = "#{}".format(x['id'])
+                node.text = x['name']
+                person.append(node)
         for x in self.relation_notes():
             person.append(x)
         if self.uris_to_idnos():
