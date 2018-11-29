@@ -105,8 +105,44 @@
                                     </td>
                                 </tr>
                                 {% endif %}
+                                {% if object.lat %}
+                                    <tr>
+                                        <th>
+                                            Lat/Lng
+                                        </th>
+                                        <td>
+                                            {{ object.lat }} / {{ object.lng }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
                             </table>
                             {% endblock info-table %}
+                            {% block info-metadata %}
+                                <table class="table table-bordered table-hover">
+                                    <tr>
+                                        <th>
+                                            Collection(s)
+                                        </th>
+                                        <td>
+                                            {% for x in object.collection.all %}
+                                                <li>
+                                                    {{ x }}
+                                                </li>
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>
+                                            Uri(s)
+                                        </th>
+                                        <td>
+                                            {% for x in object.uri_set.all %}
+                                                <a href="{{ x }}">{{ x }}</a>
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                </table>
+                            {% endblock info-metadata %}
                             {% block left-pane-additional %}
                             {% endblock left-pane-additional %}
                         </div>
