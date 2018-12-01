@@ -87,6 +87,8 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
             'apis_entities/detail_views/entity_detail_generic.html'
             ])
         tei = getattr(settings, "APIS_TEI_TEXTS", [])
+        if tei:
+            tei = set(tei) & set([x.kind.name for x in instance.text.all()])
         ceteicean_css = getattr(settings, "APIS_CETEICEAN_CSS", None)
         ceteicean_js = getattr(settings, "APIS_CETEICEAN_JS", None)
         return HttpResponse(template.render(
