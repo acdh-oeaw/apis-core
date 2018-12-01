@@ -111,4 +111,9 @@ Let's say that all TEI texts are stored in Text fields with kind "xml/tei transc
 
 `APIS_TEI_TEXTS = ['xml/tei transcription']`
 
-Also make sure to include the needed js/css files to you template. 
+You'll also need to set define the locations for the CETEICEAN specific static files via dedicated paramters:
+
+```
+APIS_CETEICEAN_CSS = "http://teic.github.io/CETEIcean/css/CETEIcean.css"
+APIS_CETEICEAN_JS = "http://teic.github.io/CETEIcean/js/CETEI.js"
+``` 

@@ -87,6 +87,8 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
             'apis_entities/detail_views/entity_detail_generic.html'
             ])
         tei = getattr(settings, "APIS_TEI_TEXTS", [])
+        ceteicean_css = getattr(settings, "APIS_CETEICEAN_CSS", None)
+        ceteicean_js = getattr(settings, "APIS_CETEICEAN_JS", None)
         return HttpResponse(template.render(
             request=request, context={
                 'entity_type': entity,
@@ -94,7 +96,9 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
                 'right_card': side_bar,
                 'object_texts': object_texts,
                 'object_lod': object_lod,
-                'tei': tei
+                'tei': tei,
+                'ceteicean_css': ceteicean_css,
+                'ceteicean_js': ceteicean_js
                 }
             ))
 

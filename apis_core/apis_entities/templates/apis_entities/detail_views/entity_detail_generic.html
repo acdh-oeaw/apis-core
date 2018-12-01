@@ -5,8 +5,8 @@
 {% block scriptHeader %}
 {{ block.super }}
 {% if tei %}
-    {# <link rel="stylesheet" href="http://teic.github.io/CETEIcean/css/CETEIcean.css" media="screen" charset="utf-8"> #}
-    <script src="http://teic.github.io/CETEIcean/js/CETEI.js"></script>
+    <link rel="stylesheet" href="{{ ceteicean_css }}" media="screen" charset="utf-8">
+    <script src="{{ ceteicean_js }}"></script>
 {% endif %}
 {% endblock scriptHeader %}
 {% block content %}
