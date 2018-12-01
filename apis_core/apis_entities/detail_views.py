@@ -86,13 +86,15 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
             'apis_entities/detail_views/{}_detail_generic.html'.format(entity),
             'apis_entities/detail_views/entity_detail_generic.html'
             ])
+        tei = getattr(settings, "APIS_TEI_TEXTS", [])
         return HttpResponse(template.render(
             request=request, context={
                 'entity_type': entity,
                 'object': instance,
                 'right_card': side_bar,
                 'object_texts': object_texts,
-                'object_lod': object_lod
+                'object_lod': object_lod,
+                'tei': tei
                 }
             ))
 

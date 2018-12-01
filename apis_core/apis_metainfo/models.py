@@ -72,7 +72,7 @@ class TempEntityClass(models.Model):
         else:
             return "(ID: {})".format(self.id)
 
-    def save(self, *args, **kwargs):
+    def save(self, parse_dates=True, *args, **kwargs):
         """Adaption of the save() method of the class to automatically parse string-dates into date objects
         """
         def match_date(date):
@@ -104,17 +104,22 @@ class TempEntityClass(models.Model):
                 dr = None
                 dr2 = date
             return dr, dr2
-        if self.start_date_written:
-            self.start_date, self.start_date_written = match_date(self.start_date_written)
+        if parse_dates:
+            if self.start_date_written:
+                self.start_date, self.start_date_written = match_date(self.start_date_written)
+            else:
+                self.start_date = self.start_date_written = None
+            if self.end_date_written:
+                self.end_date, self.end_date_written = match_date(self.end_date_written)
+            else:
+                self.end_date = self.end_date_written = None
+            if self.name:
+                self.name = unicodedata.normalize('NFC', self.name)
+            super(TempEntityClass, self).save(*args, **kwargs)
         else:
-            self.start_date = self.start_date_written = None
-        if self.end_date_written:
-            self.end_date, self.end_date_written = match_date(self.end_date_written)
-        else:
-            self.end_date = self.end_date_written = None
-        if self.name:
-            self.name = unicodedata.normalize('NFC', self.name)
-        super(TempEntityClass, self).save(*args, **kwargs)
+            if self.name:
+                self.name = unicodedata.normalize('NFC', self.name)
+            super(TempEntityClass, self).save(*args, **kwargs)
         return self
 
     @classmethod
@@ -288,7 +293,7 @@ class TempEntityClass(models.Model):
                         setattr(t, 'related_{}'.format(e_a.lower()), self)
                         t.save()
             ent.delete()
-    
+
     def get_serialization(self):
         return EntitySerializer(self).data
 

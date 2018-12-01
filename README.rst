@@ -103,3 +103,12 @@ Change the template name in the project's settings file by adding the following 
 
 `APIS_LIST_VIEW_TEMPLATE = "browsing/generic_list.html"`
 `APIS_DELETE_VIEW_TEMPLATE = "webpage/confirm_delete.html"`
+
+## TEI
+
+In case you store TEI encoded XML in you TEXT objects, you can display those with https://github.com/TEIC/CETEIcean. Therefore you'll need to list the values of `Text.kind.name` in a settings parameter.
+Let's say that all TEI texts are stored in Text fields with kind "xml/tei transcription":
+
+`APIS_TEI_TEXTS = ['xml/tei transcription']`
+
+Also make sure to include the needed js/css files to you template. 

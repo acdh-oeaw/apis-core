@@ -4,6 +4,10 @@
 {% block title %} {{ object }} {% endblock %}
 {% block scriptHeader %}
 {{ block.super }}
+{% if tei %}
+    {# <link rel="stylesheet" href="http://teic.github.io/CETEIcean/css/CETEIcean.css" media="screen" charset="utf-8"> #}
+    <script src="http://teic.github.io/CETEIcean/js/CETEI.js"></script>
+{% endif %}
 {% endblock scriptHeader %}
 {% block content %}
 <div class="container-fluid">
@@ -96,7 +100,7 @@
                                         Date
                                     </th>
                                     <td>
-                                        {% if object.start_date %}
+                                        {% if object.start_date_written %}
                                             <abbr title="{{ object.start_date }}">{{ object.start_date_written }}</abbr>
                                         {% endif %}
                                         {% if object.end_date %}
@@ -189,13 +193,24 @@
                     {% for x in object.text.all %}
                         <div class="card card-default">
                             <div class="card-heading">
-                                <h4 class="card-title"> {{ x.kind }}</h4>
+                                {% if x.kind.name in tei %}
+                                    <h4 class="card-title"> TEI </h4>
+                                {% else %}
+                                    <h4 class="card-title"> {{ x.kind }}</h4>
+                                {% endif %}
                             </div>
-                            <div class="card-body">
-                                <div class="card-body" {% if "<text" in x.text %}id="sourctei"{% endif %}>
-                                        {{ x.text }}
+                            {% if x.kind.name in tei %}
+                                <div class="card-body tei" id="teisource">
+                                    {{ x.text }}
                                 </div>
+                                <div id="teiviewer">
+
+                                </div>
+                            {% else %}
+                            <div class="card-body tei-text">
+                                {{ x.text }}
                             </div>
+                            {% endif %}
                         </div>
                     {% endfor %}
                 </div>
@@ -210,4 +225,15 @@
 {% endblock content %}
 {% block scripts %}
     {{block.super}}
+    {% if tei %}
+    <script type="text/javascript">
+        var CETEIcean = new CETEI();
+        var teiString = $("#teisource").text();
+        CETEIcean.makeHTML5(teiString, function(data) {
+            $('#teisource').hide()
+            document.getElementById("teiviewer").appendChild(data)
+            CETEIcean.addStyle(document, data);
+        });
+    </script>
+    {% endif %}
 {% endblock scripts %}
