@@ -274,7 +274,7 @@
 </script>
 <script type='text/javascript'>
     function DeleteTempEntity(pk, kind) {
-        var url = '/api/'+kind+'/'+pk.toString()
+        var url = '/apis/api/'+kind+'/'+pk.toString()
         $.ajax({
             type: 'DELETE',
             url: url,
