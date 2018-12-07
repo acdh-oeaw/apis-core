@@ -8,7 +8,6 @@ from django.urls import reverse
 from guardian.shortcuts import assign_perm, remove_perm
 from django.conf import settings
 from django.contrib.auth.models import Group
-from django.contrib.sites.models import Site
 
 from apis_core.apis_metainfo.models import TempEntityClass, Uri, Text, Collection
 from apis_core.apis_labels.models import Label
