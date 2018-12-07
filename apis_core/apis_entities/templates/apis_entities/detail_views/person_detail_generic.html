@@ -47,16 +47,5 @@
             </td>
         </tr>
         {% endif %}
-        {% if object.uri_set %}
-        <tr>
-          <th>
-            URIs
-          </th>
-          <td>
-            {% for uri in object.uri_set.all %}<a href="{{uri.uri}}">{{uri.uri}}</a>
-              {% if forloop.last %}{% else %},{% endif %}
-            {% endfor %}
-          </td>
-          {% endif %}
     </table>
     {% endblock info-table %}

@@ -145,6 +145,26 @@
                                             {% endfor %}
                                         </td>
                                     </tr>
+                                    {% if object.notes %}
+                                        <tr>
+                                            <th>
+                                                Notes
+                                            </th>
+                                            <td>
+                                                {{ object.notes }}
+                                            </td>
+                                        </tr>
+                                    {% endif %}
+                                    {% if object.references %}
+                                        <tr>
+                                            <th>
+                                                References
+                                            </th>
+                                            <td>
+                                                {{ object.references }}
+                                            </td>
+                                        </tr>
+                                    {% endif %}
                                 </table>
                             {% endblock info-metadata %}
                             {% block left-pane-additional %}
