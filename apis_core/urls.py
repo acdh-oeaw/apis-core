@@ -100,6 +100,7 @@ urlpatterns = [
     url(r'labels/', include('apis_core.apis_labels.urls', namespace='apis_labels')),
     url(r'tei/', include('apis_core.apis_tei.tei_urls', namespace='apis_tei')),
     url(r'entities/', include('apis_core.apis_entities.urls', namespace='apis_entities')),
+    url(r'visuals/', include('apis_core.apis_vis.urls', namespace='apis_visuals')),
     url(r'relations/', include('apis_core.apis_relations.urls', namespace='apis_relations')),
     url(r'vocabularies/', include('apis_core.apis_vocabularies.urls', namespace='apis_vocabularies')),
     #url(r'^autocomplete/', include('autocomplete_light.urls')),

@@ -47,5 +47,7 @@ urlpatterns = [
     url(r'^networks/relation_place/$', views.pers_place_netw, name='pers_place_netw'),
     url(r'^networks/relation_institution/$', views.pers_inst_netw, name='pers_inst_netw'),
     url(r'^networks/generic/$', views.generic_network_viz, name='generic_network_viz'),
-    url(r'^compare/(?P<app>[a-z]+)/(?P<kind>[a-z]+)/(?P<pk>\d+)$', ReversionCompareView.as_view() ),
+    url(
+        r'^compare/(?P<app>[a-z]+)/(?P<kind>[a-z]+)/(?P<pk>\d+)$', ReversionCompareView.as_view()
+    ),
 ]
