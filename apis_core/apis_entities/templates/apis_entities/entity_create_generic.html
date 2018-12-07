@@ -1,6 +1,7 @@
 {% extends "webpage/base.html" %}
 {% load static %}
 {% block scriptHeader %}
+{{block.super}}
 {% if highlighter_active %}
 <script type="text/javascript" src="/static/apis_highlighter/apis_highlighter.js?8"></script>
 {% endif %}
@@ -8,10 +9,8 @@
 {% block Titel %}Create a {{entity_type|title}}{% endblock %}
 {% load guardian_tags %}
 {% load static %}
-{% load crispy_forms_tags %}
 
 {% block content %}
-{% load crispy_forms_tags %}
 {% load django_tables2 %}
 {% if instance %}
 <div class="container-fluid">
@@ -19,6 +18,7 @@
 <div class="row">
     <div class="col-md-5">
 {% endif %}
+{% load crispy_forms_tags %}
         <div class="card">
             <div class="card-header">
             	{% if instance %}
