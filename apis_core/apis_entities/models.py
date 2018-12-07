@@ -4,9 +4,11 @@ from django.conf import settings
 import reversion
 from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
+from django.urls import reverse
 from guardian.shortcuts import assign_perm, remove_perm
 from django.conf import settings
 from django.contrib.auth.models import Group
+from django.contrib.sites.models import Site
 
 from apis_core.apis_metainfo.models import TempEntityClass, Uri, Text, Collection
 from apis_core.apis_labels.models import Label
@@ -169,8 +171,9 @@ class Work(TempEntityClass):
 def create_default_uri(sender, instance, **kwargs):
     uri = Uri.objects.filter(entity=instance)
     if uri.count() == 0:
+        uri_c = "http://{}{}".format(BASE_URI, reverse('apis_core:apis_api2:GetEntityGeneric', kwargs={'pk': instance.pk}))
         uri2 = Uri(
-                uri=''.join((BASE_URI, str(instance.pk))),
+            uri=uri_c,
                 domain='apis default',
                 entity=instance)
         uri2.save()
