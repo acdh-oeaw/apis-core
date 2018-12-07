@@ -4,39 +4,106 @@ from .models import Institution, Person, Place, Event, Work
 import re
 
 
-class InstitutionSerializer(serializers.HyperlinkedModelSerializer):
+class BaseEntitySerializer(serializers.HyperlinkedModelSerializer):
+    uri_set = serializers.HyperlinkedIdentityField(
+        view_name="apis:uri-detail",
+        lookup_field="pk"
+    )
+    collection = serializers.HyperlinkedIdentityField(
+        view_name="apis:collection-detail",
+        lookup_field="pk"
+    )
+    text = serializers.HyperlinkedIdentityField(
+        view_name="apis:text-detail",
+        lookup_field="pk"
+    )
+
+
+class InstitutionSerializer(BaseEntitySerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="apis:institution-detail",
+        lookup_field="pk"
+    )
+
+    kind = serializers.HyperlinkedIdentityField(
+        view_name="apis:institutiontype-detail",
+        lookup_field="pk"
+    )
 
     class Meta:
         model = Institution
-        fields = ('id', 'name', 'uri_set', 'kind', 'collection', 'text')
+        fields = ('url', 'id', 'name', 'uri_set', 'kind', 'collection', 'text')
 
 
-class PersonSerializer(serializers.HyperlinkedModelSerializer):
+class PersonSerializer(BaseEntitySerializer):
+
+    url = serializers.HyperlinkedIdentityField(
+        view_name="apis:person-detail",
+        lookup_field="pk"
+    )
 
     class Meta:
         model = Person
-        fields = ('id', 'name', 'first_name', 'uri_set', 'profession', 'collection', 'text')
+        fields = (
+            'url', 'id', 'name', 'first_name', 'uri_set', 'profession', 'collection', 'text'
+        )
 
 
-class PlaceSerializer(serializers.HyperlinkedModelSerializer):
+class PlaceSerializer(BaseEntitySerializer):
+
+    url = serializers.HyperlinkedIdentityField(
+        view_name="apis:place-detail",
+        lookup_field="pk"
+    )
+
+    kind = serializers.HyperlinkedIdentityField(
+        view_name="apis:placetype-detail",
+        lookup_field="pk"
+    )
 
     class Meta:
         model = Place
-        fields = ('id', 'name', 'uri_set', 'collection', 'text', 'kind', 'lng', 'lat')
+        fields = (
+            'url', 'id', 'name', 'uri_set', 'collection', 'text', 'kind', 'lng', 'lat'
+        )
 
 
-class EventSerializer(serializers.HyperlinkedModelSerializer):
+class EventSerializer(BaseEntitySerializer):
+
+    url = serializers.HyperlinkedIdentityField(
+        view_name="apis:event-detail",
+        lookup_field="pk"
+    )
+
+    kind = serializers.HyperlinkedIdentityField(
+        view_name="apis:eventtype-detail",
+        lookup_field="pk"
+    )
 
     class Meta:
         model = Event
-        fields = ('id', 'name', 'uri_set', 'collection', 'text')
+        fields = (
+            'url', 'id', 'name', 'uri_set', 'collection', 'text', 'kind'
+        )
 
 
-class WorkSerializer(serializers.HyperlinkedModelSerializer):
+class WorkSerializer(BaseEntitySerializer):
+
+    url = serializers.HyperlinkedIdentityField(
+        view_name="apis:work-detail",
+        lookup_field="pk"
+    )
+
+    kind = serializers.HyperlinkedIdentityField(
+        view_name="apis:worktype-detail",
+        lookup_field="pk"
+    )
 
     class Meta:
         model = Work
-        fields = ('id', 'name', 'uri_set', 'collection', 'text')
+        fields = (
+            'url', 'id', 'name', 'uri_set', 'collection', 'text', 'kind'
+        )
 
 
 class GeoJsonSerializer(serializers.BaseSerializer):
