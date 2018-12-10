@@ -3,22 +3,62 @@ from collections import Counter
 from django.http import JsonResponse
 from django.views.generic import TemplateView
 from django.conf import settings
+from django.db.models import Avg
 
-from apis_core.apis_relations.models import PersonPlace
+from apis_core.apis_relations.models import PersonPlace, PersonInstitution
+
+from . utils import calculate_age
+
+
+def get_average_age_data(request):
+    rel_type = request.GET.get('rel-type')
+    rel_inst = request.GET.get('rel-inst')
+    start_year = request.GET.get('start-year')
+    end_year = request.GET.get('start-year')
+    per_inst = PersonInstitution.objects.filter(related_institution_id__in=[3, 2])
+    if rel_type:
+        data = []
+    else:
+        start_year = int(str(per_inst.order_by('start_date')[0].start_date)[:4])
+        end_year = int(str(per_inst.order_by('-start_date')[0].start_date)[:4])
+        qs = [
+            {
+                'year': x,
+                'members_new': per_inst.filter(start_date__year=x).count(),
+                'avg_birth_new': per_inst.filter(start_date__year=x)
+                .aggregate(
+                    Avg('related_person__start_date__year')
+                )['related_person__start_date__year__avg'],
+                'members_all': per_inst.filter(
+                    start_date__year__lte=x, end_date__year__gte=x
+                ).count(),
+                'avg_birth': per_inst.filter(start_date__year__lte=x, end_date__year__gte=x)
+                .aggregate(
+                    Avg('related_person__start_date__year')
+                )['related_person__start_date__year__avg']
+            } for x in range(1847, 2015)
+        ]
+        df = pd.DataFrame(qs)
+        df['avg_age_new'] = df.apply(lambda row: calculate_age(row, 'avg_birth_new'), axis=1)
+        df['avg_age_all'] = df.apply(lambda row: calculate_age(row, 'avg_birth'), axis=1)
+        payload = df[['year', 'avg_age_new', 'avg_age_all']].values.tolist()
+        data = {
+            "items": "some",
+            "title": "{}".format('Average Age'),
+            "subtitle": "Person Institution relation type {}".format('some type'),
+            "legendy": "legendy",
+            "legendx": "legendx",
+            "categories": "sorted(dates)",
+            "measuredObject": "{}".format("Persons average Age"),
+            "ymin": 0,
+            "payload": payload
+        }
+    return JsonResponse(data, safe=False)
 
 
 def get_heatmap_data(request):
 
     rel_type = request.GET.get('rel-type')
-
-    # places = Counter([
-    #     (
-    #         x.related_place.lat,
-    #         x.related_place.lng,
-    #     ) for x in PersonPlace.objects.filter(
-    #         relation_type__name=rel_type
-    #     ).exclude(related_place__lat__isnull=True)
-    # ])
     places = [
         (
             x.related_place.lat,
@@ -27,18 +67,12 @@ def get_heatmap_data(request):
             relation_type__name=rel_type
         ).exclude(related_place__lat__isnull=True)
     ]
-    # df = pd.DataFrame.from_dict(places, orient='index').reset_index()
-    # df['lat'] = df.apply(lambda row: row['index'][1], axis=1)
-    # df['lng'] = df.apply(lambda row: row['index'][0], axis=1)
-    # df['normalized'] = (df[0]-df[0].min())/(df[0].max()-df[0].min())
-    # payload = df[['lng', 'lat', 'normalized']].values.tolist()
     return JsonResponse(places, safe=False)
 
 
 class HeatMapView(TemplateView):
     template_name = "apis_vis/heatmap.html"
 
-    def get_context_data(self, **kwargs):
-        context = super(HeatMapView, self).get_context_data(**kwargs)
-        context['apps'] = settings.INSTALLED_APPS
-        return context
+
+class AvgAge(TemplateView):
+    template_name = "apis_vis/avgage.html"

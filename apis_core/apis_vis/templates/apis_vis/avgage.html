@@ -1,0 +1,22 @@
+{% extends "webpage/base.html" %}
+{% load charts_extras %}
+{% block scriptHeader %}
+{{ block.super }}
+    {% load_highcharts_js %}
+{% endblock %}
+{% block content %}
+<div class="card card-default">
+<div class="card-heading"><h2>Map</h2></div>
+<div class="card-body">
+<div id="wrapper">
+<div id="map"></div>
+<div id="filter-menu">
+</div>
+</div>
+</div>
+</div>
+{% endblock %}
+{% block scripts %}
+{{block.super}}
+
+{% endblock %}
