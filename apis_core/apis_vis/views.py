@@ -41,7 +41,16 @@ def get_average_age_data(request):
         df = pd.DataFrame(qs)
         df['avg_age_new'] = df.apply(lambda row: calculate_age(row, 'avg_birth_new'), axis=1)
         df['avg_age_all'] = df.apply(lambda row: calculate_age(row, 'avg_birth'), axis=1)
-        payload = df[['year', 'avg_age_new', 'avg_age_all']].values.tolist()
+        payload = [
+            {
+                'name': 'average age all',
+                'data': [x for x in df[['avg_age_all']].values.tolist()]
+            },
+            {
+                'name': 'average age new',
+                'data': [x for x in df[['avg_age_new']].values.tolist()]
+            }
+        ]
         data = {
             "items": "some",
             "title": "{}".format('Average Age'),
@@ -51,6 +60,7 @@ def get_average_age_data(request):
             "categories": "sorted(dates)",
             "measuredObject": "{}".format("Persons average Age"),
             "ymin": 0,
+            "x_axis": df['year'].values.tolist(),
             "payload": payload
         }
     return JsonResponse(data, safe=False)
@@ -76,3 +86,7 @@ class HeatMapView(TemplateView):
 
 class AvgAge(TemplateView):
     template_name = "apis_vis/avgage.html"
+
+
+class MembersAmountPerYear(TemplateView):
+    template_name = "apis_vis/avgmemperyear.html"
