@@ -14,7 +14,7 @@
 {% endblock %}
 {% block content %}
 <div class="card card-default">
-<div class="card-heading"><h2>Average Age of all and new Academy Members</h2></div>
+<div class="card-heading"></div>
 <div class="card-body">
 <div id="container"></div>
 </div>
@@ -31,6 +31,9 @@
                 renderTo: 'container',
                 type: 'line'
             },
+            title: {
+                text: ''
+            },
             xAxis: {
                 categories: []
             },
@@ -42,15 +45,11 @@
             success: function(data) {
                 // console.log(data.payload)
                 var payload = data.payload;
-                console.log(payload);
+                console.log('loaded');
                 options.series = payload;
                 options.title.text = data.title;
                 options.xAxis.categories = data.x_axis;
-                console.log(options.xAxis.categories[0]);
-                console.log(options);
                 var chart = new Highcharts.Chart(options);
-
-                // Highcharts.Chart('container', options);
             }
         });
 
