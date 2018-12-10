@@ -5,9 +5,41 @@ from django.views.generic import TemplateView
 from django.conf import settings
 from django.db.models import Avg
 
-from apis_core.apis_relations.models import PersonPlace, PersonInstitution
+from apis_core.apis_relations.models import *
 
 from . utils import calculate_age
+
+
+def get_inst_range_data(request):
+    df = pd.DataFrame(list(InstitutionInstitution.objects.filter(
+        relation_type__name="ist Teil von").distinct().values_list(
+        'related_institutionA__name',
+        'related_institutionA__start_date__year',
+        'related_institutionA__end_date__year',
+        'related_institutionB__name'
+        )
+    ), columns=['name', 'start_year', 'end_year', 'teil von']).fillna(2018)
+    df.sort_values('start_year')
+
+    data = {
+        "items": "some",
+        "title": "{}".format('Kommissionen'),
+        "subtitle": "Person Institution relation type {}".format('some type'),
+        "legendy": "legendy",
+        "legendx": "legendx",
+        "categories": "sorted(dates)",
+        "measuredObject": "{}".format("Persons average Age"),
+        "ymin": 0,
+        "x_axis": df['name'].values.tolist(),
+        "payload": [
+            {
+                'name': 'Kommissionen',
+                'data': df[['start_year', 'end_year']].values.tolist()
+            }
+        ]
+    }
+
+    return JsonResponse(data, safe=False)
 
 
 def get_average_members_data(request):
@@ -136,3 +168,7 @@ class AvgAge(TemplateView):
 
 class MembersAmountPerYear(TemplateView):
     template_name = "apis_vis/avgmemperyear.html"
+
+
+class InstRange(TemplateView):
+    template_name = "apis_vis/inst_range.html"

@@ -15,4 +15,6 @@ urlpatterns = [
         api_views.GetVisJson.as_view(),
         name='person-institution-data'
     ),
+    url(r'^inst-range-data/$', views.get_inst_range_data, name='get_inst_range_data'),
+    url(r'^inst-range/$', views.InstRange.as_view(), name='inst_range_view'),
 ]
