@@ -1,0 +1,105 @@
+{% extends "webpage/base.html" %}
+{% block scriptHeader %}
+{{ block.super }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
+<style type="text/css">
+
+      body  {margin: 0; padding: 0;}
+      html,body,#map { height: 100%; }
+      #wrapper {height: 100%;
+          min-width:600px; min-height: 600px; position: relative; margin: auto;}
+      #map {margin-bottom: 10px; height: 800px}
+      #filter-menu {position:absolute; min-width:600px; left:60px; top:20px; z-index: 1000;}
+      a {margin-left: 5px}
+      #logo_ACDH {position: absolute; left:20px; bottom: 20px; width: 5%; z-index: 500000000000;}
+      ul.dropdown-menu {
+      z-index: 2000;
+    }
+
+    </style>
+{% endblock %}
+{% block content %}
+<div class="card card-default">
+<div class="card-heading"><h2>Map</h2></div>
+<div class="card-body">
+<div id="wrapper">
+<div id="map"></div>
+<div id="filter-menu">
+</div>
+</div>
+</div>
+</div>
+{% endblock %}
+{% block scripts %}
+{{block.super}}
+<script type="text/javascript">
+    function filterSet(e, filter) {
+        if (e.className === 'btn btn-success') {
+        e.className = 'btn btn-default';
+        var lg = mapLayerGroups[filter];
+        markers.removeLayer(lg);
+        //mymap.fitBounds(markers.getBounds(), {'maxZoom': 12});
+        } else {
+           e.className = 'btn btn-success';
+           var lg = mapLayerGroups[filter];
+            markers.addLayer(lg);
+            mymap.fitBounds(lg.getBounds(), {'maxZoom': 12});
+        } };
+    //var weissbrot = document.getElementById('filter-weissbrot');
+    var mapLayerGroups = [];
+    var markers = L.markerClusterGroup({
+    });
+    //weissbrot.onclick = filterSet(weissbrot, weissbrot.id.slice(7));
+
+    function onEachFeature(feature, layer) {
+            var lg = mapLayerGroups[feature.relation_type];
+            if (lg === undefined) {
+                lg = new L.layerGroup();
+                mapLayerGroups[feature.relation_type] = lg;
+                $('#filter-menu').append('<a class="btn btn-success" href="#" role="button" onclick="filterSet(this, \''+feature.relation_type+'\')">'+feature.relation_type+'</a>')
+            }
+
+
+            //add the feature to the layer
+            lg.addLayer(layer);
+            //mymap.fitBounds(lg.getBounds(), {'maxZoom': 12});
+
+            if (feature.properties && feature.properties.popupContent) {
+                popupContent = feature.properties.popupContent;
+            }
+
+            layer.bindPopup(feature.properties.popupContent);
+
+        };
+        var mymap = L.map('map', {
+          fullscreenControl: true,
+          }).setView([47.394167, 13.689167], 8);
+
+        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    maxZoom: 18,
+    id: 'mapbox.light',
+    accessToken: 'pk.eyJ1Ijoic2VubmllcmVyIiwiYSI6ImNpbHk1YWV0bDAwZnB2dW01d2l1Y3phdmkifQ.OljQLEhqeAygai2y6VoSwQ'
+}).addTo(mymap);
+        $.ajax({
+                type: 'GET',
+                url: '{% url 'apis:apis_vis:get_heatmap_data' %}?rel-type=geboren in',
+                dataType: 'json',
+                'data': {'relation': 'personplace'},
+                success: function(data) {
+                    console.log(data)
+                    var heat = L.heatLayer(data, {
+                        radius: 10,
+                        minOpacity: 0.5,
+                        gradient: {
+                            0.1: 'blue',
+                            0.65: 'lime',
+                            1: 'red'
+                        }
+                    });
+                    mymap.addLayer(heat);
+                }
+            });
+
+</script>
+{% endblock %}
