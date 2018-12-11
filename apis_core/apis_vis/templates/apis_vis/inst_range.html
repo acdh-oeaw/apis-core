@@ -2,12 +2,15 @@
 {% load charts_extras %}
 {% block scriptHeader %}
 {{ block.super }}
-    {% load_highcharts_js %}
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
     <style>
         #container {
         	min-width: 310px;
         	max-width: 800px;
-        	height: 400px;
+        	height: 800px;
         	margin: 0 auto
         }
     </style>
@@ -29,7 +32,9 @@
         var options = {
             chart: {
                 renderTo: 'container',
-                type: 'line'
+                type: 'columnrange',
+                inverted: true,
+                zoomType: 'x',
             },
             title: {
                 text: ''
@@ -41,7 +46,7 @@
         };
 
         Highcharts.ajax({
-            url: "{% url 'apis:apis_vis:get_avg_age_data' %}",
+            url: "{% url 'apis:apis_vis:get_inst_range_data' %}",
             success: function(data) {
                 // console.log(data.payload)
                 var payload = data.payload;

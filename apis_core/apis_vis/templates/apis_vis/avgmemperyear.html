@@ -14,7 +14,6 @@
 {% endblock %}
 {% block content %}
 <div class="card card-default">
-<div class="card-heading"></div>
 <div class="card-body">
 <div id="container"></div>
 </div>
@@ -41,7 +40,7 @@
         };
 
         Highcharts.ajax({
-            url: "{% url 'apis:apis_vis:get_avg_age_data' %}",
+            url: "{% url 'apis:apis_vis:get_avg_members_data' %}",
             success: function(data) {
                 // console.log(data.payload)
                 var payload = data.payload;
@@ -49,6 +48,7 @@
                 options.series = payload;
                 options.title.text = data.title;
                 options.xAxis.categories = data.x_axis;
+                console.log(options.xAxis.categories[0]);
                 var chart = new Highcharts.Chart(options);
             }
         });

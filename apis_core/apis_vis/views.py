@@ -5,9 +5,87 @@ from django.views.generic import TemplateView
 from django.conf import settings
 from django.db.models import Avg
 
-from apis_core.apis_relations.models import PersonPlace, PersonInstitution
+from apis_core.apis_relations.models import *
 
 from . utils import calculate_age
+
+
+def get_inst_range_data(request):
+    df = pd.DataFrame(list(InstitutionInstitution.objects.filter(
+        relation_type__name="ist Teil von").distinct().values_list(
+        'related_institutionA__name',
+        'related_institutionA__start_date__year',
+        'related_institutionA__end_date__year',
+        'related_institutionB__name'
+        )
+    ), columns=['name', 'start_year', 'end_year', 'teil von']).fillna(2018)
+    df.sort_values('start_year')
+
+    data = {
+        "items": "some",
+        "title": "{}".format('Kommissionen'),
+        "subtitle": "Person Institution relation type {}".format('some type'),
+        "legendy": "legendy",
+        "legendx": "legendx",
+        "categories": "sorted(dates)",
+        "measuredObject": "{}".format("Persons average Age"),
+        "ymin": 0,
+        "x_axis": df['name'].values.tolist(),
+        "payload": [
+            {
+                'name': 'Kommissionen',
+                'data': df[['start_year', 'end_year']].values.tolist()
+            }
+        ]
+    }
+
+    return JsonResponse(data, safe=False)
+
+
+def get_average_members_data(request):
+    rel_type = request.GET.get('rel-type')
+    rel_inst = request.GET.get('rel-inst')
+    start_year = request.GET.get('start-year')
+    end_year = request.GET.get('start-year')
+    per_inst = PersonInstitution.objects.filter(related_institution_id__in=[3, 2])
+    if rel_type:
+        data = []
+    else:
+        start_year = int(str(per_inst.order_by('start_date')[0].start_date)[:4])
+        end_year = int(str(per_inst.order_by('-start_date')[0].start_date)[:4])
+        qs = [
+            {
+                'year': x,
+                'members_new': per_inst.filter(start_date__year=x).count(),
+                'members_all': per_inst.filter(
+                    start_date__year__lte=x, end_date__year__gte=x
+                ).count(),
+            } for x in range(1847, 2015)
+        ]
+        df = pd.DataFrame(qs)
+        payload = [
+            {
+                'name': 'all members',
+                'data': [x for x in df[['members_all']].values.tolist()]
+            },
+            {
+                'name': 'new members',
+                'data': [x for x in df[['members_new']].values.tolist()]
+            }
+        ]
+        data = {
+            "items": "some",
+            "title": "{}".format('Members by Year'),
+            "subtitle": "Person Institution relation type {}".format('some type'),
+            "legendy": "legendy",
+            "legendx": "legendx",
+            "categories": "sorted(dates)",
+            "measuredObject": "{}".format("Persons average Age"),
+            "ymin": 0,
+            "x_axis": df['year'].values.tolist(),
+            "payload": payload
+        }
+    return JsonResponse(data, safe=False)
 
 
 def get_average_age_data(request):
@@ -53,7 +131,7 @@ def get_average_age_data(request):
         ]
         data = {
             "items": "some",
-            "title": "{}".format('Average Age'),
+            "title": "{}".format('Average Age by Year'),
             "subtitle": "Person Institution relation type {}".format('some type'),
             "legendy": "legendy",
             "legendx": "legendx",
@@ -90,3 +168,7 @@ class AvgAge(TemplateView):
 
 class MembersAmountPerYear(TemplateView):
     template_name = "apis_vis/avgmemperyear.html"
+
+
+class InstRange(TemplateView):
+    template_name = "apis_vis/inst_range.html"
