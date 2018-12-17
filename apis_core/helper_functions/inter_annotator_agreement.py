@@ -4,7 +4,7 @@ from django.db.models.query import QuerySet
 from django.conf import settings
 
 from apis_highlighter.models import Annotation
-from apis_core.metainfo.models import Text, TempEntityClass
+from apis_core.apis_metainfo.models import Text, TempEntityClass
 
 
 if 'annotator agreement' in getattr(settings, "APIS_COMPONENTS", []):

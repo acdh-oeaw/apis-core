@@ -3,7 +3,8 @@
 {% block scriptHeader %}
 {{block.super}}
 {% if highlighter_active %}
-<script type="text/javascript" src="/static/apis_highlighter/apis_highlighter.js?8"></script>
+      <link rel="stylesheet" href="{% static 'apis_highlighter/apis_highlighter.css' %}" />
+	<script type="text/javascript" src="{% static 'apis_highlighter/apis_highlighter.js' %}"></script>
 {% endif %}
 {% endblock %}
 {% block Titel %}Create a {{entity_type|title}}{% endblock %}
@@ -97,7 +98,7 @@
             <div class="card-body">
                 <div class="card" id="accordion" role="tablist" aria-multiselectable="true">
                 {% block additional_accordion %}
-                {% endblock %}
+                {% endblock additional_accordion %}
                 {% for obj in right_card %}
                     <div class="card card-default">
                         <div class="card-header" role="tab" id="heading{{forloop.counter}}">
@@ -154,6 +155,7 @@
 </div>
 </div>
 {% endif %}
+{% load crispy_forms_tags %}
 {% endblock %}
 {% block scripts %}
 {{block.super}}
@@ -318,7 +320,7 @@
         GetFormAjax("{{obj.2|add:'Form'}}");
         //unbind_ajax_forms();
         {% endfor %}
-    {% if highlighter_active %}
+{% if highlighter_active %}
     init_apis_highlighter(1, {{instance.pk}});
     if (typeof $.ApisHigh.vars == 'undefined') {
         $.ApisHigh.vars = {}; };
@@ -326,12 +328,12 @@
         $.ApisHigh.vars.instance_pk = '{{instance.pk}}';
         $.ApisHigh.vars.urls = {};
         $.ApisHigh.vars.urls.get_form_ajax = '{% url 'apis:apis_relations:get_form_ajax' %}';
-        $.ApisHigh.vars.urls.annotatoragreementview = '{% url 'api2:AnnotatorAgreementView' %}';
-        $.ApisHigh.vars.urls.showoverlappinghighlights = '{% url 'api2:ShowOverlappingHighlights' %}'
+        $.ApisHigh.vars.urls.annotatoragreementview = '{% url 'apis:apis_api2:AnnotatorAgreementView' %}';
+        $.ApisHigh.vars.urls.showoverlappinghighlights = '{% url 'apis:apis_api2:ShowOverlappingHighlights' %}'
       activate_context_menu_highlighter();
       $('body').on("click", 'mark.highlight', highlight_detail);
-      {% endif %}
     };
+{% endif %}
  function deactivate_editing(){
     $('.reldelete').addClass("disabled");
     $('.reldelete').prop("disabled", true);
