@@ -14,7 +14,7 @@ class GetVisJson(ListAPIView):
     def get_serializer(self, instance=None, data=None, many=False, partial=False):
         vis = self.request.query_params.get('vis', None)
         if vis == 'average_age':
-            return VisAgeSerializer(instance, many=False)
+            return VisAgeSerializer(self.get_queryset(), many=False)
         else:
             return None
 
