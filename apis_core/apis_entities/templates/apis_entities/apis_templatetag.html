@@ -1,7 +1,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tooltipster/3.3.0/css/tooltipster.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tooltipster/3.3.0/js/jquery.tooltipster.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tooltipster@4.2.6/dist/js/tooltipster.bundle.min.js" integrity="sha256-glChvCaC6IJq49dkfulAWd7xlkPwA0FEydjhjPBintA=" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.min.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/leaflet.js"></script>
@@ -10,8 +9,8 @@
 <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.css" /> -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css" />
 
-<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.full.min.js"></script>-->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.full.min.js"></script>
 <script type="text/javascript">
             // Setup plugin with default settings
             $(document).ready(function() {
@@ -51,7 +50,7 @@
             event.stopPropagation();
             var formData = $(this).serialize();
             //var button_text = $(this).find(':button').text();
-
+	   $(this).find('button').attr('disabled', true);
           $.ajax({
           type: 'POST',
           url: $(this).attr('action'),
@@ -119,7 +118,7 @@
         }
         if (typeof $.ApisRev == 'undefined') {
             $.ApisRev = {}; }
-        $.ApisRev.url = '/entities/compare/'+dataOptions['app']+'/'+dataOptions['kind']+'/'+dataOptions['pk']
+        $.ApisRev.url = '/apis/entities/compare/'+dataOptions['app']+'/'+dataOptions['kind']+'/'+dataOptions['pk']
         if ($origin.data('loaded') !== true) {
             $.get($.ApisRev.url, function(data) {
                 instance.content(data);

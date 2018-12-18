@@ -51,7 +51,7 @@ import json
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.forms import SelectAnnotationProject, SelectAnnotatorAgreement
-    from helper_functions.highlighter import highlight_text
+    from apis_core.helper_functions.highlighter import highlight_text
 
 if 'charts' in settings.INSTALLED_APPS:
     from charts.models import ChartConfig
