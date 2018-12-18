@@ -14,7 +14,8 @@ class Select2WidgetMixin(DALSelect2WidgetMixin):
     @property
     def media(self):
         m = super().media
-        js = list(m._js) 
+        js = list(m._js)
+        css = list(m._css['screen'])
         try:
             js.remove('admin/js/vendor/jquery/jquery.js')
             js.remove('autocomplete_light/jquery.post-setup.js')
@@ -22,7 +23,21 @@ class Select2WidgetMixin(DALSelect2WidgetMixin):
         except ValueError:
             print('Error')
             pass
-        return forms.Media(css=m._css, js=js)
+        try:
+            print(js)
+            print(m._css['screen'])
+            js.remove('admin/js/vendor/select2/select2.full.js')
+            js.remove('admin/js/vendor/select2/i18n/en.js')
+            #js.remove('autocomplete_light/select2.js')
+            js.append('https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.full.min.js')
+            css.remove('admin/css/vendor/select2/select2.css')
+            css.remove('admin/css/autocomplete.css')
+            css.remove('autocomplete_light/select2.css')
+            css.insert(0, 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css')
+        except:
+            print('didnt work')
+        print(js)
+        return forms.Media(css={'screen': css}, js=js)
 
 
 class Select2(Select2WidgetMixin, DALSelect2):
