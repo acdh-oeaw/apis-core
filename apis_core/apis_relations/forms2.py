@@ -14,6 +14,7 @@ from django.core.validators import URLValidator
 from django.urls import reverse
 from apis_core.apis_entities.fields import ListSelect2
 
+#from dal.autocomplete import ListSelect2
 from apis_core.apis_metainfo.models import TempEntityClass, Text
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
 from .tables import *

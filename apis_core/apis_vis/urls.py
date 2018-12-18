@@ -11,7 +11,7 @@ urlpatterns = [
     url(r'^avg-members-data/$', views.get_average_members_data, name='get_avg_members_data'),
     url(r'^avg-members/$', views.MembersAmountPerYear.as_view(), name='avg_members_view'),
     url(
-        r'^person-institution-data/$',
+        r'^(?P<relation>[a-z]+)/data/$',
         api_views.GetVisJson.as_view(),
         name='person-institution-data'
     ),

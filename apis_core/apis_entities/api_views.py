@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
 
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
 from .serializers import (
@@ -35,7 +36,7 @@ import requests
 from datetime import datetime
 # from metainfo.models import TempEntityClass
 
-from . api_renderers import EntityToTEI
+from . api_renderers import EntityToTEI, EntityToCIDOC
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -47,7 +48,14 @@ class StandardResultsSetPagination(PageNumberPagination):
 class GetEntityGeneric(APIView):
     serializer_class = EntitySerializer
     renderer_classes = tuple(
-        api_settings.DEFAULT_RENDERER_CLASSES) + (EntityToTEI, )
+        api_settings.DEFAULT_RENDERER_CLASSES) + (EntityToTEI, EntityToCIDOC)
+    if getattr(settings, 'APIS_RENDERERS', None) is not None:
+        rend_add = tuple()
+        for rd in settings.APIS_RENDERERS:
+            rend_mod = __import__(rd)
+            for name, cls in rend_mod.__dict__.items():
+                rend_add + (cls, )
+        renderer_classes += rend_add
 
     def get_object(self, pk):
         try:

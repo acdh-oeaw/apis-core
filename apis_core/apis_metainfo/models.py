@@ -381,7 +381,7 @@ class Uri(models.Model):
     loaded_time = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return self.uri
+        return str(self.uri)
 
     def get_web_object(self):
         result = {

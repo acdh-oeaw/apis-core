@@ -71,12 +71,18 @@ class GenericRDFParser(object):
         """
         if not self.created:
             return False
+
+        exist = genUri.objects.filter(uri=self.uri)
+        if exist.count() > 0:
+            if exist[0].entity is not None:
+                return exist[0].entity
         self.objct.status = 'distinct'
         self.objct.save()
         def_coll, created = Collection.objects.get_or_create(name='Default import collection')
         self.objct.collection.add(def_coll)
         self.saved = True
-        Uri.objects.create(uri=self.uri, entity=self.objct)
+        self._objct_uri.entity=self.objct
+        self._objct_uri.save()
         for lab in self.labels:
             lab.temp_entity = self.objct
             lab.save()
@@ -160,9 +166,14 @@ class GenericRDFParser(object):
         """
         owl = "http://www.w3.org/2002/07/owl#"
 
-        def exist(uri):
+        def exist(uri, create_uri=False):
+            print(uri)
+            print(type(uri))
             if objct.objects.filter(uri__uri=uri).count() > 0:
                 return True, objct.objects.get(uri__uri=uri)
+            elif create_uri:
+                self._objct_uri = genUri.objects.create(uri=uri)
+                return False, False
             else:
                 return False, False
 
@@ -192,7 +203,7 @@ class GenericRDFParser(object):
         self.uri = uri
         self.kind = kind
         self.saved = False
-        test = exist(self.uri)
+        test = exist(self.uri, create_uri=True)
         if test[0] and not force:
             self.objct = test[1]
             self.created = False
