@@ -327,14 +327,14 @@
         $.ApisHigh.vars.entity_type = '{{entity_type}}';
         $.ApisHigh.vars.instance_pk = '{{instance.pk}}';
         $.ApisHigh.vars.urls = {};
-        $.ApisHigh.vars.urls.get_form_ajax = '{% url 'apis:apis_relations:get_form_ajax' %}';
-        $.ApisHigh.vars.urls.annotatoragreementview = '{% url 'apis:apis_api2:AnnotatorAgreementView' %}';
-        $.ApisHigh.vars.urls.showoverlappinghighlights = '{% url 'apis:apis_api2:ShowOverlappingHighlights' %}'
+        $.ApisHigh.vars.urls.get_form_ajax = "{% url 'apis:apis_relations:get_form_ajax' %}";
+        $.ApisHigh.vars.urls.annotatoragreementview = "{% url 'apis:apis_api2:AnnotatorAgreementView' %}";
+        $.ApisHigh.vars.urls.showoverlappinghighlights = "{% url 'apis:apis_api2:ShowOverlappingHighlights' %}";
       activate_context_menu_highlighter();
       $('body').on("click", 'mark.highlight', highlight_detail);
-    };
-{% endif %}
- function deactivate_editing(){
+    {% endif %}
+ };
+function deactivate_editing(){
     $('.reldelete').addClass("disabled");
     $('.reldelete').prop("disabled", true);
     $('.reledit').addClass("disabled");
