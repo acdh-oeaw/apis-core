@@ -3,6 +3,7 @@
 {% load crispy_forms_tags %}
 {% block scriptHeader %}
 {{ block.super }}
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.2.1/bootstrap-slider.min.js" integrity="sha256-rjNVc4p9W5ytzudhfdvmen38QnQTPHD6izDAF9nA95w=" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/10.2.1/css/bootstrap-slider.css" integrity="sha256-fyvdwFZ10EzDoLhbbG8gpn2ll8lqkABsEbGWrG18WOU=" crossorigin="anonymous" />
 <script src="{% static 'webpage/libraries/linkurious.js/src/sigma.core.js' %}"></script>
@@ -74,7 +75,7 @@ div.col-md-9 {
 	height: 100%;
 }
       #graph-container {
-      
+
       min-height: 900px;
       width:100%;
       height:100%;
@@ -179,72 +180,75 @@ div.col-md-9 {
     </style>
 {% endblock %}
 {% block content %}
-<div class="panel panel-default panel-fixed">
-<div class="panel-heading"><h2>Network Visualization</h2></div>
-<div class="panel-body">
-    <div class="row">
-        <div class="col-md-3">
-            <div id="filter-container">
-                {% crispy form %}
-            </div>
-	    <hr/>
-	    <div id="interaction-form">
-		    <input id="label-threshold" data-slider-id='threhSlider' type="text" data-slider-min="1" data-slider-max="30" data-slider-step="1" data-slider-value="8"/>
-		    <button type="submit" class="btn btn-default" id="toggle-force-link">Start Forcelink</button>
-	    </div>
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-heading">
+            <h2>Network Visualization</h2>
+        </div>
+        <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <div id="filter-container">
+                    {% crispy form %}
+                </div>
+    	    <hr/>
+    	    <div id="interaction-form">
+    		    <input id="label-threshold" data-slider-id='threhSlider' type="text" data-slider-min="1" data-slider-max="30" data-slider-step="1" data-slider-value="8"/>
+    		    <button type="submit" class="btn btn-default" id="toggle-force-link">Start Forcelink</button>
+    	    </div>
+                <hr/>
+                <div id="export-form">
+                    <form class="form-inline" id="create-file-form">
+                        <div class="form-group">
+                            <label for="select-format">Format</label>
+                            <select class="form-control" id="select-format">
+                                <option>Json</option>
+                                <option>Graphml</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <div class="checkbox">
+                            <label>
+                            <input type="checkbox" id="choice-download"> Download?
+                            </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-default" id="create-button">Create</button>
+                        </div>
+                    </form>
+                </div>
             <hr/>
-            <div id="export-form">
-                <form class="form-inline" id="create-file-form">
-                    <div class="form-group">
-                        <label for="select-format">Format</label>
-                        <select class="form-control" id="select-format">
-                            <option>Json</option>
-                            <option>Graphml</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <div class="checkbox">
-                        <label>
-                        <input type="checkbox" id="choice-download"> Download?
-                        </label>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-default" id="create-button">Create</button>
-                    </div>
-                </form>
-            </div>
-        <hr/>
-      </div>
+          </div>
 
-        <div class="col-md-9">
-		<div id="graph-container"><div id="filter_network">
-                    <div class="panel panel-default">
-                        <div class="panel-heading" role="tab" id="headingNetworkFilter">
-                          <h4 class="panel-title">
-                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseNetworkFilter" aria-expanded="false" aria-controls="collapseNetworkFilter">
-                                Filter
-                            </a>
-                          </h4>
-                        </div>
-                        <div id="collapseNetworkFilter" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingNetworkFilter">
-                          <div class="panel-body">
-                            
-				<form class="form" id="filter2-form">
-					
-				    <div class="form-group">
-					<label for="filter3-label">Name contains</label>
-					<input class="form-control" id="filter3-label">
-				    </div>
-				</form>
+            <div class="col-md-9">
+    		<div id="graph-container"><div id="filter_network">
+                        <div class="panel panel-default">
+                            <div class="panel-heading" role="tab" id="headingNetworkFilter">
+                              <h4 class="panel-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseNetworkFilter" aria-expanded="false" aria-controls="collapseNetworkFilter">
+                                    Filter
+                                </a>
+                              </h4>
+                            </div>
+                            <div id="collapseNetworkFilter" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingNetworkFilter">
+                              <div class="panel-body">
+
+    				<form class="form" id="filter2-form">
+
+    				    <div class="form-group">
+    					<label for="filter3-label">Name contains</label>
+    					<input class="form-control" id="filter3-label">
+    				    </div>
+    				</form>
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
-			</div></div>
+    			</div></div>
+            </div>
         </div>
     </div>
-</div>
-</div>
+</div></div>
 {% endblock %}
 
 {% block scripts %}
@@ -270,7 +274,7 @@ $.ApisNet.selected_nodes = new Array();
 	}
 	console.log(filters);
         $.ApisNet.instance.graph.nodes().forEach(function (n) {
-		var test = false;	
+		var test = false;
 		var label_contains = $('#filter3-label').val()
 		if (label_contains != null) {
 			if (n.label.includes(label_contains)) {
@@ -297,7 +301,7 @@ $.ApisNet.selected_nodes = new Array();
 				} else {
 					if (filters[f2].includes(d[f2])){
 					test2 = true
-					}	
+					}
 				}
 				if (test2){
 				test = true
@@ -311,7 +315,7 @@ $.ApisNet.selected_nodes = new Array();
 		n.color = '#f4e242';
 		$.ApisNet.selected_nodes.push(n);
 		}
-	
+
 	}
 )
 
@@ -364,7 +368,7 @@ function download_network_data(formData) {
 			      $.ApisNet.filter.list_node_filters[key].values.push(n[key]);
 				      $.ApisNet.filter.list_node_filters[key].select2.push({id: n[key], text: n[key]})
 			      };
-			      
+
 			      }
 
 			      };
@@ -380,7 +384,7 @@ function download_network_data(formData) {
      $.ApisNet.instance.refresh();
      sigma.layouts.startForceLink($.ApisNet.instance);
 		  for (var key in $.ApisNet.filter.list_node_filters) {
-		  
+
 		$("#filter2-"+key).select2({
 		data: $.ApisNet.filter.list_node_filters[key].select2
 		})
@@ -678,4 +682,3 @@ $('#id_select_relation').on("change", function(){
 })
 </script>
 {% endblock %}
-
