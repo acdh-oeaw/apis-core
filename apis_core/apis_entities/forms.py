@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from dal import autocomplete
-from .fields import ListSelect2
+from .fields import ListSelect2, Select2Multiple
 from django import forms
 from django.urls import reverse_lazy
 from crispy_forms.helper import FormHelper
@@ -71,7 +71,7 @@ def get_entities_form(entity):
                         'apis_vocabularies',
                         'apis_labels'
                     ], model=v_name_p.lower()).app_label.lower() == 'apis_vocabularies':
-                        self.fields[f].widget = autocomplete.Select2Multiple(
+                        self.fields[f].widget = Select2Multiple(
                             url=reverse(
                                 'apis:apis_vocabularies:generic_vocabularies_autocomplete',
                                 kwargs={
