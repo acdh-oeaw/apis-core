@@ -102,7 +102,8 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
                     iiif = False
             except AttributeError:
                 iiif = False
-            print(iiif)
+        else:
+            iiif = False
         iiif_server = getattr(settings, "APIS_IIIF_SERVER", None)
         iiif_info_json = instance.name
         return HttpResponse(template.render(
