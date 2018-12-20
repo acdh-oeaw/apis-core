@@ -91,6 +91,20 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
             tei = set(tei) & set([x.kind.name for x in instance.text.all()])
         ceteicean_css = getattr(settings, "APIS_CETEICEAN_CSS", None)
         ceteicean_js = getattr(settings, "APIS_CETEICEAN_JS", None)
+        openseadragon_js = getattr(settings, "APIS_OSD_JS", None)
+        openseadragon_img = getattr(settings, "APIS_OSD_IMG_PREFIX", None)
+        iiif_field = getattr(settings, "APIS_IIIF_WORK_KIND", None)
+        if iiif_field:
+            try:
+                if "{}".format(instance.kind) == "{}".format(iiif_field):
+                    iiif = True
+                else:
+                    iiif = False
+            except AttributeError:
+                iiif = False
+            print(iiif)
+        iiif_server = getattr(settings, "APIS_IIIF_SERVER", None)
+        iiif_info_json = instance.name
         return HttpResponse(template.render(
             request=request, context={
                 'entity_type': entity,
@@ -100,7 +114,13 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
                 'object_lod': object_lod,
                 'tei': tei,
                 'ceteicean_css': ceteicean_css,
-                'ceteicean_js': ceteicean_js
+                'ceteicean_js': ceteicean_js,
+                'iiif': iiif,
+                'openseadragon_js': openseadragon_js,
+                'openseadragon_img': openseadragon_img,
+                'iiif_field': iiif_field,
+                'iiif_info_json': iiif_info_json,
+                'iiif_server': iiif_server,
                 }
             ))
 
