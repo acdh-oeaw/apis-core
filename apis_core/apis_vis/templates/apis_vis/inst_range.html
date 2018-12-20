@@ -1,0 +1,63 @@
+{% extends "webpage/base.html" %}
+{% load charts_extras %}
+{% block scriptHeader %}
+{{ block.super }}
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/highcharts-more.js"></script>
+<script src="https://code.highcharts.com/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/modules/export-data.js"></script>
+    <style>
+        #container {
+        	min-width: 310px;
+        	max-width: 800px;
+        	height: 800px;
+        	margin: 0 auto
+        }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="card card-default">
+<div class="card-heading"></div>
+<div class="card-body">
+<div id="container"></div>
+</div>
+</div>
+{% endblock %}
+{% block scripts %}
+{{block.super}}
+<script type="text/javascript">
+
+    document.addEventListener('DOMContentLoaded', function () {
+
+        var options = {
+            chart: {
+                renderTo: 'container',
+                type: 'columnrange',
+                inverted: true,
+                zoomType: 'x',
+            },
+            title: {
+                text: ''
+            },
+            xAxis: {
+                categories: []
+            },
+            series: []
+        };
+
+        Highcharts.ajax({
+            url: "{% url 'apis:apis_vis:get_inst_range_data' %}",
+            success: function(data) {
+                // console.log(data.payload)
+                var payload = data.payload;
+                console.log('loaded');
+                options.series = payload;
+                options.title.text = data.title;
+                options.xAxis.categories = data.x_axis;
+                var chart = new Highcharts.Chart(options);
+            }
+        });
+
+    });
+</script>
+{% endblock %}
