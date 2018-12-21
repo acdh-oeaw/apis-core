@@ -4,10 +4,12 @@ from rest_framework import viewsets, generics, filters
 from rest_framework.reverse import reverse_lazy
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, bad_request
 from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
+from django.shortcuts import redirect
+from rest_framework.decorators import api_view
 
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
 from .serializers import (
@@ -21,6 +23,7 @@ from apis_core.helper_functions.stanbolQueries import find_loc
 from apis_core.default_settings.NER_settings import autocomp_settings, stb_base
 from apis_core.apis_metainfo.api_renderers import PaginatedCSVRenderer
 from apis_core.apis_metainfo.models import TempEntityClass
+from apis_core.apis_metainfo.models import Uri
 from rest_framework.settings import api_settings
 from rest_framework.permissions import DjangoObjectPermissions, AllowAny
 from rest_framework.pagination import PageNumberPagination
@@ -67,6 +70,17 @@ class GetEntityGeneric(APIView):
         ent = self.get_object(pk)
         res = EntitySerializer(ent, context={'request': request})
         return Response(res.data)
+
+
+@api_view(['GET'])
+def uri_resolver(request):
+    uri = request.query_params.get('uri', None)
+    if uri is None:
+        raise Http404
+    else:
+        uri = Uri.objects.get(uri=uri)
+        url = reverse('apis_core:apis_api2:GetEntityGeneric', kwargs={'pk': uri.entity_id})
+        return redirect(url)
 
 
 class InstitutionViewSet(viewsets.ModelViewSet):
