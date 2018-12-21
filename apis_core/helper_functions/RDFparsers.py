@@ -16,7 +16,7 @@ from apis_core.default_settings.RDF_settings import sett_RDF_generic
 from apis_core.apis_metainfo.models import Collection, Uri
 
 import rdflib
-from rdflib import ConjunctiveGraph, URIRef, RDFS, Literal, OWL
+from rdflib import ConjunctiveGraph, URIRef, RDFS, Literal, OWL, XSD
 import re
 from datetime import datetime
 import types
@@ -219,10 +219,23 @@ class GenericRDFParser(object):
                 uri_2 = uri
                 if not uri_2.endswith('/'):
                     uri_2 += '/'
-                o2 = rdflib.term.URIRef(uri)
+                o2 = rdflib.term.Literal(uri, datatype=XSD.string)
+                duri = rdflib.term.URIRef('http://d-nb.info/standards/elementset/dnb#deprecatedUri')
                 g.parse('{}{}'.format(uri_2.strip(), x['url_appendix']), format='xml')
-                sameas = rdflib.term.URIRef(owl+'sameAs')
+                g.parse(uri)
                 list_sameas = []
+                if g.triples((None, duri, o2)):
+                    o2 = g.value(subject=None, predicate=duri, object=o2, any=True)
+                    ex2 = exist(o2, create_uri=False)
+                    if ex2[0]:
+                        self.objct = ex2[1]
+                        self.created = False
+                        if Uri.objects.filter(uri=uri_2).count() == 0:
+                            Uri.objects.create(uri=uri_2, entity=self.objct)
+                        break
+                    else:
+                        list_sameas.append(str(o2))
+                sameas = rdflib.term.URIRef(owl+'sameAs')
                 for p in g.objects(subject=o2, predicate=sameas):
                     list_sameas.append(genUri(uri=p))
                 self.sameas = list_sameas
@@ -327,6 +340,7 @@ class GenericRDFParser(object):
                                         setattr(u2, 'related_' + con['type'].lower() + '_id', ob.objct.pk)
                                     setattr(u2, 'relation_type_id', uk.pk)
                                     related_objcts.append(u2)
-            self.objct = objct(**res_attrb)
-            self.labels = labels
-            self.related_objcts = related_objcts
+            if self.created:
+                self.objct = objct(**res_attrb)
+                self.labels = labels
+                self.related_objcts = related_objcts
