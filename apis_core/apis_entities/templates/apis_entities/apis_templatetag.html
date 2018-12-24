@@ -19,6 +19,7 @@
                         console.log('apScrollTop: init');
                     }
                 });
+	$(document).on('submit', 'form.form.ajax_form', unbind_ajax_forms);
             });
     </script>
     <script type="text/javascript">
@@ -44,13 +45,12 @@
 
     </script>
     <script type="text/javascript">
-      function unbind_ajax_forms(){
-      $(".form.ajax_form").submit(function(event) {
+      function unbind_ajax_forms(event){
+	   $(this).find('button').attr('disabled', true);
             event.preventDefault();
             event.stopPropagation();
             var formData = $(this).serialize();
             //var button_text = $(this).find(':button').text();
-	   $(this).find('button').attr('disabled', true);
           $.ajax({
           type: 'POST',
           url: $(this).attr('action'),
@@ -63,7 +63,7 @@
             })
           .done(function(response) {
               window[response.call_function](response)}
-      )})}
+      )}
 </script>
         <script type="text/javascript">
     //script that converts the multi select element of the annotation project menu

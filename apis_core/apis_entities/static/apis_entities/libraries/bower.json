@@ -1,0 +1,31 @@
+{
+  "name": "libraries",
+  "description": "libraries for apis-core package",
+  "main": "libraries",
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.2.1",
+    "bootstrap": "^3.3.7",
+    "bootstrap-multiselect": "^0.9.13",
+    "bootstrap-datepicker": "^1.7.0",
+    "jquery-tablesort": "^0.0.11",
+    "leaflet": "^1.1.0",
+    "tooltipster": "^4.2.5",
+    "leaflet.markercluster": "Leaflet.markercluster#^1.0.6",
+    "linkurious.js": "sennierer/linkurious.js#^1.5.4",
+    "CETEI": "https://github.com/TEIC/CETEIcean/releases/download/v0.4.0/CETEI.js",
+    "components-font-awesome": "^4.7.0"
+  },
+  "resolutions": {
+    "jquery": "1.9.1 - 3"
+  }
+}

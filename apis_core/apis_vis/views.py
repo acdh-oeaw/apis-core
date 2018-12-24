@@ -5,7 +5,11 @@ from django.views.generic import TemplateView
 from django.conf import settings
 from django.db.models import Avg
 
+<<<<<<< HEAD
 from apis_core.apis_relations.models import PersonPlace, PersonInstitution, InstitutionInstitution
+=======
+from apis_core.apis_relations.models import *
+>>>>>>> apis-core-package
 
 from . utils import calculate_age
 

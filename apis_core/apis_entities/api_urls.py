@@ -10,7 +10,8 @@ app_name = 'apis_entities'
 urlpatterns = [
     url(r'^savenetworkfiles/$', api_views.SaveNetworkFiles.as_view()),
     url(r'^getorcreateentity/$', api_views.GetOrCreateEntity.as_view(), name='GetOrCreateEntity'),
-    path(r'entity/<int:pk>/', api_views.GetEntityGeneric.as_view(), name="GetEntityGeneric")
+    path(r'entity/<int:pk>/', api_views.GetEntityGeneric.as_view(), name="GetEntityGeneric"),
+    path(r'uri/', api_views.uri_resolver, name="UriResolver")
 ]
 
 if 'deep learning' in getattr(settings, "APIS_COMPONENTS", []) and 'apis_highlighter' in settings.INSTALLED_APPS:

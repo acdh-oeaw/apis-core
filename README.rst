@@ -116,4 +116,18 @@ You'll also need to set define the locations for the CETEICEAN specific static f
 ```
 APIS_CETEICEAN_CSS = "http://teic.github.io/CETEIcean/css/CETEIcean.css"
 APIS_CETEICEAN_JS = "http://teic.github.io/CETEIcean/js/CETEI.js"
-``` 
+```
+
+
+## IIIF
+
+In case you want to dipslay images served via IIIF protocoll add the following params to your settings files
+
+```
+APIS_IIIF_WORK_KIND = 'IIIF'
+APIS_IIIF_ENT_IIIF_REL = "has iiif image"
+APIS_IIIF_SERVER = "https://iiif.acdh.oeaw.ac.at/"
+# APIS_OPENSEADRAGON_CSS = "https://teic.github.io/CETEIcean/css/CETEIcean.css"
+APIS_OSD_JS = "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.4.0/openseadragon.min.js"
+APIS_OSD_IMG_PREFIX = "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.4.0/images/"
+```

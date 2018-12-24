@@ -1,0 +1,506 @@
+{% extends "webpage/base.html" %}
+{% load staticfiles %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block scriptHeader %}
+{{ block.super }}
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/sigma.core.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/conrad.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/utils/sigma.utils.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/utils/sigma.polyfills.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/sigma.settings.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/classes/sigma.classes.dispatcher.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/classes/sigma.classes.configurable.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/classes/sigma.classes.graph.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/classes/sigma.classes.camera.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/classes/sigma.classes.quad.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/captors/sigma.captors.mouse.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/captors/sigma.captors.touch.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/sigma.renderers.canvas.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/sigma.renderers.webgl.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/sigma.renderers.svg.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/sigma.renderers.def.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/webgl/sigma.webgl.nodes.def.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/webgl/sigma.webgl.nodes.fast.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/webgl/sigma.webgl.edges.def.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/webgl/sigma.webgl.edges.fast.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/webgl/sigma.webgl.edges.arrow.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.labels.def.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.hovers.def.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.nodes.def.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edges.def.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edges.curve.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edges.arrow.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edges.curvedArrow.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edgehovers.def.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edgehovers.curve.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edgehovers.arrow.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.edgehovers.curvedArrow.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/canvas/sigma.canvas.extremities.def.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.utils.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.nodes.def.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.edges.def.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.edges.curve.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.edges.curvedArrow.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.labels.def.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/renderers/svg/sigma.svg.hovers.def.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/middlewares/sigma.middlewares.rescale.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/middlewares/sigma.middlewares.copy.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/misc/sigma.misc.animation.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/misc/sigma.misc.bindEvents.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/misc/sigma.misc.bindDOMEvents.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/src/misc/sigma.misc.drawHovers.js' %}"></script>
+<!-- END SIGMA IMPORTS -->
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/plugins/sigma.parsers.json/sigma.parsers.json.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/plugins/sigma.parsers.gexf/sigma.parsers.gexf.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/plugins/sigma.plugins.animate/sigma.plugins.animate.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/plugins/sigma.layouts.forceLink/worker.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/plugins/sigma.layouts.forceLink/supervisor.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/plugins/sigma.plugins.animate/sigma.plugins.animate.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/plugins/sigma.layouts.fruchtermanReingold/sigma.layout.fruchtermanReingold.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/plugins/sigma.plugins.tooltips/sigma.plugins.tooltips.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/plugins/sigma.exporters.json/sigma.exporters.json.js' %}"></script>
+<script src="{% static 'apis_entities/libraries/bower_components/linkurious.js/plugins/sigma.exporters.graphml/sigma.exporters.graphml.js' %}"></script>
+<style type="text/css">
+
+      #graph-container {
+      height: 1000px;
+    }
+
+    ul.dropdown-menu {
+      z-index: 2000;
+    }
+
+    .sigma-tooltip {
+      max-width: 240px;
+      max-height: 280px;
+      background-color: white;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      border-radius: 6px;
+    }
+    .sigma-tooltip-header {
+      font-variant: small-caps;
+      font-size: 120%;
+      color: #437356;
+      border-bottom: 1px solid #aac789;
+      padding: 10px;
+    }
+    .sigma-tooltip-body {
+      padding: 10px;
+    }
+    .sigma-tooltip-body th {
+      color: #999;
+      text-align: left;
+    }
+    .sigma-tooltip-footer {
+      padding: 10px;
+      border-top: 1px solid #aac789;
+    }
+    .sigma-tooltip > .arrow {
+      border-width: 10px;
+      position: absolute;
+      display: block;
+      width: 0;
+      height: 0;
+      border-color: transparent;
+      border-style: solid;
+    }
+    .sigma-tooltip.top {
+      margin-top: -12px;
+    }
+    .sigma-tooltip.top > .arrow {
+      left: 50%;
+      bottom: -10px;
+      margin-left: -10px;
+      border-top-color: rgb(249, 247, 237);
+      border-bottom-width: 0;
+    }
+    .sigma-tooltip.bottom {
+      margin-top: 12px;
+    }
+    .sigma-tooltip.bottom > .arrow {
+      left: 50%;
+      top: -10px;
+      margin-left: -10px;
+      border-bottom-color: rgb(249, 247, 237);
+      border-top-width: 0;
+    }
+    .sigma-tooltip.left {
+      margin-left: -12px;
+    }
+    .sigma-tooltip.left > .arrow {
+      top: 50%;
+      right: -10px;
+      margin-top: -10px;
+      border-left-color: rgb(249, 247, 237);
+      border-right-width: 0;
+    }
+    .sigma-tooltip.right {
+      margin-left: 12px;
+    }
+    .sigma-tooltip.right > .arrow {
+      top: 50%;
+      left: -10px;
+      margin-top: -10px;
+      border-right-color: rgb(249, 247, 237);
+      border-left-width: 0;
+    }
+    </style>
+{% endblock %}
+{% block content %}
+<div class="card card-default card-fixed">
+<div class="card-heading"><h2>Network Visualization</h2></div>
+<div class="card-body">
+    <div class="row">
+        <div class="col-md-4">
+            <div id="filter-container">
+                {% crispy form %}
+            </div>
+            <hr/>
+            <div id="export-form">
+                <form class="form-inline" id="create-file-form">
+                    <div class="form-group">
+                        <label for="select-format">Format</label>
+                        <select class="form-control" id="select-format">
+                            <option>Json</option>
+                            <option>Graphml</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <div class="checkbox">
+                        <label>
+                        <input type="checkbox" id="choice-download"> Download?
+                        </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-default" id="create-button">Create</button>
+                    </div>
+                </form>
+            </div>
+        <hr/>
+      </div>
+
+        <div class="col-md-8">
+            <div id="graph-container"></div>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+{{block.super}}
+<script type="text/javascript">
+
+function download_network_data(formData) {
+    $.ajax({
+          type: 'POST',
+          url: '{% url "apis:NetJson-list" %}',
+          data: formData,
+          beforeSend: function(request) {
+                  var csrftoken = getCookie('csrftoken');
+                    request.setRequestHeader("X-CSRFToken", csrftoken);
+            },
+          success: function(data, s, xhr) {
+              $.ApisNet.instance.graph.read(data);
+              $.ApisNet.instance.graph.nodes().forEach(function (n) {
+                    $.ApisNet.nodes_pk.push(n.id);
+
+      n.x = Math.random();
+      n.y = Math.random();
+      n.size = 10*(1-1/$.ApisNet.instance.graph.degree(n.id));
+      if (n.type === 'person') {
+        n.color = '#5FB404';
+      } else if (n.type === 'institution') {
+        n.color = '#B40404';
+      } else if (n.type === 'place') {
+          n.color = '#4286f4'
+      } else if (n.type === 'event') {
+          n.color = '#f4f142'
+      } else {
+          n.color = '#a8a8a8'
+      };
+
+  });
+       if (typeof $.ApisNet.form_data_load !== 'undefined'){
+           if ($.ApisNet.form_data_load.length > 0) {
+               var form = $.ApisNet.form_data_load.shift();
+               download_network_data(form);
+           }
+       }
+
+     $.ApisNet.instance.refresh();
+     sigma.layouts.startForceLink($.ApisNet.instance);
+          }
+
+    })
+}
+
+function delete_nodes(e) {
+    $.ApisNet.instance.graph.dropNode(e.data['node']['id']);
+    $.ApisNet.instance.refresh();
+    event.stopPropagation();
+    event.preventDefault();
+
+};
+
+function delete_nodes_2(e) {
+    $.ApisNet.instance.graph.dropNode(e);
+    $.ApisNet.instance.refresh();
+};
+
+function process_selected_nodes(e) {
+    if (e['keyCode'] === 46) {
+        for (i = 0; i < $.ApisNet.selected_nodes.length; i++) {
+            delete_nodes_2($.ApisNet.selected_nodes[i]['id']);
+        };
+        $.ApisNet.selected_nodes = new Array();
+    } else if (e.keyCode == 69 && e.ctrlKey) {
+        e.stopPropagation();
+        e.preventDefault();
+        if (typeof $.ApisNet.nodes_expand == 'undefined') {
+            $.ApisNet.nodes_expand = new Array();
+        }
+        var list_nodes_2 = $.ApisNet.selected_nodes;
+        for (i = 0; i < list_nodes_2.length; i++) {
+            var node_id = list_nodes_2[i]['id'];
+            var node_type = list_nodes_2[i]['type'];
+            node_type = node_type[0].toUpperCase()+node_type.substring(1, node_type.length);
+            var new_node = [node_type, node_id]
+            $.ApisNet.nodes_expand.push(new_node)
+        };
+        expand_nodes();
+        $.ApisNet.selected_nodes = new Array();
+    }
+};
+
+function select_unselect_node(e) {
+    var node = e.data['node'];
+    $.ApisNet.instance.graph.nodes(e.data['node']['id']).color = '#f4e242';
+    if ($.ApisNet.selected_nodes.includes(node)) {
+        var n = node;
+        if (n.type === 'person') {
+                    n.color = '#5FB404';
+                } else if (n.type === 'institution') {
+                    n.color = '#B40404';
+                } else if (n.type === 'place') {
+                    n.color = '#4286f4'
+                } else if (n.type === 'event') {
+                    n.color = '#f4f142'
+                } else {
+                    n.color = '#a8a8a8'
+                };
+        $.ApisNet.selected_nodes.splice( $.inArray(n, $.ApisNet.selected_nodes), 1 );
+    } else {
+        $.ApisNet.selected_nodes.push(node);
+
+    }
+    $.ApisNet.instance.refresh();
+};
+
+function expand_nodes() {
+if (typeof $.ApisNet.form_data_load == 'undefined') {
+    $.ApisNet.form_data_load = new Array();
+};
+for (i2 = 0; i2 < $.ApisNet.nodes_expand.length; i2++) {
+    var node_id = $.ApisNet.nodes_expand[i2][1];
+    var node_type = $.ApisNet.nodes_expand[i2][0];
+    console.log(node_type);
+    for (i = 0; i < $.ApisNet.relation_types.length; i++) {
+        var formData = {};
+        if ($.ApisNet.relation_types[i].startsWith(node_type.toLowerCase())) {
+            formData.search_source = node_id;
+            formData.select_relation = $.ApisNet.relation_types[i];
+        }
+        ;
+        if ($.ApisNet.relation_types[i].endsWith(node_type.toLowerCase())) {
+            formData.search_target = node_id;
+            formData.select_relation = $.ApisNet.relation_types[i];
+        }
+        ;
+
+        $.ApisNet.form_data_load.push(formData);
+    }
+}
+var form2 = $.ApisNet.form_data_load.shift()
+    download_network_data(form2);
+$.ApisNet.nodes_expand = new Array();
+};
+
+function expand_node(node_type, node_id){
+    if (typeof $.ApisNet.nodes_expand == 'undefined') {
+            $.ApisNet.nodes_expand = new Array();
+        };
+  $.ApisNet.nodes_expand.push([node_type, node_id]);
+  $.ApisNet.tooltip.close();
+  expand_nodes();
+};
+function add_file_list(data, s, xhr) {
+    var file_name = data['file_name'].split('/')[2]
+    if ($('#list_created_graphs').length) {
+        var html = '<li class="list-group-item"><a href="'
+        html += data['file_name']
+        html += '">'+file_name+'</a></li>'
+        $('#list_created_graphs').append(html)
+    } else {
+        var html = '<div class="card card-default top-buffer"><div class="card-heading">Files</div><div class="card-body"><ul class="list-group" id="list_created_graphs">'
+        html += '<li class="list-group-item"><a href="'
+        html += data['file_name']
+        html += '">'+file_name+'</a></li></ul></div></div>'
+        $('#export-form').nextAll('hr').append(html)
+    }
+};
+function unbind_create_file_form(){
+    $("form#create-file-form").submit(function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        var download = $("input#choice-download").is(":checked");
+        var format = $("select#select-format").val();
+        var dt = new Date();
+        var month = dt.getMonth()+1
+        var date = dt.getFullYear() + "_" + month + "_" + dt.getDate();
+        var user = '{{ request.user.username }}'
+        if ($.ApisNet.instance) {
+            if (download) {
+                if (format=='Json') {
+                    $.ApisNet.instance.toJSON({
+                      download: true,
+                      filename: 'apisGraph_'+user+'_'+date+'.json'
+                    });
+                }
+                if (format=='Graphml') {
+                    console.log($.ApisNet.instance)
+                    $.ApisNet.instance.toGraphML({
+                      download: true,
+                      filename: 'apisGraph_'+user+'_'+date+'.graphml',
+                      edgesAttributes: 'data',
+                      nodesAttributes: 'data',
+                      renderer: $.ApisNet.instance.renderers[0],
+                      undirectedEdges: false
+                    });
+                }
+            } else {
+                if (format=='Json') {
+                    var file = $.ApisNet.instance.toJSON({
+                      download: false,
+                    });
+
+                   // file = file.replace(',"edges":[{', ',"links":[{')
+
+                } else if (format=='Graphml') {
+
+                    var file = $.ApisNet.instance.toGraphML();
+                }
+                $.ajax({
+                        type: 'POST',
+                        url: '/api2/savenetworkfiles/',
+                        data: {'file': file, 'file_name': 'apisGraph_' + user + '_' + date + '.json'},
+                        success: add_file_list,
+                    })
+            }
+        }
+    }
+    )
+};
+function unbind_net_viz_form(){
+    $("form.FilterNodesForm").submit(function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            var type_relation = $('#id_select_relation').val();
+            if (!$.ApisNet.relation_types.includes(type_relation)) {
+                $.ApisNet.relation_types.push(type_relation);
+            }
+            var formData = $(this).serialize();
+            //var button_text = $(this).find(':button').text();
+          download_network_data(formData)
+          })
+}
+
+$( document ).ready(function() {
+	console.log('running unbind')
+unbind_net_viz_form();
+unbind_create_file_form();
+$("#graph-container").on("contextmenu", function(e) { e.preventDefault(); });
+$(document).keydown(process_selected_nodes);
+if (!$.ApisNet) {
+    $.ApisNet = {};
+    $.ApisNet.relation_types = new Array();
+    $.ApisNet.nodes_pk = new Array();
+    $.ApisNet.selected_nodes = new Array();
+    $.ApisNet.instance = new sigma('graph-container');
+    $.ApisNet.instance.settings({
+  minNodeSize: 5,
+  maxNodeSize: 15,
+    animationsTime: 4500,
+  skip_existing_nodes: true,
+  skip_existing_edges: true
+})
+    sigma.layouts.configForceLink($.ApisNet.instance, {
+      worker: true,
+      barnesHutOptimize: false,
+      autoStop: true,
+      background: true,
+      easing: 'cubicInOut'
+    });
+var config = {
+      node: [{
+        show: 'clickNode',
+        cssClass: 'sigma-tooltip',
+        position: 'top',
+        hide: 'clickStage',
+        renderer: function(node) {
+          // The function context is s.graph
+          // Returns an HTML string:
+          return node.tooltip;
+          // Returns a DOM Element:
+          //var el = document.createElement('div');
+          //return el.innerHTML = Mustache.render(template, node);
+        }
+      }],
+    };
+    // Instanciate the tooltips plugin with a Mustache renderer for node tooltips:
+    $.ApisNet.tooltip = sigma.plugins.tooltips($.ApisNet.instance, $.ApisNet.instance.renderers[0], config);
+//$.ApisNet.instance.bind("rightClickNode", delete_nodes);
+    $.ApisNet.instance.bind("rightClickNode", select_unselect_node);
+
+};
+$('#id_select_relation').on("change", function(){
+    var list_ent = $(this).val().split('-')
+    console.log(list_ent);
+    console.log("changed");
+    //$('#id_select_kind-autocomplete').yourlabsAutocomplete('destroy');
+    //$('#id_select_kind-autocomplete').yourlabsAutocomplete({'url': new_val, 'minimumCharacters': 2});
+
+    $('#id_search_source').select2('destroy');
+    $('#id_search_source').select2({
+          ajax: {
+		  url: "{% url 'apis_core:apis_entities:generic_network_entities_autocomplete' 334488  %}".replace("334488", list_ent[0].toString()),
+            dataType: 'json'
+            // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+          }
+        });
+    $('#id_search_target').select2('destroy');
+    $('#id_search_target').select2({
+        allowClear: true,
+          ajax: {
+		  url: "{% url 'apis_core:apis_entities:generic_network_entities_autocomplete' 334488 %}".replace("334488", list_ent[1].toString()),
+            	dataType: 'json'
+            // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+          }
+        });
+    $('#id_select_kind').select2('destroy');
+    $('#id_select_kind').select2({
+        allowClear: true,
+          ajax: {
+		  url: "{% url 'apis_core:apis_vocabularies:generic_vocabularies_autocomplete' 223344 'normal' %}".replace("223344", list_ent[0]+list_ent[1]+'relation'),
+            dataType: 'json'
+            // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+          }
+        });
+    //$('#id_search_target-autocomplete').yourlabsAutocomplete('destroy');
+    //$('#id_search_target-autocomplete').yourlabsAutocomplete({'url': new_val_target, 'minimumCharacters': 2});
+})
+})
+</script>
+{% endblock %}
