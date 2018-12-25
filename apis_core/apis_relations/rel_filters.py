@@ -143,8 +143,8 @@ def get_generic_relation_filter(entity):
                      'data-minimum-input-length': 3,
                      'data-html': True}
             super(GenericListFilter, self).__init__(*args, **kwargs)
-            print()
             for x in self.filters.keys():
+                print(type(self.filters[x].field).__name__)
                 if type(self.filters[x].field).__name__ == "ModelChoiceField":
                     current_model_name = str(self.filters[x].queryset.model.__name__).lower()
                     current_qs = self.filters[x].queryset
@@ -164,5 +164,28 @@ def get_generic_relation_filter(entity):
                                 ),
                             )
                         )
-
+                if type(self.filters[x].field).__name__ == "DateField":
+                    self.filters[x] = django_filters.DateFromToRangeFilter(
+                        field_name=x,
+                    )
+                if type(self.filters[x].field).__name__ == "CharField":
+                    self.filters[x] = django_filters.CharFilter(
+                        lookup_expr='icontains',
+                        field_name=x,
+                    )
+                if type(self.filters[x].field).__name__ == "ModelMultipleChoiceField":
+                    current_model_name = str(self.filters[x].queryset.model.__name__).lower()
+                    current_qs = self.filters[x].queryset
+                    self.filters[x] = django_filters.ModelMultipleChoiceFilter(
+                        field_name=x,
+                        queryset=current_qs,
+                        widget=autocomplete.ModelSelect2Multiple(
+                            url=reverse(
+                                'apis:apis_entities:generic_network_entities_autocomplete',
+                                kwargs={
+                                    'entity': current_model_name
+                                }
+                            ),
+                        )
+                    )
     return GenericListFilter
