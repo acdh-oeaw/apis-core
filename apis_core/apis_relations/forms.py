@@ -3,7 +3,6 @@
 from datetime import datetime
 
 from django import forms
-#import autocomplete_light.shortcuts as al
 from django.utils.translation import ugettext_lazy as _
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout
@@ -15,9 +14,11 @@ from .models import (PersonPlace, PersonPerson, PersonInstitution,
                      PlaceEvent, PersonWork, InstitutionWork, PlaceWork, EventWork, PlacePlace)
 from apis_core.apis_entities.models import Place, Institution, Person, Event, Work
 from apis_core.apis_metainfo.models import Uri, Text
-from apis_core.apis_vocabularies.models import (PersonInstitutionRelation, PersonPlaceRelation, InstitutionPlaceRelation,
-                                 PersonEventRelation, InstitutionEventRelation, PlaceEventRelation,
-                                 InstitutionInstitutionRelation, PersonPersonRelation)
+from apis_core.apis_vocabularies.models import (
+    PersonInstitutionRelation, PersonPlaceRelation, InstitutionPlaceRelation,
+    PersonEventRelation, InstitutionEventRelation, PlaceEventRelation,
+    InstitutionInstitutionRelation, PersonPersonRelation
+)
 from apis_core.apis_labels.models import Label
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
 from dal import autocomplete
@@ -78,14 +79,9 @@ class InstitutionLabelForm(EntityLabelForm):
 ##############################################
 
 
-
-
 ##############################################
 # Events
 ##############################################
-
-
-
 
 
 class EventLabelForm(EntityLabelForm):
@@ -96,8 +92,9 @@ class EventLabelForm(EntityLabelForm):
 # Entities Base Forms
 #############################################
 
+
 class PlaceEntityForm(forms.Form):
-    #place = forms.CharField(label='Place', widget=al.TextWidget('OrtAutocomplete'))
+    # place = forms.CharField(label='Place', widget=al.TextWidget('OrtAutocomplete'))
     place_uri = forms.CharField(required=False, widget=forms.HiddenInput())
 
     def save(self, *args, **kwargs):

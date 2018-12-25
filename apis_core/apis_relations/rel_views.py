@@ -6,13 +6,12 @@ from django_tables2 import RequestConfig
 
 from apis_core.apis_entities.views import GenericListViewNew
 from . forms2 import GenericRelationForm
-from . rel_forms import PersonPlaceFilterFormHelper
 from . tables import get_generic_relation_listview_table
+from . rel_filters import get_generic_relation_filter
 
 
 class GenericRelationView(GenericListViewNew):
 
-    # formhelper_class = GenericRelationForm
     context_filter_name = 'filter'
     paginate_by = 25
     template_name = getattr(
@@ -21,6 +20,16 @@ class GenericRelationView(GenericListViewNew):
         'apis_entities/generic_list.html'
     )
     login_url = '/accounts/login/'
+
+    def get_queryset(self, **kwargs):
+        self.entity = self.kwargs.get('entity')
+        qs = ContentType.objects.get(
+            app_label__startswith='apis_', model=self.entity.lower()
+        ).model_class().objects.all()
+        self.filter = get_generic_relation_filter(
+            self.entity.title())(self.request.GET, queryset=qs)
+        self.filter.form.helper = self.formhelper_class()
+        return self.filter.qs.distinct()
 
     def get_table(self, **kwargs):
         relation = self.kwargs['entity'].lower()
