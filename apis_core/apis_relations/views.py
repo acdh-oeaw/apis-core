@@ -137,6 +137,7 @@ def get_form_ajax(request):
                 'button_text': ButtonText,
                 'ObjectID': ObjectID,
                 'SiteID': SiteID})}
+    print(data)
 
     return HttpResponse(json.dumps(data), content_type='application/json')
 
@@ -233,7 +234,7 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
             call_function = 'HighlForm_response'
         data = {'test': False, 'call_function': call_function,
                 'DivID': 'div_'+kind_form+instance_id,
-                'form': render_to_string("_ajax_form.html", context={
+                'form': render_to_string("apis_relations/_ajax_form.html", context={
                     "entity_type": entity_type_str,
                     "form": form, 'type1': kind_form, 'url2': 'save_ajax_'+kind_form,
                     'button_text': button_text, 'ObjectID': ObjectID, 'SiteID': SiteID},

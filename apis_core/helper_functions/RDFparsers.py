@@ -221,10 +221,10 @@ class GenericRDFParser(object):
                     uri_2 += '/'
                 o2 = rdflib.term.Literal(uri, datatype=XSD.string)
                 duri = rdflib.term.URIRef('http://d-nb.info/standards/elementset/dnb#deprecatedUri')
-                g.parse('{}{}'.format(uri_2.strip(), x['url_appendix']), format='xml')
+                #g.parse('{}{}'.format(uri_2.strip(), x['url_appendix']), format='xml')
                 g.parse(uri)
                 list_sameas = []
-                if g.triples((None, duri, o2)):
+                if (None, duri, o2) in g:
                     o2 = g.value(subject=None, predicate=duri, object=o2, any=True)
                     ex2 = exist(o2, create_uri=False)
                     if ex2[0]:
@@ -235,6 +235,8 @@ class GenericRDFParser(object):
                         break
                     else:
                         list_sameas.append(str(o2))
+                else:
+                    o2 = rdflib.term.URIRef(uri)
                 sameas = rdflib.term.URIRef(owl+'sameAs')
                 for p in g.objects(subject=o2, predicate=sameas):
                     list_sameas.append(genUri(uri=p))
@@ -279,6 +281,8 @@ class GenericRDFParser(object):
                                 if z[cnt][0] == 'objects':
                                     pred = rdflib.term.URIRef(z[cnt][2])
                                     res = g.objects(subject=s, predicate=pred)
+                                    for s, p, o in g.triples((None, None, None)):
+                                        print(s, p, o)
                                     if type(res) != types.GeneratorType:
                                         break
                                     for r in res:
