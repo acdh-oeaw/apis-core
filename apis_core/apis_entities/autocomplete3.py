@@ -4,6 +4,7 @@ from .models import Place, Person, Institution, Event, Work
 from apis_core.apis_metainfo.models import Uri, Collection
 from apis_core.default_settings.NER_settings import autocomp_settings as ac_settings
 from django.conf import settings
+from django.core.exceptions import FieldError
 from .custom_autocompletes import *
 
 from dal import autocomplete
@@ -348,9 +349,30 @@ class GenericNetworkEntitiesAutocomplete(autocomplete.Select2ListView):
             res = Collection.objects.filter(name__icontains=q[3:])
             results = [{'id': 'cl:'+str(x.pk), 'text': x.name} for x in res]
         else:
-            ent_model = ContentType.objects.get(app_label='apis_entities', model=entity).model_class()
-            arg_list = [Q(**{x + '__icontains': q}) for x in settings.APIS_ENTITIES[entity.title()]['search']]
-            res = ent_model.objects.filter(reduce(operator.or_, arg_list)).distinct()
+            ent_model = ContentType.objects.get(
+                app_label__startswith='apis_', model=entity
+            ).model_class()
+            try:
+                arg_list = [
+                    Q(
+                        **{x + '__icontains': q}
+                    ) for x in settings.APIS_ENTITIES[entity.title()]['search']
+                ]
+            except KeyError:
+                arg_list = [
+                    Q(
+                        **{x + '__icontains': q}
+                    ) for x in ['name']
+                ]
+            try:
+                res = ent_model.objects.filter(reduce(operator.or_, arg_list)).distinct()
+            except FieldError:
+                arg_list = [
+                    Q(
+                        **{x + '__icontains': q}
+                    ) for x in ['text']
+                ]
+                res = ent_model.objects.filter(reduce(operator.or_, arg_list)).distinct()
             results = [{'id': x.pk, 'text': str(x)} for x in res]
         return http.HttpResponse(json.dumps({
             'results': results
