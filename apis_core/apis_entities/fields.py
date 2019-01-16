@@ -26,7 +26,6 @@ class Select2WidgetMixin(DALSelect2WidgetMixin):
         css_remove_list = ['admin/css/vendor/select2/select2.css',
                            'admin/css/vendor/select2/select2.min.css',
                            'admin/css/autocomplete.css',
-                           'autocomplete_light/select2.css'
                           ]
         for e in js_remove_list:
             try:
