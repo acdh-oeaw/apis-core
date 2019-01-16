@@ -16,27 +16,29 @@ class Select2WidgetMixin(DALSelect2WidgetMixin):
         m = super().media
         js = list(m._js)
         css = list(m._css['screen'])
-        try:
-            js.remove('admin/js/vendor/jquery/jquery.js')
-            js.remove('autocomplete_light/jquery.post-setup.js')
-            #js.remove('admin/js/vendor/jquery/jquery.min.js')
-        except ValueError:
-            print('Error')
-            pass
-        try:
-            print(js)
-            print(m._css['screen'])
-            js.remove('admin/js/vendor/select2/select2.full.js')
-            js.remove('admin/js/vendor/select2/i18n/en.js')
-            #js.remove('autocomplete_light/select2.js')
-            js.append('https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.full.min.js')
-            css.remove('admin/css/vendor/select2/select2.css')
-            css.remove('admin/css/autocomplete.css')
-            css.remove('autocomplete_light/select2.css')
-            css.insert(0, 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css')
-        except:
-            print('didnt work')
-        print(js)
+        js_remove_list = ['admin/js/vendor/jquery/jquery.js',
+                          'autocomplete_light/jquery.post-setup.js',
+                          'admin/js/vendor/select2/select2.full.js',
+                          'admin/js/vendor/select2/select2.full.min.js',
+                          'admin/js/vendor/select2/i18n/en.js'
+                         ]
+        css_remove_list = ['admin/css/vendor/select2/select2.css',
+                           'admin/css/autocomplete.css',
+                           'autocomplete_light/select2.css'
+                          ]
+        for e in js_remove_list:
+            try:
+                js.remove(e)
+            except ValueError:
+                pass
+        for e in css_remove_list:
+            try:
+                css.remove(e)
+            except ValueError:
+                pass
+
+        js.append('https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.full.min.js')
+        css.insert(0, 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.min.css')
         return forms.Media(css={'screen': css}, js=js)
 
 
