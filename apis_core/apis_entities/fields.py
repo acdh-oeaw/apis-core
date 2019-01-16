@@ -17,12 +17,14 @@ class Select2WidgetMixin(DALSelect2WidgetMixin):
         js = list(m._js)
         css = list(m._css['screen'])
         js_remove_list = ['admin/js/vendor/jquery/jquery.js',
+                          'admin/js/vendor/jquery/jquery.min.js',
                           'autocomplete_light/jquery.post-setup.js',
                           'admin/js/vendor/select2/select2.full.js',
                           'admin/js/vendor/select2/select2.full.min.js',
                           'admin/js/vendor/select2/i18n/en.js'
                          ]
         css_remove_list = ['admin/css/vendor/select2/select2.css',
+                           'admin/css/vendor/select2/select2.min.css',
                            'admin/css/autocomplete.css',
                            'autocomplete_light/select2.css'
                           ]
