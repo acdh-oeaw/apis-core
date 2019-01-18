@@ -31,43 +31,26 @@
             <div class="card-body">
                 <form action="" method="post">
                     <div class="card card-default">
+
+                	{% crispy form %}
+
                         <div class="card-header" role="tab" id="headingFour">
-                          <h4 class="card-title">
-                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            <h4 class="card-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
                                 Texts
-                            </a>
-                          </h4>
+                                </a>
+                            </h4>
                         </div>
                         <div id="collapseFour" class="card-collapse collapse" role="tabcard" aria-labelledby="headingFour">
-                          <div class="card-body">
-                            {% block texts %}
-                            {% crispy form_text %}
-                            {% endblock %}
-                          </div>
+                            <div class="card-body">
+                                {% block texts %}
+                                {% crispy form_text %}
+                                {% endblock %}
+                            </div>
                         </div>
-                      </div>
-                	{% crispy form %}
-                    {% block editbuttons %}
-    {% if instance %}
-    {% if "delete" in permissions %}
-                    <a class ="btn btn-danger btn-primary" href="delete">Delete</a>
-    {% endif %}
-    {% if "change" in permissions %}
-    <input class="btn btn-primary" type="submit" value="modify" />
-    {% endif %}
-        {% else %}
-        {% if "create" in permissions %}
-        <input class="btn btn-primary" type="submit" value="create" />
-            {% endif %}
-                    {% endif %}
-    {% if instance %}
-    <button class="compare_tooltip btn btn-default" data-tooltip='{"app":"entities","kind":"{{entity_type|lower}}","pk":"{{ instance.pk }}"}'>Revisions</button>
-    {% endif %}
-{% endblock editbuttons %}
-                </form>
+
                 {% block linkedOpenData %}
                 {% if object_lod %}
-                <p></p>
                     <div class="card card-default">
                         <div class="card-header" role="tab" id="headingSix">
                             <h4 class="card-title">
@@ -84,6 +67,25 @@
                     </div>
                 {% endif %}
                 {% endblock %}
+                {% block editbuttons %}
+                    {% if instance %}
+                    {% if "delete" in permissions %}
+                                    <a class ="btn btn-danger btn-primary" href="delete">Delete</a>
+                    {% endif %}
+                    {% if "change" in permissions %}
+                    <input class="btn btn-primary" type="submit" value="modify" />
+                    {% endif %}
+                        {% else %}
+                        {% if "create" in permissions %}
+                        <input class="btn btn-primary" type="submit" value="create" />
+                            {% endif %}
+                                    {% endif %}
+                    {% if instance %}
+                    <button class="compare_tooltip btn btn-default" data-tooltip='{"app":"entities","kind":"{{entity_type|lower}}","pk":"{{ instance.pk }}"}'>Revisions</button>
+                    {% endif %}
+                {% endblock editbuttons %}
+                </div>
+            </form>
             </div>
 {% if instance %}
         </div>

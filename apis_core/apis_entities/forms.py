@@ -5,7 +5,7 @@ from django import forms
 from django.urls import reverse_lazy
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
-from crispy_forms.layout import Layout
+from crispy_forms.layout import Layout, Fieldset
 from crispy_forms.bootstrap import Accordion, AccordionGroup
 from django.forms import ModelMultipleChoiceField
 from django.utils.translation import ugettext_lazy as _
@@ -51,10 +51,9 @@ def get_entities_form(entity):
             self.helper.form_class = entity.title()+'Form'
             self.helper.form_tag = False
             self.helper.help_text_inline = True
-            acc_grp1 = AccordionGroup('Metadata {}'.format(entity.title()))
+            acc_grp1 = Fieldset('Metadata {}'.format(entity.title()))
             acc_grp2 = AccordionGroup(
                         'MetaInfo',
-                        'collection',
                         'references',
                         'notes',
                         'review')
@@ -91,6 +90,22 @@ def get_entities_form(entity):
                             self.fields[f].initial = res
                 if f not in acc_grp2:
                     acc_grp1.append(f)
+            print(acc_grp1)
+            if entity == 'Person':
+                acc_grp1 = Fieldset('Metadata {}'.format(entity.title()))
+                person_field_list = [
+                    'name',
+                    'first_name',
+                    'gender',
+                    'title',
+                    'profession',
+                    'start_date',
+                    'end_date',
+                    'status',
+                    'collection',
+                ]
+                for x in person_field_list:
+                    acc_grp1.append(x)
 
             self.helper.layout = Layout(
                 Accordion(
