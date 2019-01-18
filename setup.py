@@ -25,7 +25,7 @@ bower_json = {
 
 setup(
     name='apis-core',
-    version='0.9.18',
+    version='0.9.19',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',  # example license

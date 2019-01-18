@@ -166,6 +166,7 @@
             // update our tooltip content with our returned data and cache it
             $('#tab_'+data.tab).find('div:eq(1)').remove();
             $('#tab_'+data.tab).append(data.form);
+	    $('#form_PersonInstitutionForm div:first div:first select').focus();
             //$(".form.ajax_form").unbind()
         };
         if (!$.ApisForms) {
