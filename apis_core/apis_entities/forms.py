@@ -17,7 +17,7 @@ from django.conf import settings
 
 from .models import Person, Place, Institution, Event, Work
 from apis_core.apis_vocabularies.models import TextType
-from apis_core.apis_metainfo.models import Text, Uri
+from apis_core.apis_metainfo.models import Text, Uri, Collection
 
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
 
@@ -90,7 +90,6 @@ def get_entities_form(entity):
                             self.fields[f].initial = res
                 if f not in acc_grp2:
                     acc_grp1.append(f)
-            print(acc_grp1)
             if entity == 'Person':
                 acc_grp1 = Fieldset('Metadata {}'.format(entity.title()))
                 person_field_list = [
@@ -117,6 +116,15 @@ def get_entities_form(entity):
             self.fields['collection'].required = False
             self.fields['start_date_written'].required = False
             self.fields['end_date_written'].required = False
+
+        def save(self, *args, **kwargs):
+            obj = super(GenericEntitiesForm, self).save(*args, **kwargs)
+            if obj.collection.all().count() == 0:
+                col_name = getattr(settings, 'APIS_DEFAULT_COLLECTION', 'manually created entity')
+                col, created = Collection.objects.get_or_create(name=col_name)
+                obj.collection.add(col)
+            return obj
+
     return GenericEntitiesForm
 
 
