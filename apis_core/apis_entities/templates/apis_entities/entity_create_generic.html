@@ -70,11 +70,12 @@
                 {% block editbuttons %}
                     {% if instance %}
                     {% if "delete" in permissions %}
-                                    <a class ="btn btn-danger btn-primary" href="delete">Delete</a>
+                       <a class ="btn btn-danger btn-primary" href="delete">Delete</a>
                     {% endif %}
                     {% if "change" in permissions %}
-                    <input class="btn btn-primary" type="submit" value="modify" />
+                       <input class="btn btn-primary" type="submit" value="modify" />
                     {% endif %}
+		    <a class ="btn btn-success" href="{% url 'apis:apis_entities:generic_entities_create_view' entity_type %}">Create new {{entity_type|title}}</a>
                         {% else %}
                         {% if "create" in permissions %}
                         <input class="btn btn-primary" type="submit" value="create" />

@@ -33,7 +33,7 @@
                             </div>
                             <div class="card-body">
                                 {% crispy entity_create_stanbol  entity_create_stanbol.helper %}
-                                <a class="btn btn-primary btn-small" href="/apis/entities/entity/{{entity}}/create">create new {{entity}}</a>
+                                <a class="btn btn-primary btn-small" href="{% url 'apis:apis_entities:generic_entities_create_view' entity %}">create new {{entity}}</a>
                             </div>
                         </div>
                     {% endif %}
