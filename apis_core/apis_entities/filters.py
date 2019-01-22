@@ -116,9 +116,6 @@ def get_generic_list_filter(entity):
                 if 'list_filters' in settings.APIS_ENTITIES[entity.title()].keys():
                     for f in settings.APIS_ENTITIES[entity.title()]['list_filters']:
                         for ff in f[1].keys():
-                            print("f: {}".format(f))
-                            print("ff: {}".format(ff))
-                            print("f[0]]: {}".format(f[0]))
                             setattr(self.filters[f[0]], ff, f[1][ff])
             except KeyError:
                 pass

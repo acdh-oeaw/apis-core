@@ -148,11 +148,20 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
 
     def get_table(self, **kwargs):
         session = getattr(self.request, 'session', False)
+        entity = self.kwargs.get('entity')
+        selected_cols = self.request.GET.getlist("columns")
         if session:
             edit_v = self.request.session.get('edit_views', False)
         else:
             edit_v = False
-        self.table_class = get_entities_table(self.entity.title(), edit_v)
+        if 'table_fields' in settings.APIS_ENTITIES[entity.title()]:
+            default_cols = settings.APIS_ENTITIES[entity.title()]['table_fields']
+        else:
+            default_cols = ['name']
+        default_cols = default_cols + selected_cols
+        self.table_class = get_entities_table(
+            self.entity.title(), edit_v, default_cols=default_cols
+        )
         table = super(GenericListViewNew, self).get_table()
         RequestConfig(self.request, paginate={
             'page': 1, 'per_page': self.paginate_by}).configure(table)
@@ -163,6 +172,7 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
         context = super(GenericListViewNew, self).get_context_data()
         context[self.context_filter_name] = self.filter
         context['entity'] = self.entity
+        entity = self.entity.title()
         context['entity_create_stanbol'] = GenericEntitiesStanbolForm(self.entity)
         if 'browsing' in settings.INSTALLED_APPS:
             from browsing.models import BrowsConf
@@ -205,6 +215,10 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
                     app_label=app_label
                 )
                 context = dict(context, **chartdata)
+        try:
+            context['togglable_colums'] = settings.APIS_ENTITIES[entity.title()]['additional_cols']
+        except KeyError:
+            context['togglable_colums'] = []
         return context
 
     def render_to_response(self, context, **kwargs):
