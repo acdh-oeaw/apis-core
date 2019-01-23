@@ -3,7 +3,7 @@ from django.conf.urls import url
 from .autocomplete3 import GenericEntitiesAutocomplete, GenericNetworkEntitiesAutocomplete
 from .views import ReversionCompareView
 from .views2 import GenericEntitiesCreateStanbolView
-from . import views, views2, detail_views
+from . import views, views2, detail_views, merge_views
 
 app_name = 'apis_entities'
 
@@ -50,4 +50,5 @@ urlpatterns = [
     url(
         r'^compare/(?P<app>[a-z]+)/(?P<kind>[a-z]+)/(?P<pk>\d+)$', ReversionCompareView.as_view()
     ),
+    url(r'^merge-objects/$', merge_views.merge_objects, name='merge_objects'),
 ]

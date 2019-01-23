@@ -172,6 +172,7 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
         context = super(GenericListViewNew, self).get_context_data()
         context[self.context_filter_name] = self.filter
         context['entity'] = self.entity
+        context['app_name'] = 'apis_entities'
         entity = self.entity.title()
         context['entity_create_stanbol'] = GenericEntitiesStanbolForm(self.entity)
         if 'browsing' in settings.INSTALLED_APPS:
@@ -219,6 +220,10 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
             context['togglable_colums'] = settings.APIS_ENTITIES[entity.title()]['additional_cols']
         except KeyError:
             context['togglable_colums'] = []
+        try:
+            context['enable_merge'] = settings.APIS_ENTITIES[entity.title()]['merge']
+        except KeyError:
+            context['enable_merge'] = False
         return context
 
     def render_to_response(self, context, **kwargs):
