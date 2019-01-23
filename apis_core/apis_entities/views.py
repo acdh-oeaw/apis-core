@@ -1,4 +1,9 @@
 # -*- coding: utf-8 -*-
+import json
+import reversion
+from reversion_compare.views import HistoryCompareDetailView
+from reversion.models import Version
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -10,31 +15,30 @@ from django.views.generic.edit import DeleteView
 from django.views import generic
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-# from reversion import revisions as reversion
-from reversion.models import Version
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.db.models import Q
 from django_tables2 import SingleTableView
 from django_tables2 import RequestConfig
-from reversion_compare.views import HistoryCompareDetailView
-import reversion
 from django_tables2.export.views import ExportMixin
 
 from apis_core.helper_functions.utils import access_for_all
 
 from .models import Person, Place, Institution, Event, Work
+from apis_core.apis_vocabularies.models import LabelType
+from apis_core.apis_metainfo.models import Uri, UriCandidate, TempEntityClass, Text
+from apis_core.helper_functions.stanbolQueries import retrieve_obj
+from apis_core.helper_functions.RDFparsers import GenericRDFParser
+from apis_core.helper_functions.utils import (
+    access_for_all, access_for_all_function, ENTITIES_DEFAULT_COLS
+)
+from apis_core.apis_labels.models import Label
+
 from .forms import (
     FullTextForm, SearchForm, GenericFilterFormHelper,
     NetworkVizFilterForm, PersonResolveUriForm,
     get_entities_form, GenericEntitiesStanbolForm
 )
-
-from apis_core.apis_vocabularies.models import LabelType
-from apis_core.apis_metainfo.models import Uri, UriCandidate, TempEntityClass, Text
-from apis_core.helper_functions.stanbolQueries import retrieve_obj
-from apis_core.helper_functions.RDFparsers import GenericRDFParser
-from apis_core.apis_labels.models import Label
 from .tables import (
     PersonTable, PlaceTable, InstitutionTable, EventTable, WorkTable,
     get_entities_table
@@ -44,10 +48,6 @@ from .filters import (
     get_generic_list_filter
 )
 
-from apis_core.helper_functions.utils import access_for_all, access_for_all_function
-
-
-import json
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.forms import SelectAnnotationProject, SelectAnnotatorAgreement
@@ -56,7 +56,8 @@ if 'apis_highlighter' in settings.INSTALLED_APPS:
 if 'charts' in settings.INSTALLED_APPS:
     from charts.models import ChartConfig
     from charts.views import create_payload
-############################################################################
+
+###########################################################################
 ############################################################################
 #
 #   Helper Functions
@@ -217,13 +218,17 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
                 )
                 context = dict(context, **chartdata)
         try:
-            context['togglable_colums'] = settings.APIS_ENTITIES[entity.title()]['additional_cols']
-        except KeyError:
-            context['togglable_colums'] = []
-        try:
             context['enable_merge'] = settings.APIS_ENTITIES[entity.title()]['merge']
         except KeyError:
             context['enable_merge'] = False
+        try:
+            togg_cols = settings.APIS_ENTITIES[entity.title()]['additional_cols']
+        except KeyError:
+            togg_cols = []
+        if context['enable_merge'] and self.request.user.is_authenticated:
+            togg_cols = togg_cols + ['merge']
+        context['togglable_colums'] = togg_cols + ENTITIES_DEFAULT_COLS
+
         return context
 
     def render_to_response(self, context, **kwargs):
