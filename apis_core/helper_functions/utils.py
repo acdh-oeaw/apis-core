@@ -26,3 +26,17 @@ def access_for_all_function(user):
         return getattr(settings, 'APIS_DETAIL_VIEWS_ALLOWED', False)
     else:
         return True
+
+
+ENTITIES_DEFAULT_COLS = [
+    'start_date',
+    'start_date_written'
+    'end_date',
+    'end_date_written',
+    'text',
+    'collection',
+    'status',
+    'source',
+    'references',
+    'notes',
+]
