@@ -98,8 +98,8 @@ def get_entities_form(entity):
                     'gender',
                     'title',
                     'profession',
-                    'start_date',
-                    'end_date',
+                    'start_date_written',
+                    'end_date_written',
                     'status',
                     'collection',
                 ]
