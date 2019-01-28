@@ -7,14 +7,14 @@ import re
 import unicodedata
 
 
-
 @reversion.register()
 class VocabNames(models.Model):
-    """List of Vocabulary names to allow the easy retrieval of Vovcabulary names and classes from the VocabsBaseClass"""
+    """List of Vocabulary names to allow the easy retrieval\
+    of Vovcabulary names and classes from the VocabsBaseClass"""
     name = models.CharField(max_length=255)
 
     def get_vocab_label(self):
-        return re.sub( r"([A-Z])", r" \1", self.name).strip()
+        return re.sub(r"([A-Z])", r" \1", self.name).strip()
 
 
 @reversion.register()
@@ -22,18 +22,29 @@ class VocabsBaseClass(models.Model):
     """ An abstract base class for other classes which contain so called
     'controlled vocablury' to describe subtypes of main temporalized
     entites"""
-    choices_status = (('rej', 'rejected'), ('ac', 'accepted'), ('can', 'candidate'), ('del', 'deleted'))
+    choices_status = (
+        ('rej', 'rejected'),
+        ('ac', 'accepted'),
+        ('can', 'candidate'),
+        ('del', 'deleted')
+    )
     name = models.CharField(max_length=255, verbose_name='Name')
     description = models.TextField(
         blank=True,
         help_text="Brief description of the used term.")
-    parent_class = models.ForeignKey('self', blank=True, null=True,
-                                     on_delete=models.CASCADE)
+    parent_class = models.ForeignKey(
+        'self', blank=True, null=True,
+        on_delete=models.CASCADE
+    )
     status = models.CharField(max_length=4, choices=choices_status, default='can')
-    userAdded = models.ForeignKey(User, blank=True, null=True,
-                                  on_delete=models.SET_NULL)  #changed from default=12
-    vocab_name = models.ForeignKey(VocabNames, blank=True, null=True,
-                                   on_delete=models.SET_NULL)
+    userAdded = models.ForeignKey(
+        User, blank=True, null=True,
+        on_delete=models.SET_NULL
+    )
+    vocab_name = models.ForeignKey(
+        VocabNames, blank=True, null=True,
+        on_delete=models.SET_NULL
+    )
 
     def __str__(self):
         return self.name
@@ -41,7 +52,7 @@ class VocabsBaseClass(models.Model):
     def save(self, *args, **kwargs):
         d, created = VocabNames.objects.get_or_create(name=type(self).__name__)
         self.vocab_name = d
-        if self.name != unicodedata.normalize('NFC', self.name):    #secure correct unicode encoding
+        if self.name != unicodedata.normalize('NFC', self.name):  # secure correct unicode encoding
             self.name = unicodedata.normalize('NFC', self.name)
         super(VocabsBaseClass, self).save(*args, **kwargs)
         return self
@@ -54,7 +65,6 @@ class VocabsBaseClass(models.Model):
             res = d.parent_class.name + ' >> ' + res
             d = d.parent_class
         return res
-
 
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
@@ -84,14 +94,14 @@ class RelationBaseClass(VocabsBaseClass):
                 t = RelationBaseClass.objects.get(pk=d.parent_class.pk).name_reverse
                 if len(t) < 1:
                     t = '(' + d.parent_class.name + ')'
-            except:
+            except Exception as e:
                 t = '(' + d.parent_class.name + ')'
             res = t + ' >> ' + res
             d = d.parent_class
         return res
 
     def save(self, *args, **kwargs):
-        if self.name_reverse != unicodedata.normalize('NFC', self.name_reverse):    #secure correct unicode encoding
+        if self.name_reverse != unicodedata.normalize('NFC', self.name_reverse):
             self.name_reverse = unicodedata.normalize('NFC', self.name_reverse)
         super(RelationBaseClass, self).save(*args, **kwargs)
         return self
