@@ -11,6 +11,7 @@ from dal import autocomplete
 from django.db.models import Q
 from django import http
 from django.contrib.contenttypes.models import ContentType
+from django.urls import reverse
 
 import requests
 import json
@@ -162,14 +163,46 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                 f = dict()
                 dataclass = ""
                 try:
-                    f['id'] = Uri.objects.filter(entity=r)[0].uri
+                    f['id'] = r.uri_set.all()[0].uri
+                    print(f['id'])
                 except:
                     continue
-                if hasattr(r, 'lng'):
+                dataclass_gen = 'data-vis-tooltip="{}" \
+                        data-url="{}" data-start="{}" \
+                        data-end="{}" data-alt="{}" \
+                        data-uris="{}" \
+                        class="apis-autocomplete-span"'.format(
+                            ac_type,
+                            reverse(
+                                'apis:apis_entities:generic_entities_detail_view',
+                                args=[ac_type, r.pk]),
+                            r.start_date,
+                            r.end_date,
+                            '/'.join([x.label for x in r.label_set.filter(label_type__name='alternative name')]),
+                            ','.join([x.uri for x in r.uri_set.all()])
+                            )
+                if ac_type == 'place' and  hasattr(r, 'lng'):
                     if r.lng and r.lat:
-                        dataclass = 'data-vis-tooltip="{}" data-lat="{}" \
-                        data-long="{}"  class="apis-autocomplete-span"'.format(ac_type, r.lat, r.lng)
-                f['text'] = '<span {}><small>db</small> {}</span>'.format(dataclass, str(r))
+                        dataclass = '{} data-lat="{}" \
+                        data-long="{}"'.format(dataclass_gen, r.lat, r.lng)
+                    else:
+                        dataclass = dataclass_gen
+                elif ac_type == 'person':
+                    print(getattr(settings, 'APIS_PLACE_OF_BIRTH','Place of Birth'))
+                    p_birth = r.personplace_set.all().filter(relation_type__name=
+                                                       getattr(
+                                                           settings,
+                                                           'APIS_PLACE_OF_BIRTH',
+                                                           'Place of Birth'))
+                    if p_birth.count() == 1:
+                        dataclass = '{} data-birthplace="{}"'.format(
+                        dataclass_gen, p_birth[0].related_place.name
+                        )
+                    else:
+                        dataclass = dataclass_gen
+                else:
+                    dataclass = dataclass_gen
+                f['text'] = '<span {}><small>db</small> {}</span>'.format(dataclass, str(r), r.pk)
                 choices.append(f)
             if len(choices) < page_size:
                 test_db = False
