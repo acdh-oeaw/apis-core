@@ -3,6 +3,7 @@
 <script src="https://cdn.jsdelivr.net/npm/tooltipster@4.2.6/dist/js/tooltipster.bundle.min.js" integrity="sha256-glChvCaC6IJq49dkfulAWd7xlkPwA0FEydjhjPBintA=" crossorigin="anonymous"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tooltipster@4.2.6/dist/css/tooltipster.bundle.min.css" integrity="sha256-Qc4lCfqZWYaHF5hgEOFrYzSIX9Rrxk0NPHRac+08QeQ=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tooltipster@4.2.6/src/css/plugins/tooltipster/sideTip/themes/tooltipster-sideTip-light.css" integrity="sha256-TCVc2Qc+NEQu24pQ9XbBwEZivtNyIPCqn6kE92Y8Fys=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/leaflet.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.3.4/leaflet.css" />
@@ -77,24 +78,39 @@
     })
     </script>
         <script type="application/javascript">
-        $('body').on('mouseenter', '.apis-autocomplete-span:not(.tooltipstered)', function() {
-                    $(this).tooltipster({
+		console.log('script loaded');
+		$(document).on('mouseenter', 'span.apis-autocomplete-span:not(.tooltipstered)', function(e) {
+                    
+        console.log('mouse event triggered');
+			console.log(this);
+			console.log(e);
+			$(this).tooltipster({
                       theme: 'tooltipster-light',
-                      side: 'left',
-                      contentAsHTML: true,
+		      trigger: 'hover',
+		      content: 'loading...',
+		      side: 'left',
+		      contentAsHTML: true,
+		      interactive: true,
 
-                      functionBefore: function(instance, helper) {
-                        $('#container2').remove();
-                        instance.content('<div class="autocomplete-vis-container" id="container2" style="height: 200px; width: 200px"></div>');
-                      },
-                      functionReady: function(instance, helper){
+                      functionInit: function(instance, helper) {
+                        console.log(helper);
+			      if (typeof $.ApisAutoCount == 'undefined') {
+				      $.ApisAutoCount = 0; } else {
+				     $.ApisAutoCount += 1; 
+				      };
+
+                        var elem_id = 'auto_comp_extra_'+$.ApisAutoCount
                         var func = 'autocomplete_vis_'+$(helper.origin).data('vis-tooltip');
-                        var res = window[func]($(helper.origin));
-                        console.log(res);
-                      },
+			      console.log(func);
+
+                        var res = window[func]($(helper.origin), elem_id);
+                        console.log('went through');
+			instance.elem_id = elem_id;
+			console.log(instance)
+			      //return instance
+		      },
                     })
-                    .tooltipster('reposition')
-                    .tooltipster('open');
+				.tooltipster('open');
                 });
 
 
