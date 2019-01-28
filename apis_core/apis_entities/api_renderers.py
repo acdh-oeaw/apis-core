@@ -1,6 +1,6 @@
-from rest_framework import renderers
 from apis_core.apis_tei.tei import TeiEntCreator
-from rdflib import Namespace, Graph, URIRef, RDF, BNode, Literal, RDFS, XSD
+from rdflib import RDF, RDFS, XSD, BNode, Graph, Literal, Namespace, URIRef
+from rest_framework import renderers
 
 
 class EntityToTEI(renderers.BaseRenderer):
