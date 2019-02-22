@@ -47,3 +47,12 @@ class EntityToCIDOC(renderers.BaseRenderer):
         g.add( (b_date_of_birth, cidoc.P114, Literal(data['start_date'], datatype=XSD.date)) )
 
         return g.serialize(format='xml')
+
+
+class EntityToGenericRDF(renderers.BaseRenderer):
+
+    media_type = "text/rdf+xml+simple"
+    format = "rdf+xml+simple"
+
+    def render(self, data, media_type=None, renderer_context=None):
+        app = Namespace('')
