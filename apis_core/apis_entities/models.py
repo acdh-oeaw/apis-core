@@ -21,7 +21,11 @@ from django.dispatch import receiver
 from django.urls import reverse
 from guardian.shortcuts import assign_perm, remove_perm
 
-BASE_URI = getattr(settings, "APIS_BASE_URI", "http://apis.info/")
+from apis_core.apis_metainfo.models import TempEntityClass, Uri, Text, Collection
+from apis_core.apis_labels.models import Label
+from apis_core.apis_vocabularies.models import (
+    ProfessionType, PlaceType, InstitutionType,
+    EventType, Title, WorkType, WorkLanguage)
 
 
 @reversion.register(follow=["tempentityclass_ptr"])
@@ -145,7 +149,10 @@ class Event(TempEntityClass):
 
 @reversion.register(follow=["tempentityclass_ptr"])
 class Work(TempEntityClass):
-    kind = models.ForeignKey(WorkType, blank=True, null=True, on_delete=models.SET_NULL)
+    kind = models.ForeignKey(WorkType, blank=True, null=True,
+                             on_delete=models.SET_NULL) 
+    language = models.ForeignKey(WorkLanguage, blank=True, null=True,
+                             on_delete=models.SET_NULL)
 
     def __str__(self):
         if self.name != "":

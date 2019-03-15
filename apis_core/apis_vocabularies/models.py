@@ -180,6 +180,12 @@ class CollectionType(VocabsBaseClass):
     pass
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
+class WorkLanguage(VocabsBaseClass):
+    """vocab to set the language of a work"""
+    pass
+
+
+@reversion.register(follow=['vocabsbaseclass_ptr'])
 class TextType(VocabsBaseClass):
     """used to store the Text types for the forms"""
     entity = models.CharField(max_length=255)
