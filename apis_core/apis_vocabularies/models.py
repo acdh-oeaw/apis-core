@@ -187,18 +187,6 @@ class WorkLanguage(VocabsBaseClass):
 
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
-class WorkDenomination(VocabsBaseClass):
-    """vocab to set the Denomiation of a work"""
-    pass
-
-
-@reversion.register(follow=['vocabsbaseclass_ptr'])
-class WorkTopics(VocabsBaseClass):
-    """vocab to set the tag of a work"""
-    pass
-
-
-@reversion.register(follow=['vocabsbaseclass_ptr'])
 class TextType(VocabsBaseClass):
     """used to store the Text types for the forms"""
     entity = models.CharField(max_length=255)
