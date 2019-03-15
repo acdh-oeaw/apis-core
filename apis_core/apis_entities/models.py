@@ -13,7 +13,7 @@ from apis_core.apis_metainfo.models import TempEntityClass, Uri, Text, Collectio
 from apis_core.apis_labels.models import Label
 from apis_core.apis_vocabularies.models import (
     ProfessionType, PlaceType, InstitutionType,
-    EventType, Title, WorkType)
+    EventType, Title, WorkType, WorkLanguage)
 
 import re
 import unicodedata
@@ -143,6 +143,8 @@ class Event(TempEntityClass):
 @reversion.register(follow=['tempentityclass_ptr'])
 class Work(TempEntityClass):
     kind = models.ForeignKey(WorkType, blank=True, null=True,
+                             on_delete=models.SET_NULL) 
+    language = models.ForeignKey(WorkLanguage, blank=True, null=True,
                              on_delete=models.SET_NULL)
 
     def __str__(self):
