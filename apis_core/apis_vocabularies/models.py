@@ -192,7 +192,7 @@ class WorkDenomination(VocabsBaseClass):
 
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
-class WorkTag(VocabsBaseClass):
+class WorkTopics(VocabsBaseClass):
     """vocab to set the tag of a work"""
     pass
 
