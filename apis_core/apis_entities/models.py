@@ -12,6 +12,7 @@ from apis_core.apis_vocabularies.models import (
     ProfessionType,
     Title,
     WorkLanguage,
+    WorkDenomination,
     WorkType,
 )
 from django.conf import settings
@@ -150,6 +151,7 @@ class Work(TempEntityClass):
     language = models.ForeignKey(
         WorkLanguage, blank=True, null=True, on_delete=models.SET_NULL
     )
+    denomiation = models.ManyToManyField(WorkDenomination, blank=True, Null=True)
 
     def __str__(self):
         if self.name != "":
