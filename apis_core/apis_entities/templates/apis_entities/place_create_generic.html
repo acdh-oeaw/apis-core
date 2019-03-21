@@ -1,6 +1,15 @@
 {% extends "apis_entities/entity_create_generic.html" %}
 {% load guardian_tags %}
+{% load static %}
 {% block title %}Create/Edit a Place{% endblock %}
+{% block scriptHeader %}
+{{block.super}}
+<script src="{% static 'autocomplete_light/jquery.init.js' %}"></script>
+<script src="{% static 'autocomplete_light/select2.js' %}"></script>
+<script src="{% static 'autocomplete_light/forward.js' %}"></script>
+<script src="{% static 'autocomplete_light/autocomplete.init.js' %}"></script>
+<link rel="icon" type="image/png" sizes="16x16" href="{% static 'autocomplete_light/select2.css' %}"/>
+{% endblock scriptHeader %}
 {% block additional_accordion %}
 {% load crispy_forms_tags %}
         <div class="card-header" role="tab" id="headingOne">
