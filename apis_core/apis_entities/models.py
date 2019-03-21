@@ -103,7 +103,6 @@ class Institution(TempEntityClass):
     kind = models.ForeignKey(
         InstitutionType, blank=True, null=True, on_delete=models.SET_NULL
     )
-    homepage = models.URLField(blank=True, null=True)
 
     def __str__(self):
         if self.name != "":
