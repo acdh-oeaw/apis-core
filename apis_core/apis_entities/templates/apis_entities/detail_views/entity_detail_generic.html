@@ -91,6 +91,14 @@
                                 </tr>
                                 <tr>
                                     <th>
+                                        ID
+                                    </th>
+                                    <td>
+                                        {{ object.id }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
                                         Type
                                     </th>
                                     <td>
@@ -111,6 +119,21 @@
                                         {% endif %}
                                     </td>
                                 </tr>
+                                <tr>
+                                  <th>
+                                    Notes
+                                  </th>
+                                  <td>
+                                    {{ object.notes }}
+                                  </td>
+                                </tr>
+                                <tr>
+                                  <th>
+                                    References
+                                  </th>
+                                  <td>
+                                    {{ object.references }}
+                                  </td>
                                 {% endif %}
                                 {% if object.lat %}
                                     <tr>
