@@ -152,7 +152,7 @@ class Work(TempEntityClass):
     language = models.ForeignKey(
         WorkLanguage, blank=True, null=True, on_delete=models.SET_NULL
     )
-    denomiation = models.ManyToManyField(WorkDenomination, blank=True, Null=True)
+    denomiation = models.ManyToManyField(WorkDenomination, blank=True, null=True)
 
     def __str__(self):
         if self.name != "":
