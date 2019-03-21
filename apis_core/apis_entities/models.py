@@ -14,6 +14,7 @@ from apis_core.apis_vocabularies.models import (
     WorkLanguage,
     WorkDenomination,
     WorkType,
+    WorkTopics
 )
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -153,7 +154,7 @@ class Work(TempEntityClass):
         WorkLanguage, blank=True, null=True, on_delete=models.SET_NULL
     )
     denomination = models.ManyToManyField(WorkDenomination, blank=True, null=True)
-    tag = models.ManyToManyField(WorkTag, blank=True, null=True)
+    topics = models.ManyToManyField(WorkTopics, blank=True, null=True)
 
     def __str__(self):
         if self.name != "":
