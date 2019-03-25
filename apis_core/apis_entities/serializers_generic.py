@@ -40,10 +40,15 @@ class EntitySerializer(serializers.Serializer):
         ver = Version.objects.get_for_object(obj)
         res = []
         for v in ver:
+            usr_1 = getattr(v.revision, 'user', None)
+            if usr_1 is not None:
+                usr_1 = usr_1.username
+            else:
+                usr_1 = "Not specified"
             res.append({
                 "id": v.id,
                 "date_created": v.revision.date_created,
-                "user_created": v.revision.user.username})
+                "user_created": usr_1}) 
         return res
 
     def add_relations(self, obj):
@@ -131,10 +136,15 @@ class RelationEntitySerializer(serializers.Serializer):
         ver = Version.objects.get_for_object(obj)
         res = []
         for v in ver:
+            usr_1 = getattr(v.revision, 'user', None)
+            if usr_1 is not None:
+                usr_1 = usr_1.username
+            else:
+                usr_1 = "Not specified"
             res.append({
                 "id": v.id,
                 "date_created": v.revision.date_created,
-                "user_created": v.revision.user.username})
+                "user_created": usr_1})
         return res
 
     def add_annotations(self, obj):
