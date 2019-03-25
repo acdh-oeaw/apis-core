@@ -7,6 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models.query import QuerySet
 from django.urls import reverse
 from rest_framework import serializers
+from reversion.models import Version
 
 
 class CollectionSerializer(serializers.Serializer):
@@ -33,6 +34,17 @@ class EntitySerializer(serializers.Serializer):
     end_date = serializers.DateField()
     uris = EntityUriSerializer(source="uri_set", many=True)
     labels = LabelSerializer(source="label_set", many=True)
+    revisions = serializers.SerializerMethodField(method_name="add_revisions")
+
+    def add_revisions(self, obj):
+        ver = Version.objects.get_for_object(obj)
+        res = []
+        for v in ver:
+            res.append({
+                "id": v.id,
+                "date_created": v.revision.date_created,
+                "user_created": v.revision.user.username})
+        return res
 
     def add_relations(self, obj):
         res = {}
@@ -113,6 +125,17 @@ class RelationEntitySerializer(serializers.Serializer):
     id = serializers.IntegerField()
     relation_type = serializers.SerializerMethodField(method_name="add_relation_label")
     annotation = serializers.SerializerMethodField(method_name="add_annotations")
+    revisions = serializers.SerializerMethodField(method_name="add_revisions")
+
+    def add_revisions(self, obj):
+        ver = Version.objects.get_for_object(obj)
+        res = []
+        for v in ver:
+            res.append({
+                "id": v.id,
+                "date_created": v.revision.date_created,
+                "user_created": v.revision.user.username})
+        return res
 
     def add_annotations(self, obj):
         if "apis_highlighter" in settings.INSTALLED_APPS:

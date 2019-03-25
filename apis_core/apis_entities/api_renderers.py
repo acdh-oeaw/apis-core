@@ -1,11 +1,11 @@
 import json
 
-from django.core.serializers.json import DjangoJSONEncoder
 from apis_core.apis_tei.tei import TeiEntCreator
+from django.conf import settings
+from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 from rdflib import RDF, RDFS, XSD, BNode, Graph, Literal, Namespace, URIRef
 from rest_framework import renderers
-from django.conf import settings
 
 from webpage.metadata import PROJECT_METADATA
 
@@ -160,33 +160,72 @@ class EntityToProsopogrAPhI(renderers.BaseRenderer):
                     s["statementContent"].append(s2)
                 stmts.append(s)
                 stmt_count += 1
-        f['statements'] = stmts
+        f["statements"] = stmts
         factoids.append(f)
         print(factoids)
+        facts = []
+        facts_ind = {}
         if "relations" in data.keys():
             for ent in data["relations"].keys():
                 for rel_1 in data["relations"][ent]:
                     print(rel_1)
-                    s = {"id": "Stmt{}_rel_{}".format(data['id'], rel_1['id']), "role": {"label": rel_1["relation_type"]["label"], "url": rel_1["relation_type"]["url"]}}
+                    s = {
+                        "id": "Stmt{}_rel_{}".format(data["id"], rel_1["id"]),
+                        "role": {
+                            "label": rel_1["relation_type"]["label"],
+                            "url": rel_1["relation_type"]["url"],
+                        },
+                    }
                     if "start_date" in rel_1.keys():
                         if rel_1["start_date"] != "":
-                            s["date"] = {"sortdate": rel_1["start_date"], "label": rel_1["start_date_written"]}
+                            s["date"] = {
+                                "sortdate": rel_1["start_date"],
+                                "label": rel_1["start_date_written"],
+                            }
                             if rel_1["end_date_written"] != "":
-                                s["date"]["label"] += "-{}".format(rel_1["end_date_written"])
+                                s["date"]["label"] += "-{}".format(
+                                    rel_1["end_date_written"]
+                                )
                     ext_stc = False
-                    t1 = {"uri": rel_1[ent[:-1]]["url"], "label": rel_1[ent[:-1]]["name"]}
+                    t1 = {
+                        "uri": rel_1[ent[:-1]]["url"],
+                        "label": rel_1[ent[:-1]]["name"],
+                    }
                     if fact_settings is not None:
                         if ent in fact_settings.keys():
-                            if rel_1["relation_type"]["label"] in fact_settings[ent].keys():
-                                s[fact_settings[ent][rel_1["relation_type"]["label"]]] = t1
+                            if (
+                                rel_1["relation_type"]["label"]
+                                in fact_settings[ent].keys()
+                            ):
+                                s[
+                                    fact_settings[ent][rel_1["relation_type"]["label"]]
+                                ] = t1
                                 ext_stc = True
                     if not ext_stc:
-                        s["statementContent"] = [t1, ]
-                    if len(rel_1["annotation"]) == 1:
-                        ann = rel_1["annotation"][0]
-                        s3 = {"person": factoids[0]['person'], "id": "{}_{}".format(factoids[0]['id'], len(stmts)), "source": {"id": "APIS", "metadata": "APIS highlighter annotations"}, "createdBy": ann["user"], "createdWhen": timezone.now()}
-                        s3["statements"] = [s, ]
-                        factoids.append(s3)
+                        s["statementContent"] = [t1]
+                    if len(rel_1["revisions"]) > 0:
+                        user_1 = rel_1["revisions"][0]["user_created"]
+                        date_1 = rel_1["revisions"][0]["date_created"].strftime("%Y-%m-%d")
+                        rev_id = rel_1["revisions"][0]["id"]
+                        if "{}_{}".format(user_1, date_1) not in facts_ind.keys():
+                            facts_ind["{}_{}".format(user_1, date_1)] = len(factoids)
+                            s3 = {
+                                "person": factoids[0]["person"],
+                                "id": "{}_{}".format(factoids[0]["id"], len(stmts)),
+                                "source": {
+                                    "id": "APIS",
+                                    "metadata": "APIS highlighter annotations rev. {}".format(rev_id),
+                                },
+                                "createdBy": user_1,
+                                "createdWhen": date_1,
+                                "statements": [s]
+                            }
+                            factoids.append(s3)
+                        else:
+                            factoids[facts_ind["{}_{}".format(user_1, date_1)]]["statements"].append(s)
+                            factoids[facts_ind["{}_{}".format(user_1, date_1)]]["source"]["metadata"] += " / {}".format(rev_id)
                     else:
-                        factoids[0]['statements'].append(s)
-        return json.dumps({"factoids": factoids}, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
+                        factoids[0]["statements"].append(s)
+        return json.dumps(
+            {"factoids": factoids}, sort_keys=True, indent=1, cls=DjangoJSONEncoder
+        )
