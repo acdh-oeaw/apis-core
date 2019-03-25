@@ -1,5 +1,6 @@
 import json
 
+from django.core.serializers.json import DjangoJSONEncoder
 from apis_core.apis_tei.tei import TeiEntCreator
 from django.utils import timezone
 from rdflib import RDF, RDFS, XSD, BNode, Graph, Literal, Namespace, URIRef
@@ -94,8 +95,8 @@ class EntityToProsopogrAPhI(renderers.BaseRenderer):
         factoids = []
         fact_settings = getattr(settings, "PROSOPOGRAPHI_API", None)
         stmt_temp = "Stmt{}_{}"
-        f = {"id": "apis_{}_{}".format(data["entity_type"], data["id"])}
-        f[data["entity_type"]] = {"id": data["id"]}
+        f = {"id": "apis_{}_{}".format(data["entity_type"].lower(), data["id"])}
+        f[data["entity_type"].lower()] = {"id": data["id"]}
         f["source"] = {
             "id": PROJECT_METADATA["title"],
             "metadata": "{} export".format(PROJECT_METADATA["title"]),
@@ -159,17 +160,21 @@ class EntityToProsopogrAPhI(renderers.BaseRenderer):
                     s["statementContent"].append(s2)
                 stmts.append(s)
                 stmt_count += 1
+        f['statements'] = stmts
+        factoids.append(f)
+        print(factoids)
         if "relations" in data.keys():
-            stmts_2 = {}
             for ent in data["relations"].keys():
-                for rel_1 in ent:
-                    s = {"id": rel_1.pk, "role": {"label": rel_1["relation_type"]["label"], "url": rel_1["relation_type"]["url"]}}
-                    if rel_1["start_date"] != "":
-                        s["date"] = {"sortdate": rel_1["start_date"], "label": rel_1["start_date_written"]}
-                        if rel_1["end_date_written"] != "":
-                            s["date"]["label"] += "-{}".format(rel_1["end_date_written"])
+                for rel_1 in data["relations"][ent]:
+                    print(rel_1)
+                    s = {"id": "Stmt{}_rel_{}".format(data['id'], rel_1['id']), "role": {"label": rel_1["relation_type"]["label"], "url": rel_1["relation_type"]["url"]}}
+                    if "start_date" in rel_1.keys():
+                        if rel_1["start_date"] != "":
+                            s["date"] = {"sortdate": rel_1["start_date"], "label": rel_1["start_date_written"]}
+                            if rel_1["end_date_written"] != "":
+                                s["date"]["label"] += "-{}".format(rel_1["end_date_written"])
                     ext_stc = False
-                    t1 = {"uri": rel_1[ent[:-1]["url"]], "label": rel_1[ent[:-1]["name"]]}
+                    t1 = {"uri": rel_1[ent[:-1]]["url"], "label": rel_1[ent[:-1]]["name"]}
                     if fact_settings is not None:
                         if ent in fact_settings.keys():
                             if rel_1["relation_type"]["label"] in fact_settings[ent].keys():
@@ -178,6 +183,10 @@ class EntityToProsopogrAPhI(renderers.BaseRenderer):
                     if not ext_stc:
                         s["statementContent"] = [t1, ]
                     if len(rel_1["annotation"]) == 1:
-                        for ann in rel_1["annotation"]:
-                            s3 = {"person": {"id": }}
-        return json.dumps({"factoids": stmts})
+                        ann = rel_1["annotation"][0]
+                        s3 = {"person": factoids[0]['person'], "id": "{}_{}".format(factoids[0]['id'], len(stmts)), "source": {"id": "APIS", "metadata": "APIS highlighter annotations"}, "createdBy": ann["user"], "createdWhen": timezone.now()}
+                        s3["statements"] = [s, ]
+                        factoids.append(s3)
+                    else:
+                        factoids[0]['statements'].append(s)
+        return json.dumps({"factoids": factoids}, sort_keys=True, indent=1, cls=DjangoJSONEncoder)
