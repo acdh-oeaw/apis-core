@@ -39,7 +39,7 @@ import requests
 from datetime import datetime
 # from metainfo.models import TempEntityClass
 
-from . api_renderers import EntityToTEI, EntityToCIDOC
+from . api_renderers import EntityToTEI, EntityToCIDOC, EntityToProsopogrAPhI
 
 
 class StandardResultsSetPagination(PageNumberPagination):
@@ -51,7 +51,7 @@ class StandardResultsSetPagination(PageNumberPagination):
 class GetEntityGeneric(APIView):
     serializer_class = EntitySerializer
     renderer_classes = tuple(
-        api_settings.DEFAULT_RENDERER_CLASSES) + (EntityToTEI, EntityToCIDOC)
+        api_settings.DEFAULT_RENDERER_CLASSES) + (EntityToTEI, EntityToCIDOC, EntityToProsopogrAPhI)
     if getattr(settings, 'APIS_RENDERERS', None) is not None:
         rend_add = tuple()
         for rd in settings.APIS_RENDERERS:
