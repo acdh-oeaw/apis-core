@@ -166,6 +166,8 @@ class RelationEntitySerializer(serializers.Serializer):
                     e = len(text)
                 r1["annotation"] = text[an.start : an.end]
                 r1["text"] = text[s:e]
+                r1["text"] = "{}<annotation>{}</annotation>{}".format(r1["text"][:an.start-s], r1["text"][an.start-s:an.end-s], r1["text"][an.end-s:])
+                r1["string_offset"] = "{}-{}".format(an.start, an.end)
                 r1["text_url"] = self.context["request"].build_absolute_uri(
                     reverse("apis_core:text-detail", kwargs={"pk": an.text_id})
                 )

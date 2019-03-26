@@ -203,6 +203,15 @@ class EntityToProsopogrAPhI(renderers.BaseRenderer):
                                 ext_stc = True
                     if not ext_stc:
                         s["statementContent"] = [t1]
+                    if len(rel_1["annotation"]) > 0:
+                        stct = {
+                            "id": "Annotation_{}".format(rel_1["annotation"][0]["id"]),
+                            "label": rel_1["annotation"][0]["text"]
+                        }
+                        if "statementContent" in s.keys():
+                            s["statementContent"].append(stct)
+                        else:
+                            s["statementContent"] = [stct,]
                     if len(rel_1["revisions"]) > 0:
                         user_1 = rel_1["revisions"][0]["user_created"]
                         date_1 = rel_1["revisions"][0]["date_created"].strftime("%Y-%m-%d")
