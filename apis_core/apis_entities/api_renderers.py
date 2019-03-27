@@ -96,7 +96,7 @@ class EntityToProsopogrAPhI(renderers.BaseRenderer):
         fact_settings = getattr(settings, "PROSOPOGRAPHI_API", None)
         stmt_temp = "Stmt{}_{}"
         f = {"id": "apis_{}_{}".format(data["entity_type"].lower(), data["id"])}
-        f[data["entity_type"].lower()] = {"id": data["id"]}
+        f[data["entity_type"].lower()] = {"id": "{}_{}_{}_{}".format(PROJECT_METADATA["title"], data["first_name"], data["name"], data["id"])}
         f["source"] = {
             "id": PROJECT_METADATA["title"],
             "metadata": "{} export".format(PROJECT_METADATA["title"]),
@@ -162,13 +162,11 @@ class EntityToProsopogrAPhI(renderers.BaseRenderer):
                 stmt_count += 1
         f["statements"] = stmts
         factoids.append(f)
-        print(factoids)
         facts = []
         facts_ind = {}
         if "relations" in data.keys():
             for ent in data["relations"].keys():
                 for rel_1 in data["relations"][ent]:
-                    print(rel_1)
                     s = {
                         "id": "Stmt{}_rel_{}".format(data["id"], rel_1["id"]),
                         "role": {
