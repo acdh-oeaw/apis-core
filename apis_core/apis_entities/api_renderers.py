@@ -95,7 +95,7 @@ class EntityToProsopogrAPhI(renderers.BaseRenderer):
         factoids = []
         fact_settings = getattr(settings, "PROSOPOGRAPHI_API", None)
         stmt_temp = "Stmt{}_{}"
-        f = {"id": "apis_{}_{}".format(data["entity_type"].lower(), data["id"])}
+        f = {"id": "apis_{}_{}".format(data["entity_type"].lower(), data["id"]).replace(" ", "_")}
         f[data["entity_type"].lower()] = {"id": "{}_{}_{}_{}".format(PROJECT_METADATA["title"], data["first_name"], data["name"], data["id"])}
         f["source"] = {
             "id": PROJECT_METADATA["title"],
