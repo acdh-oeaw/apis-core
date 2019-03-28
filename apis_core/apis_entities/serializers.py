@@ -5,29 +5,35 @@ import re
 
 
 class BaseEntitySerializer(serializers.HyperlinkedModelSerializer):
-    uri_set = serializers.HyperlinkedIdentityField(
-        view_name="apis:uri-detail",
-        lookup_field="pk"
+    uri_set = serializers.HyperlinkedRelatedField(
+        view_name="apis:apis_api:uri-detail",
+        lookup_field="pk",
+        many=True,
+        read_only=True
     )
-    collection = serializers.HyperlinkedIdentityField(
-        view_name="apis:collection-detail",
-        lookup_field="pk"
+    collection = serializers.HyperlinkedRelatedField(
+        view_name="apis:apis_api:collection-detail",
+        lookup_field="pk",
+        many=True,
+        read_only=True
     )
-    text = serializers.HyperlinkedIdentityField(
-        view_name="apis:text-detail",
-        lookup_field="pk"
+    text = serializers.HyperlinkedRelatedField(
+        view_name="apis:apis_api:text-detail",
+        lookup_field="pk",
+        many=True,
+        read_only=True
     )
 
 
 class InstitutionSerializer(BaseEntitySerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name="apis:institution-detail",
+        view_name="apis:apis_api:institution-detail",
         lookup_field="pk"
     )
 
-    kind = serializers.HyperlinkedIdentityField(
-        view_name="apis:institutiontype-detail",
-        lookup_field="pk"
+    kind = serializers.HyperlinkedRelatedField(
+        view_name="apis:apis_api:institutiontype-detail",
+        read_only=True
     )
 
     class Meta:
@@ -38,8 +44,14 @@ class InstitutionSerializer(BaseEntitySerializer):
 class PersonSerializer(BaseEntitySerializer):
 
     url = serializers.HyperlinkedIdentityField(
-        view_name="apis:person-detail",
+        view_name="apis:apis_api:person-detail",
         lookup_field="pk"
+    )
+    profession = serializers.HyperlinkedRelatedField(
+        view_name="apis:apis_api:professiontype-detail",
+        lookup_field="pk",
+        many=True,
+        read_only=True
     )
 
     class Meta:
@@ -52,13 +64,14 @@ class PersonSerializer(BaseEntitySerializer):
 class PlaceSerializer(BaseEntitySerializer):
 
     url = serializers.HyperlinkedIdentityField(
-        view_name="apis:place-detail",
+        view_name="apis:apis_api:place-detail",
         lookup_field="pk"
     )
 
-    kind = serializers.HyperlinkedIdentityField(
-        view_name="apis:placetype-detail",
-        lookup_field="pk"
+    kind = serializers.HyperlinkedRelatedField(
+        view_name="apis:apis_api:placetype-detail",
+        lookup_field="pk",
+        read_only=True
     )
 
     class Meta:
@@ -71,13 +84,14 @@ class PlaceSerializer(BaseEntitySerializer):
 class EventSerializer(BaseEntitySerializer):
 
     url = serializers.HyperlinkedIdentityField(
-        view_name="apis:event-detail",
+        view_name="apis:apis_api:event-detail",
         lookup_field="pk"
     )
 
-    kind = serializers.HyperlinkedIdentityField(
-        view_name="apis:eventtype-detail",
-        lookup_field="pk"
+    kind = serializers.HyperlinkedRelatedField(
+        view_name="apis:apis_api:eventtype-detail",
+        lookup_field="pk",
+        read_only=True
     )
 
     class Meta:
@@ -90,13 +104,14 @@ class EventSerializer(BaseEntitySerializer):
 class WorkSerializer(BaseEntitySerializer):
 
     url = serializers.HyperlinkedIdentityField(
-        view_name="apis:work-detail",
+        view_name="apis:apis_api:work-detail",
         lookup_field="pk"
     )
 
-    kind = serializers.HyperlinkedIdentityField(
-        view_name="apis:worktype-detail",
-        lookup_field="pk"
+    kind = serializers.HyperlinkedRelatedField(
+        view_name="apis:apis_api:worktype-detail",
+        lookup_field="pk",
+        read_only=True
     )
 
     class Meta:

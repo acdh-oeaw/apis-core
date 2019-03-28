@@ -23,21 +23,47 @@ class UserAccSerializer(serializers.ModelSerializer):
         fields = ['username', 'email']
 
 
-class CollectionTypeSerializer(serializers.HyperlinkedModelSerializer):
+class VocabsBaseSerializer(serializers.HyperlinkedModelSerializer):
+    userAdded = serializers.HyperlinkedRelatedField(
+        view_name="apis:apis_api:user-detail",
+        lookup_field="pk",
+        read_only=True
+    )
+    parent_class = serializers.HyperlinkedRelatedField(
+        view_name="apis:apis_api:vocabsbaseclass-detail",
+        lookup_field="pk",
+        read_only=True
+    )
+    vocab_name = serializers.HyperlinkedRelatedField(
+        view_name="apis:apis_api:vocabnames-detail",
+        lookup_field="pk",
+        read_only=True
+    )
+
+
+class CollectionTypeSerializer(VocabsBaseSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="apis:apis_api:collectiontype-detail",
+        lookup_field="pk"
+    )
 
     class Meta:
         fields = '__all__'
         model = CollectionType
 
 
-class VocabsBaseClassSerializer(serializers.HyperlinkedModelSerializer):
+class VocabsBaseClassSerializer(VocabsBaseSerializer): 
+    url = serializers.HyperlinkedIdentityField(
+        view_name="apis:apis_api:vocabsbaseclass-detail",
+        lookup_field="pk"
+    )
 
     class Meta:
         fields = '__all__'
         model = VocabsBaseClass
 
 
-class VocabNamesSerializer(serializers.HyperlinkedModelSerializer):
+class VocabNamesSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
@@ -51,42 +77,72 @@ class VocabNamesSerializer(serializers.HyperlinkedModelSerializer):
 ###########################################################
 
 
-class TextTypeSerializer(serializers.HyperlinkedModelSerializer):
+class TextTypeSerializer(VocabsBaseSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="apis:apis_api:texttype-detail",
+        lookup_field="pk"
+    )
+    collections = serializers.HyperlinkedRelatedField(
+        view_name="apis:apis_api:collection-detail",
+        lookup_field="pk",
+        many=True,
+        read_only=True
+    )
 
     class Meta:
         fields = '__all__'
         model = TextType
 
 
-class InstitutionTypeSerializer(serializers.HyperlinkedModelSerializer):
+class InstitutionTypeSerializer(VocabsBaseSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="apis:apis_api:institutiontype-detail",
+        lookup_field="pk"
+    )
 
     class Meta:
         fields = '__all__'
         model = InstitutionType
 
 
-class ProfessionTypeSerializer(serializers.HyperlinkedModelSerializer):
+class ProfessionTypeSerializer(VocabsBaseSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="apis:apis_api:professiontype-detail",
+        lookup_field="pk"
+    )
 
     class Meta:
         fields = '__all__'
         model = ProfessionType
 
 
-class PlaceTypeSerializer(serializers.HyperlinkedModelSerializer):
+class PlaceTypeSerializer(VocabsBaseSerializer): 
+    url = serializers.HyperlinkedIdentityField(
+        view_name="apis:apis_api:placetype-detail",
+        lookup_field="pk"
+    )
 
     class Meta:
         fields = '__all__'
         model = PlaceType
 
 
-class EventTypeSerializer(serializers.HyperlinkedModelSerializer):
+class EventTypeSerializer(VocabsBaseSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="apis:apis_api:eventtype-detail",
+        lookup_field="pk"
+    )
 
     class Meta:
         fields = '__all__'
         model = EventType
 
 
-class WorkTypeSerializer(serializers.HyperlinkedModelSerializer):
+class WorkTypeSerializer(VocabsBaseSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="apis:apis_api:worktype-detail",
+        lookup_field="pk"
+    )
 
     class Meta:
         fields = '__all__'
@@ -94,6 +150,10 @@ class WorkTypeSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class LabelTypeSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="apis:apis_api:labeltype-detail",
+        lookup_field="pk"
+    )
 
     class Meta:
         fields = ('id', 'name')
@@ -106,105 +166,105 @@ class LabelTypeSerializer(serializers.ModelSerializer):
 ####################################################################
 
 
-class InstitutionInstitutionRelationSerializer(serializers.HyperlinkedModelSerializer):
+class InstitutionInstitutionRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
         model = InstitutionInstitutionRelation
 
 
-class PersonPersonRelationSerializer(serializers.HyperlinkedModelSerializer):
+class PersonPersonRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
         model = PersonPersonRelation
 
 
-class PersonInstitutionRelationSerializer(serializers.HyperlinkedModelSerializer):
+class PersonInstitutionRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
         model = PersonInstitutionRelation
 
 
-class PersonPlaceRelationSerializer(serializers.HyperlinkedModelSerializer):
+class PersonPlaceRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
         model = PersonPlaceRelation
 
 
-class PersonEventRelationSerializer(serializers.HyperlinkedModelSerializer):
+class PersonEventRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
         model = PersonEventRelation
 
 
-class PersonWorkRelationSerializer(serializers.HyperlinkedModelSerializer):
+class PersonWorkRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
         model = PersonWorkRelation
 
 
-class InstitutionPlaceRelationSerializer(serializers.HyperlinkedModelSerializer):
+class InstitutionPlaceRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
         model = InstitutionPlaceRelation
 
 
-class InstitutionEventRelationSerializer(serializers.HyperlinkedModelSerializer):
+class InstitutionEventRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
         model = InstitutionEventRelation
 
 
-class InstitutionWorkRelationSerializer(serializers.HyperlinkedModelSerializer):
+class InstitutionWorkRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
         model = InstitutionWorkRelation
 
 
-class PlaceEventRelationSerializer(serializers.HyperlinkedModelSerializer):
+class PlaceEventRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
         model = PlaceEventRelation
 
 
-class PlaceWorkRelationSerializer(serializers.HyperlinkedModelSerializer):
+class PlaceWorkRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
         model = PlaceWorkRelation
 
 
-class PlacePlaceRelationSerializer(serializers.HyperlinkedModelSerializer):
+class PlacePlaceRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
         model = PlacePlaceRelation
 
 
-class EventWorkRelationSerializer(serializers.HyperlinkedModelSerializer):
+class EventWorkRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
         model = EventWorkRelation
 
 
-class EventEventRelationSerializer(serializers.HyperlinkedModelSerializer):
+class EventEventRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
         model = EventEventRelation
 
 
-class WorkWorkRelationSerializer(serializers.HyperlinkedModelSerializer):
+class WorkWorkRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'

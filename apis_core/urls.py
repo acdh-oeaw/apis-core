@@ -104,7 +104,7 @@ urlpatterns = [
     url(r'relations/', include('apis_core.apis_relations.urls', namespace='apis_relations')),
     url(r'vocabularies/', include('apis_core.apis_vocabularies.urls', namespace='apis_vocabularies')),
     #url(r'^autocomplete/', include('autocomplete_light.urls')),
-    url(r'^api/', include(router.urls)),    #routers do not support namespaces out of the box
+    url(r'^api/', include((router.urls, 'apis_core'), namespace="apis_api") ),    #routers do not support namespaces out of the box
     url(r'^api2/', include('apis_core.apis_entities.api_urls', namespace="apis_api2")),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     #url(r'^api-schema/', schema_view),
