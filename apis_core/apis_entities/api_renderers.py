@@ -96,7 +96,7 @@ class EntityToProsopogrAPhI(renderers.BaseRenderer):
         fact_settings = getattr(settings, "PROSOPOGRAPHI_API", None)
         stmt_temp = "Stmt{}_{}"
         f = {"id": "apis_{}_{}".format(data["entity_type"].lower(), data["id"])}
-        f[data["entity_type"].lower()] = {"id": "{}_{}_{}_{}".format(PROJECT_METADATA["title"], data["first_name"], data["name"], data["id"]).replace(" ", "_")}
+        f[data["entity_type"].lower()] = {"id": str(data["id"])}
         f["source"] = {
             "id": PROJECT_METADATA["title"],
             "metadata": "{} export".format(PROJECT_METADATA["title"]),
@@ -105,6 +105,9 @@ class EntityToProsopogrAPhI(renderers.BaseRenderer):
         f["createdWhen"] = timezone.now()
         stmt_count = 1
         stmts = []
+        f[data["entity_type"].lower()]["uris"] = []
+        for u in data["uris"]:
+            f[data["entity_type"].lower()]["uris"].append(u["uri"])
         if data["entity_type"].lower() == "person":
             s = {
                 "id": stmt_temp.format(data["id"], stmt_count),
