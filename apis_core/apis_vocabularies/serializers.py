@@ -150,10 +150,6 @@ class WorkTypeSerializer(VocabsBaseSerializer):
 
 
 class LabelTypeSerializer(serializers.ModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="apis:apis_api:labeltype-detail",
-        lookup_field="pk"
-    )
 
     class Meta:
         fields = ('id', 'name')
