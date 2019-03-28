@@ -61,7 +61,7 @@
                         </div>
                         <div id="collapseOne3" class="card-collapse collapse" role="tabcard" aria-labelledby="headingSix">
                             <div id="tab_Revisions" class="card-body">
-                                <p>{% for lod in object_lod %}{% if forloop.last %}<a href="{{ lod.uri }}">{{ lod.uri }}</a>{% else %}<a href="{{ lod.uri }}">{{ lod.uri }}</a>, {% endif %}{% endfor %}</p>
+                                <p>{% for lod in object_lod %}{% if forloop.last %}<a href="{{ lod.uri }}">{{ lod.uri }}</a>{% else %}<a href="{{ lod.uri }}">{{ lod.uri }}</a> <br  /> {% endif %}{% endfor %}</p>
                             </div>
                         </div>
                     </div>
