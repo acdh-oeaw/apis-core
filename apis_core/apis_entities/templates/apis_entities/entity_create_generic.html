@@ -61,7 +61,7 @@
                         </div>
                         <div id="collapseOne3" class="card-collapse collapse" role="tabcard" aria-labelledby="headingSix">
                             <div id="tab_Revisions" class="card-body">
-                                <p>{% for lod in object_lod %}{% if forloop.last %}<a href="{{ lod.uri }}">{{ lod.uri }}</a>{% else %}<a href="{{ lod.uri }}">{{ lod.uri }}</a>, {% endif %}{% endfor %}</p>
+                                <p>{% for lod in object_lod %}{% if forloop.last %}<a href="{{ lod.uri }}">{{ lod.uri }}</a>{% else %}<a href="{{ lod.uri }}">{{ lod.uri }}</a> <br  /> {% endif %}{% endfor %}</p>
                             </div>
                         </div>
                     </div>
@@ -69,21 +69,23 @@
                 {% endblock %}
                 {% block editbuttons %}
                     {% if instance %}
-                    {% if "delete" in permissions %}
-                       <a class ="btn btn-danger btn-primary" href="delete">Delete</a>
-                    {% endif %}
                     {% if "change" in permissions %}
                        <input class="btn btn-primary" type="submit" value="modify" />
                     {% endif %}
+                    {% if instance %}
+                    <button class="compare_tooltip btn btn-default" data-tooltip='{"app":"entities","kind":"{{entity_type|lower}}","pk":"{{ instance.pk }}"}'>Revisions</button>
+                    {% endif %}
+                    {% if "delete" in permissions %}
+                       <a class ="btn btn-danger btn-primary" href="delete">Delete</a>
+                    {% endif %}
+
 		    <a class ="btn btn-success" href="{% url 'apis:apis_entities:generic_entities_create_view' entity_type %}">Create new {{entity_type|title}}</a>
                         {% else %}
                         {% if "create" in permissions %}
                         <input class="btn btn-primary" type="submit" value="create" />
                             {% endif %}
                                     {% endif %}
-                    {% if instance %}
-                    <button class="compare_tooltip btn btn-default" data-tooltip='{"app":"entities","kind":"{{entity_type|lower}}","pk":"{{ instance.pk }}"}'>Revisions</button>
-                    {% endif %}
+
                 {% endblock editbuttons %}
                 </div>
             </form>
