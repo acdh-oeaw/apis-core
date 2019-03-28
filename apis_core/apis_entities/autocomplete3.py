@@ -348,6 +348,24 @@ class GenericNetworkEntitiesAutocomplete(autocomplete.Select2ListView):
         if q.startswith('cl:'):
             res = Collection.objects.filter(name__icontains=q[3:])
             results = [{'id': 'cl:'+str(x.pk), 'text': x.name} for x in res]
+        elif q.startswith('reg:'):
+            results = []
+            if entity.lower() == 'person':
+                filen = 'reg_persons.json'
+            elif entity.lower() == 'place':
+                filen = 'reg_places.json'
+            with open(filen, 'r') as reg:
+                r1 = json.load(reg)
+                r_dict = dict()
+                for r2 in r1:
+                    if q[4:].lower() in r2[1].lower():
+                        if r2[1] in r_dict.keys():
+                            r_dict[r2[1]] += "|{}".format(r2[0])
+                        else:
+                            r_dict[r2[1]] = r2[0]
+            for k in r_dict.keys():
+                results.append({'id': 'reg:'+r_dict[k], 'text': k})
+
         else:
             ent_model = ContentType.objects.get(
                 app_label__startswith='apis_', model=entity

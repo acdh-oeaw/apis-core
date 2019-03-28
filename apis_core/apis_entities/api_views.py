@@ -233,6 +233,43 @@ class NetJsonViewSet(viewsets.ViewSet):
                                   | Q(**{rel_b+'__collection__id': int(source[3:])}))
                 else:
                     q_dict[rel_a+'__collection__id'] = int(source[3:])
+            elif source.startswith('reg:'):
+                ent3 = source[4:]
+                nodes_1 = []
+                edges_1 = []
+                res_zw = dict()
+                print(ent3)
+                if rel.lower() == 'person-person':
+                    with open('reg_sources.json', 'r') as r3:
+                        r4 = json.load(r3)
+                        for rr4 in r4:
+                            if ent3 == rr4[1]:
+                                if rr4[0] in res_zw.keys():
+                                    if rr4[1] not in res_zw[rr4[0]]:
+                                        res_zw[rr4[0]].append(rr4[1])
+                                else:
+                                    res_zw[rr4[0]] = [rr4[1],]
+                                for r6 in r4:
+                                    if r6[0] == rr4[0]:
+                                        if r6[1] not in res_zw[rr4[0]]:
+                                            res_zw[rr4[0]].append(r6[1])
+                    print(res_zw)
+                    with open('reg_persons.json', 'r') as p_regest:
+                        pr2 = json.load(p_regest)
+                        for p in res_zw.keys():
+                            for idx2, pp in enumerate(res_zw[p]):
+                                for pr3 in pr2:
+                                    if pp == pr3[0]:
+                                        n = {'id': pp, 'label': pr3[1], 'data': {}}
+                                        if n not in nodes_1:
+                                            nodes_1.append(n)
+                                for edg in res_zw[p][idx2:]:
+                                    edges_1.append({"id": "{}_{}_{}".format(p, pp, edg), "source": pp, "target": edg, "label": p})
+                    return Response({'nodes': nodes_1, 'edges': edges_1})
+                elif rel.lower() == 'person-place':
+                    return Response({'nodes': [], 'edges': []})
+                else:
+                    return Response({'nodes': [], 'edges': []})
             else:
                 if q_list is not None:
                     q_list.append(
