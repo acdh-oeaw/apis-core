@@ -281,9 +281,7 @@ class GenericRDFParser(object):
                                 if z[cnt][0] == 'objects':
                                     pred = rdflib.term.URIRef(z[cnt][2])
                                     res = g.objects(subject=s, predicate=pred)
-                                    for s, p, o in g.triples((None, None, None)):
-                                        print(s, p, o)
-                                    if type(res) != types.GeneratorType:
+                                    if not isinstance(res, types.GeneratorType):
                                         break
                                     for r in res:
                                         if z[cnt][3]:
@@ -294,6 +292,7 @@ class GenericRDFParser(object):
                                         elif k == '=':
                                             results.append((z[cnt][1], r, indx))
                                             ind_type += ((len(ind_type), z[cnt][1]),)
+                                            k = False
                             cnt_2 += 2
                             try:
                                 k = z[cnt_2]
@@ -303,17 +302,20 @@ class GenericRDFParser(object):
                                 k = None
                             cnt += 2
                             subj = subj2
+                    print(results)
                     for attrb in sett_RDF_generic[kind]['matching']['attributes'].keys():
                         res_2 = []
                         for x in sett_RDF_generic[kind]['matching']['attributes'][attrb]:
+                            print('new print: {}'.format(x))
                             for s in x:
                                 for ind, elem in filter(lambda x: x[1] == s[0], ind_type):
                                     elem = results[ind][1]
                                     res_2.append(prep_string((elem, s[1])))
                                 if isinstance(s, str):
                                     res_2.append(s)
-                        if len(res_2) == len(x):
-                            res_attrb[attrb] = ''.join(res_2)
+                            if len(res_2) == len(x):
+                                res_attrb[attrb] = ''.join(res_2)
+                    print(res_attrb)
                     for lab in sett_RDF_generic[kind]['matching']['labels'].keys():
                         lb_type, created = LabelType.objects.get_or_create(name=lab)
                         for x in sett_RDF_generic[kind]['matching']['labels'][lab]:

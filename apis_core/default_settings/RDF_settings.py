@@ -139,11 +139,11 @@ sett_RDF_generic = {
                              ('objects', 'surname', gndo + 'surname', None)
                         ),
                             (
-                              ('objects', 'prefNameNode', gndo + 'variantNameEntityForThePerson', None), '>',
+                              ('objects', 'prefNameNode', gndo + 'preferredNameEntityForThePerson', None), '>',
                                 ('objects', 'descriptionNode', gndo + 'Description', None), '>',
-                                ('objects', 'personalName', gndo + 'personalName', None), '=',
                                 ('objects', 'personalNameAddition', gndo + 'nameAddition', None), '=',
-                                ('objects', 'personalNameCounting', gndo + 'counting', None)
+                                ('objects', 'personalNameCounting', gndo + 'counting', None), '=',
+                                ('objects', 'personalName', gndo + 'personalName', None),
                             ),
 
                         )
@@ -210,10 +210,17 @@ sett_RDF_generic = {
         'matching': {
             'attributes': {
                 'name': (
-                    (('surname', None),),
+                    (('surname', None),
+                    ),
+                    (('personalNameAddition', None),
+                    )
                 ),
                 'first_name': (
                     (('forename', None),),
+                    (('personalName', None),
+                    ' ',
+                     ('personalNameCounting', None)
+                    ),
                 ),
                 'start_date_written': (
                     (('date of birth', None),),
