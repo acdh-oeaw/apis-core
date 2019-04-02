@@ -1,7 +1,9 @@
 {% extends "webpage/base.html" %}
 {% load static %}
+{% load bibsonomy_templatetags %}
 {% block scriptHeader %}
 {{block.super}}
+{% include 'apis_bibsonomy/apis_bibsonomy_include.html' %}
 {% if highlighter_active %}
       <link rel="stylesheet" href="{% static 'apis_highlighter/apis_highlighter.css' %}" />
 	<script type="text/javascript" src="{% static 'apis_highlighter/apis_highlighter.js' %}"></script>
@@ -24,6 +26,8 @@
             <div class="card-header">
             	{% if instance %}
                     <h3><strong>{{ instance }}</strong></h3>
+		    {% bibsonomy_form content_type='person' hidden=True %}
+		    <button class="bibsonomy-anker" data-bibs-contenttype="person" data-bibs-object_pk={{instance.pk}}>References</button>
                 {% else %}
                     <h2><small>create new object type:</small> <strong>{{ entity_type|title }}</strong></h2>
                 {% endif %}
