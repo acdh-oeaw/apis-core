@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from dal import autocomplete
-from .fields import ListSelect2, Select2Multiple
+from .fields import ListSelect2, Select2Multiple, Select2
 from django import forms
 from django.urls import reverse_lazy
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from crispy_forms.layout import Layout, Fieldset
 from crispy_forms.bootstrap import Accordion, AccordionGroup
-from django.forms import ModelMultipleChoiceField
+from django.forms import ModelMultipleChoiceField, ModelChoiceField
 from django.utils.translation import ugettext_lazy as _
 from django.urls import reverse
 from django.db.models.fields import BLANK_CHOICE_DASH
@@ -58,11 +58,16 @@ def get_entities_form(entity):
                         'notes',
                         'review')
             attrs = {'data-placeholder': 'Type to get suggestions',
-                     'data-minimum-input-length': 3,
+                     'data-minimum-input-length': 1,
                      'data-html': True}
             for f in self.fields.keys():
-                if type(self.fields[f]) == ModelMultipleChoiceField:
+                print(type(self.fields[f]))
+                if isinstance(self.fields[f], (ModelMultipleChoiceField, ModelChoiceField)):
                     v_name_p = str(self.fields[f].queryset.model.__name__)
+                    if isinstance(self.fields[f], ModelMultipleChoiceField):
+                        widget1 = Select2Multiple
+                    else:
+                        widget1 = ListSelect2
                     if ContentType.objects.get(app_label__in=[
                         'apis_entities',
                         'apis_metainfo',
@@ -70,7 +75,7 @@ def get_entities_form(entity):
                         'apis_vocabularies',
                         'apis_labels'
                     ], model=v_name_p.lower()).app_label.lower() == 'apis_vocabularies':
-                        self.fields[f].widget = Select2Multiple(
+                        self.fields[f].widget = widget1(
                             url=reverse(
                                 'apis:apis_vocabularies:generic_vocabularies_autocomplete',
                                 kwargs={
@@ -81,13 +86,22 @@ def get_entities_form(entity):
                             attrs=attrs)
                         if self.instance:
                             res = []
-                            try:
-                                for x in getattr(self.instance, f).all():
-                                    res.append((x.pk, x.name))
-                            except ValueError:
-                                pass
-                            self.fields[f].choices = res
-                            self.fields[f].initial = res
+                            if isinstance(self.fields[f], ModelMultipleChoiceField):
+                                try:
+                                    for x in getattr(self.instance, f).all():
+                                        res.append((x.pk, x.label))
+                                except ValueError:
+                                    pass 
+                                self.fields[f].initial = res
+                                self.fields[f].choices = res
+                            else:
+                                try:
+                                    res = getattr(self.instance, f)
+                                except ValueError:
+                                    print()
+                                    res = ''
+                                self.fields[f].initial = (res.pk, res.label)
+                                self.fields[f].choices = [(res.pk, res.label),]
                 if f not in acc_grp2:
                     acc_grp1.append(f)
             if entity == 'Person':

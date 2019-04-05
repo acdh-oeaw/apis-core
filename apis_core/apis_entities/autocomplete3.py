@@ -323,21 +323,27 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
 
 class GenericVocabulariesAutocomplete(autocomplete.Select2ListView):
     def get(self, request, *args, **kwargs):
+        page_size = 20
+        offset = (int(self.request.GET.get('page', 1))-1)*page_size
+        more = False
         vocab = self.kwargs['vocab']
         direct = self.kwargs['direct']
         q = self.q
         vocab_model = ContentType.objects.get(app_label='apis_vocabularies', model=vocab).model_class()
         if direct == 'normal':
             if vocab_model.__bases__[0] == VocabsBaseClass:
-                choices = [{'id': x.pk, 'text': x.name} for x in vocab_model.objects.filter(name__icontains=q)]
+                choices = [{'id': x.pk, 'text': x.label} for x in vocab_model.objects.filter(name__icontains=q).order_by('name')[offset:offset+page_size]]
             else:
                 choices = [{'id': x.pk, 'text': x.label} for x in vocab_model.objects.filter(
-                    Q(name__icontains=q) | Q(name_reverse__icontains=q))]
+                    Q(name__icontains=q) | Q(name_reverse__icontains=q)).order_by('name')[offset:offset+page_size]]
         elif direct == 'reverse':
             choices = [{'id': x.pk, 'text': x.label_reverse} for x in vocab_model.objects.filter(
-                Q(name__icontains=q) | Q(name_reverse__icontains=q))]
+                Q(name__icontains=q) | Q(name_reverse__icontains=q)).order_by('name')[offset:offset+page_size]]
+        if len(choices) == page_size:
+            more = True
         return http.HttpResponse(json.dumps({
-            'results': choices + []
+            'results': choices + [],
+            'pagination': {'more': more}
         }), content_type='application/json')
 
 
