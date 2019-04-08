@@ -97,11 +97,12 @@ def get_entities_form(entity):
                             else:
                                 try:
                                     res = getattr(self.instance, f)
+                                    if res is not None:
+                                        self.fields[f].initial = (res.pk, res.label)
+                                        self.fields[f].choices = [(res.pk, res.label),]
                                 except ValueError:
                                     print()
                                     res = ''
-                                self.fields[f].initial = (res.pk, res.label)
-                                self.fields[f].choices = [(res.pk, res.label),]
                 if f not in acc_grp2:
                     acc_grp1.append(f)
             if entity == 'Person':
