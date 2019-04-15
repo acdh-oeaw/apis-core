@@ -187,3 +187,16 @@ APIS_IIIF_SERVER = "https://iiif.acdh.oeaw.ac.at/"
 APIS_OSD_JS = "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.4.0/openseadragon.min.js"
 APIS_OSD_IMG_PREFIX = "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/2.4.0/images/"
 ```
+
+custom management commands
+------------
+
+`python manage.py import_rel_vocabs {path-to-excel-file}`
+
+Excel-File needs to match following conventions:
+
+sheet name needs to be the class name of the Vocab class, e.g. PersonWorkRelation
+
+sheets need column-header `ebene_1`, `ebene_2`, ...
+field values: name|name_reverse; if no name_reverse value is provided, name_reverse is the same as name
+all vocabs in one row are linked with as parent_classes, column one does not have a parent class, column 2 (`ebene_2`) takes as parent value from class ebene_1
