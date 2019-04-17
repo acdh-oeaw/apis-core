@@ -90,7 +90,6 @@ class InstitutionViewSet(viewsets.ModelViewSet):
     permission_classes = (DjangoObjectPermissions,)
     queryset = Institution.objects.all()
     serializer_class = InstitutionSerializer
-    pagination_class = StandardResultsSetPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     depth = 2
     filter_fields = ('name', 'kind__name', 'collection__name')
@@ -104,7 +103,6 @@ class PersonViewSet(viewsets.ModelViewSet):
     permission_classes = (DjangoObjectPermissions,)
     queryset = Person.objects.all()
     serializer_class = PersonSerializer
-    pagination_class = StandardResultsSetPagination
     depth = 2
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filter_fields = (
@@ -121,7 +119,6 @@ class PlaceViewSet(viewsets.ModelViewSet):
     permission_classes = (DjangoObjectPermissions,)
     queryset = Place.objects.all()
     serializer_class = PlaceSerializer
-    pagination_class = StandardResultsSetPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     depth = 2
     filter_fields = ('name', 'kind__name', 'collection__name',)
@@ -136,7 +133,6 @@ class EventViewSet(viewsets.ModelViewSet):
     permission_classes = (DjangoObjectPermissions,)
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    pagination_class = StandardResultsSetPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     depth = 2
     filter_fields = ('name', 'kind__name', 'collection__name',)
@@ -150,7 +146,6 @@ class WorkViewSet(viewsets.ModelViewSet):
     permission_classes = (DjangoObjectPermissions,)
     queryset = Work.objects.all()
     serializer_class = WorkSerializer
-    pagination_class = StandardResultsSetPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     depth = 2
     filter_fields = ('name', 'kind__name', 'collection__name',)
