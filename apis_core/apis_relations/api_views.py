@@ -13,7 +13,6 @@ from apis_core.apis_entities.api_views import StandardResultsSetPagination
 class InstitutionInstitutionViewSet(viewsets.ModelViewSet):
     queryset = InstitutionInstitution.objects.all()
     serializer_class = InstitutionInstitutionSerializer
-    pagination_class = StandardResultsSetPagination
     depth = 2
     filter_fields = ('related_institutionA__name', 'related_institutionB__name')
 
@@ -21,7 +20,6 @@ class InstitutionInstitutionViewSet(viewsets.ModelViewSet):
 class PersonInstitutionViewSet(viewsets.ModelViewSet):
     queryset = PersonInstitution.objects.all()
     serializer_class = PersonInstitutionSerializer
-    pagination_class = StandardResultsSetPagination
     depth = 2
     filter_fields = ('related_person__name', 'related_institution__name')
 
@@ -29,7 +27,6 @@ class PersonInstitutionViewSet(viewsets.ModelViewSet):
 class PersonPlaceViewSet(viewsets.ModelViewSet):
     queryset = PersonPlace.objects.all()
     serializer_class = PersonPlaceSerializer
-    pagination_class = StandardResultsSetPagination
     depth = 2
     filter_fields = ('related_place__name', 'related_person__name')
 
@@ -37,7 +34,6 @@ class PersonPlaceViewSet(viewsets.ModelViewSet):
 class PersonPersonViewSet(viewsets.ModelViewSet):
     queryset = PersonPerson.objects.all()
     serializer_class = PersonPersonSerializer
-    pagination_class = StandardResultsSetPagination
     depth = 2
     filter_fields = ('related_personA__name', 'related_personB__name')
 
@@ -45,7 +41,6 @@ class PersonPersonViewSet(viewsets.ModelViewSet):
 class PersonEventViewSet(viewsets.ModelViewSet):
     queryset = PersonEvent.objects.all()
     serializer_class = PersonEventSerializer
-    pagination_class = StandardResultsSetPagination
     depth = 2
     filter_fields = ('related_person__name', 'related_event__name')
 
@@ -53,7 +48,6 @@ class PersonEventViewSet(viewsets.ModelViewSet):
 class PersonWorkViewSet(viewsets.ModelViewSet):
     queryset = PersonWork.objects.all()
     serializer_class = PersonWorkSerializer
-    pagination_class = StandardResultsSetPagination
     depth = 2
     filter_fields = ('related_person__name', 'related_work__name')
 
@@ -61,7 +55,6 @@ class PersonWorkViewSet(viewsets.ModelViewSet):
 class InstitutionPlaceViewSet(viewsets.ModelViewSet):
     queryset = InstitutionPlace.objects.all()
     serializer_class = InstitutionPlaceSerializer
-    pagination_class = StandardResultsSetPagination
     depth = 2
     filter_fields = ('related_institution__name', 'related_place__name')
 
@@ -69,7 +62,6 @@ class InstitutionPlaceViewSet(viewsets.ModelViewSet):
 class InstitutionEventViewSet(viewsets.ModelViewSet):
     queryset = InstitutionEvent.objects.all()
     serializer_class = InstitutionEventSerializer
-    pagination_class = StandardResultsSetPagination
     depth = 2
     filter_fields = ('related_institution__name', 'related_event__name')
 
@@ -77,7 +69,6 @@ class InstitutionEventViewSet(viewsets.ModelViewSet):
 class InstitutionWorkViewSet(viewsets.ModelViewSet):
     queryset = InstitutionWork.objects.all()
     serializer_class = InstitutionWorkSerializer
-    pagination_class = StandardResultsSetPagination
     depth = 2
     filter_fields = ('related_institution__name', 'related_work__name')
 
@@ -85,7 +76,6 @@ class InstitutionWorkViewSet(viewsets.ModelViewSet):
 class EventWorkViewSet(viewsets.ModelViewSet):
     queryset = EventWork.objects.all()
     serializer_class = EventWorkSerializer
-    pagination_class = StandardResultsSetPagination
     depth = 2
     filter_fields = ('related_event__name', 'related_work__name')
 
@@ -93,7 +83,6 @@ class EventWorkViewSet(viewsets.ModelViewSet):
 class EventEventViewSet(viewsets.ModelViewSet):
     queryset = EventEvent.objects.all()
     serializer_class = EventEventSerializer
-    pagination_class = StandardResultsSetPagination
     depth = 2
     filter_fields = ('related_eventA__name', 'related_eventB__name')
 
@@ -101,7 +90,6 @@ class EventEventViewSet(viewsets.ModelViewSet):
 class PlaceEventViewSet(viewsets.ModelViewSet):
     queryset = PlaceEvent.objects.all()
     serializer_class = PlaceEventSerializer
-    pagination_class = StandardResultsSetPagination
     depth = 2
     filter_fields = ('related_place__name', 'related_event__name')
 
@@ -109,7 +97,6 @@ class PlaceEventViewSet(viewsets.ModelViewSet):
 class PlaceWorkViewSet(viewsets.ModelViewSet):
     queryset = PlaceWork.objects.all()
     serializer_class = PlaceWorkSerializer
-    pagination_class = StandardResultsSetPagination
     depth = 2
     filter_fields = ('related_place__name', 'related_work__name')
 
@@ -117,7 +104,6 @@ class PlaceWorkViewSet(viewsets.ModelViewSet):
 class PlacePlaceViewSet(viewsets.ModelViewSet):
     queryset = PlacePlace.objects.all()
     serializer_class = PlacePlaceSerializer
-    pagination_class = StandardResultsSetPagination
     depth = 2
     filter_fields = ('related_placeA__name', 'related_placeB__name')
 
@@ -125,6 +111,5 @@ class PlacePlaceViewSet(viewsets.ModelViewSet):
 class WorkWorkViewSet(viewsets.ModelViewSet):
     queryset = WorkWork.objects.all()
     serializer_class = WorkWorkSerializer
-    pagination_class = StandardResultsSetPagination
     depth = 2
     filter_fields = ('related_workA__name', 'related_workB__name')
