@@ -199,6 +199,12 @@ class WorkTopics(VocabsBaseClass):
 
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
+class SundayRepresentations(VocabsBaseClass):
+    """vocab used to annotate the various representations of sunday in the texts"""
+    pass
+
+
+@reversion.register(follow=['vocabsbaseclass_ptr'])
 class TextType(VocabsBaseClass):
     """used to store the Text types for the forms"""
     entity = models.CharField(max_length=255)
