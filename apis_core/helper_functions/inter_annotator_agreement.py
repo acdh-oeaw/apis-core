@@ -115,7 +115,7 @@ class InternalDataAgreement(object):
                  format_string='start_end_text', combine=False, gold_standard=False):
         if not type(texts) == QuerySet:
             m_name = ContentType.objects.get_for_model(texts).name
-            if m_name == 'person' or m_name == 'place' or m_name == 'institution' or m_name == 'event' or m_name == 'work':
+            if m_name == 'person' or m_name == 'place' or m_name == 'institution' or m_name == 'event' or m_name == 'passage':
                 texts = Text.objects.filter(tempentityclass=texts).distinct()
             elif m_name == 'collection':
                 t = TempEntityClass.objects.filter(collection=texts)

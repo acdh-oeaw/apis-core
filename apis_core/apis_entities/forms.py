@@ -15,7 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.validators import URLValidator
 from django.conf import settings
 
-from .models import Person, Place, Institution, Event, Work
+from .models import Person, Place, Institution, Event, Passage
 from apis_core.apis_vocabularies.models import TextType
 from apis_core.apis_metainfo.models import Text, Uri, Collection
 
@@ -37,7 +37,6 @@ class SearchForm(forms.Form):
         helper.form_method = 'GET'
         return helper
 
-
 def get_entities_form(entity):
     class GenericEntitiesForm(forms.ModelForm):
         class Meta:
@@ -52,11 +51,15 @@ def get_entities_form(entity):
             self.helper.form_tag = False
             self.helper.help_text_inline = True
             acc_grp1 = Fieldset('Metadata {}'.format(entity.title()))
+
+
             acc_grp2 = AccordionGroup(
-                        'MetaInfo',
-                        'references',
-                        'notes',
-                        'review')
+                'MetaInfo',
+                'references',
+                'notes',
+                'review')
+
+
             attrs = {'data-placeholder': 'Type to get suggestions',
                      'data-minimum-input-length': 1,
                      'data-html': True}
@@ -103,6 +106,8 @@ def get_entities_form(entity):
                                     res = ''
                 if f not in acc_grp2:
                     acc_grp1.append(f)
+
+
             if entity == 'Person':
                 acc_grp1 = Fieldset('Metadata {}'.format(entity.title()))
                 person_field_list = [
@@ -120,6 +125,8 @@ def get_entities_form(entity):
                     acc_grp1.append(x)
 
             self.helper.layout = Layout(
+
+
                 Accordion(
                     acc_grp1,
                     acc_grp2
@@ -192,7 +199,7 @@ class FullTextForm(forms.Form):
                 text.text = cd[f]
                 text.save()
             elif text.count() == 0:
-                text = Text(text=cd[f], kind=text_type)
+                text = Passage(text=cd[f], kind=text_type)
                 text.save()
                 entity.text.add(text)
         return text

@@ -11,8 +11,8 @@ from django.contrib.contenttypes.models import ContentType
 
 from .models import (PersonPlace, PersonPerson, PersonInstitution,
                      InstitutionPlace, InstitutionInstitution, PersonEvent, InstitutionEvent,
-                     PlaceEvent, PersonWork, InstitutionWork, PlaceWork, EventWork, PlacePlace)
-from apis_core.apis_entities.models import Place, Institution, Person, Event, Work
+                     PlaceEvent, PersonPassage, InstitutionPassage, PlacePassage, EventPassage, PlacePlace)
+from apis_core.apis_entities.models import Place, Institution, Person, Event, Passage
 from apis_core.apis_metainfo.models import Uri, Text
 from apis_core.apis_vocabularies.models import (
     PersonInstitutionRelation, PersonPlaceRelation, InstitutionPlaceRelation,

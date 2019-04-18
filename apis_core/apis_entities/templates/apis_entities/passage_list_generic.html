@@ -1,0 +1,8 @@
+{% extends "apis_entities/generic_list.html" %}
+{% block Titel %}See all Passages{% endblock %}
+{% block list_title %}All Passages{% endblock %}
+{% block create_button %}
+        <div>
+            <a class="btn btn-primary btn-lg" href="{% url 'apis:apis_entities:passage_create' %}">create new Passage</a>
+        </div>
+{% endblock %}

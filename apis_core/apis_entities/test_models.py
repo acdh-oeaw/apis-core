@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User, Group
 
-from .models import Person, Place, Institution, Work, Event
+from .models import Person, Place, Institution, Passage, Event
 from apis_core.apis_metainfo.models import Text, Collection, Source, Uri, UriCandidate
 from apis_core.apis_vocabularies.models import PersonPlaceRelation
 from apis_core.apis_labels.models import Label
@@ -28,7 +28,7 @@ class PersonModelTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Set up data for the whole TestCase
-        cls.txt = Text.objects.create(text=cls.text)
+        cls.txt = Passage.objects.create(text=cls.text)
         cls.col = Collection.objects.create(name=cls.col_name)
 
     def test_init(self):
@@ -94,7 +94,7 @@ class PermissionsModelTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Set up data for the whole TestCase
-        cls.txt = Text.objects.create(text=cls.text)
+        cls.txt = Passage.objects.create(text=cls.text)
         cls.col = Collection.objects.create(name=cls.col_name)
         cls.pers = Person.objects.create(
             name=cls.name,

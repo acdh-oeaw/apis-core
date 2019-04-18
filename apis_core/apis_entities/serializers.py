@@ -1,6 +1,6 @@
 from django.urls import reverse_lazy
 from rest_framework import serializers
-from .models import Institution, Person, Place, Event, Work
+from .models import Institution, Person, Place, Event, Passage
 import re
 
 
@@ -101,21 +101,21 @@ class EventSerializer(BaseEntitySerializer):
         )
 
 
-class WorkSerializer(BaseEntitySerializer):
+class PassageSerializer(BaseEntitySerializer):
 
     url = serializers.HyperlinkedIdentityField(
-        view_name="apis:apis_api:work-detail",
+        view_name="apis:apis_api:passage-detail",
         lookup_field="pk"
     )
 
     kind = serializers.HyperlinkedRelatedField(
-        view_name="apis:apis_api:worktype-detail",
+        view_name="apis:apis_api:passagetype-detail",
         lookup_field="pk",
         read_only=True
     )
 
     class Meta:
-        model = Work
+        model = Passage
         fields = (
             'url', 'id', 'name', 'uri_set', 'collection', 'text', 'kind'
         )

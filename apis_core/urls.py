@@ -1,11 +1,6 @@
 from apis_core.apis_entities.api_views import (
-    EventViewSet,
-    InstitutionViewSet,
     NetJsonViewSet,
-    PersonViewSet,
     PlaceGeoJsonViewSet,
-    PlaceViewSet,
-    WorkViewSet,
 )
 
 # from rest_framework_swagger.views import get_swagger_view
@@ -18,49 +13,11 @@ from apis_core.apis_metainfo.api_views import (
     UriSerializerViewSet,
 )
 from apis_core.apis_relations.api_views import (
-    EventEventViewSet,
-    EventWorkViewSet,
-    InstitutionEventViewSet,
-    InstitutionInstitutionViewSet,
-    InstitutionPlaceViewSet,
-    InstitutionWorkViewSet,
-    PersonEventViewSet,
-    PersonInstitutionViewSet,
-    PersonPersonViewSet,
-    PersonPlaceViewSet,
-    PersonWorkViewSet,
-    PlaceEventViewSet,
-    PlacePlaceViewSet,
-    PlaceWorkViewSet,
-    WorkWorkViewSet,
-)
+    InstitutionInstitutionViewSet, InstitutionPlaceViewSet, InstitutionEventViewSet, InstitutionWorkViewSet,
+    PersonInstitutionViewSet, PersonPlaceViewSet, PersonPersonViewSet, PersonEventViewSet, PersonWorkViewSet,
+    PlaceWorkViewSet, PlaceEventViewSet, EventWorkViewSet, EventEventViewSet, WorkWorkViewSet,
+    PlacePlaceViewSet)
 from apis_core.apis_vocabularies.api_views import (
-    CollectionTypeViewSet,
-    EventEventRelationViewSet,
-    EventTypeViewSet,
-    EventWorkRelationViewSet,
-    InstitutionEventRelationViewSet,
-    InstitutionInstitutionRelationViewSet,
-    InstitutionPlaceRelationViewSet,
-    InstitutionTypeViewSet,
-    InstitutionWorkRelationViewSet,
-    PersonEventRelationViewSet,
-    PersonInstitutionRelationViewSet,
-    PersonPersonRelationViewSet,
-    PersonPlaceRelationViewSet,
-    PersonWorkRelationViewSet,
-    PlaceEventRelationViewSet,
-    PlacePlaceRelationViewSet,
-    PlaceTypeViewSet,
-    PlaceWorkRelationViewSet,
-    ProfessionTypeViewSet,
-    TextTypeViewSet,
-    UserViewSet,
-    VocabNamesViewSet,
-    VocabsBaseClassViewSet,
-    WorkTypeViewSet,
-    WorkWorkRelationViewSet,
-)
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
@@ -68,6 +25,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.views.static import serve
 from rest_framework import routers
+    UserViewSet,
 
 from .api_routers import create_generic_api_viewset
 
