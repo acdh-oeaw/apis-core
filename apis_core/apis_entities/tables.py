@@ -4,7 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from django.utils.safestring import mark_safe
 
-from .models import Person, Place, Institution, Event, Work
+from .models import Person, Place, Institution, Event, Passage
 
 input_form = """
   <input type="checkbox" name="keep" value="{}" title="keep this"/> |
@@ -96,11 +96,11 @@ class EventTable(tables.Table):
         attrs = {"class": "table table-hover table-striped table-condensed"}
 
 
-class WorkTable(tables.Table):
-    name = tables.LinkColumn('apis:apis_entities:work_edit', args=[A('pk')])
+class PassageTable(tables.Table):
+    name = tables.LinkColumn('apis:apis_entities:passage_edit', args=[A('pk')])
 
     class Meta:
-        model = Work
+        model = Passage
         fields = ['name', 'start_date', 'end_date', 'kind']
         # add class="paleblue" to <table> tag
         attrs = {"class": "table table-hover table-striped table-condensed"}

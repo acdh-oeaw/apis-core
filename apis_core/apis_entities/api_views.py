@@ -13,11 +13,11 @@ from rest_framework.decorators import api_view
 
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
 from .serializers import (
-    InstitutionSerializer, PersonSerializer, PlaceSerializer, EventSerializer, WorkSerializer,
+    InstitutionSerializer, PersonSerializer, PlaceSerializer, EventSerializer, PassageSerializer,
     GeoJsonSerializer, NetJsonEdgeSerializer, NetJsonNodeSerializer 
 )
 from .serializers_generic import EntitySerializer
-from .models import Institution, Person, Place, Event, Work
+from .models import Institution, Person, Place, Event, Passage
 from apis_core.apis_vocabularies.models import VocabsBaseClass
 from apis_core.helper_functions.stanbolQueries import find_loc
 from apis_core.default_settings.NER_settings import autocomp_settings, stb_base
@@ -143,13 +143,13 @@ class EventViewSet(viewsets.ModelViewSet):
     search_fields = ('name', )
 
 
-class WorkViewSet(viewsets.ModelViewSet):
-    """Serialization of the work class.
-    In addition to the work this view includes related texts and
-    the kind of the work (separated object)."""
+class PassageViewSet(viewsets.ModelViewSet):
+    """Serialization of the passage class.
+    In addition to the passage this view includes related texts and
+    the kind of the passage (separated object)."""
     permission_classes = (DjangoObjectPermissions,)
-    queryset = Work.objects.all()
-    serializer_class = WorkSerializer
+    queryset = Passage.objects.all()
+    serializer_class = PassageSerializer
     pagination_class = StandardResultsSetPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     depth = 2

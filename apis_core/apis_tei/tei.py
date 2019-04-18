@@ -67,16 +67,16 @@ class TeiEntCreator():
                 uris.append(idno)
         return uris
 
-    def create_work_node(self):
-        work = ET.Element("{http://www.tei-c.org/ns/1.0}item")
-        work.attrib['{http://www.w3.org/XML/1998/namespace}id'] = "work__{}".format(
+    def create_passage_node(self):
+        passage = ET.Element("{http://www.tei-c.org/ns/1.0}item")
+        passage.attrib['{http://www.w3.org/XML/1998/namespace}id'] = "passage__{}".format(
             self.ent_apis_id
         )
-        work.text = custom_escape(self.ent_dict.get('name'))
+        passage.text = custom_escape(self.ent_dict.get('name'))
         for x in self.relation_notes():
-            work.append(x)
+            passage.append(x)
 
-        return work
+        return passage
 
     def create_event_node(self):
         event = ET.Element("{http://www.tei-c.org/ns/1.0}event")
@@ -253,8 +253,8 @@ class TeiEntCreator():
         elif self.ent_type == "Event":
             item = self.create_event_node()
             ent_list = ET.Element("listEvent")
-        elif self.ent_type == "Work":
-            item = self.create_work_node()
+        elif self.ent_type == "Passage":
+            item = self.create_passage_node()
             ent_list = ET.Element("list")
         body = doc.xpath("//tei:body", namespaces=self.nsmap)[0]
         try:

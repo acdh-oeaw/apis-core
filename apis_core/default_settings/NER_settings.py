@@ -127,7 +127,7 @@ autocomp_settings = {
         'fields': {
             'descr': (u'http://d-nb.info/standards/elementset/gnd#definition','String'),
             'name': (u'http://d-nb.info/standards/elementset/gnd#preferredNameForTheSubjectHeading','String')}}],
-    'Work': []
+    'Passage': []
 }
 
 geonames_feature_codes = {

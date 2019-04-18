@@ -3,7 +3,7 @@ from dal import autocomplete
 from django.forms import ModelMultipleChoiceField
 from django.urls import reverse
 
-from .models import Person, Place, Institution, Event, Work
+from .models import Person, Place, Institution, Event, Passage
 from django.db.models import Q
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType

@@ -1,15 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from apis_core.apis_entities.models import Place, Institution, Person, Work
+from apis_core.apis_entities.models import Place, Institution, Person, Passage
 from apis_core.apis_relations.models import (
     InstitutionInstitution, InstitutionPlace, PersonPerson,
-    PersonWork, PersonPlace, PersonInstitution, PlacePlace, PlaceEvent, PlaceWork)
+    PersonPassage, PersonPlace, PersonInstitution, PlacePlace, PlaceEvent, PlacePassage)
 from apis_core.apis_metainfo.models import Uri as genUri
 from apis_core.apis_labels.models import Label
 from apis_core.apis_vocabularies.models import (
     LabelType, InstitutionInstitutionRelation,
-    InstitutionPlaceRelation, VocabsUri, ProfessionType, PersonWorkRelation,
-    PersonPersonRelation, PersonPlaceRelation, WorkType, PersonInstitutionRelation,
+    InstitutionPlaceRelation, VocabsUri, ProfessionType, PersonPassageRelation,
+    PersonPersonRelation, PersonPlaceRelation, PassageType, PersonInstitutionRelation,
     PlaceType, PlacePlaceRelation)
 from apis_core.default_settings.NER_settings import geonames_feature_codes as gn_f
 from apis_core.default_settings.RDF_settings import sett_RDF_generic
@@ -56,7 +56,7 @@ class GenericRDFParser(object):
 
     - self.related_objcts: (list) list of related objects (relations) (only saved when self.save() is called)
 
-    - self.kind: (string) kind of entity of the object (Persion, Place, Institution, Work, Event)
+    - self.kind: (string) kind of entity of the object (Persion, Place, Institution, Passage, Event)
 
     - self.uri: (string) uri provided when initializing the object
 
@@ -159,7 +159,7 @@ class GenericRDFParser(object):
                  app_label_relations="apis_relations", app_label_vocabularies="apis_vocabularies", **kwargs):
         """
         :param uri: (url) Uri to parse the object from (http://test.at). The uri must start with a base url mentioned in the RDF parser settings file.
-        :param kind: (string) Kind of entity (Person, Place, Institution, Work, Event)
+        :param kind: (string) Kind of entity (Person, Place, Institution, Passage, Event)
         :param app_label_entities: (string) Name of the Django app that contains the entities that we create.
         :param app_label_relations: (string) Name of the Django app that contains the relations for the merging process.
         :param app_label_vocabularies: (string) Name of the Django app that contains the vocabularies defining the entities and relations.

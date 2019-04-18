@@ -4,7 +4,7 @@ from django_tables2.utils import A
 
 from .models import (
     PersonInstitution, PersonPlace, PersonPerson, PersonEvent, InstitutionEvent, PlaceEvent,
-    PersonWork, InstitutionWork, InstitutionPlace, PlaceWork, EventWork
+    PersonPassage, InstitutionPassage, InstitutionPlace, PlacePassage, EventPassage
 )
 from apis_core.apis_labels.models import Label
 from apis_core.apis_metainfo.models import Uri

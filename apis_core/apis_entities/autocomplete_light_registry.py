@@ -1,7 +1,7 @@
 from autocomplete_light import shortcuts as al
 from apis_core.vocabularies.models import ProfessionType, Title
 
-from .models import Person, Place, Institution, Event, Work
+from .models import Person, Place, Institution, Event, Passage
 
 class TitleAutocomplete(al.AutocompleteModelBase):
 	search_fields=['name', 'abbreviation']
@@ -69,12 +69,12 @@ class DB_EventAutocomplete(al.AutocompleteModelBase):
 al.register(DB_EventAutocomplete)
 
 
-class DB_WorkAutocomplete(al.AutocompleteModelBase):
+class DB_PassageAutocomplete(al.AutocompleteModelBase):
     search_fields = ['name', ]
-    model = Work
+    model = Passage
     attrs = {
         'data-autocomplete-minimum-characters': 2,
         'placeholder': 'Start typing to get suggestions',
     }
 
-al.register(DB_WorkAutocomplete)
+al.register(DB_PassageAutocomplete)

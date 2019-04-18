@@ -20,7 +20,7 @@ class VocabNames(models.Model):
 @reversion.register()
 class VocabsBaseClass(models.Model):
     """ An abstract base class for other classes which contain so called
-    'controlled vocablury' to describe subtypes of main temporalized
+    'controlled vocabulary' to describe subtypes of main temporalized
     entites"""
     choices_status = (
         ('rej', 'rejected'),
@@ -70,8 +70,8 @@ class VocabsBaseClass(models.Model):
 @reversion.register(follow=['vocabsbaseclass_ptr'])
 class RelationBaseClass(VocabsBaseClass):
     """ An abstract base class for other classes which contain so called
-    'controlled vocablury' to describe the relations between main temporalized
-    entites ('db_')"""
+    'controlled vocabulary' to describe the relations between main temporalized
+    entities ('db_')"""
 
     name_reverse = models.CharField(
         max_length=255,
@@ -133,8 +133,8 @@ class VocabsUri(models.Model):
 
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
-class WorkType(VocabsBaseClass):
-    """Holds controlled vocabularies about work-types"""
+class PassageType(VocabsBaseClass):
+    """Holds controlled vocabularies about passage-types"""
     pass
 
 
@@ -181,20 +181,14 @@ class CollectionType(VocabsBaseClass):
 
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
-class WorkLanguage(VocabsBaseClass):
-    """vocab to set the language of a work"""
+class PassageLanguage(VocabsBaseClass):
+    """vocab to set the language of a passage"""
     pass
 
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
-class WorkDenomination(VocabsBaseClass):
-    """vocab to set the Denomiation of a work"""
-    pass
-
-
-@reversion.register(follow=['vocabsbaseclass_ptr'])
-class WorkTopics(VocabsBaseClass):
-    """vocab to set the tag of a work"""
+class PassageTopics(VocabsBaseClass):
+    """vocab to set the tag of a passage"""
     pass
 
 
@@ -241,14 +235,26 @@ class PersonEventRelation(RelationBaseClass):
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PersonWorkRelation(RelationBaseClass):
-    """Holds controlled vocabularies relation types of Persons and Works"""
+class    PersonPassageRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Persons and Passages"""
     pass
+
+
+class PersonPublicationRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Persons and Publications"""
+    pass
+
 
 
 #######################################################################
 # Institution-Relation-Types
 #######################################################################
+
+
+@reversion.register(follow=['relationbaseclass_ptr'])
+class InstitutionInstitutionRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Institutions and Institutions."""
+    pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
@@ -264,15 +270,17 @@ class InstitutionPlaceRelation(RelationBaseClass):
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class InstitutionInstitutionRelation(RelationBaseClass):
-    """Holds controlled vocabularies relation types of Institutions and Institutions."""
+class InstitutionPassageRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Institutions and Passages."""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class InstitutionWorkRelation(RelationBaseClass):
-    """Holds controlled vocabularies relation types of Institutions and Works."""
+class InstitutionPublicationRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Institutions and Passages."""
     pass
+
+
 
 #######################################################################
 # Place-Relation-Types
@@ -292,8 +300,14 @@ class PlaceEventRelation(RelationBaseClass):
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PlaceWorkRelation(RelationBaseClass):
-    """Holds controlled vocabularies relation types of Places and Works"""
+class PlacePassageRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Places and Passages"""
+    pass
+
+
+@reversion.register(follow=['relationbaseclass_ptr'])
+class PlacePublicationRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Institutions and Passages."""
     pass
 
 
@@ -309,17 +323,40 @@ class EventEventRelation(RelationBaseClass):
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class EventWorkRelation(RelationBaseClass):
-    """Holds controlled vocabularies relation types of Events and Works"""
+class EventPassageRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Events and Passages"""
+    pass
+
+
+@reversion.register(follow=['relationbaseclass_ptr'])
+class EventPublicationRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Institutions and Passages."""
     pass
 
 
 #######################################################################
-# Work-Relation-Types
+# Passage-Relation-Types
 #######################################################################
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class WorkWorkRelation(RelationBaseClass):
-    """Holds controlled vocabularies relation types of Works and Works"""
+class PassagePassageRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Passages and Passages"""
+    pass
+
+
+@reversion.register(follow=['relationbaseclass_ptr'])
+class PassagePublicationRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Institutions and Passages."""
+    pass
+
+
+#######################################################################
+# Publication-Relation-Types
+#######################################################################
+
+
+@reversion.register(follow=['relationbaseclass_ptr'])
+class PublicationPublicationRelation(RelationBaseClass):
+    """Holds controlled vocabularies relation types of Passages and Passages"""
     pass

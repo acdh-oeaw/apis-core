@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User, Group
 
-from .models import Person, Place, Institution, Work, Event
+from .models import Person, Place, Institution, Passage, Event
 from apis_core.apis_metainfo.models import Text, Collection, Source, Uri, UriCandidate
 from apis_core.apis_vocabularies.models import PersonPlaceRelation
 from apis_core.apis_labels.models import Label
@@ -50,7 +50,7 @@ class RDFPersonParserTestCase(TestCase):
         print('lat: {}, lng: {}'.format(rel_death.related_place.lat, rel_death.related_place.lng))
 
     def test_merge_places(self):
-        txt = Text.objects.create(text='test text')
+        txt = Passage.objects.create(text='test text')
         src = Source.objects.create(orig_id=24, pubinfo='test pub')
         pp = Place(name="Wien")
         pp.source = src

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from apis_core.apis_entities.models import Place, Person, Institution, Event, Work
+from apis_core.apis_entities.models import Place, Person, Institution, Event, Passage
 from apis_core.apis_metainfo.models import Uri
 from apis_core.default_settings.NER_settings import autocomp_settings as ac_settings
 from apis_core.apis_relations.models import PersonPerson, PersonPlace, PersonInstitution
@@ -184,9 +184,9 @@ class EventAutocomplete(StanbolAutocompleteBase):
     autocomplete_type_model = [(Event, ['name', 'label__label'], ('Start date: {}, Status: {}', ['start_date', 'status'])), ]
 
 
-class WorkAutocomplete(StanbolAutocompleteBase):
-    autocomplete_type = ['Work', ]
-    autocomplete_type_model = [(Work, ['name', 'label__label'], ('Start date: {}, Status: {}', ['start_date', 'status'])), ]
+class PassageAutocomplete(StanbolAutocompleteBase):
+    autocomplete_type = ['Passage', ]
+    autocomplete_type_model = [(Passage, ['name', 'label__label'], ('Start date: {}, Status: {}', ['start_date', 'status'])), ]
 
 
 class AddRelationPersonHighlighterAutocomplete(AddRelationBaseAutocomplete):
@@ -198,5 +198,5 @@ al.register(PlaceAutocomplete)
 al.register(InstitutionAutocomplete)
 al.register(PersonAutocomplete)
 al.register(EventAutocomplete)
-al.register(WorkAutocomplete)
+al.register(PassageAutocomplete)
 al.register(AddRelationPersonHighlighterAutocomplete)

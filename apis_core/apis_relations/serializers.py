@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import (InstitutionInstitution, PersonInstitution, PersonPlace, PersonPerson,
-                     PersonEvent, PersonWork, InstitutionPlace, InstitutionEvent, InstitutionWork,
-                     PlaceEvent, PlaceWork,PlacePlace, EventWork, EventEvent, WorkWork)
+                     PersonEvent, PersonPassage, InstitutionPlace, InstitutionEvent, InstitutionPassage,
+                     PlaceEvent, PlacePassage,PlacePlace, EventPassage, EventEvent, PassagePassage)
 
 
 class InstitutionInstitutionSerializer(serializers.HyperlinkedModelSerializer):
@@ -39,11 +39,11 @@ class PersonEventSerializer(serializers.HyperlinkedModelSerializer):
         model = PersonEvent
 
 
-class PersonWorkSerializer(serializers.HyperlinkedModelSerializer):
+class PersonPassageSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         fields = '__all__'
-        model = PersonWork
+        model = PersonPassage
 
 
 class InstitutionPlaceSerializer(serializers.HyperlinkedModelSerializer):
@@ -60,11 +60,11 @@ class InstitutionEventSerializer(serializers.HyperlinkedModelSerializer):
         model = InstitutionEvent
 
 
-class InstitutionWorkSerializer(serializers.HyperlinkedModelSerializer):
+class InstitutionPassageSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         fields = '__all__'
-        model = InstitutionWork
+        model = InstitutionPassage
 
 
 class PlaceEventSerializer(serializers.HyperlinkedModelSerializer):
@@ -74,11 +74,11 @@ class PlaceEventSerializer(serializers.HyperlinkedModelSerializer):
         model = PlaceEvent
 
 
-class PlaceWorkSerializer(serializers.HyperlinkedModelSerializer):
+class PlacePassageSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         fields = '__all__'
-        model = PlaceWork
+        model = PlacePassage
 
 
 class PlacePlaceSerializer(serializers.HyperlinkedModelSerializer):
@@ -88,11 +88,11 @@ class PlacePlaceSerializer(serializers.HyperlinkedModelSerializer):
         model = PlacePlace
 
 
-class EventWorkSerializer(serializers.HyperlinkedModelSerializer):
+class EventPassageSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         fields = '__all__'
-        model = EventWork
+        model = EventPassage
 
 
 class EventEventSerializer(serializers.HyperlinkedModelSerializer):
@@ -102,8 +102,8 @@ class EventEventSerializer(serializers.HyperlinkedModelSerializer):
         model = EventEvent
 
 
-class WorkWorkSerializer(serializers.HyperlinkedModelSerializer):
+class PassagePassageSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         fields = '__all__'
-        model = WorkWork
+        model = PassagePassage

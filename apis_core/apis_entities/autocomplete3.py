@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from .models import Place, Person, Institution, Event, Work
+from .models import Place, Person, Institution, Event, Passage
 from apis_core.apis_metainfo.models import Uri, Collection
 from apis_core.default_settings.NER_settings import autocomp_settings as ac_settings
 from django.conf import settings

@@ -19,11 +19,11 @@ from .forms2 import GenericRelationForm
 from .forms import PersonLabelForm
 from .models import (
     PersonPlace, PersonPerson, PersonInstitution, InstitutionPlace,
-    InstitutionInstitution, PlacePlace, PersonEvent, InstitutionEvent, PlaceEvent, PersonWork,
-    InstitutionWork, PlaceWork, EventWork, WorkWork
+    InstitutionInstitution, PlacePlace, PersonEvent, InstitutionEvent, PlaceEvent, PersonPassage,
+    InstitutionPassage, PlacePassage, EventPassage, PassagePassage, PersonPublication, EventPublication
 )
 from apis_core.apis_metainfo.models import Uri
-from apis_core.apis_entities.models import Person, Institution, Place, Event, Work
+from apis_core.apis_entities.models import Person, Institution, Place, Event, Passage, Publication
 from apis_core.apis_entities.forms import PersonResolveUriForm, GenericEntitiesStanbolForm
 from apis_core.apis_labels.models import Label
 from django.views.decorators.csrf import csrf_exempt
@@ -47,18 +47,18 @@ if 'apis_highlighter' in settings.INSTALLED_APPS:
 
 
 # Model-classes must be registered together with their ModelForm-classes
-registered_forms = {'WorkWorkForm': [WorkWork, Work, Work],
+registered_forms = {'PassagePassageForm': [PassagePassage, Passage, Passage],
                     'PersonPlaceForm': [PersonPlace, Person, Place],
                     'PersonPlaceHighlighterForm': [PersonPlace, Person, Place],
                     'PersonPersonForm': [PersonPerson, Person, Person],
                     'PersonPersonHighlighterForm': [PersonPerson, Person, Person],
                     'PersonInstitutionForm': [PersonInstitution, Person, Institution],
                     'PersonEventForm': [PersonEvent, Person, Event],
-                    'PersonWorkForm': [PersonWork, Person, Work],
+                    'PersonPassageForm': [PersonPassage, Person, Passage],
                     'PersonInstitutionHighlighterForm': [PersonInstitution, Person, Institution],
-                    'PersonWorkHighlighterForm': [PersonWork, Person, Work],
-                    'PlaceWorkHighlighterForm': [PlaceWork, Place, Work],
-                    'InstitutionWorkHighlighterForm': [InstitutionWork, Institution, Work],
+                    'PersonPassageHighlighterForm': [PersonPassage, Person, Passage],
+                    'PlacePassageHighlighterForm': [PlacePassage, Place, Passage],
+                    'InstitutionPassageHighlighterForm': [InstitutionPassage, Institution, Passage],
                     'InstitutionPlaceForm': [InstitutionPlace, Institution, Place],
                     'InstitutionInstitutionForm': [
                         InstitutionInstitution,
@@ -66,16 +66,23 @@ registered_forms = {'WorkWorkForm': [WorkWork, Work, Work],
                         Institution],
                     'InstitutionPersonForm': [PersonInstitution, Institution, Person],
                     'InstitutionEventForm': [InstitutionEvent, Institution, Event],
-                    'InstitutionWorkForm': [InstitutionWork, Institution, Work],
+                    'InstitutionPassageForm': [InstitutionPassage, Institution, Passage],
                     'PlaceEventForm': [PlaceEvent, Place, Event],
-                    'PlaceWorkForm': [PlaceWork, Place, Work],
+                    'PlacePassageForm': [PlacePassage, Place, Passage],
                     'PlacePlaceForm': [PlacePlace, Place, Place],
-                    'EventWorkForm': [EventWork, Event, Work],
+                    'EventPassageForm': [EventPassage, Event, Passage],
                     'InstitutionLabelForm': [Label, Institution, Label],
                     'PersonLabelForm': [Label, Person, Label],
                     'EventLabelForm': [Label, Event, Label],
                     'PersonResolveUriForm': [Uri, Person, Uri],
+                    'EventEventForm': [],
                     'AddRelationHighlighterPersonForm': [],
+                    'PersonPublicationForm': [],
+                    'PlacePublicationForm': [],
+                    'InstitutionPublicationForm': [],
+                    'EventPublicationForm': [],
+                    'PassagePublicationForm': [],
+                    'PublicationPublicationForm': [],
                     # 'PlaceHighlighterForm': [Annotation, ],
                     # 'PersonHighlighterForm': [Annotation, ]
                     }

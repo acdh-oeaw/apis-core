@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib import admin
 from rest_framework import routers
 from apis_core.apis_entities.api_views import (
-    InstitutionViewSet, PersonViewSet, PlaceViewSet, EventViewSet, WorkViewSet, PlaceGeoJsonViewSet,
+    InstitutionViewSet, PersonViewSet, PlaceViewSet, EventViewSet, PassageViewSet, PlaceGeoJsonViewSet,
     NetJsonViewSet
 )
 from django.views.static import serve
@@ -14,17 +14,17 @@ from apis_core.apis_metainfo.api_views import (
     CollectionViewSet, TextViewSet, SourceSerializerViewSet,
     UriSerializerViewSet, TempEntityClassViewSet)
 from apis_core.apis_relations.api_views import (
-    InstitutionInstitutionViewSet, InstitutionPlaceViewSet, InstitutionEventViewSet, InstitutionWorkViewSet,
-    PersonInstitutionViewSet, PersonPlaceViewSet, PersonPersonViewSet, PersonEventViewSet, PersonWorkViewSet,
-    PlaceWorkViewSet, PlaceEventViewSet, EventWorkViewSet, EventEventViewSet, WorkWorkViewSet,
+    InstitutionInstitutionViewSet, InstitutionPlaceViewSet, InstitutionEventViewSet, InstitutionPassageViewSet,
+    PersonInstitutionViewSet, PersonPlaceViewSet, PersonPersonViewSet, PersonEventViewSet, PersonPassageViewSet,
+    PlacePassageViewSet, PlaceEventViewSet, EventPassageViewSet, EventEventViewSet, PassagePassageViewSet,
     PlacePlaceViewSet)
 from apis_core.apis_vocabularies.api_views import (
     UserViewSet, VocabNamesViewSet, TextTypeViewSet, CollectionTypeViewSet, VocabsBaseClassViewSet,
-    InstitutionTypeViewSet, ProfessionTypeViewSet, PlaceTypeViewSet, EventTypeViewSet, WorkTypeViewSet,
-    PersonInstitutionRelationViewSet, PersonPlaceRelationViewSet, PersonEventRelationViewSet, PersonWorkRelationViewSet,
+    InstitutionTypeViewSet, ProfessionTypeViewSet, PlaceTypeViewSet, EventTypeViewSet, PassageTypeViewSet,
+    PersonInstitutionRelationViewSet, PersonPlaceRelationViewSet, PersonEventRelationViewSet, PersonPassageRelationViewSet,
     PersonPersonRelationViewSet, InstitutionInstitutionRelationViewSet, InstitutionPlaceRelationViewSet,
-    InstitutionEventRelationViewSet, InstitutionWorkRelationViewSet, PlaceEventRelationViewSet,
-    PlaceWorkRelationViewSet, EventWorkRelationViewSet, EventEventRelationViewSet, WorkWorkRelationViewSet,
+    InstitutionEventRelationViewSet, InstitutionPassageRelationViewSet, PlaceEventRelationViewSet,
+    PlacePassageRelationViewSet, EventPassageRelationViewSet, EventEventRelationViewSet, PassagePassageRelationViewSet,
     PlacePlaceRelationViewSet)
 
 app_name = 'apis_core'
@@ -35,7 +35,7 @@ router.register(r'institution', InstitutionViewSet)
 router.register(r'person', PersonViewSet)
 router.register(r'place', PlaceViewSet)
 router.register(r'event', EventViewSet)
-router.register(r'work', WorkViewSet)
+router.register(r'passage', PassageViewSet)
 router.register(r'collection', CollectionViewSet)
 router.register(r'text', TextViewSet, 'text')
 router.register(r'source', SourceSerializerViewSet)
@@ -46,30 +46,30 @@ router.register(r'institutionplace', InstitutionPlaceViewSet)
 router.register(r'institutionplacerelation', InstitutionPlaceRelationViewSet)
 router.register(r'institutionevent', InstitutionEventViewSet)
 router.register(r'institutioneventrelation', InstitutionEventRelationViewSet)
-router.register(r'institutionwork', InstitutionWorkViewSet)
-router.register(r'institutionworkrelation', InstitutionWorkRelationViewSet)
+router.register(r'institutionpassage', InstitutionPassageViewSet)
+router.register(r'institutionpassagerelation', InstitutionPassageRelationViewSet)
 router.register(r'personinstitution', PersonInstitutionViewSet)
 router.register(r'personinstitutionrelation', PersonInstitutionRelationViewSet)
 router.register(r'personplace', PersonPlaceViewSet)
 router.register(r'personplacerelation', PersonPlaceRelationViewSet)
 router.register(r'personevent', PersonEventViewSet)
 router.register(r'personeventrelation', PersonEventRelationViewSet)
-router.register(r'personwork', PersonWorkViewSet)
-router.register(r'personworkrelation', PersonWorkRelationViewSet)
+router.register(r'personpassage', PersonPassageViewSet)
+router.register(r'personpassagerelation', PersonPassageRelationViewSet)
 router.register(r'personperson', PersonPersonViewSet)
 router.register(r'personpersonrelation', PersonPersonRelationViewSet)
-router.register(r'placework', PlaceWorkViewSet)
-router.register(r'placeworkrelation', PlaceWorkRelationViewSet)
+router.register(r'placepassage', PlacePassageViewSet)
+router.register(r'placepassagerelation', PlacePassageRelationViewSet)
 router.register(r'placeevent', PlaceEventViewSet)
 router.register(r'placeeventrelation', PlaceEventRelationViewSet)
 router.register(r'placeplace', PlacePlaceViewSet)
 router.register(r'placeplacerelation', PlacePlaceRelationViewSet)
-router.register(r'eventwork', EventWorkViewSet)
-router.register(r'eventworkrelation', EventWorkRelationViewSet)
+router.register(r'eventpassage', EventPassageViewSet)
+router.register(r'eventpassagerelation', EventPassageRelationViewSet)
 router.register(r'eventevent', EventEventViewSet)
 router.register(r'eventeventrelation', EventEventRelationViewSet)
-router.register(r'workwork', WorkWorkViewSet)
-router.register(r'workworkrelation', WorkWorkRelationViewSet)
+router.register(r'passagepassage', PassagePassageViewSet)
+router.register(r'passagepassagerelation', PassagePassageRelationViewSet)
 router.register(r'texttype', TextTypeViewSet)
 router.register(r'collectiontype', CollectionTypeViewSet)
 router.register(r'vocabsbaseclass', VocabsBaseClassViewSet)
@@ -77,7 +77,7 @@ router.register(r'institutiontype', InstitutionTypeViewSet)
 router.register(r'professiontype', ProfessionTypeViewSet)
 router.register(r'placetype', PlaceTypeViewSet)
 router.register(r'eventtype', EventTypeViewSet)
-router.register(r'worktype', WorkTypeViewSet)
+router.register(r'passagetype', PassageTypeViewSet)
 router.register(r'users', UserViewSet)
 router.register(r'GeoJsonPlace', PlaceGeoJsonViewSet, 'PlaceGeoJson')
 router.register(r'NetJson', NetJsonViewSet, 'NetJson')
