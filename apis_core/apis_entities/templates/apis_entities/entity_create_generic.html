@@ -27,7 +27,7 @@
             	{% if instance %}
                     <h3><strong>{{ instance }}</strong></h3>
 		    {% bibsonomy_form content_type=entity_type hidden=True %}
-		    <button class="bibsonomy-anker" data-bibs-contenttype={{entity_type}} data-bibs-object_pk={{instance.pk}}>References</button>
+		    <a class="bibsonomy-anker" data-bibs-contenttype={{entity_type}} data-bibs-object_pk={{instance.pk}}><i class="fas fa-book-open"></i> References</a>
                 {% else %}
                     <h2><small>create new object type:</small> <strong>{{ entity_type|title }}</strong></h2>
                 {% endif %}
