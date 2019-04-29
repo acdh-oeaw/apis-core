@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
+from django.template.response import TemplateResponse
 from django.conf import settings
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.template import Context
@@ -126,13 +127,20 @@ class GenericEntitiesEditView(View):
         else:
             template = select_template(['apis_entities/{}_create_generic.html'.format(entity),
                                         'apis_entities/entity_create_generic.html'])
+            perm = ObjectPermissionChecker(request.user)
+            permissions = {'change': perm.has_perm('change_{}'.format(entity), instance),
+                           'delete': perm.has_perm('delete_{}'.format(entity), instance),
+                           'create': request.user.has_perm('entities.add_{}'.format(entity))}
             context = {
                 'form': form,
+                'entity_type': entity,
                 'form_text': form_text,
-                'instance': instance}
+                'instance': instance,
+                'permissions': permissions}
             if entity.lower() != 'place':
                 form_merge_with = GenericEntitiesStanbolForm(entity, ent_merge_pk=pk)
                 context['form_merge_with'] = form_merge_with
+                return TemplateResponse(request, template, context=context)
             return HttpResponse(template.render(request=request, context=context))
 
 
