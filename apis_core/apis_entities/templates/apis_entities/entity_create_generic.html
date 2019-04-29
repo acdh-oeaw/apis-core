@@ -1,9 +1,11 @@
 {% extends "webpage/base.html" %}
 {% load static %}
-{% load bibsonomy_templatetags %}
 {% block scriptHeader %}
 {{block.super}}
-{% include 'apis_bibsonomy/apis_bibsonomy_include.html' %}
+{% if bibsonomy_active is True %}
+	{% load bibsonomy_templatetags %}
+	{% include 'apis_bibsonomy/apis_bibsonomy_include.html' %}
+{% endif %}
 {% if highlighter_active %}
       <link rel="stylesheet" href="{% static 'apis_highlighter/apis_highlighter.css' %}" />
 	<script type="text/javascript" src="{% static 'apis_highlighter/apis_highlighter.js' %}"></script>
@@ -17,7 +19,7 @@
 {% load django_tables2 %}
 {% if instance %}
 <div class="container-fluid">
-
+	{{bibsonomy_active}}
 <div class="row">
     <div class="col-md-5">
 {% endif %}
