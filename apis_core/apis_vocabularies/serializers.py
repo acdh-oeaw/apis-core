@@ -52,7 +52,7 @@ class CollectionTypeSerializer(VocabsBaseSerializer):
         model = CollectionType
 
 
-class VocabsBaseClassSerializer(VocabsBaseSerializer): 
+class VocabsBaseClassSerializer(VocabsBaseSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="apis:apis_api:vocabsbaseclass-detail",
         lookup_field="pk"
@@ -116,7 +116,7 @@ class ProfessionTypeSerializer(VocabsBaseSerializer):
         model = ProfessionType
 
 
-class PlaceTypeSerializer(VocabsBaseSerializer): 
+class PlaceTypeSerializer(VocabsBaseSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="apis:apis_api:placetype-detail",
         lookup_field="pk"
@@ -184,6 +184,11 @@ class PersonInstitutionRelationSerializer(VocabsBaseSerializer):
 
 
 class PersonPlaceRelationSerializer(VocabsBaseSerializer):
+
+    url = serializers.HyperlinkedIdentityField(
+        view_name="apis:apis_api:personplacerelation-detail",
+        lookup_field="pk"
+    )
 
     class Meta:
         fields = '__all__'
