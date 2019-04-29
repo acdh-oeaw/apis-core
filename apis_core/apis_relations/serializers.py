@@ -78,6 +78,10 @@ class PersonWorkSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class InstitutionPlaceSerializer(serializers.HyperlinkedModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="apis:apis_api:institutionplace-detail",
+        lookup_field="pk"
+    )
 
     class Meta:
         fields = '__all__'
