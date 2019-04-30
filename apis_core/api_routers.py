@@ -45,10 +45,12 @@ def create_generic_api_viewset(**kwargs):
         permission_classes = (DjangoObjectPermissions,)
         filter_backends = (DjangoFilterBackend, filters.SearchFilter)
         depth = 2
-        test_search = getattr(settings, "APIS_ENTITIES", False)
+        test_search = getattr(settings, app_label.upper(), False)
         if test_search:
-            search_fields = deep_get(test_search, "{}.search".format(entity_str))
-            filter_fields = deep_get(test_search, "{}.list_filters".format(entity_str))
+            search_fields = deep_get(test_search, "search", [])
+            filter_fields = deep_get(test_search, "list_filters", [])
+            search_fields = deep_get(test_search, "{}.search".format(entity_str), search_fields)
+            filter_fields = deep_get(test_search, "{}.list_filters".format(entity_str), filter_fields)
             if filter_fields is not None:
                 filterset_fields = [x[0] for x in filter_fields]
 
