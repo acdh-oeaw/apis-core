@@ -74,6 +74,12 @@ def create_generic_api_viewset(**kwargs):
                 exclude_lst.extend(
                     deep_get(set_prem, "{}.exclude".format(entity_str), [])
                 )
+            elif app_label == "apis_metainfo":
+                set_prem = getattr(settings, "APIS_METAINFO", {})
+                exclude_lst = deep_get(set_prem, "exclude", [])
+                exclude_lst.extend(
+                    deep_get(set_prem, "{}.exclude".format(entity_str), [])
+                )
 
             class CustomSerializer(serializers.HyperlinkedModelSerializer):
                 url = serializers.HyperlinkedIdentityField(
