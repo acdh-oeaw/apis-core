@@ -9,6 +9,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, generics, pagination, routers, serializers, viewsets
 from rest_framework.permissions import AllowAny, DjangoObjectPermissions
 from rest_framework.response import Response
+from rest_framework import renderers
+from .api_renderers import NetJsonRenderer
 
 
 def deep_get(dictionary, keys, default=None):
@@ -62,6 +64,7 @@ def create_generic_api_viewset(**kwargs):
         filter_backends = (DjangoFilterBackend, filters.SearchFilter)
         depth = 2
         test_search = getattr(settings, app_label.upper(), False)
+        renderer_classes = (renderers.JSONRenderer, renderers.BrowsableAPIRenderer, NetJsonRenderer)
         if test_search:
             search_fields = deep_get(test_search, "search", [])
             filter_fields = deep_get(test_search, "list_filters", [])
