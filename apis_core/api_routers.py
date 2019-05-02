@@ -6,8 +6,9 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, generics, routers, serializers, viewsets
+from rest_framework import filters, generics, pagination, routers, serializers, viewsets
 from rest_framework.permissions import AllowAny, DjangoObjectPermissions
+from rest_framework.response import Response
 
 
 def deep_get(dictionary, keys, default=None):
@@ -18,8 +19,22 @@ def deep_get(dictionary, keys, default=None):
     )
 
 
+class CustomPagination(pagination.LimitOffsetPagination):
+    def get_paginated_response(self, data):
+        return Response(
+            {
+                "next": self.get_next_link(),
+                "previous": self.get_previous_link(),
+                "count": self.count,
+                "limit": self.limit,
+                "offset": self.offset,
+                "results": data,
+            }
+        )
+
+
 class LabelSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
+    id = serializers.ReadOnlyField()
     label = serializers.SerializerMethodField(method_name="add_label")
     uri = serializers.SerializerMethodField(method_name="add_uri")
 
@@ -40,6 +55,7 @@ def create_generic_api_viewset(**kwargs):
         entity = ContentType.objects.get(
             app_label=app_label, model=entity_str.lower()
         ).model_class()
+        pagination_class = CustomPagination
         model = entity
         queryset = entity.objects.all()
         permission_classes = (DjangoObjectPermissions,)
@@ -49,8 +65,12 @@ def create_generic_api_viewset(**kwargs):
         if test_search:
             search_fields = deep_get(test_search, "search", [])
             filter_fields = deep_get(test_search, "list_filters", [])
-            search_fields = deep_get(test_search, "{}.search".format(entity_str), search_fields)
-            filter_fields = deep_get(test_search, "{}.list_filters".format(entity_str), filter_fields)
+            search_fields = deep_get(
+                test_search, "{}.search".format(entity_str), search_fields
+            )
+            filter_fields = deep_get(
+                test_search, "{}.list_filters".format(entity_str), filter_fields
+            )
             if filter_fields is not None:
                 filterset_fields = [x[0] for x in filter_fields]
 
@@ -84,6 +104,7 @@ def create_generic_api_viewset(**kwargs):
                 )
 
             class CustomSerializer(serializers.HyperlinkedModelSerializer):
+                id = serializers.ReadOnlyField()
                 url = serializers.HyperlinkedIdentityField(
                     view_name="apis:apis_api:{}-detail".format(entity_str.lower())
                 )
@@ -142,6 +163,3 @@ def create_generic_api_viewset(**kwargs):
             return CustomSerializer
 
     return GenericAPIViewSet
-
-
-router = routers.DefaultRouter()
