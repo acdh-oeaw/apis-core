@@ -14,10 +14,14 @@ class NetJsonRenderer(renderers.JSONRenderer):
             for r in data["results"][0].keys():
                 if r.startswith("related_"):
                     r2 = r.split("_")[1]
-                    rel2 = re.match("^{}.*".format(r2), rel)
+                    rel2 = re.match("^{}[a-z]*".format(r2), rel)
                     if rel2:
                         source = r
-                    rel2 = re.match("^.*?{}$".format(r2), rel)
+                    elif r.endswith('A'):
+                        source = r
+                    elif r.endswith('B'):
+                        target = r
+                    rel2 = re.match("^[a-z]*?{}$".format(r2), rel)
                     if rel2:
                         target = r
             results2 = []
@@ -34,6 +38,5 @@ class NetJsonRenderer(renderers.JSONRenderer):
                 )
                 results2.append(d2)
             data["results"] = results2
-            print(renderer_context)
             res3 = super().render(data, accepted_media_type=media_type, renderer_context=renderer_context)
             return res3
