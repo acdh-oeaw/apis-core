@@ -2,7 +2,7 @@ import re
 import unicodedata
 from datetime import datetime
 from difflib import SequenceMatcher
-
+from dateutil.parser import parse
 import requests
 
 # from reversion import revisions as reversion
@@ -55,7 +55,6 @@ class TempEntityClass(models.Model):
         max_length=255,
         blank=True,
         null=True,
-        validators=[date_validator],
         verbose_name="Start",
         help_text="Please enter a date (DD).(MM).YYYY",
     )
@@ -63,7 +62,6 @@ class TempEntityClass(models.Model):
         max_length=255,
         blank=True,
         null=True,
-        validators=[date_validator],
         verbose_name="End",
         help_text="Please enter a date (DD).(MM).YYYY",
     )
@@ -96,6 +94,12 @@ class TempEntityClass(models.Model):
             """Function to parse string-dates into python date objects.
             """
             date = date.strip()
+            m1 = re.search(r'<([^>]*)>', date)
+            dr_1 = False
+            if m1:
+                dr_1 = m1.group(1)
+                if len(dr_1) == 0:
+                    dr_1 = None
             date = date.replace("-", ".")
             if re.match(r"[0-9]{4}$", date):
                 dr = datetime.strptime(date, "%Y")
@@ -120,6 +124,8 @@ class TempEntityClass(models.Model):
             else:
                 dr = None
                 dr2 = date
+            if dr_1:
+                dr = parse(dr_1)
             return dr, dr2
 
         if parse_dates:
