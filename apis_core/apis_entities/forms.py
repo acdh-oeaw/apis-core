@@ -361,7 +361,7 @@ class NetworkVizFilterForm(forms.Form):
                 (See the include general relations checkbox)")
         self.helper = FormHelper()
         self.helper.form_class = 'FilterNodesForm'
-        self.helper.form_action = reverse('apis:NetJson-list')
+        self.helper.form_action = reverse('apis:apis_core:NetJson-list')
         self.helper.add_input(Submit('Submit', 'Add nodes'))
         self.order_fields(('select_relation', 'ann_include_all',
                            'annotation_proj', 'search_source', 'select_kind', 'search_target'))

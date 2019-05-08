@@ -324,7 +324,7 @@ $.ApisNet.selected_nodes = new Array();
 function download_network_data(formData) {
     $.ajax({
           type: 'POST',
-          url: '{% url "apis:NetJson-list" %}',
+          url: '{% url "apis:apis_core:NetJson-list" %}',
           data: formData,
           beforeSend: function(request) {
                   var csrftoken = getCookie('csrftoken');

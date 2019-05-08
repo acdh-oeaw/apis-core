@@ -39,14 +39,16 @@ class EntitySerializer(serializers.Serializer):
             app_label="apis_relations", model__icontains=mk.lower()
         ):
             mk2 = re.match(r"{}([A-Za-z]+)".format(mk.lower()), rel.model)
+            reverse = False
             if not mk2:
-                mk2 = re.match(r"([A-Za-z]+{})".format(mk.lower()), rel.model)
+                mk2 = re.match(r"([A-Za-z]+){}".format(mk.lower()), rel.model)
+                reverse = True
             res["{}s".format(mk2.group(1))] = []
             if mk2.group(1).lower() != mk.lower():
                 for rel2 in getattr(obj, "{}_set".format(rel.model)).all():
                     res["{}s".format(mk2.group(1))].append(
                         RelationEntitySerializer(
-                            rel2, own_class=mk, read_only=True, context=self.context
+                            rel2, own_class=mk, read_only=True, context=self.context, reverse=reverse
                         ).data
                     )
             else:
@@ -56,11 +58,13 @@ class EntitySerializer(serializers.Serializer):
                     ).all():
                         if t == "A":
                             ok = "{}A".format(mk.lower())
+                            reverse = False
                         else:
                             ok = "{}B".format(mk.lower())
+                            reverse = True
                         res["{}s".format(mk2.group(1))].append(
                             RelationEntitySerializer(
-                                rel2, own_class=ok, read_only=True, context=self.context
+                                rel2, own_class=ok, read_only=True, context=self.context, reverse=reverse
                             ).data
                         )
         return res
@@ -109,8 +113,6 @@ class RelationEntitySerializer(serializers.Serializer):
 
     def add_relation_label(self, obj):
         cm = obj.__class__.__name__
-        cm_match_1 = re.match(r"{}.*".format(self.own_class), cm)
-        cm_match_2 = re.match(r".*{}".format(self.own_class), cm)
         res_1 = dict()
         request_1 = self.context.get("request", None)
         if request_1 is not None:
@@ -125,17 +127,18 @@ class RelationEntitySerializer(serializers.Serializer):
                 "apis_core:apis_api:{}relation-detail".format(cm).lower(),
                 kwargs={"pk": obj.relation_type.pk},
             )
-        if cm_match_1:
-            res_1["label"] = obj.relation_type.label
-        elif cm_match_2:
+        if self.reverse and len(obj.relation_type.label_reverse) > 0:
             res_1["label"] = obj.relation_type.label_reverse
-        else:
+        elif self.reverse:
             res_1["label"] = "({})".format(obj.relation_type.label)
+        else:
+            res_1["label"] = obj.relation_type.label
         return res_1
 
-    def __init__(self, *args, own_class=None, **kwargs):
+    def __init__(self, *args, own_class=None, reverse=False, **kwargs):
         super(RelationEntitySerializer, self).__init__(*args, **kwargs)
         self.own_class = own_class
+        self.reverse = reverse
         if self.instance is not None:
             for f in self.instance._meta.fields:
                 if f.name.startswith("related_"):
@@ -143,10 +146,6 @@ class RelationEntitySerializer(serializers.Serializer):
 
                     if mk2.lower() != own_class.lower():
                         self.entity_type = mk2
-                        if re.match(r".*[A-B]$", mk2):
-                            mk2_ = mk2[:-1]
-                        else:
-                            mk2_ = mk2
                         self.fields[
-                            "{}".format(mk2_)
+                            "target"
                         ] = serializers.SerializerMethodField(method_name="add_entity")
