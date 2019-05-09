@@ -86,7 +86,6 @@ def get_form_ajax(request):
     '''Returns forms rendered in html'''
 
     FormName = request.POST.get('FormName')
-    print(FormName)
     SiteID = request.POST.get('SiteID')
     ButtonText = request.POST.get('ButtonText')
     ObjectID = request.POST.get('ObjectID')
@@ -137,7 +136,6 @@ def get_form_ajax(request):
                 'button_text': ButtonText,
                 'ObjectID': ObjectID,
                 'SiteID': SiteID})}
-    print(data)
 
     return HttpResponse(json.dumps(data), content_type='application/json')
 

@@ -243,7 +243,6 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
             response = HttpResponse(content_type='text/csv')
             if context['conf_items']:
                 conf_items = context['conf_items']
-                print(dir(self))
                 try:
                     df = pd.DataFrame(
                         list(
@@ -471,8 +470,6 @@ def resolve_ambigue_person(request):
     if form.is_valid():
         pers = form.save()
         return redirect(reverse('apis_entities:person_edit', kwargs={'pk': pers.pk}))
-    else:
-        print(form)
 
 
 ############################################################################

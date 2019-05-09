@@ -56,14 +56,18 @@ class TempEntityClass(models.Model):
         blank=True,
         null=True,
         verbose_name="Start",
-        help_text="Please enter a date (DD).(MM).YYYY",
+        help_text="""Please enter a date. You can use any string to describe the date. 
+        The system tries to parse the given string into valid date formats (the string is preserved). 
+        To explicitly set the iso-date use '&lt;YYYY-MM-DD'&gt;. To explicitly delete the iso-date use '&lt;&gt;' """,
     )
     end_date_written = models.CharField(
         max_length=255,
         blank=True,
         null=True,
         verbose_name="End",
-        help_text="Please enter a date (DD).(MM).YYYY",
+        help_text="""Please enter a date. You can use any string to describe the date. 
+        The system tries to parse the given string into valid date formats (the string is preserved). 
+        To explicitly set the iso-date use '&lt;YYYY-MM-DD'&gt;. To explicitly delete the iso-date use '&lt;&gt;' """,
     )
     text = models.ManyToManyField("Text", blank=True)
     collection = models.ManyToManyField("Collection")
@@ -98,45 +102,52 @@ class TempEntityClass(models.Model):
             dr_1 = False
             if m1:
                 dr_1 = m1.group(1)
+                dr2 = date
                 if len(dr_1) == 0:
-                    dr_1 = None
-            date = date.replace("-", ".")
-            if re.match(r"[0-9]{4}$", date):
-                dr = datetime.strptime(date, "%Y")
-                dr2 = date
-            elif re.match(r"[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{4}$", date):
-                dr = datetime.strptime(date, "%d.%m.%Y")
-                dr2 = date
-            elif re.match(r"[0-9]{4}\.\.\.$", date):
-                dr = datetime.strptime(date, "%Y...")
-                dr2 = re.match(r"([0-9]{4})\.\.\.$", date).group(1)
-            elif re.match(r"[0-9]{4}\.[0-9]{1,2}\.\.$", date):
-                dr = datetime.strptime(date, "%Y.%m..")
-                dr2 = re.match(r"([0-9]{4})\.([0-9]{1,2})\.\.$", date).group(2)
-                +"." + re.match(r"([0-9]{4})\.([0-9]{1,2})\.\.$", date).group(1)
-            elif re.match(r"[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}$", date):
-                dr = datetime.strptime(date, "%Y.%m.%d")
-                dr3 = re.match(r"([0-9]{4})\.([0-9]{1,2})\.([0-9]{1,2})$", date)
-                dr2 = dr3.group(3) + "." + dr3.group(2) + "." + dr3.group(1)
-            elif re.match(r"^\s*$", date):
-                dr = None
-                dr2 = None
+                    dr = None
+                    dr_1 = False
+                else:
+                    try:
+                        dr = parse(dr_1)
+                    except ValueError:
+                        dr = None
             else:
-                dr = None
-                dr2 = date
-            if dr_1:
-                dr = parse(dr_1)
+                date = date.replace("-", ".")
+                if re.match(r"[0-9]{4}$", date):
+                    dr = datetime.strptime(date, "%Y")
+                    dr2 = date
+                elif re.match(r"[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{4}$", date):
+                    dr = datetime.strptime(date, "%d.%m.%Y")
+                    dr2 = date
+                elif re.match(r"[0-9]{4}\.\.\.$", date):
+                    dr = datetime.strptime(date, "%Y...")
+                    dr2 = re.match(r"([0-9]{4})\.\.\.$", date).group(1)
+                elif re.match(r"[0-9]{4}\.[0-9]{1,2}\.\.$", date):
+                    dr = datetime.strptime(date, "%Y.%m..")
+                    dr2 = re.match(r"([0-9]{4})\.([0-9]{1,2})\.\.$", date).group(2)
+                    +"." + re.match(r"([0-9]{4})\.([0-9]{1,2})\.\.$", date).group(1)
+                elif re.match(r"[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}$", date):
+                    dr = datetime.strptime(date, "%Y.%m.%d")
+                    dr3 = re.match(r"([0-9]{4})\.([0-9]{1,2})\.([0-9]{1,2})$", date)
+                    dr2 = dr3.group(3) + "." + dr3.group(2) + "." + dr3.group(1)
+                else:
+                    dr = False
+                    dr2 = date
             return dr, dr2
 
         if parse_dates:
             if self.start_date_written:
-                self.start_date, self.start_date_written = match_date(
+                start_date, self.start_date_written = match_date(
                     self.start_date_written
                 )
+                if start_date or start_date is None:
+                    self.start_date = start_date
             else:
                 self.start_date = self.start_date_written = None
             if self.end_date_written:
-                self.end_date, self.end_date_written = match_date(self.end_date_written)
+                end_date, self.end_date_written = match_date(self.end_date_written)
+                if end_date or end_date is None:
+                    self.end_date = end_date
             else:
                 self.end_date = self.end_date_written = None
             if self.name:

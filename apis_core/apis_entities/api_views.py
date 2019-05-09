@@ -89,7 +89,6 @@ def uri_resolver(request):
         uri = Uri.objects.get(uri=uri)
         if f == "gui":
             ent = TempEntityClass.objects_inheritance.get_subclass(pk=uri.entity_id)
-            print(ent)
             c_name = ent.__class__.__name__
             url = reverse(
                 "apis_core:apis_entities:generic_entities_detail_view",
@@ -326,12 +325,10 @@ class NetJsonViewSet(viewsets.ViewSet):
         if "start_date" in request.data.keys():
             if len(request.data["start_date"]) > 0:
                 start_date_d = datetime.strptime(request.data["start_date"], "%d.%m.%Y")
-                print(start_date_d)
                 q_dict["end_date__gte"] = start_date_d
         if "end_date" in request.data.keys():
             if len(request.data["end_date"]) > 0:
                 end_date_d = datetime.strptime(request.data["end_date"], "%d.%m.%Y")
-                print(end_date_d)
                 q_dict["start_date__lte"] = end_date_d
         if annotation_proj:
             annProj_filter = {"ann_proj": annotation_proj}
@@ -364,7 +361,6 @@ class SaveNetworkFiles(APIView):
         data = request.data["file"]
         nmb = False
         for file in os.listdir("downloads/"):
-            print(file)
             if (
                 fnmatch.fnmatch(file, file_name_list[0] + "_*." + file_name_list[1])
                 or file == file_name

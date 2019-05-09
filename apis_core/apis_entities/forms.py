@@ -61,7 +61,6 @@ def get_entities_form(entity):
                      'data-minimum-input-length': 1,
                      'data-html': True}
             for f in self.fields.keys():
-                print(type(self.fields[f]))
                 if isinstance(self.fields[f], (ModelMultipleChoiceField, ModelChoiceField)):
                     v_name_p = str(self.fields[f].queryset.model.__name__)
                     if isinstance(self.fields[f], ModelMultipleChoiceField):
@@ -101,7 +100,6 @@ def get_entities_form(entity):
                                         self.fields[f].initial = (res.pk, res.label)
                                         self.fields[f].choices = [(res.pk, res.label),]
                                 except ValueError:
-                                    print()
                                     res = ''
                 if f not in acc_grp2:
                     acc_grp1.append(f)
@@ -188,7 +186,6 @@ class FullTextForm(forms.Form):
         text = None
         for f in cd.keys():
             text_type = TextType.objects.get(pk=f.split('_')[1])
-            print(text_type)
             text = Text.objects.filter(tempentityclass=entity, kind=text_type)
             if text.count() == 1:
                 text = text[0]
