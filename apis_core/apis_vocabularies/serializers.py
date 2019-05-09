@@ -107,7 +107,7 @@ class InstitutionTypeSerializer(VocabsBaseSerializer):
 
 class ProfessionTypeSerializer(VocabsBaseSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name="apis:apis_api:professiontype-detail",
+        view_name="apis:apis_api:profession-detail",
         lookup_field="pk"
     )
 

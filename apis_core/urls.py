@@ -1,6 +1,7 @@
 from django.conf.urls import url, include
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.contenttypes.models import ContentType
 from rest_framework import routers
 from apis_core.apis_entities.api_views import (
     InstitutionViewSet, PersonViewSet, PlaceViewSet, EventViewSet, WorkViewSet, PlaceGeoJsonViewSet,
@@ -26,62 +27,28 @@ from apis_core.apis_vocabularies.api_views import (
     InstitutionEventRelationViewSet, InstitutionWorkRelationViewSet, PlaceEventRelationViewSet,
     PlaceWorkRelationViewSet, EventWorkRelationViewSet, EventEventRelationViewSet, WorkWorkRelationViewSet,
     PlacePlaceRelationViewSet)
+from .api_routers import create_generic_api_viewset
+
 
 app_name = 'apis_core'
 
 router = routers.DefaultRouter()
-router.register(r'tempentity', TempEntityClassViewSet)
-router.register(r'institution', InstitutionViewSet)
-router.register(r'person', PersonViewSet)
-router.register(r'place', PlaceViewSet)
-router.register(r'event', EventViewSet)
-router.register(r'work', WorkViewSet)
-router.register(r'collection', CollectionViewSet)
-router.register(r'text', TextViewSet, 'text')
-router.register(r'source', SourceSerializerViewSet)
-router.register(r'uri', UriSerializerViewSet)
-router.register(r'institutioninstitution', InstitutionInstitutionViewSet)
-router.register(r'institutioninstitutionrelation', InstitutionInstitutionRelationViewSet)
-router.register(r'institutionplace', InstitutionPlaceViewSet)
-router.register(r'institutionplacerelation', InstitutionPlaceRelationViewSet)
-router.register(r'institutionevent', InstitutionEventViewSet)
-router.register(r'institutioneventrelation', InstitutionEventRelationViewSet)
-router.register(r'institutionwork', InstitutionWorkViewSet)
-router.register(r'institutionworkrelation', InstitutionWorkRelationViewSet)
-router.register(r'personinstitution', PersonInstitutionViewSet)
-router.register(r'personinstitutionrelation', PersonInstitutionRelationViewSet)
-router.register(r'personplace', PersonPlaceViewSet)
-router.register(r'personplacerelation', PersonPlaceRelationViewSet)
-router.register(r'personevent', PersonEventViewSet)
-router.register(r'personeventrelation', PersonEventRelationViewSet)
-router.register(r'personwork', PersonWorkViewSet)
-router.register(r'personworkrelation', PersonWorkRelationViewSet)
-router.register(r'personperson', PersonPersonViewSet)
-router.register(r'personpersonrelation', PersonPersonRelationViewSet)
-router.register(r'placework', PlaceWorkViewSet)
-router.register(r'placeworkrelation', PlaceWorkRelationViewSet)
-router.register(r'placeevent', PlaceEventViewSet)
-router.register(r'placeeventrelation', PlaceEventRelationViewSet)
-router.register(r'placeplace', PlacePlaceViewSet)
-router.register(r'placeplacerelation', PlacePlaceRelationViewSet)
-router.register(r'eventwork', EventWorkViewSet)
-router.register(r'eventworkrelation', EventWorkRelationViewSet)
-router.register(r'eventevent', EventEventViewSet)
-router.register(r'eventeventrelation', EventEventRelationViewSet)
-router.register(r'workwork', WorkWorkViewSet)
-router.register(r'workworkrelation', WorkWorkRelationViewSet)
-router.register(r'texttype', TextTypeViewSet)
-router.register(r'collectiontype', CollectionTypeViewSet)
-router.register(r'vocabsbaseclass', VocabsBaseClassViewSet)
-router.register(r'institutiontype', InstitutionTypeViewSet)
-router.register(r'professiontype', ProfessionTypeViewSet)
-router.register(r'placetype', PlaceTypeViewSet)
-router.register(r'eventtype', EventTypeViewSet)
-router.register(r'worktype', WorkTypeViewSet)
-router.register(r'users', UserViewSet)
-router.register(r'GeoJsonPlace', PlaceGeoJsonViewSet, 'PlaceGeoJson')
-router.register(r'NetJson', NetJsonViewSet, 'NetJson')
-router.register(r'VocabNames', VocabNamesViewSet)
+for ent in ContentType.objects.filter(app_label="apis_entities"):
+    name = ''.join([x.title() for x in ent.name.split(' ')])
+    router.register(r'entities/{}'.format(name.lower()), create_generic_api_viewset(entity=name, app_label="apis_entities"))
+
+
+for ent in ContentType.objects.filter(app_label="apis_metainfo"):
+    name = ''.join([x.title() for x in ent.name.split(' ')])
+    router.register(r'metainfo/{}'.format(name.lower()), create_generic_api_viewset(entity=name, app_label="apis_metainfo"))
+
+for ent in ContentType.objects.filter(app_label="apis_vocabularies"):
+    name = ''.join([x.title() for x in ent.name.split(' ')])
+    router.register(r'vocabularies/{}'.format(name.lower()), create_generic_api_viewset(entity=name, app_label="apis_vocabularies"))
+
+for ent in ContentType.objects.filter(app_label="apis_relations"):
+    name = ''.join([x.title() for x in ent.name.split(' ')])
+    router.register(r'relations/{}'.format(name.lower()), create_generic_api_viewset(entity=name, app_label="apis_relations"))
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.api_views import (

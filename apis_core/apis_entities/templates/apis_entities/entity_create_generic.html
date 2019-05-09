@@ -2,6 +2,10 @@
 {% load static %}
 {% block scriptHeader %}
 {{block.super}}
+{% if bibsonomy_active is True %}
+	{% load bibsonomy_templatetags %}
+	{% include 'apis_bibsonomy/apis_bibsonomy_include.html' %}
+{% endif %}
 {% if highlighter_active %}
       <link rel="stylesheet" href="{% static 'apis_highlighter/apis_highlighter.css' %}" />
 	<script type="text/javascript" src="{% static 'apis_highlighter/apis_highlighter.js' %}"></script>
@@ -15,7 +19,7 @@
 {% load django_tables2 %}
 {% if instance %}
 <div class="container-fluid">
-
+	{{bibsonomy_active}}
 <div class="row">
     <div class="col-md-5">
 {% endif %}
@@ -24,6 +28,8 @@
             <div class="card-header">
             	{% if instance %}
                     <h3><strong>{{ instance }}</strong></h3>
+		    {% bibsonomy_form content_type=entity_type hidden=True %}
+		    <a class="bibsonomy-anker" data-bibs-contenttype={{entity_type}} data-bibs-object_pk={{instance.pk}}><i class="fas fa-book-open"></i> References</a>
                 {% else %}
                     <h2><small>create new object type:</small> <strong>{{ entity_type|title }}</strong></h2>
                 {% endif %}

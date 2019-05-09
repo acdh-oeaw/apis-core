@@ -75,9 +75,10 @@ registered_forms = {'WorkWorkForm': [WorkWork, Work, Work],
                     'PersonLabelForm': [Label, Person, Label],
                     'EventLabelForm': [Label, Event, Label],
                     'PersonResolveUriForm': [Uri, Person, Uri],
+                    'SundayHighlighterForm': [ ],
                     'AddRelationHighlighterPersonForm': [],
-                    # 'PlaceHighlighterForm': [Annotation, ],
-                    # 'PersonHighlighterForm': [Annotation, ]
+                    #'PlaceHighlighterForm': [Annotation, ],
+                    #'PersonHighlighterForm': [Annotation, ]
                     }
 
 
@@ -155,7 +156,7 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
     entity_type_str = entity_type
     entity_type = ContentType.objects.get(
         app_label__startswith="apis_", model=entity_type.lower()).model_class()
-    form_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+)(Highlighter)?Form', kind_form)
+    form_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+)?(Highlighter)?Form', kind_form)
     form_dict = {'data': request.POST,
                  'entity_type': entity_type,
                  'request': request}
@@ -209,7 +210,7 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
                 prefix='PURI-'
             )
 
-        elif tab == 'AddRelationHighlighterPerson' or tab == 'PlaceHighlighter' or tab == 'PersonHighlighter':
+        elif tab == 'AddRelationHighlighterPerson' or tab == 'PlaceHighlighter' or tab == 'PersonHighlighter' or tab == 'SundayHighlighter':
             table_html = None
             right_card = False
             call_function = 'PAddRelation_response'
