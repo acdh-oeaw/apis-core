@@ -1,2 +1,2 @@
 {% load apis_helpers %}
-<a class="bibsonomy-anker" data-bibs-contenttype="{{ record|content_type|lower }}" data-bibs-object_pk="{% if record.relation_pk %}{{ record.relation_pk }}{% else %}{{ record.pk }}{% endif %}"><i class="fas fa-book-open"></i></a>
+<a class="bibsonomy-anker" data-bibs-contenttype="{{ record|content_type|lower }}" data-bibs-object_pk="{% if record.relation_pk %}{{ record.relation_pk }}{% else %}{{ record.pk }}{% endif %}"><i data-feather="book-open"></i></a>

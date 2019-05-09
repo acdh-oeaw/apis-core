@@ -21,7 +21,7 @@
                     {% if object.get_prev_url %}
                         <h2>
                             <a href="{{ object.get_prev_url }}" style="float:right">
-                                <i class="fas fa-chevron-left" title="previous"></i>
+                                <i data-feather="chevron-left" title="previous"></i>
                             </a>
                         </h2>
                     {% endif %}
@@ -38,19 +38,15 @@
                         {{ object }}
                         {% if user.is_authenticated %}
                             {% if object.get_edit_url %}
-                                <small>
                                     <a href="{{ object.get_edit_url }}">
-                                        <i class="far fa-edit" title="edit"></i>
+                                        <i class="feather-32" data-feather="edit" title="edit"></i>
                                     </a>
-                                </small>
                             {% endif %}
                             {% if object.get_delete_url %}
                                 |
-                                <small>
                                     <a href="{{ object.get_delete_url }}">
-                                        <i class="far fa-trash-alt" title="delete"></i>
+                                        <i class="feather-32" data-feather="trash" title="delete"></i>
                                     </a>
-                                </small>
                             {% endif %}
                         {% endif %}
                     </h2>
@@ -59,7 +55,7 @@
                 {% if object.get_next_url %}
                     <h2>
                         <a href="{{ object.get_next_url}}" style="float:left">
-                            <i class="fas fa-chevron-right" title="next"></i>
+                            <i data-feather="chevron-right" title="next"></i>
                         </a>
                     </h2>
                 {% endif %}
