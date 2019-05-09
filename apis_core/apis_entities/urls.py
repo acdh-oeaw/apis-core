@@ -48,7 +48,7 @@ urlpatterns = [
     url(r'^networks/relation_institution/$', views.pers_inst_netw, name='pers_inst_netw'),
     url(r'^networks/generic/$', views.generic_network_viz, name='generic_network_viz'),
     url(
-        r'^compare/(?P<app>[a-z]+)/(?P<kind>[a-z]+)/(?P<pk>\d+)$', ReversionCompareView.as_view()
+        r'^compare/(?P<app>[a-z_]+)/(?P<kind>[a-z]+)/(?P<pk>\d+)$', ReversionCompareView.as_view()
     ),
     url(r'^merge-objects/$', merge_views.merge_objects, name='merge_objects'),
 ]

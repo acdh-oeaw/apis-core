@@ -76,7 +76,7 @@
                        <input class="btn btn-primary" type="submit" value="modify" />
                     {% endif %}
                     {% if instance %}
-                    <button class="compare_tooltip btn btn-default" data-tooltip='{"app":"entities","kind":"{{entity_type|lower}}","pk":"{{ instance.pk }}"}'>Revisions</button>
+                    <button class="compare_tooltip btn btn-default" data-tooltip='{"app":"apis_entities","kind":"{{entity_type|lower}}","pk":"{{ instance.pk }}"}'>Revisions</button>
                     {% endif %}
                     {% if "delete" in permissions %}
                        <a class ="btn btn-danger btn-primary" href="delete">Delete</a>

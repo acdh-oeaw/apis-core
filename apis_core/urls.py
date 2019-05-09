@@ -62,6 +62,10 @@ if 'apis_highlighter' in settings.INSTALLED_APPS:
     router.register(r'HLVocabularyAPI', HighlighterVocabularyAPIViewSet)
     router.register(r'HLAnnotation', HighlighterAnnotationViewSet)
 
+router.register(r'users', UserViewSet)
+router.register(r'GeoJsonPlace', PlaceGeoJsonViewSet, 'PlaceGeoJson')
+router.register(r'NetJson', NetJsonViewSet, 'NetJson')
+
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'labels/', include('apis_core.apis_labels.urls', namespace='apis_labels')),
