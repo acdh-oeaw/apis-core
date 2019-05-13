@@ -279,7 +279,7 @@ def add_usergroup_collection(sender, instance, **kwargs):
     if kwargs["action"] == "pre_add":
         for x in kwargs["model"].objects.filter(pk__in=kwargs["pk_set"]):
             for z in ["change", "delete"]:
-                for y in [Person, Institution, Place, Event, Passage]:
+                for y in [Person, Institution, Place, Event, Passage, Publication]:
                     assign_perm(
                         z + "_" + y.__name__.lower(),
                         x,
