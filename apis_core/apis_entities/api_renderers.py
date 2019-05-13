@@ -34,13 +34,13 @@ class EntityToCIDOC(renderers.BaseRenderer):
         place_of_birth = URIRef('http://127.0.0.1:8000/apis/api2/entity/{}'.format(data['relations']['places'][0]['id']))
         g.add( (b_birth, cidoc.P7, place_of_birth) )
         g.add( (place_of_birth, RDF.type, cidoc.E53) )
-        g.add( (place_of_birth, RDFS.label, Literal(data['relations']['places'][0]['place']['name'], lang='de'))) 
+        g.add( (place_of_birth, RDFS.label, Literal(data['relations']['places'][0]['target']['name'], lang='de'))) 
         
         b_place_of_birth_app2 = BNode()
         g.add( (place_of_birth, cidoc.P87, b_place_of_birth_app2) )
         g.add(( b_place_of_birth_app2, RDF.type, cidoc.E47 ))
-        g.add( (b_place_of_birth_app2, geo.lat, Literal(data['relations']['places'][0]['place']['lat'])) )
-        g.add( (b_place_of_birth_app2, geo.long, Literal(data['relations']['places'][0]['place']['lng'])) )
+        g.add( (b_place_of_birth_app2, geo.lat, Literal(data['relations']['places'][0]['target']['lat'])) )
+        g.add( (b_place_of_birth_app2, geo.long, Literal(data['relations']['places'][0]['target']['lng'])) )
 
         b_date_of_birth = BNode()
         g.add( (b_date_of_birth, RDF.type, cidoc.E50) )

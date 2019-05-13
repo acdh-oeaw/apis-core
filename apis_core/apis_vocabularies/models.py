@@ -179,31 +179,6 @@ class CollectionType(VocabsBaseClass):
     """e.g. reseachCollection, importCollection """
     pass
 
-
-@reversion.register(follow=['vocabsbaseclass_ptr'])
-class WorkLanguage(VocabsBaseClass):
-    """vocab to set the language of a work"""
-    pass
-
-
-@reversion.register(follow=['vocabsbaseclass_ptr'])
-class WorkDenomination(VocabsBaseClass):
-    """vocab to set the Denomiation of a work"""
-    pass
-
-
-@reversion.register(follow=['vocabsbaseclass_ptr'])
-class WorkTopics(VocabsBaseClass):
-    """vocab to set the tag of a work"""
-    pass
-
-
-@reversion.register(follow=['vocabsbaseclass_ptr'])
-class SundayRepresentations(VocabsBaseClass):
-    """vocab used to annotate the various representations of sunday in the texts"""
-    pass
-
-
 @reversion.register(follow=['vocabsbaseclass_ptr'])
 class TextType(VocabsBaseClass):
     """used to store the Text types for the forms"""
