@@ -149,14 +149,11 @@ class Event(TempEntityClass):
             return False
 
 
-# TODO __sresch__ : adapt Passage, modify attributes & relations, insert new ones
-#  new attributes: Migne
-#  change order of text fields: Auswertung > Zitat > DE > EN > Notes
-
 @reversion.register(follow=["tempentityclass_ptr"])
 class Passage(TempEntityClass):
-
     topics = models.ManyToManyField(PassageTopics, blank=True, null=True)
+    migne_number = models.CharField(max_length=1024, blank=True, null=True)
+    kind = models.ForeignKey(PassageType, blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         if self.name != "":
@@ -175,19 +172,13 @@ class Passage(TempEntityClass):
             return False
 
 
-
-# TODO __sresch__ : implement new entity 'Publication'
-#  new attributes: clavis nummer, migne nummer,
-#  new text field: Informationen zum Werk allgemein
 @reversion.register(follow=["tempentityclass_ptr"])
 class Publication(TempEntityClass):
-
     kind = models.ForeignKey(PassageType, blank=True, null=True, on_delete=models.SET_NULL)
     language = models.ForeignKey(PassageLanguage, blank=True, null=True, on_delete=models.SET_NULL)
-    migne_number = models.CharField(max_length=1024, blank=True, null=True)
     clavis_number = models.CharField(max_length=1024, blank=True, null=True)
+    migne_number = models.CharField(max_length=1024, blank=True, null=True)
     publication_description = models.TextField(blank=True, null=True)
-
 
     def __str__(self):
         if self.name != "":
