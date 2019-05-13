@@ -2,8 +2,6 @@
 {% load static %}
 {% block scriptHeader %}
 {{block.super}}
-	{% load bibsonomy_templatetags %}
-	{% include 'apis_bibsonomy/apis_bibsonomy_include.html' %}
 {% if highlighter_active %}
       <link rel="stylesheet" href="{% static 'apis_highlighter/apis_highlighter.css' %}" />
 	<script type="text/javascript" src="{% static 'apis_highlighter/apis_highlighter.js' %}"></script>
@@ -25,9 +23,11 @@
             <div class="card-header">
             	{% if instance %}
                     <h3><strong>{{ instance }}</strong></h3>
+		    {% if bibsonomy_active %}
 		    {% bibsonomy_form content_type=entity_type hidden=True %}
 		    <a class="bibsonomy-anker" data-bibs-contenttype={{entity_type}} data-bibs-object_pk={{instance.pk}}><i data-feather="book-open"></i> References</a>
-                {% else %}
+               	    {% endif %} 
+		{% else %}
                     <h2><small>create new object type:</small> <strong>{{ entity_type|title }}</strong></h2>
                 {% endif %}
             </div>

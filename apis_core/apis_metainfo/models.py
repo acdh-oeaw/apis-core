@@ -157,6 +157,11 @@ class TempEntityClass(models.Model):
             if self.name:
                 self.name = unicodedata.normalize("NFC", self.name)
             super(TempEntityClass, self).save(*args, **kwargs)
+        if self.start_date:
+            self.start_date = self.start_date.date()
+            print(self.start_date)
+        if self.end_date:
+            self.end_date = self.end_date.date()
         return self
 
     @classmethod
