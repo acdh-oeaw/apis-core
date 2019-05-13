@@ -1,7 +1,9 @@
 {% extends "webpage/base.html" %}
 {% load static %}
+{% load bibsonomy_templatetags %}
 {% block scriptHeader %}
 {{block.super}}
+{% include 'apis_bibsonomy/apis_bibsonomy_include.html' %}
 {% if highlighter_active %}
       <link rel="stylesheet" href="{% static 'apis_highlighter/apis_highlighter.css' %}" />
 	<script type="text/javascript" src="{% static 'apis_highlighter/apis_highlighter.js' %}"></script>
