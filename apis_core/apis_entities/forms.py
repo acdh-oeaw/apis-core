@@ -51,15 +51,11 @@ def get_entities_form(entity):
             self.helper.form_tag = False
             self.helper.help_text_inline = True
             acc_grp1 = Fieldset('Metadata {}'.format(entity.title()))
-
-
             acc_grp2 = AccordionGroup(
                 'MetaInfo',
                 'references',
                 'notes',
                 'review')
-
-
             attrs = {'data-placeholder': 'Type to get suggestions',
                      'data-minimum-input-length': 3,
                      'data-html': True}
@@ -91,11 +87,8 @@ def get_entities_form(entity):
                                 pass
                             self.fields[f].choices = res
                             self.fields[f].initial = res
-
-
                 if f not in acc_grp2:
                     acc_grp1.append(f)
-
 
             if entity == 'Person':
                 acc_grp1 = Fieldset('Metadata {}'.format(entity.title()))
@@ -114,8 +107,6 @@ def get_entities_form(entity):
                     acc_grp1.append(x)
 
             self.helper.layout = Layout(
-
-
                 Accordion(
                     acc_grp1,
                     acc_grp2
@@ -183,13 +174,13 @@ class FullTextForm(forms.Form):
         for f in cd.keys():
             text_type = TextType.objects.get(pk=f.split('_')[1])
             print(text_type)
-            text = Passage.objects.filter(tempentityclass=entity, kind=text_type)
+            text = Text.objects.filter(tempentityclass=entity, kind=text_type)
             if text.count() == 1:
                 text = text[0]
                 text.text = cd[f]
                 text.save()
             elif text.count() == 0:
-                text = Passage(text=cd[f], kind=text_type)
+                text = Text(text=cd[f], kind=text_type)
                 text.save()
                 entity.text.add(text)
         return text
