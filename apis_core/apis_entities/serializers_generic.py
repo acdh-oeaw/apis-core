@@ -2,10 +2,12 @@ import re
 
 from apis_core.apis_labels.serializers import LabelSerializer
 from apis_core.apis_vocabularies.models import ProfessionType
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.query import QuerySet
 from django.urls import reverse
 from rest_framework import serializers
+from reversion.models import Version
 
 
 class CollectionSerializer(serializers.Serializer):
@@ -26,11 +28,28 @@ class EntityUriSerializer(serializers.Serializer):
 
 class EntitySerializer(serializers.Serializer):
     id = serializers.IntegerField()
+    url = serializers.SerializerMethodField(method_name="add_url")
     name = serializers.CharField()
     start_date = serializers.DateField()
     end_date = serializers.DateField()
     uris = EntityUriSerializer(source="uri_set", many=True)
     labels = LabelSerializer(source="label_set", many=True)
+    revisions = serializers.SerializerMethodField(method_name="add_revisions")
+
+    def add_revisions(self, obj):
+        ver = Version.objects.get_for_object(obj)
+        res = []
+        for v in ver:
+            usr_1 = getattr(v.revision, 'user', None)
+            if usr_1 is not None:
+                usr_1 = usr_1.username
+            else:
+                usr_1 = "Not specified"
+            res.append({
+                "id": v.id,
+                "date_created": v.revision.date_created,
+                "user_created": usr_1}) 
+        return res
 
     def add_relations(self, obj):
         res = {}
@@ -72,6 +91,15 @@ class EntitySerializer(serializers.Serializer):
     def add_entity_type(self, obj):
         return str(obj.__class__.__name__)
 
+    def add_url(self, obj):
+        if "request" in self.context.keys():
+            url = self.context["request"].build_absolute_uri(
+                reverse("apis_core:apis_api2:GetEntityGeneric", kwargs={"pk": obj.pk})
+            )
+        else:
+            url = "undefined"
+        return url
+
     def __init__(self, *args, depth_ent=1, **kwargs):
         super(EntitySerializer, self).__init__(*args, **kwargs)
         if type(self.instance) == QuerySet:
@@ -105,6 +133,50 @@ class EntitySerializer(serializers.Serializer):
 class RelationEntitySerializer(serializers.Serializer):
     id = serializers.IntegerField()
     relation_type = serializers.SerializerMethodField(method_name="add_relation_label")
+    annotation = serializers.SerializerMethodField(method_name="add_annotations")
+    revisions = serializers.SerializerMethodField(method_name="add_revisions")
+
+    def add_revisions(self, obj):
+        ver = Version.objects.get_for_object(obj)
+        res = []
+        for v in ver:
+            usr_1 = getattr(v.revision, 'user', None)
+            if usr_1 is not None:
+                usr_1 = usr_1.username
+            else:
+                usr_1 = "Not specified"
+            res.append({
+                "id": v.id,
+                "date_created": v.revision.date_created,
+                "user_created": usr_1})
+        return res
+
+    def add_annotations(self, obj):
+        if "apis_highlighter" in settings.INSTALLED_APPS:
+            res = []
+            offs = 50
+            for an in obj.annotation_set.all():
+                r1 = dict()
+                r1["id"] = an.pk
+                r1["user"] = an.user_added.username
+                text = an.text.text
+                if offs < an.start:
+                    s = an.start - offs
+                else:
+                    s = 0
+                if offs + an.end < len(text):
+                    e = an.end + offs
+                else:
+                    e = len(text)
+                r1["annotation"] = text[an.start : an.end]
+                r1["text"] = text[s:e]
+                r1["text"] = "{}<annotation>{}</annotation>{}".format(r1["text"][:an.start-s], r1["text"][an.start-s:an.end-s], r1["text"][an.end-s:])
+                r1["string_offset"] = "{}-{}".format(an.start, an.end)
+                r1["text_url"] = self.context["request"].build_absolute_uri(
+                    reverse("apis_core:text-detail", kwargs={"pk": an.text_id})
+                )
+                res.append(r1)
+            return res
 
     def add_entity(self, obj):
         return EntitySerializer(

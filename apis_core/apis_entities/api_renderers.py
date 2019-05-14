@@ -1,12 +1,19 @@
-from rest_framework import renderers
+import json
+
 from apis_core.apis_tei.tei import TeiEntCreator
-from rdflib import Namespace, Graph, URIRef, RDF, BNode, Literal, RDFS, XSD
+from django.conf import settings
+from django.core.serializers.json import DjangoJSONEncoder
+from django.utils import timezone
+from rdflib import RDF, RDFS, XSD, BNode, Graph, Literal, Namespace, URIRef
+from rest_framework import renderers
+
+from webpage.metadata import PROJECT_METADATA
 
 
 class EntityToTEI(renderers.BaseRenderer):
 
     media_type = "text/xml"
-    format = 'tei'
+    format = "tei"
 
     def render(self, data, media_type=None, renderer_context=None):
         tei_doc = TeiEntCreator(data)
@@ -16,34 +23,219 @@ class EntityToTEI(renderers.BaseRenderer):
 class EntityToCIDOC(renderers.BaseRenderer):
 
     media_type = "text/rdf+xml"
-    format = 'rdf+xml'
-    
+    format = "rdf+xml"
+
     def render(self, data, media_type=None, renderer_context=None):
-        cidoc = Namespace('http://www.cidoc-crm.org/cidoc-crm/')
-        geo = Namespace('http://www.w3.org/2003/01/geo/wgs84_pos#')
+        cidoc = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
+        geo = Namespace("http://www.w3.org/2003/01/geo/wgs84_pos#")
         g = Graph()
-        k_uri = URIRef('http://127.0.0.1:8000/apis/api2/entity/{}'.format(data['id']))
-        g.add( (k_uri, RDF.type, cidoc.P21) )
+        k_uri = URIRef(data["url"])
+        g.add((k_uri, RDF.type, cidoc.P21))
         b_app = BNode()
-        g.add( (k_uri, cidoc.P131, b_app) )
-        g.add( (b_app, RDF.type, cidoc.E82) )
-        g.add( (b_app, RDFS.label, Literal('{} {}'.format(data['first_name'], data['name']),  lang='de')) )
+        g.add((k_uri, cidoc.P131, b_app))
+        g.add((b_app, RDF.type, cidoc.E82))
+        g.add(
+            (
+                b_app,
+                RDFS.label,
+                Literal("{} {}".format(data["first_name"], data["name"]), lang="de"),
+            )
+        )
         b_birth = BNode()
-        g.add( (b_birth, RDF.type, cidoc.E67) )
-        g.add( (b_birth, cidoc.P98, k_uri) )
-        place_of_birth = URIRef('http://127.0.0.1:8000/apis/api2/entity/{}'.format(data['relations']['places'][0]['id']))
-        g.add( (b_birth, cidoc.P7, place_of_birth) )
-        g.add( (place_of_birth, RDF.type, cidoc.E53) )
-        g.add( (place_of_birth, RDFS.label, Literal(data['relations']['places'][0]['target']['name'], lang='de'))) 
-        
+        g.add((b_birth, RDF.type, cidoc.E67))
+        g.add((b_birth, cidoc.P98, k_uri))
+        place_of_birth = URIRef(data["relations"]["places"][0]["url"])
+        g.add((b_birth, cidoc.P7, place_of_birth))
+        g.add((place_of_birth, RDF.type, cidoc.E53))
+        g.add(
+            (
+                place_of_birth,
+                RDFS.label,
+                Literal(data["relations"]["places"][0]["place"]["name"], lang="de"),
+            )
+        )
+
         b_place_of_birth_app2 = BNode()
-        g.add( (place_of_birth, cidoc.P87, b_place_of_birth_app2) )
-        g.add(( b_place_of_birth_app2, RDF.type, cidoc.E47 ))
-        g.add( (b_place_of_birth_app2, geo.lat, Literal(data['relations']['places'][0]['target']['lat'])) )
-        g.add( (b_place_of_birth_app2, geo.long, Literal(data['relations']['places'][0]['target']['lng'])) )
+        g.add((place_of_birth, cidoc.P87, b_place_of_birth_app2))
+        g.add((b_place_of_birth_app2, RDF.type, cidoc.E47))
+        g.add(
+            (
+                b_place_of_birth_app2,
+                geo.lat,
+                Literal(data["relations"]["places"][0]["place"]["lat"]),
+            )
+        )
+        g.add(
+            (
+                b_place_of_birth_app2,
+                geo.long,
+                Literal(data["relations"]["places"][0]["place"]["lng"]),
+            )
+        )
 
         b_date_of_birth = BNode()
-        g.add( (b_date_of_birth, RDF.type, cidoc.E50) )
-        g.add( (b_date_of_birth, cidoc.P114, Literal(data['start_date'], datatype=XSD.date)) )
+        g.add((b_date_of_birth, RDF.type, cidoc.E50))
+        g.add(
+            (
+                b_date_of_birth,
+                cidoc.P114,
+                Literal(data["start_date"], datatype=XSD.date),
+            )
+        )
 
-        return g.serialize(format='xml')
+        return g.serialize(format="xml")
+
+
+class EntityToProsopogrAPhI(renderers.BaseRenderer):
+
+    media_type = "text/json+prosop"
+    format = "json+prosop"
+
+    def render(self, data, media_type=None, renderer_context=None):
+        factoids = []
+        fact_settings = getattr(settings, "PROSOPOGRAPHI_API", None)
+        stmt_temp = "Stmt{}_{}"
+        f = {"id": "apis_{}_{}".format(data["entity_type"].lower(), data["id"])}
+        f[data["entity_type"].lower()] = {"id": str(data["id"])}
+        f["source"] = {
+            "id": PROJECT_METADATA["title"],
+            "metadata": "{} export".format(PROJECT_METADATA["title"]),
+        }
+        f["createdBy"] = "{} export".format(PROJECT_METADATA["title"])
+        f["createdWhen"] = timezone.now()
+        stmt_count = 1
+        stmts = []
+        f[data["entity_type"].lower()]["uris"] = []
+        for u in data["uris"]:
+            f[data["entity_type"].lower()]["uris"].append(u["uri"])
+        if data["entity_type"].lower() == "person":
+            s = {
+                "id": stmt_temp.format(data["id"], stmt_count),
+                "name": "{}, {}".format(data["name"], data["first_name"]),
+            }
+            stmts.append(s)
+            stmt_count += 1
+        if "end_date" in data.keys():
+            if data["end_date"] is not None and data["end_date"] != "":
+                s = {
+                    "id": stmt_temp.format(data["id"], stmt_count),
+                    "date": {
+                        "sortdate": data["end_date"],
+                        "label": data["end_date_written"],
+                    },
+                    "role": {"label": "stirbt"},
+                }
+                stmts.append(s)
+                stmt_count += 1
+        if "start_date" in data.keys():
+            if data["start_date"] is not None and data["start_date"] != "":
+                s = {
+                    "id": stmt_temp.format(data["id"], stmt_count),
+                    "date": {
+                        "sortdate": data["start_date"],
+                        "label": data["start_date_written"],
+                    },
+                    "role": {"label": "geboren"},
+                }
+                stmts.append(s)
+                stmt_count += 1
+        if "gender" in data.keys():
+            if data["gender"] is not None and data["gender"] != "":
+                s = {
+                    "id": stmt_temp.format(data["id"], stmt_count),
+                    "statmentContent": [{"label": data["gender"]}],
+                    "role": {"uri": "bio-crm:gender", "label": "gender"},
+                }
+                stmts.append(s)
+                stmt_count += 1
+        if "profession" in data.keys():
+            if len(data["profession"]) > 0:
+                s = {
+                    "id": stmt_temp.format(data["id"], stmt_count),
+                    "role": {"label": "profession"},
+                    "statementContent": [],
+                }
+                for p in data["profession"]:
+                    s2 = {
+                        "uri": "apis_profession_type:{}".format(p["id"]),
+                        "label": p["label"],
+                    }
+                    s["statementContent"].append(s2)
+                stmts.append(s)
+                stmt_count += 1
+        f["statements"] = stmts
+        factoids.append(f)
+        facts = []
+        facts_ind = {}
+        if "relations" in data.keys():
+            for ent in data["relations"].keys():
+                for rel_1 in data["relations"][ent]:
+                    s = {
+                        "id": "Stmt{}_rel_{}".format(data["id"], rel_1["id"]),
+                        "role": {
+                            "label": rel_1["relation_type"]["label"],
+                            "url": rel_1["relation_type"]["url"],
+                        },
+                    }
+                    if "start_date" in rel_1.keys():
+                        if rel_1["start_date"] != "":
+                            s["date"] = {
+                                "sortdate": rel_1["start_date"],
+                                "label": rel_1["start_date_written"],
+                            }
+                            if rel_1["end_date_written"] != "":
+                                s["date"]["label"] += "-{}".format(
+                                    rel_1["end_date_written"]
+                                )
+                    ext_stc = False
+                    t1 = {
+                        "uri": rel_1[ent[:-1]]["url"],
+                        "label": rel_1[ent[:-1]]["name"],
+                    }
+                    if fact_settings is not None:
+                        if ent in fact_settings.keys():
+                            if (
+                                rel_1["relation_type"]["label"]
+                                in fact_settings[ent].keys()
+                            ):
+                                s[
+                                    fact_settings[ent][rel_1["relation_type"]["label"]]
+                                ] = t1
+                                ext_stc = True
+                    if not ext_stc:
+                        s["statementContent"] = [t1]
+                    if len(rel_1["annotation"]) > 0:
+                        stct = {
+                            "id": "Annotation_{}".format(rel_1["annotation"][0]["id"]),
+                            "label": rel_1["annotation"][0]["text"]
+                        }
+                        if "statementContent" in s.keys():
+                            s["statementContent"].append(stct)
+                        else:
+                            s["statementContent"] = [stct,]
+                    if len(rel_1["revisions"]) > 0:
+                        user_1 = rel_1["revisions"][0]["user_created"]
+                        date_1 = rel_1["revisions"][0]["date_created"].strftime("%Y-%m-%d")
+                        rev_id = rel_1["revisions"][0]["id"]
+                        if "{}_{}".format(user_1, date_1) not in facts_ind.keys():
+                            facts_ind["{}_{}".format(user_1, date_1)] = len(factoids)
+                            s3 = {
+                                "person": factoids[0]["person"],
+                                "id": "{}_{}".format(factoids[0]["id"], len(stmts)),
+                                "source": {
+                                    "id": "APIS",
+                                    "metadata": "APIS highlighter annotations rev. {}".format(rev_id),
+                                },
+                                "createdBy": user_1,
+                                "createdWhen": date_1,
+                                "statements": [s]
+                            }
+                            factoids.append(s3)
+                        else:
+                            factoids[facts_ind["{}_{}".format(user_1, date_1)]]["statements"].append(s)
+                            factoids[facts_ind["{}_{}".format(user_1, date_1)]]["source"]["metadata"] += " / {}".format(rev_id)
+                    else:
+                        factoids[0]["statements"].append(s)
+        return json.dumps(
+            {"factoids": factoids}, sort_keys=True, indent=1, cls=DjangoJSONEncoder
+        )
