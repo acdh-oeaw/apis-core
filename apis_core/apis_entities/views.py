@@ -24,7 +24,7 @@ from django_tables2.export.views import ExportMixin
 
 from apis_core.helper_functions.utils import access_for_all
 
-from .models import Person, Place, Institution, Event, Work
+from .models import Person, Place, Institution, Event, Passage
 from apis_core.apis_vocabularies.models import LabelType
 from apis_core.apis_metainfo.models import Uri, UriCandidate, TempEntityClass, Text
 from apis_core.helper_functions.stanbolQueries import retrieve_obj
@@ -40,11 +40,11 @@ from .forms import (
     get_entities_form, GenericEntitiesStanbolForm
 )
 from .tables import (
-    PersonTable, PlaceTable, InstitutionTable, EventTable, WorkTable,
+    PersonTable, PlaceTable, InstitutionTable, EventTable, PassageTable,
     get_entities_table
 )
 from .filters import (
-    PersonListFilter, PlaceListFilter, InstitutionListFilter, EventListFilter, WorkListFilter,
+    PersonListFilter, PlaceListFilter, InstitutionListFilter, EventListFilter, PassageListFilter,
     get_generic_list_filter
 )
 

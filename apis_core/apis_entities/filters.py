@@ -3,7 +3,7 @@ from dal import autocomplete
 from django.forms import ModelMultipleChoiceField
 from django.urls import reverse
 
-from .models import Person, Place, Institution, Event, Work
+from .models import Person, Place, Institution, Event, Passage
 from django.db.models import Q
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -195,12 +195,12 @@ class EventListFilter(django_filters.FilterSet):
         fields = ['name', 'start_date', 'end_date', 'kind__name', 'collection']
 
 
-class WorkListFilter(django_filters.FilterSet):
+class PassageListFilter(django_filters.FilterSet):
     name = django_filters.CharFilter(lookup_expr='icontains', label='Name')
     start_date = django_filters.DateFilter(label='Start date')
     end_date = django_filters.DateFilter(label='End date')
     kind__name = django_filters.CharFilter(lookup_expr='icontains', label='Kind')
 
     class Meta:
-        model = Work
+        model = Passage
         fields = ['name', 'start_date', 'end_date', 'kind__name', 'collection']

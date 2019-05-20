@@ -11,10 +11,13 @@ from apis_core.apis_vocabularies.models import (
     PlaceType,
     ProfessionType,
     Title,
-    WorkLanguage,
-    WorkDenomination,
-    WorkType,
-    WorkTopics
+    PassageLanguage,
+
+    # TOOD __sresch__ : entfernen falls endgueltig nicht mehr benoetigt
+    # PassageDenomination,
+
+    PassageType,
+    PassageTopics
 )
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -147,13 +150,10 @@ class Event(TempEntityClass):
 
 
 @reversion.register(follow=["tempentityclass_ptr"])
-class Work(TempEntityClass):
-    kind = models.ForeignKey(WorkType, blank=True, null=True, on_delete=models.SET_NULL)
-    language = models.ForeignKey(
-        WorkLanguage, blank=True, null=True, on_delete=models.SET_NULL
-    )
-    denomination = models.ManyToManyField(WorkDenomination, blank=True, null=True)
-    topics = models.ManyToManyField(WorkTopics, blank=True, null=True)
+class Passage(TempEntityClass):
+    topics = models.ManyToManyField(PassageTopics, blank=True, null=True)
+    migne_number = models.CharField(max_length=1024, blank=True, null=True)
+    kind = models.ForeignKey(PassageType, blank=True, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         if self.name != "":
@@ -164,19 +164,50 @@ class Work(TempEntityClass):
     def get_or_create_uri(uri):
         try:
             if re.match(r"^[0-9]*$", uri):
-                p = Work.objects.get(pk=uri)
+                p = Passage.objects.get(pk=uri)
             else:
-                p = Work.objects.get(uri__uri=uri)
+                p = Passage.objects.get(uri__uri=uri)
             return p
         except:
             return False
 
 
+@reversion.register(follow=["tempentityclass_ptr"])
+class Publication(TempEntityClass):
+    kind = models.ForeignKey(PassageType, blank=True, null=True, on_delete=models.SET_NULL)
+    language = models.ForeignKey(PassageLanguage, blank=True, null=True, on_delete=models.SET_NULL)
+    clavis_number = models.CharField(max_length=1024, blank=True, null=True)
+    migne_number = models.CharField(max_length=1024, blank=True, null=True)
+    publication_description = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        if self.name != "":
+            return self.name
+        else:
+            return "no name provided"
+
+    def get_or_create_uri(uri):
+        try:
+            if re.match(r"^[0-9]*$", uri):
+                p = Publication.objects.get(pk=uri)
+            else:
+                p = Publication.objects.get(uri__uri=uri)
+            return p
+        except:
+            return False
+
+
+
+
+
+
+
 @receiver(post_save, sender=Event, dispatch_uid="create_default_uri")
-@receiver(post_save, sender=Work, dispatch_uid="create_default_uri")
+@receiver(post_save, sender=Passage, dispatch_uid="create_default_uri")
 @receiver(post_save, sender=Institution, dispatch_uid="create_default_uri")
 @receiver(post_save, sender=Person, dispatch_uid="create_default_uri")
 @receiver(post_save, sender=Place, dispatch_uid="create_default_uri")
+@receiver(post_save, sender=Publication, dispatch_uid="create_default_uri")
 def create_default_uri(sender, instance, **kwargs):
     uri = Uri.objects.filter(entity=instance)
     if uri.count() == 0:
@@ -195,7 +226,7 @@ def create_default_uri(sender, instance, **kwargs):
 )
 @receiver(
     m2m_changed,
-    sender=Work.collection.through,
+    sender=Passage.collection.through,
     dispatch_uid="create_object_permissions",
 )
 @receiver(
@@ -211,6 +242,11 @@ def create_default_uri(sender, instance, **kwargs):
 @receiver(
     m2m_changed,
     sender=Place.collection.through,
+    dispatch_uid="create_object_permissions",
+)
+@receiver(
+    m2m_changed,
+    sender=Publication.collection.through,
     dispatch_uid="create_object_permissions",
 )
 def create_object_permissions(sender, instance, **kwargs):
@@ -243,7 +279,7 @@ def add_usergroup_collection(sender, instance, **kwargs):
     if kwargs["action"] == "pre_add":
         for x in kwargs["model"].objects.filter(pk__in=kwargs["pk_set"]):
             for z in ["change", "delete"]:
-                for y in [Person, Institution, Place, Event, Work]:
+                for y in [Person, Institution, Place, Event, Passage]:
                     assign_perm(
                         z + "_" + y.__name__.lower(),
                         x,

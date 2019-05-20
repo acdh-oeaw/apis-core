@@ -5,14 +5,14 @@ from django.db.models import Q
 import operator
 import pdb
 
-from apis_core.apis_entities.models import Person, Place, Institution, Event, Work
+from apis_core.apis_entities.models import Person, Place, Institution, Event, Passage, Publication
 from apis_core.apis_metainfo.models import TempEntityClass
-from apis_core.apis_vocabularies.models import (PersonPlaceRelation, PersonPersonRelation,
-    PersonInstitutionRelation, PersonEventRelation, PersonWorkRelation,
-    InstitutionInstitutionRelation, InstitutionPlaceRelation,
-    InstitutionEventRelation, PlacePlaceRelation, PlaceEventRelation,
-    PlaceWorkRelation, EventEventRelation, EventWorkRelation,
-    WorkWorkRelation, InstitutionWorkRelation)
+from apis_core.apis_vocabularies.models import (PersonPersonRelation, PersonPlaceRelation,
+    PersonInstitutionRelation, PersonEventRelation, PersonPassageRelation, PersonPublicationRelation,
+    InstitutionInstitutionRelation, InstitutionEventRelation, InstitutionPlaceRelation,
+    InstitutionPassageRelation, InstitutionPublicationRelation, PlacePlaceRelation, PlaceEventRelation,
+    PlacePassageRelation, PlacePublicationRelation, EventEventRelation, EventPassageRelation,
+    EventPublicationRelation, PassagePassageRelation, PassagePublicationRelation, PublicationPublicationRelation)
 
 
 #######################################################################
@@ -55,6 +55,7 @@ class AnnotationRelationLinkManager(models.Manager):
         if include_all:
             query.add(Q(annotation__annotation_project__isnull=True), Q.OR)
         return qs.filter(query)
+
 
 
 #######################################################################
@@ -238,25 +239,25 @@ class PersonEvent(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PersonWork(TempEntityClass):
-    """ Defines and describes a relation between a Person and a Work
+class PersonPassage(TempEntityClass):
+    """ Defines and describes a relation between a Person and a Passage
 
-    :param int relation_type: Foreign Key to :class:`vocabularies.models.PersonWorkRelation`
+    :param int relation_type: Foreign Key to :class:`vocabularies.models.PersonPassageRelation`
     :param int related_person: Foreign Key to :class:`entities.models.Person`
-    :param int related_work: Foreign Key to :class:`entities.models.Work`
+    :param int related_passage: Foreign Key to :class:`entities.models.Passage`
     """
 
-    relation_type = models.ForeignKey(PersonWorkRelation, blank=True, null=True,
+    relation_type = models.ForeignKey(PersonPassageRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
     related_person = models.ForeignKey(
         Person, blank=True, null=True, on_delete=models.CASCADE)
-    related_work = models.ForeignKey(
-        Work, blank=True, null=True, on_delete=models.CASCADE)
+    related_passage = models.ForeignKey(
+        Passage, blank=True, null=True, on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
-        return "{} ({}) {}".format(self.related_person, self.relation_type, self.related_work)
+        return "{} ({}) {}".format(self.related_person, self.relation_type, self.related_passage)
 
     def get_web_object(self):
 
@@ -266,10 +267,46 @@ class PersonWork(TempEntityClass):
             'relation_pk': self.pk,
             'relation_type': self.relation_type.name,
             'related_person': self.related_person.name+', '+self.related_person.first_name,
-            'related_work': self.related_work.name,
+            'related_passage': self.related_passage.name,
             'start_date': self.start_date_written,
             'end_date': self.end_date_written}
         return result
+
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class PersonPublication(TempEntityClass):
+    """ Defines and describes a relation between a Person and a Publication
+
+    :param int relation_type: Foreign Key to :class: vocabularies.models.PersonPublicationRelation
+    :param int related_person: Forein Key to :class: `entities.models.Person`
+    :param int related_publication: Forein Key to :class: `entities.models.Publication`
+    """
+
+    relation_type = models.ForeignKey(PersonPublicationRelation, blank=True, null=True,
+                                      on_delete=models.SET_NULL)
+    related_person = models.ForeignKey(
+        Person, blank=True, null=True, on_delete=models.CASCADE)
+    related_publication = models.ForeignKey(
+        Publication, blank=True, null=True, on_delete=models.CASCADE)
+    objects = models.Manager()
+    annotation_links = AnnotationRelationLinkManager()
+
+    def __str__(self):
+        return "{} ({}) {}".format(self.related_person, self.relation_type, self.related_publication)
+
+    def get_web_object(self):
+
+        if self.related_person.first_name is None:
+            self.related_person.first_name = '-'
+        result = {
+            'relation_ok': self.pk,
+            'relation_type': self.relation_type.name,
+            'related_person': self.related_person.name+', '+self.related_person.first_name,
+            'related_publication': self.related_publication.name,
+            'start_date': self.start_date_written,
+            'end_date': self.end_date_written}
+        return result
+
 
 
 #######################################################################
@@ -398,33 +435,66 @@ class InstitutionEvent(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class InstitutionWork(TempEntityClass):
-    """Describes a relation bewteen an Institution and a Work
+class InstitutionPassage(TempEntityClass):
+    """Describes a relation bewteen an Institution and a Passage
 
-    :param int relation_type: Foreign Key to :class:`vocabularies.models.InstitutionWorkRelation`
+    :param int relation_type: Foreign Key to :class:`vocabularies.models.InstitutionPassageRelation`
     :param int related_institution: Foreign Key to :class:`entities.models.Institution`
-    :param int related_work: Foreign Key to :class:`entities.models.Work`
+    :param int related_passage: Foreign Key to :class:`entities.models.Passage`
     """
 
-    relation_type = models.ForeignKey(InstitutionWorkRelation, blank=True,
+    relation_type = models.ForeignKey(InstitutionPassageRelation, blank=True,
                                       null=True, on_delete=models.SET_NULL)
     related_institution = models.ForeignKey(
         Institution, blank=True, null=True, on_delete=models.CASCADE)
-    related_work = models.ForeignKey(
-        Work, blank=True, null=True, on_delete=models.CASCADE)
+    related_passage = models.ForeignKey(
+        Passage, blank=True, null=True, on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
         return "{} ({}) {}".format(
-            self.related_institution, self.relation_type, self.related_work)
+            self.related_institution, self.relation_type, self.related_passage)
 
     def get_web_object(self):
         result = {
             'relation_pk': self.pk,
             'relation_type': self.relation_type.name,
             'related_institution': self.related_institution.name,
-            'related_work': self.related_work.name,
+            'related_passage': self.related_passage.name,
+            'start_date': self.start_date_written,
+            'end_date': self.end_date_written}
+        return result
+
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class InstitutionPublication(TempEntityClass):
+    """Describes a relation bewteen an Institution and a Passage
+
+    :param int relation_type: Foreign Key to :class:`vocabularies.models.InstitutionPassageRelation`
+    :param int related_institution: Foreign Key to :class:`entities.models.Institution`
+    :param int related_passage: Foreign Key to :class:`entities.models.Passage`
+    """
+
+    relation_type = models.ForeignKey(InstitutionPublicationRelation, blank=True,
+                                      null=True, on_delete=models.SET_NULL)
+    related_institution = models.ForeignKey(
+        Institution, blank=True, null=True, on_delete=models.CASCADE)
+    related_publication = models.ForeignKey(
+        Publication, blank=True, null=True, on_delete=models.CASCADE)
+    objects = models.Manager()
+    annotation_links = AnnotationRelationLinkManager()
+
+    def __str__(self):
+        return "{} ({}) {}".format(
+            self.related_institution, self.relation_type, self.related_publication)
+
+    def get_web_object(self):
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': self.relation_type.name,
+            'related_institution': self.related_institution.name,
+            'related_publication': self.related_publication.name,
             'start_date': self.start_date_written,
             'end_date': self.end_date_written}
         return result
@@ -461,10 +531,24 @@ class PlacePlace(TempEntityClass):
     def __str__(self):
         return "{} ({}) {}".format(self.related_placeA, self.relation_type, self.related_placeB)
 
+    def get_web_object(self):
+        """Used in some html views.
+
+        :return: Dict with object properties
+        """
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': self.relation_type.name,
+            'related_placeA': self.related_placeA.name,
+            'related_placeB': self.related_placeB.name,
+            'start_date': self.start_date_written,
+            'end_date': self.end_date_written}
+        return result
+
     def get_table_dict(self, entity):
         """Dict for the tabels in the html view
 
-        :param entity: Object of type :class:`entities.models.Place`; Used to determine which Place is the main antity
+        :param entity: Object of type :class:`entities.models.Place`; Used to determine which Place is the main entity
             and which one the related.
         :return:
         """
@@ -480,20 +564,6 @@ class PlacePlace(TempEntityClass):
             'related_place': rel_place,
             'start_date': self.start_date,
             'end_date': self.end_date}
-        return result
-
-    def get_web_object(self):
-        """Used in some html views.
-
-        :return: Dict with object properties
-        """
-        result = {
-            'relation_pk': self.pk,
-            'relation_type': self.relation_type.name,
-            'related_placeA': self.related_placeA.name,
-            'related_placeB': self.related_placeB.name,
-            'start_date': self.start_date_written,
-            'end_date': self.end_date_written}
         return result
 
 
@@ -535,26 +605,26 @@ class PlaceEvent(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PlaceWork(TempEntityClass):
-    """Describes a relation between an Place and a Work
+class PlacePassage(TempEntityClass):
+    """Describes a relation between an Place and a Passage
 
-    :param int relation_type: Foreign Key to :class:`vocabularies.models.PlaceWorkRelation`
+    :param int relation_type: Foreign Key to :class:`vocabularies.models.PlacePassageRelation`
     :param int related_place: Foreign Key to :class:`entities.models.Place`
-    :param int related_Work: Foreign Key to :class:`entities.models.Work`
+    :param int related_Passage: Foreign Key to :class:`entities.models.Passage`
     """
 
-    relation_type = models.ForeignKey(PlaceWorkRelation, blank=True, null=True,
+    relation_type = models.ForeignKey(PlacePassageRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
     related_place = models.ForeignKey(
         Place, blank=True, null=True, on_delete=models.CASCADE)
-    related_work = models.ForeignKey(
-        Work, blank=True, null=True, on_delete=models.CASCADE)
+    related_passage = models.ForeignKey(
+        Passage, blank=True, null=True, on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
         return "{} ({}) {}".format(
-            self.related_place, self.relation_type, self.related_work)
+            self.related_place, self.relation_type, self.related_passage)
 
     def get_web_object(self):
         """Function that returns a dict that is used in html views.
@@ -565,10 +635,48 @@ class PlaceWork(TempEntityClass):
             'relation_pk': self.pk,
             'relation_type': self.relation_type.name,
             'related_place': self.related_place.name,
-            'related_work': self.related_work.name,
+            'related_passage': self.related_passage.name,
             'start_date': self.start_date_written,
             'end_date': self.end_date_written}
         return result
+    
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class PlacePublication(TempEntityClass):
+    """Describes a relation between an Place and a Passage
+
+    :param int relation_type: Foreign Key to :class:`vocabularies.models.PlacePublicationRelation`
+    :param int related_place: Foreign Key to :class:`entities.models.Place`
+    :param int related_Publication: Foreign Key to :class:`entities.models.Publication`
+    """
+
+    relation_type = models.ForeignKey(PlacePublicationRelation, blank=True, null=True,
+                                      on_delete=models.SET_NULL)
+    related_place = models.ForeignKey(
+        Place, blank=True, null=True, on_delete=models.CASCADE)
+    related_publication = models.ForeignKey(
+        Publication, blank=True, null=True, on_delete=models.CASCADE)
+    objects = models.Manager()
+    annotation_links = AnnotationRelationLinkManager()
+
+    def __str__(self):
+        return "{} ({}) {}".format(
+            self.related_place, self.relation_type, self.related_publication)
+
+    def get_web_object(self):
+        """Function that returns a dict that is used in html views.
+
+        :return: dict of attributes
+        """
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': self.relation_type.name,
+            'related_place': self.related_place.name,
+            'related_publication': self.related_publication.name,
+            'start_date': self.start_date_written,
+            'end_date': self.end_date_written}
+        return result
+
 
 
 #######################################################################
@@ -600,30 +708,55 @@ class EventEvent(TempEntityClass):
 
     def __str__(self):
         return "{} ({}) {}".format(
-            self.related_event, self.relation_type, self.related_event)
+            self.related_eventA, self.relation_type, self.related_eventB)
+
+    def get_web_object(self):
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': self.relation_type.name,
+            'related_eventA': self.related_eventA.name,
+            'related_eventB': self.related_eventB.name,
+            'start_date': self.start_date_written,
+            'end_date': self.end_date_written}
+        return result
+
+    def get_table_dict(self, entity):
+        if self.related_eventA == entity:
+            rel_event = self.related_eventB
+            rel_type = self.relation_type.name
+        elif self.related_eventB == entity:
+            rel_event = self.related_eventA
+            rel_type = self.relation_type.name_reverse
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': rel_type,
+            'related_event': rel_event,
+            'start_date': self.start_date,
+            'end_date': self.end_date}
+        return result
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class EventWork(TempEntityClass):
-    """Describes a relation between an Event and a Work
+class EventPassage(TempEntityClass):
+    """Describes a relation between an Event and a Passage
 
-    :param int relation_type: Foreign Key to :class:`vocabularies.models.EventWorkRelation`
+    :param int relation_type: Foreign Key to :class:`vocabularies.models.EventPassageRelation`
     :param int related_event: Foreign Key to :class:`entities.models.Event`
-    :param int related_work: Foreign Key to :class:`entities.models.Work`
+    :param int related_passage: Foreign Key to :class:`entities.models.Passage`
     """
 
-    relation_type = models.ForeignKey(EventWorkRelation, blank=True, null=True,
+    relation_type = models.ForeignKey(EventPassageRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
     related_event = models.ForeignKey(
         Event, blank=True, null=True, on_delete=models.CASCADE)
-    related_work = models.ForeignKey(
-        Work, blank=True, null=True, on_delete=models.CASCADE)
+    related_passage = models.ForeignKey(
+        Passage, blank=True, null=True, on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
         return "{} ({}) {}".format(
-            self.related_event, self.relation_type, self.related_work)
+            self.related_event, self.relation_type, self.related_passage)
 
     def get_web_object(self):
         """Function that returns a dict that is used in html views.
@@ -634,59 +767,75 @@ class EventWork(TempEntityClass):
             'relation_pk': self.pk,
             'relation_type': self.relation_type.name,
             'related_event': self.related_event.name,
-            'related_work': self.related_work.name,
+            'related_passage': self.related_passage.name,
             'start_date': self.start_date_written,
             'end_date': self.end_date_written}
         return result
 
 
+@reversion.register(follow=['tempentityclass_ptr'])
+class EventPublication(TempEntityClass):
+    """ Defines and describes a relation between a Event and a Publication
+
+    :param int relation_type: Foreign Key to :class: vocabularies.models.EventPublicationRelation
+    :param int related_event: Forein Key to :class: `entities.models.Event`
+    :param int related_publication: Forein Key to :class: `entities.models.Publication`
+    """
+
+    relation_type = models.ForeignKey(EventPublicationRelation, blank=True, null=True,
+                                      on_delete=models.SET_NULL)
+    related_event = models.ForeignKey(
+        Event, blank=True, null=True, on_delete=models.CASCADE)
+    related_publication = models.ForeignKey(
+        Publication, blank=True, null=True, on_delete=models.CASCADE)
+    objects = models.Manager()
+    annotation_links = AnnotationRelationLinkManager()
+
+    def __str__(self):
+        return "{} ({}) {}".format(self.related_event, self.relation_type, self.related_publication)
+
+    def get_web_object(self):
+
+        result = {
+            'relation_ok': self.pk,
+            'relation_type': self.relation_type.name,
+            'related_event': self.related_event.name,
+            'related_publication': self.related_publication.name,
+            'start_date': self.start_date_written,
+            'end_date': self.end_date_written}
+        return result
+
+
+
 #######################################################################
 #
-#   Event - ... - Relation
+#   Passage - ... - Relation
 #
 #######################################################################
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class WorkWork(TempEntityClass):
-    """Describes a relation between an Work and a Work
+class PassagePassage(TempEntityClass):
+    """Describes a relation between an Passage and a Passage
 
-    :param int relation_type: Foreign Key to :class:`vocabularies.models.WorkWorkRelation`
-    :param int related_workA: Foreign Key to :class:`entities.models.Work`
-    :param int related_workB: Foreign Key to :class:`entities.models.Work`
+    :param int relation_type: Foreign Key to :class:`vocabularies.models.PassagePassageRelation`
+    :param int related_passageA: Foreign Key to :class:`entities.models.Passage`
+    :param int related_passageB: Foreign Key to :class:`entities.models.Passage`
     """
 
-    relation_type = models.ForeignKey(WorkWorkRelation, blank=True, null=True,
+    relation_type = models.ForeignKey(PassagePassageRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
-    related_workA = models.ForeignKey(
-        Work, blank=True, null=True, related_name="related_workA",
+    related_passageA = models.ForeignKey(
+        Passage, blank=True, null=True, related_name="related_passageA",
         on_delete=models.CASCADE)
-    related_workB = models.ForeignKey(
-        Work, blank=True, null=True, related_name="related_workB",
+    related_passageB = models.ForeignKey(
+        Passage, blank=True, null=True, related_name="related_passageB",
         on_delete=models.CASCADE)
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
-    def get_table_dict(self, entity):
-        """Dict for the tabels in the html view
-
-        :param entity: Object of type :class:`entities.models.Place`; Used to determine which Place is the main antity
-            and which one the related.
-        :return:
-        """
-        if self.related_workA == entity:
-            rel_work = self.related_workB
-            rel_type = self.relation_type.name
-        elif self.related_workB == entity:
-            rel_work = self.related_workA
-            rel_type = self.relation_type.name_reverse
-        result = {
-            'relation_pk': self.pk,
-            'relation_type': rel_type,
-            'related_work': rel_work,
-            'start_date': self.start_date,
-            'end_date': self.end_date}
-        return result
+    def __str__(self):
+        return "{} ({}) {}".format(self.related_passageA, self.relation_type, self.related_passageB)
 
     def get_web_object(self):
         """Used in some html views.
@@ -696,11 +845,140 @@ class WorkWork(TempEntityClass):
         result = {
             'relation_pk': self.pk,
             'relation_type': self.relation_type.name,
-            'related_workA': self.related_workA.name,
-            'related_workB': self.related_workB.name,
+            'related_passageA': self.related_passageA.name,
+            'related_passageB': self.related_passageB.name,
             'start_date': self.start_date_written,
             'end_date': self.end_date_written}
         return result
 
+    def get_table_dict(self, entity):
+        """Dict for the tabels in the html view
+
+        :param entity: Object of type :class:`entities.models.Place`; Used to determine which Place is the main entity
+            and which one the related.
+        :return:
+        """
+        if self.related_passageA == entity:
+            rel_passage = self.related_passageB
+            rel_type = self.relation_type.name
+        elif self.related_passageB == entity:
+            rel_passage = self.related_passageA
+            rel_type = self.relation_type.name_reverse
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': rel_type,
+            'related_passage': rel_passage,
+            'start_date': self.start_date,
+            'end_date': self.end_date}
+        return result
+
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class PassagePublication(TempEntityClass):
+    """Describes a relation between an Place and a Passage
+
+    :param int relation_type: Foreign Key to :class:`vocabularies.models.PassagePublicationRelation`
+    :param int related_passage: Foreign Key to :class:`entities.models.Passage`
+    :param int related_Publication: Foreign Key to :class:`entities.models.Publication`
+    """
+    
+    relation_type = models.ForeignKey(PassagePublicationRelation, blank=True, null=True,
+                                      on_delete=models.SET_NULL)
+    related_passage = models.ForeignKey(
+        Passage, blank=True, null=True, on_delete=models.CASCADE)
+    related_publication = models.ForeignKey(
+        Publication, blank=True, null=True, on_delete=models.CASCADE)
+    objects = models.Manager()
+    annotation_links = AnnotationRelationLinkManager()
+
     def __str__(self):
-        return "{} ({}) {}".format(self.related_workA, self.relation_type, self.related_workB)
+        return "{} ({}) {}".format(
+            self.related_passage, self.relation_type, self.related_publication)
+
+    def get_web_object(self):
+        """Function that returns a dict that is used in html views.
+
+        :return: dict of attributes
+        """
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': self.relation_type.name,
+            'related_passage': self.related_passage.name,
+            'related_publication': self.related_publication.name,
+            'start_date': self.start_date_written,
+            'end_date': self.end_date_written}
+        return result
+    
+
+
+#######################################################################
+#
+#   Publication - ... - Relation
+#
+#######################################################################
+
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class PublicationPublication(TempEntityClass):
+    """Describes a relation bewteen an Place  and a Place
+
+    :param int relation_type: Foreign Key to :class:`vocabularies.models.PublicationPublicationRelation`
+    :param int related_publicationA: Foreign Key to :class:`entities.models.Publication`
+    :param int related_publicationB: Foreign Key to :class:`entities.models.Publication`
+    """
+    
+    relation_type = models.ForeignKey(PublicationPublicationRelation, blank=True, null=True,
+                                      on_delete=models.SET_NULL)
+    related_publicationA = models.ForeignKey(
+        Publication, blank=True, null=True, related_name="related_publicationA",
+        on_delete=models.CASCADE)
+    related_publicationB = models.ForeignKey(
+        Publication, blank=True, null=True, related_name="related_publicationB",
+        on_delete=models.CASCADE)
+    objects = models.Manager()
+    annotation_links = AnnotationRelationLinkManager()
+
+    def __str__(self):
+        return "{} ({}) {}".format(self.related_publicationA, self.relation_type, self.related_publicationB)
+
+    def get_web_object(self):
+        """Used in some html views.
+
+        :return: Dict with object properties
+        """
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': self.relation_type.name,
+            'related_publicationA': self.related_publicationA.name,
+            'related_publicationB': self.related_publicationB.name,
+            'start_date': self.start_date_written,
+            'end_date': self.end_date_written}
+        return result
+
+    def get_table_dict(self, entity):
+        """Dict for the tabels in the html view
+
+        :param entity: Object of type :class:`entities.models.Place`; Used to determine which Publication is the main entity
+            and which one the related.
+        :return:
+        """
+        if self.related_publicationA == entity:
+            rel_publication = self.related_publicationB
+            rel_type = self.relation_type.name
+        elif self.related_publicationB == entity:
+            rel_publication = self.related_publicationA
+            rel_type = self.relation_type.name_reverse
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': rel_type,
+            'related_place': rel_publication,
+            'start_date': self.start_date,
+            'end_date': self.end_date}
+        return result
+
+
+    
+    
+    
+    
+    

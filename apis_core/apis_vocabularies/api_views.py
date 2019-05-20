@@ -7,16 +7,16 @@ from .serializers import (
     InstitutionTypeSerializer, ProfessionTypeSerializer, InstitutionPlaceRelationSerializer,
     PlaceTypeSerializer, PersonInstitutionRelationSerializer,
     PersonPlaceRelationSerializer, UserAccSerializer, VocabNamesSerializer,
-    PersonPersonRelationSerializer, PersonEventRelationSerializer, PersonWorkRelationSerializer,
-    InstitutionEventRelationSerializer, InstitutionWorkRelationSerializer, PlaceEventRelationSerializer,
-    PlaceWorkRelationSerializer, PlacePlaceRelationSerializer, EventWorkRelationSerializer,
-    EventEventRelationSerializer, WorkWorkRelationSerializer, EventTypeSerializer, WorkTypeSerializer)
+    PersonPersonRelationSerializer, PersonEventRelationSerializer, PersonPassageRelationSerializer,
+    InstitutionEventRelationSerializer, InstitutionPassageRelationSerializer, PlaceEventRelationSerializer,
+    PlacePassageRelationSerializer, PlacePlaceRelationSerializer, EventPassageRelationSerializer,
+    EventEventRelationSerializer, PassagePassageRelationSerializer, EventTypeSerializer, PassageTypeSerializer)
 from .models import (
     InstitutionInstitutionRelation, TextType, CollectionType, VocabsBaseClass,
     InstitutionType, ProfessionType, PlaceType, PersonInstitutionRelation, InstitutionPlaceRelation,
     PersonPlaceRelation, PersonPersonRelation, VocabNames, InstitutionPlaceRelation, PersonEventRelation,
-    PersonWorkRelation, InstitutionEventRelation, InstitutionWorkRelation, PlaceWorkRelation, PlaceEventRelation,
-    PlacePlaceRelation, EventWorkRelation, EventEventRelation, WorkWorkRelation, EventType, WorkType)
+    PersonPassageRelation, InstitutionEventRelation, InstitutionPassageRelation, PlacePassageRelation, PlaceEventRelation,
+    PlacePlaceRelation, EventPassageRelation, EventEventRelation, PassagePassageRelation, EventType, PassageType)
 
 
 ###########################################################
@@ -78,9 +78,9 @@ class EventTypeViewSet(viewsets.ModelViewSet):
     serializer_class = EventTypeSerializer
 
 
-class WorkTypeViewSet(viewsets.ModelViewSet):
-    queryset = WorkType.objects.all()
-    serializer_class = WorkTypeSerializer
+class PassageTypeViewSet(viewsets.ModelViewSet):
+    queryset = PassageType.objects.all()
+    serializer_class = PassageTypeSerializer
 
 
 ######################################################
@@ -105,9 +105,9 @@ class PersonEventRelationViewSet(viewsets.ModelViewSet):
     serializer_class = PersonEventRelationSerializer
 
 
-class PersonWorkRelationViewSet(viewsets.ModelViewSet):
-    queryset = PersonWorkRelation.objects.all()
-    serializer_class = PersonWorkRelationSerializer
+class PersonPassageRelationViewSet(viewsets.ModelViewSet):
+    queryset = PersonPassageRelation.objects.all()
+    serializer_class = PersonPassageRelationSerializer
 
 
 class PersonPersonRelationViewSet(viewsets.ModelViewSet):
@@ -130,9 +130,9 @@ class InstitutionEventRelationViewSet(viewsets.ModelViewSet):
     serializer_class = InstitutionEventRelationSerializer
 
 
-class InstitutionWorkRelationViewSet(viewsets.ModelViewSet):
-    queryset = InstitutionWorkRelation.objects.all()
-    serializer_class = InstitutionWorkRelationSerializer
+class InstitutionPassageRelationViewSet(viewsets.ModelViewSet):
+    queryset = InstitutionPassageRelation.objects.all()
+    serializer_class = InstitutionPassageRelationSerializer
 
 
 class PlaceEventRelationViewSet(viewsets.ModelViewSet):
@@ -140,9 +140,9 @@ class PlaceEventRelationViewSet(viewsets.ModelViewSet):
     serializer_class = PlaceEventRelationSerializer
 
 
-class PlaceWorkRelationViewSet(viewsets.ModelViewSet):
-    queryset = PlaceWorkRelation.objects.all()
-    serializer_class = PlaceWorkRelationSerializer
+class PlacePassageRelationViewSet(viewsets.ModelViewSet):
+    queryset = PlacePassageRelation.objects.all()
+    serializer_class = PlacePassageRelationSerializer
 
 
 class PlacePlaceRelationViewSet(viewsets.ModelViewSet):
@@ -150,9 +150,9 @@ class PlacePlaceRelationViewSet(viewsets.ModelViewSet):
     serializer_class = PlacePlaceRelationSerializer
 
 
-class EventWorkRelationViewSet(viewsets.ModelViewSet):
-    queryset = EventWorkRelation.objects.all()
-    serializer_class = EventWorkRelationSerializer
+class EventPassageRelationViewSet(viewsets.ModelViewSet):
+    queryset = EventPassageRelation.objects.all()
+    serializer_class = EventPassageRelationSerializer
 
 
 class EventEventRelationViewSet(viewsets.ModelViewSet):
@@ -160,9 +160,9 @@ class EventEventRelationViewSet(viewsets.ModelViewSet):
     serializer_class = EventEventRelationSerializer
 
 
-class WorkWorkRelationViewSet(viewsets.ModelViewSet):
-    queryset = WorkWorkRelation.objects.all()
-    serializer_class = WorkWorkRelationSerializer
+class PassagePassageRelationViewSet(viewsets.ModelViewSet):
+    queryset = PassagePassageRelation.objects.all()
+    serializer_class = PassagePassageRelationSerializer
 
 
 

@@ -4,9 +4,9 @@ from django.contrib.auth.models import User
 from .models import (
     InstitutionInstitutionRelation, TextType, CollectionType, VocabsBaseClass,
     InstitutionType, ProfessionType, PlaceType, PersonInstitutionRelation, InstitutionPlaceRelation,
-    PersonPlaceRelation, VocabNames, PersonPersonRelation, PersonEventRelation, PersonWorkRelation,
-    InstitutionEventRelation, InstitutionWorkRelation, PlaceEventRelation, PlaceWorkRelation, PlacePlaceRelation,
-    EventWorkRelation, EventEventRelation, WorkWorkRelation, EventType, WorkType, LabelType)
+    PersonPlaceRelation, VocabNames, PersonPersonRelation, PersonEventRelation, PersonPassageRelation,
+    InstitutionEventRelation, InstitutionPassageRelation, PlaceEventRelation, PlacePassageRelation, PlacePlaceRelation,
+    EventPassageRelation, EventEventRelation, PassagePassageRelation, EventType, PassageType, LabelType)
 
 
 ###########################################################
@@ -138,15 +138,15 @@ class EventTypeSerializer(VocabsBaseSerializer):
         model = EventType
 
 
-class WorkTypeSerializer(VocabsBaseSerializer):
+class PassageTypeSerializer(VocabsBaseSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name="apis:apis_api:worktype-detail",
+        view_name="apis:apis_api:passagetype-detail",
         lookup_field="pk"
     )
 
     class Meta:
         fields = '__all__'
-        model = WorkType
+        model = PassageType
 
 
 class LabelTypeSerializer(serializers.ModelSerializer):
@@ -197,11 +197,11 @@ class PersonEventRelationSerializer(VocabsBaseSerializer):
         model = PersonEventRelation
 
 
-class PersonWorkRelationSerializer(VocabsBaseSerializer):
+class PersonPassageRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
-        model = PersonWorkRelation
+        model = PersonPassageRelation
 
 
 class InstitutionPlaceRelationSerializer(VocabsBaseSerializer):
@@ -218,11 +218,11 @@ class InstitutionEventRelationSerializer(VocabsBaseSerializer):
         model = InstitutionEventRelation
 
 
-class InstitutionWorkRelationSerializer(VocabsBaseSerializer):
+class InstitutionPassageRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
-        model = InstitutionWorkRelation
+        model = InstitutionPassageRelation
 
 
 class PlaceEventRelationSerializer(VocabsBaseSerializer):
@@ -232,11 +232,11 @@ class PlaceEventRelationSerializer(VocabsBaseSerializer):
         model = PlaceEventRelation
 
 
-class PlaceWorkRelationSerializer(VocabsBaseSerializer):
+class PlacePassageRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
-        model = PlaceWorkRelation
+        model = PlacePassageRelation
 
 
 class PlacePlaceRelationSerializer(VocabsBaseSerializer):
@@ -246,11 +246,11 @@ class PlacePlaceRelationSerializer(VocabsBaseSerializer):
         model = PlacePlaceRelation
 
 
-class EventWorkRelationSerializer(VocabsBaseSerializer):
+class EventPassageRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
-        model = EventWorkRelation
+        model = EventPassageRelation
 
 
 class EventEventRelationSerializer(VocabsBaseSerializer):
@@ -260,8 +260,8 @@ class EventEventRelationSerializer(VocabsBaseSerializer):
         model = EventEventRelation
 
 
-class WorkWorkRelationSerializer(VocabsBaseSerializer):
+class PassagePassageRelationSerializer(VocabsBaseSerializer):
 
     class Meta:
         fields = '__all__'
-        model = WorkWorkRelation
+        model = PassagePassageRelation

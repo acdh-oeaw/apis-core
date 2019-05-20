@@ -14,7 +14,7 @@ from django.conf import settings
 from apis_core.helper_functions.utils import access_for_all
 
 from .views import get_highlighted_texts
-from .models import Work
+from .models import Passage
 from apis_core.apis_labels.models import Label
 from apis_core.apis_metainfo.models import Uri
 from apis_core.apis_relations.tables import (
@@ -126,10 +126,10 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
             ))
 
 
-class WorkDetailView(DetailView):
-    model = Work
-    template_name = 'apis_entities/detail_views/work_detail.html'
+class PassageDetailView(DetailView):
+    model = Passage
+    template_name = 'apis_entities/detail_views/passage_detail.html'
 
     def get_context_data(self, **kwargs):
-        context = super(WorkDetailView, self).get_context_data(**kwargs)
+        context = super(PassageDetailView, self).get_context_data(**kwargs)
         return context
