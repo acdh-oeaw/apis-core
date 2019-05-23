@@ -84,7 +84,7 @@ for app_label in ["entities", "metainfo", "vocabularies", "relations"]:
                     entity=name, app_label="apis_{}".format(app_label)
                 ),
             )
-        except AttributeError:
+        except Exception as e:
             print("{} not found, skipping".format(name.lower()))
 
 
