@@ -79,6 +79,7 @@ class EntityToCIDOC(renderers.BaseRenderer):
                     g.add((b_birth_time_span, RDF.type, cidoc["E52_Time-Span"]))
                     g.add((b_birth_time_span, cidoc.P82a_begin_of_the_begin, Literal(data["start_date"], datatype=XSD.date)))
                     g.add((b_birth_time_span, cidoc.P82b_end_of_the_end, Literal(data["start_date"], datatype=XSD.date)))
+                    g.add((b_birth_time_span, RDFS.label, Literal(f"data['start_date']")))
                     g.add((b_birth, cidoc.P98_brought_into_life, k_uri))
             if data["end_date"] is not None:
                 if len(data["end_date"]) > 0:
@@ -90,6 +91,7 @@ class EntityToCIDOC(renderers.BaseRenderer):
                     g.add((b_death_time_span, RDF.type, cidoc["E52_Time-Span"]))
                     g.add((b_death_time_span, cidoc.P82a_begin_of_the_begin, Literal(data["end_date"], datatype=XSD.date)))
                     g.add((b_death_time_span, cidoc.P82b_end_of_the_end, Literal(data["end_date"], datatype=XSD.date)))
+                    g.add((b_death_time_span, RDFS.label, Literal(f"data['end_date']")))
                     g.add((b_death, cidoc.P100_was_death_of, k_uri))
             for ent_1 in data['relations']:
                 for p in data['relations'][ent_1]:
