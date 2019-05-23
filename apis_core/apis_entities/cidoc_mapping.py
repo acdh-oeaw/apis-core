@@ -31,7 +31,8 @@ def m_place(g, ns, data):
             )
         )
         g.add((place_uri, RDFS.label, Literal(data["name"], lang=lang)))
-        g.add((place_uri, ns['cidoc'].P168_place_is_defined_by, Literal(f"Point( {data['lng']} {data['lat']} )", datatype="geo:wktLiteral")))
+        if data['lng'] is not None:
+            g.add((place_uri, ns['cidoc'].P168_place_is_defined_by, Literal(f"Point( {data['lng']} {data['lat']} )", datatype="geo:wktLiteral")))
         g = m_add_uris(g, ns, place_uri, data['uris'])        
         return g, place_uri
 
