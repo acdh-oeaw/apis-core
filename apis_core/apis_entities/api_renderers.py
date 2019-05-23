@@ -36,11 +36,14 @@ class EntityToCIDOC(renderers.BaseRenderer):
         'places_place of death': m_place_of_death
     }
 
-    def render(self, data1, media_type=None, renderer_context=None):
-        print(dir(self))
+    def render(self, data1, media_type=None, renderer_context=None, format_1=None):
         if type(data1) != list:
             data1 = [data1]
-            print('no list')
+        print(self.format)
+        if format_1 is not None:
+            print(format_1)
+            self.format = format_1
+        print(self.format)
         cidoc = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
         geo = Namespace("http://www.opengis.net/ont/geosparql#")
         store = IOMemory()
@@ -70,9 +73,10 @@ class EntityToCIDOC(renderers.BaseRenderer):
                 if len(data["start_date"]) > 0:
                     b_birth = URIRef(f"{base_uri}/appellation/birth/{data['id']}")
                     g.add((b_birth, RDF.type, cidoc.E67_Birth))
+                    g.add((b_birth, RDFS.label, Literal(f"Geburt von {data['first_name']} {data['name']}", lang="de")))
                     b_birth_time_span = BNode()
                     g.add((b_birth, cidoc["P4_has_time-span"], b_birth_time_span))
-                    g.add((b_birth_time_span, RDF.type, cidoc["E52_Time-spans"]))
+                    g.add((b_birth_time_span, RDF.type, cidoc["E52_Time-Span"]))
                     g.add((b_birth_time_span, cidoc.P82a_begin_of_the_begin, Literal(data["start_date"], datatype=XSD.date)))
                     g.add((b_birth_time_span, cidoc.P82b_end_of_the_end, Literal(data["start_date"], datatype=XSD.date)))
                     g.add((b_birth, cidoc.P98_brought_into_life, k_uri))
@@ -80,9 +84,10 @@ class EntityToCIDOC(renderers.BaseRenderer):
                 if len(data["end_date"]) > 0:
                     b_death = URIRef(f"{base_uri}/appellation/death/{data['id']}")
                     g.add((b_death, RDF.type, cidoc.E69_Death))
+                    g.add((b_death, RDFS.label, Literal(f"Tod von {data['first_name']} {data['name']}", lang="de")))
                     b_death_time_span = BNode()
                     g.add((b_death, cidoc["P4_has_time-span"], b_death_time_span))
-                    g.add((b_death_time_span, RDF.type, cidoc["E52_Time-spans"]))
+                    g.add((b_death_time_span, RDF.type, cidoc["E52_Time-Span"]))
                     g.add((b_death_time_span, cidoc.P82a_begin_of_the_begin, Literal(data["end_date"], datatype=XSD.date)))
                     g.add((b_death_time_span, cidoc.P82b_end_of_the_end, Literal(data["end_date"], datatype=XSD.date)))
                     g.add((b_death, cidoc.P100_was_death_of, k_uri))
