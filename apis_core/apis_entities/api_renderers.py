@@ -4,10 +4,17 @@ from apis_core.apis_tei.tei import TeiEntCreator
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
-from rdflib import RDF, RDFS, XSD, BNode, Graph, Literal, Namespace, URIRef
+from rdflib import RDF, RDFS, XSD, BNode, Graph, Literal, Namespace, URIRef, ConjunctiveGraph, OWL
+from rdflib.plugins.memory import IOMemory
 from rest_framework import renderers
-
+from .cidoc_mapping import m_place_of_birth, m_place_of_death, m_add_uris
 from webpage.metadata import PROJECT_METADATA
+
+
+base_uri = getattr(settings, 'APIS_BASE_URI', 'http://apis.info')
+if base_uri.endswith('/'):
+    base_uri = base_uri[:-1]
+lang = getattr(settings, 'LANGUAGE_CODE', 'de')
 
 
 class EntityToTEI(renderers.BaseRenderer):
@@ -22,68 +29,89 @@ class EntityToTEI(renderers.BaseRenderer):
 
 class EntityToCIDOC(renderers.BaseRenderer):
 
-    media_type = "text/rdf+xml"
+    media_type = "text/rdf"
+
+    mps = {
+        'places_place of birth': m_place_of_birth,
+        'places_place of death': m_place_of_death
+    }
+
+    def render(self, data1, media_type=None, renderer_context=None):
+        print(dir(self))
+        if type(data1) != list:
+            data1 = [data1]
+            print('no list')
+        cidoc = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
+        geo = Namespace("http://www.opengis.net/ont/geosparql#")
+        store = IOMemory()
+        g1 = ConjunctiveGraph(store=store)
+        g = Graph(store, identifier=URIRef('http://apis.acdh.oeaw.ac.at/entities#'))
+        g1.bind('cidoc', cidoc, override=False)
+        g1.bind('geo', geo, override=False)
+        g1.bind('owl', OWL, override=False)
+        apis = Namespace('https://apis.acdh.oeaw.ac.at')
+        g1.bind('apis', apis, override=False)
+        ns = {'cidoc': cidoc, 'geo': geo}
+        for data in data1:
+            k_uri = URIRef(data["url"])
+            g.add((k_uri, RDF.type, cidoc.E21_Person))
+            b_app = BNode()
+            g.add((k_uri, cidoc.P1_is_identified_by, b_app))
+            g.add((b_app, RDF.type, cidoc.E41_Appellation))
+            g.add(
+                (
+                    b_app,
+                    RDFS.label,
+                    Literal("{} {}".format(data["first_name"], data["name"]), lang=lang),
+                )
+            )
+            g.add((k_uri, RDFS.label, Literal(f"{data['first_name']} {data['name']}", lang=lang)))
+            if data["start_date"] is not None:
+                if len(data["start_date"]) > 0:
+                    b_birth = URIRef(f"{base_uri}/appellation/birth/{data['id']}")
+                    g.add((b_birth, RDF.type, cidoc.E67_Birth))
+                    b_birth_time_span = BNode()
+                    g.add((b_birth, cidoc["P4_has_time-span"], b_birth_time_span))
+                    g.add((b_birth_time_span, RDF.type, cidoc["E52_Time-spans"]))
+                    g.add((b_birth_time_span, cidoc.P82a_begin_of_the_begin, Literal(data["start_date"], datatype=XSD.date)))
+                    g.add((b_birth_time_span, cidoc.P82b_end_of_the_end, Literal(data["start_date"], datatype=XSD.date)))
+                    g.add((b_birth, cidoc.P98_brought_into_life, k_uri))
+            if data["end_date"] is not None:
+                if len(data["end_date"]) > 0:
+                    b_death = URIRef(f"{base_uri}/appellation/death/{data['id']}")
+                    g.add((b_death, RDF.type, cidoc.E69_Death))
+                    b_death_time_span = BNode()
+                    g.add((b_death, cidoc["P4_has_time-span"], b_death_time_span))
+                    g.add((b_death_time_span, RDF.type, cidoc["E52_Time-spans"]))
+                    g.add((b_death_time_span, cidoc.P82a_begin_of_the_begin, Literal(data["end_date"], datatype=XSD.date)))
+                    g.add((b_death_time_span, cidoc.P82b_end_of_the_end, Literal(data["end_date"], datatype=XSD.date)))
+                    g.add((b_death, cidoc.P100_was_death_of, k_uri))
+            for ent_1 in data['relations']:
+                for p in data['relations'][ent_1]:
+                    if f"{ent_1}_{p['relation_type']['label']}" in self.mps.keys():
+                        g = self.mps[f"{ent_1}_{p['relation_type']['label']}"](g, k_uri, ns, p) 
+            g = m_add_uris(g, ns, k_uri, data['uris'])        
+        return g1.serialize(format=self.format.split('+')[-1])
+
+
+class EntityToCIDOCXML(EntityToCIDOC):
+
     format = "rdf+xml"
 
-    def render(self, data, media_type=None, renderer_context=None):
-        cidoc = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
-        geo = Namespace("http://www.w3.org/2003/01/geo/wgs84_pos#")
-        g = Graph()
-        k_uri = URIRef(data["url"])
-        g.add((k_uri, RDF.type, cidoc.P21))
-        b_app = BNode()
-        g.add((k_uri, cidoc.P131, b_app))
-        g.add((b_app, RDF.type, cidoc.E82))
-        g.add(
-            (
-                b_app,
-                RDFS.label,
-                Literal("{} {}".format(data["first_name"], data["name"]), lang="de"),
-            )
-        )
-        b_birth = BNode()
-        g.add((b_birth, RDF.type, cidoc.E67))
-        g.add((b_birth, cidoc.P98, k_uri))
-        place_of_birth = URIRef(data["relations"]["places"][0]["url"])
-        g.add((b_birth, cidoc.P7, place_of_birth))
-        g.add((place_of_birth, RDF.type, cidoc.E53))
-        g.add(
-            (
-                place_of_birth,
-                RDFS.label,
-                Literal(data["relations"]["places"][0]["place"]["name"], lang="de"),
-            )
-        )
 
-        b_place_of_birth_app2 = BNode()
-        g.add((place_of_birth, cidoc.P87, b_place_of_birth_app2))
-        g.add((b_place_of_birth_app2, RDF.type, cidoc.E47))
-        g.add(
-            (
-                b_place_of_birth_app2,
-                geo.lat,
-                Literal(data["relations"]["places"][0]["place"]["lat"]),
-            )
-        )
-        g.add(
-            (
-                b_place_of_birth_app2,
-                geo.long,
-                Literal(data["relations"]["places"][0]["place"]["lng"]),
-            )
-        )
+class EntityToCIDOCN3(EntityToCIDOC):
 
-        b_date_of_birth = BNode()
-        g.add((b_date_of_birth, RDF.type, cidoc.E50))
-        g.add(
-            (
-                b_date_of_birth,
-                cidoc.P114,
-                Literal(data["start_date"], datatype=XSD.date),
-            )
-        )
+    format = "rdf+n3"
 
-        return g.serialize(format="xml")
+
+class EntityToCIDOCNQUADS(EntityToCIDOC):
+
+    format = "rdf+nquads"
+
+
+class EntityToCIDOCTURTLE(EntityToCIDOC):
+
+    format = "rdf+turtle"
 
 
 class EntityToProsopogrAPhI(renderers.BaseRenderer):
@@ -189,8 +217,8 @@ class EntityToProsopogrAPhI(renderers.BaseRenderer):
                                 )
                     ext_stc = False
                     t1 = {
-                        "uri": rel_1[ent[:-1]]["url"],
-                        "label": rel_1[ent[:-1]]["name"],
+                        "uri": "{}api2/entity/{}".format(base_uri, rel_1["target"]["id"]),
+                        "label": rel_1["target"]["name"],
                     }
                     if fact_settings is not None:
                         if ent in fact_settings.keys():

@@ -9,6 +9,10 @@ from django.urls import reverse
 from rest_framework import serializers
 from reversion.models import Version
 
+base_uri = getattr(settings, 'APIS_BASE_URI', 'http://apis.info')
+if base_uri.endswith('/'):
+    base_uri = base_uri[:-1]
+
 
 class CollectionSerializer(serializers.Serializer):
     id = serializers.IntegerField()
@@ -93,9 +97,10 @@ class EntitySerializer(serializers.Serializer):
 
     def add_url(self, obj):
         if "request" in self.context.keys():
-            url = self.context["request"].build_absolute_uri(
-                reverse("apis_core:apis_api2:GetEntityGeneric", kwargs={"pk": obj.pk})
-            )
+            # url = self.context["request"].build_absolute_uri(
+            #    reverse("apis_core:apis_api2:GetEntityGeneric", kwargs={"pk": obj.pk})
+            # )
+            url = f"{base_uri}{reverse('apis_core:apis_api2:GetEntityGeneric', kwargs={'pk': obj.pk})}"
         else:
             url = "undefined"
         return url
@@ -172,9 +177,10 @@ class RelationEntitySerializer(serializers.Serializer):
                 r1["text"] = text[s:e]
                 r1["text"] = "{}<annotation>{}</annotation>{}".format(r1["text"][:an.start-s], r1["text"][an.start-s:an.end-s], r1["text"][an.end-s:])
                 r1["string_offset"] = "{}-{}".format(an.start, an.end)
-                r1["text_url"] = self.context["request"].build_absolute_uri(
-                        reverse("apis_core:apis_api:text-detail", kwargs={"pk": an.text_id})
-                )
+                # r1["text_url"] = self.context["request"].build_absolute_uri(
+                #        reverse("apis_core:apis_api:text-detail", kwargs={"pk": an.text_id})
+                # )
+                r1["text_url"] = f"{base_uri}{reverse('apis_core:apis_api:text-detail', kwargs={'pk': an.text_id})}"
                 res.append(r1)
             return res
 
@@ -186,19 +192,7 @@ class RelationEntitySerializer(serializers.Serializer):
     def add_relation_label(self, obj):
         cm = obj.__class__.__name__
         res_1 = dict()
-        request_1 = self.context.get("request", None)
-        if request_1 is not None:
-            res_1["url"] = self.context["request"].build_absolute_uri(
-                reverse(
-                    "apis_core:apis_api:{}relation-detail".format(cm).lower(),
-                    kwargs={"pk": obj.relation_type.pk},
-                )
-            )
-        else:
-            res_1["url"] = reverse(
-                "apis_core:apis_api:{}relation-detail".format(cm).lower(),
-                kwargs={"pk": obj.relation_type.pk},
-            )
+        res_1["url"] = f"{base_uri}{reverse('apis_core:apis_api:{}relation-detail'.format(cm).lower(), kwargs={'pk': obj.relation_type.pk},)}"
         if self.reverse and len(obj.relation_type.label_reverse) > 0:
             res_1["label"] = obj.relation_type.label_reverse
         elif self.reverse:

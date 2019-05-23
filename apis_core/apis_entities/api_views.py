@@ -46,7 +46,7 @@ from .serializers_generic import EntitySerializer
 
 # from metainfo.models import TempEntityClass
 
-from . api_renderers import EntityToTEI, EntityToCIDOC, EntityToProsopogrAPhI
+from . api_renderers import EntityToTEI, EntityToCIDOCXML, EntityToProsopogrAPhI, EntityToCIDOCN3, EntityToCIDOCNQUADS, EntityToCIDOCTURTLE
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 25
@@ -57,7 +57,7 @@ class StandardResultsSetPagination(PageNumberPagination):
 class GetEntityGeneric(APIView):
     serializer_class = EntitySerializer
     renderer_classes = tuple(
-        api_settings.DEFAULT_RENDERER_CLASSES) + (EntityToTEI, EntityToCIDOC, EntityToProsopogrAPhI)
+        api_settings.DEFAULT_RENDERER_CLASSES) + (EntityToTEI, EntityToCIDOCXML, EntityToProsopogrAPhI, EntityToCIDOCN3, EntityToCIDOCNQUADS, EntityToCIDOCTURTLE)
     if getattr(settings, 'APIS_RENDERERS', None) is not None:
         rend_add = tuple()
         for rd in settings.APIS_RENDERERS:
