@@ -19,14 +19,15 @@ class UriListView(GenericListView):
     table_class = UriTable
     init_columns = [
         'id',
-        'title',
+        'uri',
+        'entity',
     ]
     enable_merge = True
 
 
 class UriDetailView(DetailView):
     model = Uri
-    template_name = 'books/exemplar_detail.html'
+    template_name = 'apis_metainfo/uri_detail.html'
 
 
 class UriCreate(BaseCreateView):

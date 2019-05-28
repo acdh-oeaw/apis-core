@@ -131,6 +131,10 @@ urlpatterns = [
         r"metainfo/",
         include("apis_core.apis_metainfo.urls", namespace="apis_metainfo"),
     ),
+    url(
+        r"metainfo-ac/",
+        include("apis_core.apis_metainfo.dal_urls", namespace="apis_metainfo-ac"),
+    ),
     # url(r'^autocomplete/', include('autocomplete_light.urls')),
     url(
         r"^api/", include((router.urls, "apis_core"), namespace="apis_api")

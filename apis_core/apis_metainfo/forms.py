@@ -10,6 +10,10 @@ class UriForm(forms.ModelForm):
     class Meta:
         model = Uri
         fields = "__all__"
+        widgets = {
+            'entity': autocomplete.ModelSelect2(
+                url='apis_core:apis_metainfo-ac:apis_tempentity-autocomplete'),
+            }
 
     def __init__(self, *args, **kwargs):
         super(UriForm, self).__init__(*args, **kwargs)
@@ -33,8 +37,9 @@ class UriFilterFormHelper(FormHelper):
             Accordion(
                 AccordionGroup(
                     'Filter',
-                    'id',
                     'uri',
+                    'domain',
+                    'entity__name',
                     css_id="basic_search_fields"
                     ),
                 )

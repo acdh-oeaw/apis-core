@@ -13,9 +13,11 @@ from apis_core.apis_vocabularies.models import CollectionType, LabelType, TextTy
 
 # from helper_functions.highlighter import highlight_text
 from apis_core.default_settings.NER_settings import autocomp_settings
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models.query import QuerySet
 from django.db.models.signals import m2m_changed, post_save
@@ -84,9 +86,9 @@ class TempEntityClass(models.Model):
         if self.name != "" and hasattr(
             self, "first_name"
         ):  # relation usually don´t have names
-            return "{}, {}".format(self.name, self.first_name)
+            return "{}, {} (ID: {})".format(self.name, self.first_name, self.id)
         elif self.name != "":
-            return self.name
+            return "{} (ID: {})".format(self.name, self.id)
         else:
             return "(ID: {})".format(self.id)
 
@@ -164,6 +166,17 @@ class TempEntityClass(models.Model):
             self.end_date = self.end_date.date()
         return self
 
+    def get_child_entity(self):
+        for x in [x for x in apps.all_models['apis_entities'].values()]:
+            if x.__name__ in list(settings.APIS_ENTITIES.keys()):
+                try:
+                    my_ent = x.objects.get(id=self.id)
+                    return my_ent
+                    break
+                except ObjectDoesNotExist:
+                    pass
+        return None
+
     @classmethod
     def get_listview_url(self):
         entity = self.__name__.lower()
@@ -199,6 +212,13 @@ class TempEntityClass(models.Model):
         else:
             return None
 
+    def get_child_class(self):
+        child = self.get_child_entity()
+        if child:
+            return "{}".format(child.__class__.__name__)
+        else:
+            return "{}".format(child.__class__.__name__)
+
     def get_absolute_url(self):
         entity = self.__class__.__name__.lower()
         if entity == "institution" or len(entity) < 10:
@@ -206,6 +226,8 @@ class TempEntityClass(models.Model):
                 "apis_core:apis_entities:generic_entities_detail_view",
                 kwargs={"entity": entity, "pk": self.id},
             )
+        elif entity == "tempentityclass":
+            return self.get_child_entity().get_absolute_url()
         else:
             return reverse(
                 "apis_core:apis_relations:generic_relations_detail_view",
@@ -411,6 +433,8 @@ class Uri(models.Model):
             "relation_pk": self.pk,
             "relation_type": "uri",
             "related_entity": self.entity.name,
+            "related_entity_url": self.entity.get_absolute_url(),
+            "related_entity_class_name": self.entity.__class__.__name__.lower(),
             "uri": self.uri,
         }
         return result
