@@ -87,6 +87,18 @@
                                 </tr>
                                 <tr>
                                     <th>
+                                        Labels
+                                    </th>
+                                    <td>
+                                        {% for x in no_merge_labels %}
+                                            <li>
+                                                <small>{{ x.label_type }}: </small>{{ x.label }}
+                                            </li>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
                                         ID
                                     </th>
                                     <td>
