@@ -127,6 +127,10 @@ urlpatterns = [
         r"vocabularies/",
         include("apis_core.apis_vocabularies.urls", namespace="apis_vocabularies"),
     ),
+    url(
+        r"metainfo/",
+        include("apis_core.apis_metainfo.urls", namespace="apis_metainfo"),
+    ),
     # url(r'^autocomplete/', include('autocomplete_light.urls')),
     url(
         r"^api/", include((router.urls, "apis_core"), namespace="apis_api")

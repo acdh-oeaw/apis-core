@@ -56,8 +56,8 @@ class TempEntityClass(models.Model):
         blank=True,
         null=True,
         verbose_name="Start",
-        help_text="""Please enter a date. You can use any string to describe the date. 
-        The system tries to parse the given string into valid date formats (the string is preserved). 
+        help_text="""Please enter a date. You can use any string to describe the date.
+        The system tries to parse the given string into valid date formats (the string is preserved).
         To explicitly set the iso-date use '&lt;YYYY-MM-DD'&gt;. To explicitly delete the iso-date use '&lt;&gt;' """,
     )
     end_date_written = models.CharField(
@@ -65,8 +65,8 @@ class TempEntityClass(models.Model):
         blank=True,
         null=True,
         verbose_name="End",
-        help_text="""Please enter a date. You can use any string to describe the date. 
-        The system tries to parse the given string into valid date formats (the string is preserved). 
+        help_text="""Please enter a date. You can use any string to describe the date.
+        The system tries to parse the given string into valid date formats (the string is preserved).
         To explicitly set the iso-date use '&lt;YYYY-MM-DD'&gt;. To explicitly delete the iso-date use '&lt;&gt;' """,
     )
     text = models.ManyToManyField("Text", blank=True)
@@ -414,6 +414,23 @@ class Uri(models.Model):
             "uri": self.uri,
         }
         return result
+
+    @classmethod
+    def get_listview_url(self):
+        return reverse("apis_core:apis_metainfo:uri_browse")
+
+    @classmethod
+    def get_createview_url(self):
+        return reverse('apis_core:apis_metainfo:uri_create')
+
+    def get_absolute_url(self):
+        return reverse('apis_core:apis_metainfo:uri_detail', kwargs={'pk': self.id})
+
+    def get_delete_url(self):
+        return reverse('apis_core:apis_metainfo:uri_delete', kwargs={'pk': self.id})
+
+    def get_edit_url(self):
+        return reverse('apis_core:apis_metainfo:uri_edit', kwargs={'pk': self.id})
 
 
 @reversion.register()
