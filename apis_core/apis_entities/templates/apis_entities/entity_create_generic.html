@@ -22,13 +22,13 @@
         <div class="card">
             <div class="card-header">
             	{% if instance %}
-                    <h3><strong>{{ instance }}</strong></h3>
-		    {% if bibsonomy_active %}
-		    {% bibsonomy_form content_type=entity_type hidden=True %}
-		    <a class="bibsonomy-anker" data-bibs-contenttype={{entity_type}} data-bibs-object_pk={{instance.pk}}><i data-feather="book-open"></i> References</a>
-               	    {% endif %} 
-		{% else %}
-                    <h2><small>create new object type:</small> <strong>{{ entity_type|title }}</strong></h2>
+                    <h3>
+                        <strong>{{ instance }}</strong>
+                    </h3>
+		        {% else %}
+                    <h2>
+                        <small>create new object type:</small> <strong>{{ entity_type|title }}</strong>
+                    </h2>
                 {% endif %}
             </div>
             <div class="card-body">
@@ -51,7 +51,6 @@
                                 {% endblock %}
                             </div>
                         </div>
-
                 {% block linkedOpenData %}
                 {% if object_lod %}
                     <div class="card card-default">
