@@ -7,7 +7,7 @@ from django.utils import timezone
 from rdflib import RDF, RDFS, XSD, BNode, Graph, Literal, Namespace, URIRef, ConjunctiveGraph, OWL
 from rdflib.plugins.memory import IOMemory
 from rest_framework import renderers
-from .cidoc_mapping import m_place_of_birth, m_place_of_death, m_add_uris
+from .cidoc_mapping import m_person, m_place
 from webpage.metadata import PROJECT_METADATA
 
 
@@ -31,12 +31,9 @@ class EntityToCIDOC(renderers.BaseRenderer):
 
     media_type = "text/rdf"
 
-    mps = {
-        'places_place of birth': m_place_of_birth,
-        'places_geboren in': m_place_of_birth,
-        'places_place of death': m_place_of_death,
-        'places_gestorben in': m_place_of_death
-    }
+    ent_func = {'Person': m_person,
+                'Place': m_place
+               }
 
     def render(self, data1, media_type=None, renderer_context=None, format_1=None, binary=False):
         if type(data1) != list:
@@ -59,48 +56,7 @@ class EntityToCIDOC(renderers.BaseRenderer):
         g.bind('owl', OWL, override=False)
         ns = {'cidoc': cidoc, 'geo': geo}
         for data in data1:
-            k_uri = URIRef(data["url"])
-            g.add((k_uri, RDF.type, cidoc.E21_Person))
-            b_app = BNode()
-            g.add((k_uri, cidoc.P1_is_identified_by, b_app))
-            g.add((b_app, RDF.type, cidoc.E41_Appellation))
-            g.add(
-                (
-                    b_app,
-                    RDFS.label,
-                    Literal("{} {}".format(data["first_name"], data["name"]), lang=lang),
-                )
-            )
-            g.add((k_uri, RDFS.label, Literal(f"{data['first_name']} {data['name']}", lang=lang)))
-            if data["start_date"] is not None:
-                if len(data["start_date"]) > 0:
-                    b_birth = URIRef(f"{base_uri}/appellation/birth/{data['id']}")
-                    g.add((b_birth, RDF.type, cidoc.E67_Birth))
-                    g.add((b_birth, RDFS.label, Literal(f"Geburt von {data['first_name']} {data['name']}", lang="de")))
-                    b_birth_time_span = BNode()
-                    g.add((b_birth, cidoc["P4_has_time-span"], b_birth_time_span))
-                    g.add((b_birth_time_span, RDF.type, cidoc["E52_Time-Span"]))
-                    g.add((b_birth_time_span, cidoc.P82a_begin_of_the_begin, Literal(data["start_date"], datatype=XSD.date)))
-                    g.add((b_birth_time_span, cidoc.P82b_end_of_the_end, Literal(data["start_date"], datatype=XSD.date)))
-                    g.add((b_birth_time_span, RDFS.label, Literal(f"{data['start_date']}")))
-                    g.add((b_birth, cidoc.P98_brought_into_life, k_uri))
-            if data["end_date"] is not None:
-                if len(data["end_date"]) > 0:
-                    b_death = URIRef(f"{base_uri}/appellation/death/{data['id']}")
-                    g.add((b_death, RDF.type, cidoc.E69_Death))
-                    g.add((b_death, RDFS.label, Literal(f"Tod von {data['first_name']} {data['name']}", lang="de")))
-                    b_death_time_span = BNode()
-                    g.add((b_death, cidoc["P4_has_time-span"], b_death_time_span))
-                    g.add((b_death_time_span, RDF.type, cidoc["E52_Time-Span"]))
-                    g.add((b_death_time_span, cidoc.P82a_begin_of_the_begin, Literal(data["end_date"], datatype=XSD.date)))
-                    g.add((b_death_time_span, cidoc.P82b_end_of_the_end, Literal(data["end_date"], datatype=XSD.date)))
-                    g.add((b_death_time_span, RDFS.label, Literal(f"{data['end_date']}")))
-                    g.add((b_death, cidoc.P100_was_death_of, k_uri))
-            for ent_1 in data['relations']:
-                for p in data['relations'][ent_1]:
-                    if f"{ent_1}_{p['relation_type']['label']}" in self.mps.keys():
-                        g = self.mps[f"{ent_1}_{p['relation_type']['label']}"](g, k_uri, ns, p) 
-            g = m_add_uris(g, ns, k_uri, data['uris'])        
+            g, ent = self.ent_func[data['entity_type']](g, ns, data, drill_down=True)
         if binary:
             return g
         return g.serialize(format=self.format.split('+')[-1])
