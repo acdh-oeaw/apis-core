@@ -8,7 +8,7 @@ from rdflib import RDF, RDFS, XSD, BNode, Graph, Literal, Namespace, URIRef, Con
 from rdflib.plugins.memory import IOMemory
 from rest_framework import renderers
 from .cidoc_mapping import m_place_of_birth, m_place_of_death, m_add_uris
-from webpage.metadata import PROJECT_METADATA
+from webpage.utils import PROJECT_METADATA
 
 
 base_uri = getattr(settings, 'APIS_BASE_URI', 'http://apis.info')
@@ -96,8 +96,8 @@ class EntityToCIDOC(renderers.BaseRenderer):
             for ent_1 in data['relations']:
                 for p in data['relations'][ent_1]:
                     if f"{ent_1}_{p['relation_type']['label']}" in self.mps.keys():
-                        g = self.mps[f"{ent_1}_{p['relation_type']['label']}"](g, k_uri, ns, p) 
-            g = m_add_uris(g, ns, k_uri, data['uris'])        
+                        g = self.mps[f"{ent_1}_{p['relation_type']['label']}"](g, k_uri, ns, p)
+            g = m_add_uris(g, ns, k_uri, data['uris'])
         return g1.serialize(format=self.format.split('+')[-1])
 
 
