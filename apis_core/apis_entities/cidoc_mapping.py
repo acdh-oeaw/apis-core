@@ -7,6 +7,10 @@ if base_uri.endswith('/'):
 lang = getattr(settings, 'LANGUAGE_CODE', 'de')
 
 
+cidoc_mappings = {
+    ''
+}
+
 def m_add_uris(g, ns, obj, uris):
     for u in uris:
         b_uri = URIRef(u['uri'])
@@ -35,6 +39,15 @@ def m_place(g, ns, data):
             g.add((place_uri, ns['cidoc'].P168_place_is_defined_by, Literal(f"Point( {data['lng']} {data['lat']} )", datatype="geo:wktLiteral")))
         g = m_add_uris(g, ns, place_uri, data['uris'])        
         return g, place_uri
+
+
+def m_institution(g, ns, data):
+    inst_uri = URIRef(f"{base_uri}/apis/api2/entity/{data['id']}")
+    if (inst_uri, RDF.type, ns['cidoc'].E74_Group) in g:
+        return g, inst_uri
+    else:
+        g.add((inst_uri, RDF.type, ns['cidoc'].E74_Group))
+        g.add((inst_uri, RDFS.label, Literal(data['name'], lang=lang)))
 
 
 def m_place_of_birth(g, p, ns, data):

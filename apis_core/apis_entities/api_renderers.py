@@ -33,10 +33,12 @@ class EntityToCIDOC(renderers.BaseRenderer):
 
     mps = {
         'places_place of birth': m_place_of_birth,
-        'places_place of death': m_place_of_death
+        'places_geboren in': m_place_of_birth,
+        'places_place of death': m_place_of_death,
+        'places_gestorben in': m_place_of_death
     }
 
-    def render(self, data1, media_type=None, renderer_context=None, format_1=None):
+    def render(self, data1, media_type=None, renderer_context=None, format_1=None, binary=False):
         if type(data1) != list:
             data1 = [data1]
         print(self.format)
@@ -47,13 +49,14 @@ class EntityToCIDOC(renderers.BaseRenderer):
         cidoc = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
         geo = Namespace("http://www.opengis.net/ont/geosparql#")
         store = IOMemory()
-        g1 = ConjunctiveGraph(store=store)
-        g = Graph(store, identifier=URIRef('http://apis.acdh.oeaw.ac.at/entities#'))
-        g1.bind('cidoc', cidoc, override=False)
-        g1.bind('geo', geo, override=False)
-        g1.bind('owl', OWL, override=False)
-        apis = Namespace('https://apis.acdh.oeaw.ac.at')
-        g1.bind('apis', apis, override=False)
+        #g1 = ConjunctiveGraph(store=store)
+        if binary:
+            g = Graph(store)
+        else:
+            g = Graph(store, identifier=URIRef(f'{base_uri}/entities#'))
+        g.bind('cidoc', cidoc, override=False)
+        g.bind('geo', geo, override=False)
+        g.bind('owl', OWL, override=False)
         ns = {'cidoc': cidoc, 'geo': geo}
         for data in data1:
             k_uri = URIRef(data["url"])
@@ -79,7 +82,7 @@ class EntityToCIDOC(renderers.BaseRenderer):
                     g.add((b_birth_time_span, RDF.type, cidoc["E52_Time-Span"]))
                     g.add((b_birth_time_span, cidoc.P82a_begin_of_the_begin, Literal(data["start_date"], datatype=XSD.date)))
                     g.add((b_birth_time_span, cidoc.P82b_end_of_the_end, Literal(data["start_date"], datatype=XSD.date)))
-                    g.add((b_birth_time_span, RDFS.label, Literal(f"data['start_date']")))
+                    g.add((b_birth_time_span, RDFS.label, Literal(f"{data['start_date']}")))
                     g.add((b_birth, cidoc.P98_brought_into_life, k_uri))
             if data["end_date"] is not None:
                 if len(data["end_date"]) > 0:
@@ -91,14 +94,16 @@ class EntityToCIDOC(renderers.BaseRenderer):
                     g.add((b_death_time_span, RDF.type, cidoc["E52_Time-Span"]))
                     g.add((b_death_time_span, cidoc.P82a_begin_of_the_begin, Literal(data["end_date"], datatype=XSD.date)))
                     g.add((b_death_time_span, cidoc.P82b_end_of_the_end, Literal(data["end_date"], datatype=XSD.date)))
-                    g.add((b_death_time_span, RDFS.label, Literal(f"data['end_date']")))
+                    g.add((b_death_time_span, RDFS.label, Literal(f"{data['end_date']}")))
                     g.add((b_death, cidoc.P100_was_death_of, k_uri))
             for ent_1 in data['relations']:
                 for p in data['relations'][ent_1]:
                     if f"{ent_1}_{p['relation_type']['label']}" in self.mps.keys():
                         g = self.mps[f"{ent_1}_{p['relation_type']['label']}"](g, k_uri, ns, p) 
             g = m_add_uris(g, ns, k_uri, data['uris'])        
-        return g1.serialize(format=self.format.split('+')[-1])
+        if binary:
+            return g
+        return g.serialize(format=self.format.split('+')[-1])
 
 
 class EntityToCIDOCXML(EntityToCIDOC):
