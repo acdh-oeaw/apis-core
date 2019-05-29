@@ -17,120 +17,136 @@
 {% load django_tables2 %}
 {% if instance %}
 <div class="container-fluid">
-<div class="row">
-    <div class="col-md-5">
-{% endif %}
-{% load crispy_forms_tags %}
-        <div class="card">
-            <div class="card-header">
-            	{% if instance %}
-                    <h3><strong>{{ instance }}</strong></h3>
-		    {% if bibsonomy_active %}
-		    {% bibsonomy_form content_type=entity_type hidden=True %}
-		    <a class="bibsonomy-anker" data-bibs-contenttype={{entity_type}} data-bibs-object_pk={{instance.pk}}><i data-feather="book-open"></i> References</a>
-               	    {% endif %} 
-		{% else %}
-                    <h2><small>create new object type:</small> <strong>{{ entity_type|title }}</strong></h2>
-                {% endif %}
-            </div>
-            <div class="card-body">
-                <form action="" method="post">
-                    <div class="card card-default">
-
-                	{% crispy form %}
-
-                        <div class="card-header" role="tab" id="headingFour">
-                            <h4 class="card-title">
-                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                                Texts
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapseFour" class="card-collapse collapse" role="tabcard" aria-labelledby="headingFour">
-                            <div class="card-body">
-                                {% block texts %}
-                                {% crispy form_text %}
-                                {% endblock %}
-                            </div>
-                        </div>
-
-                {% block linkedOpenData %}
-                {% if object_lod %}
-                    <div class="card card-default">
-                        <div class="card-header" role="tab" id="headingSix">
-                            <h4 class="card-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne3" aria-expanded="false" aria-controls="collapseOne3">
-                                    Linked Open Data
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapseOne3" class="card-collapse collapse" role="tabcard" aria-labelledby="headingSix">
-                            <div id="tab_Revisions" class="card-body">
-                                <p>{% for lod in object_lod %}{% if forloop.last %}<a href="{{ lod.uri }}">{{ lod.uri }}</a>{% else %}<a href="{{ lod.uri }}">{{ lod.uri }}</a> <br  /> {% endif %}{% endfor %}</p>
-                            </div>
-                        </div>
-                    </div>
-                {% endif %}
-                {% endblock %}
-                {% block editbuttons %}
-                    {% if instance %}
-                    {% if "change" in permissions %}
-                       <input class="btn btn-primary" type="submit" value="modify" />
-                    {% endif %}
-                    {% if instance %}
-                    <button class="compare_tooltip btn btn-default" data-tooltip='{"app":"apis_entities","kind":"{{entity_type|lower}}","pk":"{{ instance.pk }}"}'>Revisions</button>
-                    {% endif %}
-                    {% if "delete" in permissions %}
-                       <a class ="btn btn-danger btn-primary" href="delete">Delete</a>
-                    {% endif %}
-
-		    <a class ="btn btn-success" href="{% url 'apis:apis_entities:generic_entities_create_view' entity_type %}">Create new {{entity_type|title}}</a>
-                        {% else %}
-                        {% if "create" in permissions %}
-                        <input class="btn btn-primary" type="submit" value="create" />
-                            {% endif %}
-                                    {% endif %}
-
-                {% endblock editbuttons %}
-                </div>
-            </form>
-            </div>
-{% if instance %}
+    <div class="card">
+        <div class="card-header" style="text-align: center;">
+            <h1><a href="{{ instance.get_listview_url }}">
+                <small>{{ entity_type }}s</small>
+            </a>
+                <strong>{{ instance }} </strong> <a href="{{ instance.get_absolute_url }}">
+                    <i data-feather="eye" title="eye"></i>
+                </a>
+            </h1>
         </div>
-    </div>
-{% endif %}
-{% if instance %}
-    <div class="col-md-7">
-        <div class="card card-default">
-            <div class="card-header">
-                <h3>related to</h3>
-            </div>
-            <div class="card-body">
-                <div class="card" id="accordion" role="tablist" aria-multiselectable="true">
-                {% block additional_accordion %}
-                {% endblock additional_accordion %}
-                {% for obj in right_card %}
-                    <div class="card card-default">
-                        <div class="card-header" role="tab" id="heading{{forloop.counter}}">
-                            <h4 class="card-title">
-                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{forloop.counter}}" aria-expanded="true" aria-controls="collapse{{forloop.counter}}">
-                                    {{ obj.0 }}
-                                </a>
-                            </h4>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-5">
+            {% endif %}
+            {% load crispy_forms_tags %}
+                    <div class="card">
+                        <div class="card-header">
+                        	{% if instance %}
+                                <h3>
+                                    <small>Edit the Entity</small>
+                                </h3>
+            		        {% else %}
+                                <h2>
+                                    <small>create new object type:</small> <strong>{{ entity_type|title }}</strong>
+                                </h2>
+                            {% endif %}
                         </div>
-                        <div id="collapse{{forloop.counter}}" class="card-collapse collapse{% if obj.3 %} in{% endif %}" role="tabcard" aria-labelledby="heading{{forloop.counter}}">
-                            <div id="tab_{{ obj.2 }}" class="card-body">
-                                {% render_table obj.1 %}
+                        <div class="card-body">
+                            <form action="" method="post">
+                                <div class="card card-default">
+
+                            	{% crispy form %}
+
+                                    <div class="card-header" role="tab" id="headingFour">
+                                        <h4 class="card-title">
+                                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                            Texts
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div id="collapseFour" class="card-collapse collapse" role="tabcard" aria-labelledby="headingFour">
+                                        <div class="card-body">
+                                            {% block texts %}
+                                            {% crispy form_text %}
+                                            {% endblock %}
+                                        </div>
+                                    </div>
+                            {% block linkedOpenData %}
+                            {% if object_lod %}
+                                <div class="card card-default">
+                                    <div class="card-header" role="tab" id="headingSix">
+                                        <h4 class="card-title">
+                                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne3" aria-expanded="false" aria-controls="collapseOne3">
+                                                Linked Open Data
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div id="collapseOne3" class="card-collapse collapse" role="tabcard" aria-labelledby="headingSix">
+                                        <div id="tab_Revisions" class="card-body">
+                                            <p>{% for lod in object_lod %}{% if forloop.last %}<a href="{{ lod.uri }}">{{ lod.uri }}</a>{% else %}<a href="{{ lod.uri }}">{{ lod.uri }}</a> <br  /> {% endif %}{% endfor %}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% endblock %}
+                            {% block editbuttons %}
+                                {% if instance %}
+                                {% if "change" in permissions %}
+                                   <input class="btn btn-primary" type="submit" value="modify" />
+                                {% endif %}
+                                {% if instance %}
+                                <button class="compare_tooltip btn btn-default" data-tooltip='{"app":"apis_entities","kind":"{{entity_type|lower}}","pk":"{{ instance.pk }}"}'>Revisions</button>
+                                {% endif %}
+                                {% if "delete" in permissions %}
+                                   <a class ="btn btn-danger btn-primary" href="delete">Delete</a>
+                                {% endif %}
+
+            		    <a class ="btn btn-success" href="{% url 'apis:apis_entities:generic_entities_create_view' entity_type %}">Create new {{entity_type|title}}</a>
+                                    {% else %}
+                                    {% if "create" in permissions %}
+                                    <input class="btn btn-primary" type="submit" value="create" />
+                                        {% endif %}
+                                                {% endif %}
+
+                            {% endblock editbuttons %}
+                            </div>
+                        </form>
+                        </div>
+            {% if instance %}
+                    </div>
+                </div>
+            {% endif %}
+            {% if instance %}
+                <div class="col-md-7">
+                    <div class="card card-default">
+                        <div class="card-header">
+                            <h3><small> the Entity is related to</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="card" id="accordion" role="tablist" aria-multiselectable="true">
+                            {% block additional_accordion %}
+                            {% endblock additional_accordion %}
+                            {% for obj in right_card %}
+                                <div class="card card-default">
+                                    <div class="card-header" role="tab" id="heading{{forloop.counter}}">
+                                        <h4 class="card-title">
+                                            <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{forloop.counter}}" aria-expanded="true" aria-controls="collapse{{forloop.counter}}">
+                                                {{ obj.0 }}
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div id="collapse{{forloop.counter}}" class="card-collapse collapse{% if obj.3 %} in{% endif %}" role="tabcard" aria-labelledby="heading{{forloop.counter}}">
+                                        <div id="tab_{{ obj.2 }}" class="card-body">
+                                            {% render_table obj.1 %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
                             </div>
                         </div>
                     </div>
-                    {% endfor %}
-                </div>
-                </div>
+                {% endif %}
+    {% if instance %}
             </div>
         </div>
     {% endif %}
-    </div>
+
+
+
 {% if object_texts %}
     {% if user.is_superuser %}
         {% if form_ann_agreement %}
