@@ -19,10 +19,10 @@ class CollectionSerializer(serializers.Serializer):
     name = serializers.CharField()
 
 
-class ProfessionTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProfessionType
-        fields = ("id", "name", "label")
+class VocabsSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    label = serializers.CharField()
 
 
 class EntityUriSerializer(serializers.Serializer):
@@ -115,11 +115,17 @@ class EntitySerializer(serializers.Serializer):
                 "FloatField",
             ]:
                 self.fields[f.name] = getattr(serializers, field_name)()
+            elif field_name in ['ForeignKey', 'ManyToMany']:
+                if str(f.related_model.__module__).endswith('apis_vocabularies.models'):
+                    many = False
+                    if f.many_to_many or f.one_to_many:
+                        many = True
+                    self.fields[f.name] = VocabsSerializer(many=many)
         for f in inst._meta.many_to_many:
-            if f.name == "profession":
-                self.fields["profession"] = ProfessionTypeSerializer(many=True)
-            elif f.name == "collection":
+            if f.name == "collection":
                 self.fields["collection"] = CollectionSerializer(many=True)
+            elif str(f.related_model.__module__).endswith('apis_vocabularies.models'):
+                self.fields[f.name] = VocabsSerializer(many=True)
         self.fields["entity_type"] = serializers.SerializerMethodField(
             method_name="add_entity_type"
         )
