@@ -6,6 +6,8 @@ from apis_core.apis_entities.api_renderers import EntityToCIDOC
 import json
 from django.conf import settings
 import requests
+from rdflib import Graph
+from rdflib.plugins.memory import IOMemory
 
 
 map_ct = {
@@ -96,7 +98,8 @@ class Command(BaseCommand):
             res.append(EntitySerializer(e).data)
         self.stdout.write(self.style.SUCCESS(f'serialized {len(res)} objects'))
         self.stdout.write(self.style.NOTICE('Starting to create the graph'))
-        fin = EntityToCIDOC().render(res, format_1=options['format'])
+        store = IOMemory()
+        fin, store = EntityToCIDOC().render(res, format_1=options['format'], store=store)
         if options['output']:
             with open(options['output'], 'wb') as out:
                 out.write(fin)

@@ -35,22 +35,16 @@ class EntityToCIDOC(renderers.BaseRenderer):
                 'Place': m_place
                }
 
-    def render(self, data1, media_type=None, renderer_context=None, format_1=None, binary=False):
+    def render(self, data1, media_type=None, renderer_context=None, format_1=None, binary=False, store=False):
         if type(data1) != list:
             data1 = [data1]
-        print(self.format)
         if format_1 is not None:
-            print(format_1)
             self.format = format_1
-        print(self.format)
         cidoc = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
         geo = Namespace("http://www.opengis.net/ont/geosparql#")
-        store = IOMemory()
-        #g1 = ConjunctiveGraph(store=store)
-        if binary:
-            g = Graph(store)
-        else:
-            g = Graph(store, identifier=URIRef(f'{base_uri}/entities#'))
+        if not store:
+            store = IOMemory()
+        g = Graph(store, identifier=URIRef(f'{base_uri}/entities#'))
         g.bind('cidoc', cidoc, override=False)
         g.bind('geo', geo, override=False)
         g.bind('owl', OWL, override=False)
