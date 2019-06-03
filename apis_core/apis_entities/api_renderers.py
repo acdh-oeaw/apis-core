@@ -8,7 +8,10 @@ from rdflib import RDF, RDFS, XSD, BNode, Graph, Literal, Namespace, URIRef, Con
 from rdflib.plugins.memory import IOMemory
 from rest_framework import renderers
 from .cidoc_mapping import m_person, m_place
-from webpage.metadata import PROJECT_METADATA
+try:
+    from webpage.metadata import PROJECT_METADATA
+except ImportError:
+    from webpage.utils import PROJECT_METADATA
 
 
 base_uri = getattr(settings, 'APIS_BASE_URI', 'http://apis.info')
