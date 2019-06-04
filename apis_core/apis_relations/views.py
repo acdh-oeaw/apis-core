@@ -31,6 +31,7 @@ from .tables import EntityLabelTable
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_core.helper_functions.highlighter import highlight_text
+    from apis_highlighter.forms import SundayHighlighterForm
 
 
 ############################################################################

@@ -192,20 +192,20 @@ class PassageTopics(VocabsBaseClass):
 
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
-class WorkLanguage(VocabsBaseClass):
-    """vocab to set the language of a work"""
+class PassageLanguage(VocabsBaseClass):
+    """vocab to set the language of a passage"""
     pass
 
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
-class WorkDenomination(VocabsBaseClass):
-    """vocab to set the Denomiation of a work"""
+class PassageTopics(VocabsBaseClass):
+    """vocab to set the tag of a passage"""
     pass
 
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
-class WorkTopics(VocabsBaseClass):
-    """vocab to set the tag of a work"""
+class SundayRepresentations(VocabsBaseClass):
+    """vocab used to annotate the various representations of sunday in the texts"""
     pass
 
 

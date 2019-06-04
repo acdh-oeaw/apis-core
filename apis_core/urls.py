@@ -13,9 +13,9 @@ from apis_core.apis_metainfo.api_views import (
     UriSerializerViewSet,
 )
 from apis_core.apis_relations.api_views import (
-    InstitutionInstitutionViewSet, InstitutionPlaceViewSet, InstitutionEventViewSet, InstitutionWorkViewSet,
-    PersonInstitutionViewSet, PersonPlaceViewSet, PersonPersonViewSet, PersonEventViewSet, PersonWorkViewSet,
-    PlaceWorkViewSet, PlaceEventViewSet, EventWorkViewSet, EventEventViewSet, WorkWorkViewSet,
+    InstitutionInstitutionViewSet, InstitutionPlaceViewSet, InstitutionEventViewSet, InstitutionPassageViewSet,
+    PersonInstitutionViewSet, PersonPlaceViewSet, PersonPersonViewSet, PersonEventViewSet, PersonPassageViewSet,
+    PlacePassageViewSet, PlaceEventViewSet, EventPassageViewSet, EventEventViewSet, PassagePassageViewSet,
     PlacePlaceViewSet)
 from apis_core.apis_vocabularies.api_views import (
 from django.conf import settings

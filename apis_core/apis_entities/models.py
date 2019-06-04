@@ -13,8 +13,8 @@ from apis_core.apis_vocabularies.models import (
     Title,
     PassageLanguage,
 
-import re
-import unicodedata
+    # TOOD __sresch__ : entfernen falls endgueltig nicht mehr benoetigt
+    # PassageDenomination,
 
     PassageType,
     PassageTopics
