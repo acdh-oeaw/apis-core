@@ -31,24 +31,12 @@ from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
 from .api_renderers import EntityToCIDOC, EntityToTEI
-from .models import Event, Institution, Person, Place, Work
 from .serializers import (
     InstitutionSerializer, PersonSerializer, PlaceSerializer, EventSerializer, PassageSerializer,
     GeoJsonSerializer, NetJsonEdgeSerializer, NetJsonNodeSerializer 
 )
 from .serializers_generic import EntitySerializer
 from .models import Institution, Person, Place, Event, Passage
-from apis_core.apis_vocabularies.models import VocabsBaseClass
-from apis_core.helper_functions.stanbolQueries import find_loc
-from apis_core.default_settings.NER_settings import autocomp_settings, stb_base
-from apis_core.apis_metainfo.api_renderers import PaginatedCSVRenderer
-from apis_core.apis_metainfo.models import TempEntityClass
-from apis_core.apis_metainfo.models import Uri
-from rest_framework.settings import api_settings
-from rest_framework.permissions import DjangoObjectPermissions, AllowAny
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.parsers import FileUploadParser
-from django.urls import reverse
 
 # from metainfo.models import TempEntityClass
 

@@ -179,17 +179,6 @@ class CollectionType(VocabsBaseClass):
     """e.g. reseachCollection, importCollection """
     pass
 
-@reversion.register(follow=['vocabsbaseclass_ptr'])
-class PassageLanguage(VocabsBaseClass):
-    """vocab to set the language of a passage"""
-    pass
-
-
-@reversion.register(follow=['vocabsbaseclass_ptr'])
-class PassageTopics(VocabsBaseClass):
-    """vocab to set the tag of a passage"""
-    pass
-
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
 class PassageLanguage(VocabsBaseClass):

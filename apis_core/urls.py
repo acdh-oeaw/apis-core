@@ -17,7 +17,7 @@ from apis_core.apis_relations.api_views import (
     PersonInstitutionViewSet, PersonPlaceViewSet, PersonPersonViewSet, PersonEventViewSet, PersonPassageViewSet,
     PlacePassageViewSet, PlaceEventViewSet, EventPassageViewSet, EventEventViewSet, PassagePassageViewSet,
     PlacePlaceViewSet)
-from apis_core.apis_vocabularies.api_views import (
+from apis_core.apis_vocabularies.api_views import UserViewSet
 from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
@@ -25,7 +25,6 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.views.static import serve
 from rest_framework import routers
-    UserViewSet,
 
 from .api_routers import create_generic_api_viewset
 
@@ -36,6 +35,8 @@ for app_label in ["entities", "metainfo", "vocabularies", "relations"]:
     for ent in ContentType.objects.filter(app_label="apis_{}".format(app_label)):
         name = "".join([x.title() for x in ent.name.split(" ")])
         try:
+            if name.lower() in ['texttype-collectionrelationship']:
+                continue
             router.register(
                 r"{}/{}".format(app_label, name.lower()),
                 create_generic_api_viewset(

@@ -54,6 +54,7 @@ def create_generic_api_viewset(**kwargs):
     class GenericAPIViewSet(viewsets.ModelViewSet):
         entity_str = kwargs.get("entity")
         app_label = kwargs.get("app_label")
+        print(app_label, entity_str)
         entity = ContentType.objects.get(
             app_label=app_label, model=entity_str.lower()
         ).model_class()
