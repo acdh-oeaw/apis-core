@@ -59,7 +59,7 @@ class EntityToCIDOC(renderers.BaseRenderer):
             g, ent = self.ent_func[data['entity_type']](g, ns, data, drill_down=True)
         if binary:
             return g
-        return g.serialize(format=self.format.split('+')[-1])
+        return g.serialize(format=self.format.split('+')[-1]), store
 
 
 class EntityToCIDOCXML(EntityToCIDOC):

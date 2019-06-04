@@ -31,7 +31,7 @@ class Command(BaseCommand):
             '--filter',
             action='store',
             dest='filter',
-            default={},
+            default='{}',
             help='Specify a dictionary of filter arguments for the Entity queryset.',
         )
 
@@ -42,7 +42,7 @@ class Command(BaseCommand):
             default='Person',
             help='Specify a dictionary of filter arguments for the Person queryset.',
         )
-        
+
         parser.add_argument(
             '--update',
             action='store_true',
@@ -58,7 +58,7 @@ class Command(BaseCommand):
             default=False,
             help='Specify a tuple of URL, username, password to access triple-store.',
         )
- 
+
         parser.add_argument(
             '--delete',
             action='store_true',
