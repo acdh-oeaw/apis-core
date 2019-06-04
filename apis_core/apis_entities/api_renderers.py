@@ -10,7 +10,7 @@ from rdflib.void import generateVoID
 from rdflib.namespace import DCTERMS, VOID
 from rdflib.plugins.memory import IOMemory
 from rest_framework import renderers
-from .cidoc_mapping import m_person, m_place
+from .cidoc_mapping import m_person, m_place, m_work, m_institution
 try:
     from webpage.metadata import PROJECT_METADATA
 except ImportError:
@@ -37,9 +37,12 @@ class EntityToCIDOC(renderers.BaseRenderer):
 
     media_type = "text/rdf"
 
-    ent_func = {'Person': m_person,
-                'Place': m_place
-               }
+    ent_func = {
+        'Person': m_person,
+        'Place': m_place,
+        'Work': m_work,
+        'Institution': m_institution,
+        }
 
     def render(self, data1, media_type=None, renderer_context=None, format_1=None, binary=False, store=False):
         if type(data1) != list:

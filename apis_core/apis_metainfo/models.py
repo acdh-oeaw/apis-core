@@ -160,10 +160,10 @@ class TempEntityClass(models.Model):
                 self.name = unicodedata.normalize("NFC", self.name)
             super(TempEntityClass, self).save(*args, **kwargs)
         if self.start_date:
-            self.start_date = self.start_date.date()
+            self.start_date = self.start_date
             print(self.start_date)
         if self.end_date:
-            self.end_date = self.end_date.date()
+            self.end_date = self.end_date
         return self
 
     def get_child_entity(self):

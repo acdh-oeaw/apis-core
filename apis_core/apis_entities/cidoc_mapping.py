@@ -1,11 +1,10 @@
-from rdflib import RDF, RDFS, XSD, BNode, Graph, Literal, URIRef, OWL 
+from rdflib import RDF, RDFS, XSD, BNode, Graph, Literal, URIRef, OWL
 from django.conf import settings
 
 base_uri = getattr(settings, 'APIS_BASE_URI', 'http://apis.info')
 if base_uri.endswith('/'):
     base_uri = base_uri[:-1]
 lang = getattr(settings, 'LANGUAGE_CODE', 'de')
-
 
 
 def m_add_uris(g, ns, obj, uris):
@@ -17,7 +16,7 @@ def m_add_uris(g, ns, obj, uris):
 
 def m_place_of_birth(g, p, ns, data):
     if (None, ns['cidoc'].P98_brought_into_life, p) in g:
-        b_birth = g.value(None, ns['cidoc'].P98_brought_into_life, p, any=False) 
+        b_birth = g.value(None, ns['cidoc'].P98_brought_into_life, p, any=False)
     else:
         b_birth = URIRef(f"{base_uri}/appellation/birth/{data['id']}")
         g.set((b_birth, RDF.type, ns['cidoc'].E67_Birth))
@@ -26,11 +25,11 @@ def m_place_of_birth(g, p, ns, data):
     g.set((b_birth, ns['cidoc'].P7_took_place_at, place_of_birth))
 
     return g
-    
+
 
 def m_place_of_death(g, p, ns, data):
     if (None, ns['cidoc'].P100_was_death_of, p) in g:
-        b_death = g.value(None, ns['cidoc'].P100_was_death_of, p, any=False) 
+        b_death = g.value(None, ns['cidoc'].P100_was_death_of, p, any=False)
     else:
         b_death = URIRef(f"{base_uri}/appellation/death/{data['id']}")
         g.set((b_death, RDF.type, ns['cidoc'].E69_Death))
@@ -68,13 +67,29 @@ def m_place(g, ns, data, drill_down=False):
         g.set((place_uri, RDFS.label, Literal(data["name"], lang=lang)))
         if data['lng'] is not None:
             g.set((place_uri, ns['cidoc'].P168_place_is_defined_by, Literal(f"Point( {data['lng']} {data['lat']} )", datatype="geo:wktLiteral")))
-        g = m_add_uris(g, ns, place_uri, data['uris'])        
+        g = m_add_uris(g, ns, place_uri, data['uris'])
         if drill_down:
             for ent_1 in data['relations']:
                 for p in data['relations'][ent_1]:
                     if f"{ent_1}_{p['relation_type']['label']}" in cd_mp.keys():
-                        g = cd_mp[f"{ent_1}_{p['relation_type']['label']}"](g, place_uri, ns, p) 
+                        g = cd_mp[f"{ent_1}_{p['relation_type']['label']}"](g, place_uri, ns, p)
         return g, place_uri
+
+
+def m_work(g, ns, data, drill_down=False):
+    k_uri = URIRef(data["url"])
+    if (k_uri, RDF.type, ns['cidoc'].E73_Information_Object) in g and not drill_down:
+        return g, k_uri
+    else:
+        k_label_string = f"{data['name']}".strip()
+        g.set((k_uri, RDF.type, ns['cidoc'].E73_Information_Object))
+        g.set((k_uri, RDFS.label, Literal(k_label_string, lang=lang)))
+        b_app = BNode()
+        g.set((k_uri, ns['cidoc'].P1_is_identified_by, b_app))
+        g.set((b_app, RDF.type, ns['cidoc'].E41_Appellation))
+        g.set((b_app, RDFS.label, Literal(k_label_string, lang=lang)))
+        g = m_add_uris(g, ns, k_uri, data['uris'])
+        return g, k_uri
 
 
 def m_person(g, ns, data, drill_down=False):
@@ -122,7 +137,7 @@ def m_person(g, ns, data, drill_down=False):
             for ent_1 in data['relations']:
                 for p in data['relations'][ent_1]:
                     if f"{ent_1}_{p['relation_type']['label']}" in cd_mp.keys():
-                        g = cd_mp[f"{ent_1}_{p['relation_type']['label']}"](g, k_uri, ns, p) 
+                        g = cd_mp[f"{ent_1}_{p['relation_type']['label']}"](g, k_uri, ns, p)
     g = m_add_uris(g, ns, k_uri, data['uris'])
     return g, k_uri
 
@@ -134,5 +149,3 @@ def m_institution(g, ns, data):
     else:
         g.add((inst_uri, RDF.type, ns['cidoc'].E74_Group))
         g.add((inst_uri, RDFS.label, Literal(data['name'], lang=lang)))
-
-
