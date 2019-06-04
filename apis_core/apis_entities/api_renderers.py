@@ -1,10 +1,13 @@
 import json
+from datetime import date
 
 from apis_core.apis_tei.tei import TeiEntCreator
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
-from rdflib import RDF, RDFS, XSD, BNode, Graph, Literal, Namespace, URIRef, ConjunctiveGraph, OWL
+from rdflib import RDF, XSD, Graph, Literal, Namespace, URIRef, ConjunctiveGraph, OWL
+from rdflib.void import generateVoID
+from rdflib.namespace import DCTERMS, VOID
 from rdflib.plugins.memory import IOMemory
 from rest_framework import renderers
 from .cidoc_mapping import m_person, m_place
@@ -47,16 +50,28 @@ class EntityToCIDOC(renderers.BaseRenderer):
         geo = Namespace("http://www.opengis.net/ont/geosparql#")
         if not store:
             store = IOMemory()
-        g = Graph(store, identifier=URIRef(f'{base_uri}/entities#'))
+        uri_entities = URIRef(f'{base_uri}/entities#')
+        g = Graph(store, identifier=uri_entities)
         g.bind('cidoc', cidoc, override=False)
         g.bind('geo', geo, override=False)
         g.bind('owl', OWL, override=False)
         ns = {'cidoc': cidoc, 'geo': geo}
         for data in data1:
             g, ent = self.ent_func[data['entity_type']](g, ns, data, drill_down=True)
+        g_prov = Graph(store, identifier=URIRef('https://omnipot.acdh.oeaw.ac.at/provenance'))
+        g_prov.bind('dct', DCTERMS, override=False)
+        g_prov.bind('void', VOID, override=False)
+        g_prov.add((uri_entities, DCTERMS.title, Literal(PROJECT_METADATA['title'], lang=lang)))
+        g_prov.add((uri_entities, DCTERMS.description, Literal(PROJECT_METADATA['description'], lang=lang)))
+        g_prov.add((uri_entities, DCTERMS.creator, Literal(PROJECT_METADATA['author'], lang=lang)))
+        g_prov.add((uri_entities, DCTERMS.publisher, Literal('ACDH-OeAW', lang=lang)))
+        g_prov.add((uri_entities, DCTERMS.source, URIRef(base_uri)))
+        g_prov.add((uri_entities, DCTERMS.created, Literal(str(date.today()), datatype=XSD.date)))
+        g_prov, g = generateVoID(g, dataset=uri_entities, res=g_prov)
+        g_all = ConjunctiveGraph(store=store)
         if binary:
-            return g
-        return g.serialize(format=self.format.split('+')[-1])
+            return g_all, store
+        return g_all.serialize(format=self.format.split('+')[-1]), store
 
 
 class EntityToCIDOCXML(EntityToCIDOC):

@@ -31,7 +31,7 @@ class Command(BaseCommand):
             '--filter',
             action='store',
             dest='filter',
-            default={},
+            default="{}",
             help='Specify a dictionary of filter arguments for the Entity queryset.',
         )
 
