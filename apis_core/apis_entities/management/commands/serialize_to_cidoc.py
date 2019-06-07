@@ -8,7 +8,7 @@ from django.conf import settings
 import requests
 from rdflib import Graph
 from rdflib.plugins.memory import IOMemory
-
+from SPARQLWrapper import SPARQLWrapper, POST, BASIC, JSON
 
 map_ct = {
     'trig': ('application/x-trig', 'trig'),
@@ -117,11 +117,60 @@ class Command(BaseCommand):
                     return
             if options['delete']:
                 if not options['namedgraph']:
+                    sparql_serv = SPARQLWrapper(url)
+                    sparql_serv.setHTTPAuth(BASIC)
+                    sparql_serv.setCredentials(username, password)
+                    sparql_serv.setMethod(POST)
+                    sparql_serv.setReturnFormat(JSON)
+                    sp_count = f"""
+                            SELECT (COUNT(*) AS ?triples)
+                            FROM <{base_uri}/entities#>
+                            WHERE {{ ?s ?p ?o }}
+                            """
+                    sparql_serv.setQuery(sp_count)
+                    res_count_1 = sparql_serv.query().convert()
+                    count = int(res_count_1['results']['bindings'][0]['triples']['value'])
+                    if count > 0:
+                        self.stdout.write(self.style.NOTICE(f'Found {count} triples in named graph >> deleting'))
                     params = {'c': f'<{base_uri}/entities#>'}
                     res3 = requests.delete(url, auth=(username, password), headers={'Accept': 'application/xml'}, params=params)
                     self.stdout.write(self.style.NOTICE(f'Deleted the graph: {res3.text} {res3.status_code}'))
+                    for f in ['class', 'property']:
+                        sparql_serv.setQuery(f"""
+                            PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+                            PREFIX void: <http://rdfs.org/ns/void#>
+
+
+                            DELETE WHERE {{
+                                GRAPH <https://omnipot.acdh.oeaw.ac.at/provenance> {{
+                                    <{base_uri}/entities#> void:{f}Partition ?o.
+                                    ?o ?p ?s
+                                    }}
+                                    }}
+                        """)
+                        res4 = sparql_serv.query().convert()
+                    sparql_serv.setQuery(f"""
+                        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+                        PREFIX void: <http://rdfs.org/ns/void#>
+
+
+                        DELETE WHERE {{
+                          GRAPH <https://omnipot.acdh.oeaw.ac.at/provenance> {{
+                            <{base_uri}/entities#> ?p ?o.
+                            
+                        }}
+                        }}
+                    """)
+                    res4 = sparql_serv.query()
             header = {'Content-Type': map_ct[options['format']][0]}
             res2 = requests.post(url, headers=header, data=fin, auth=(username, password))
+            sparql_serv.setQuery(sp_count)
+            res_count_1 = sparql_serv.query().convert()
+            count = int(res_count_1['results']['bindings'][0]['triples']['value'])
+            if count > 0:
+                self.stdout.write(self.style.NOTICE(f'Found {count} triples after update in store'))
             if res2.status_code != 200:
                 self.stdout.write(self.style.ERROR(f'Something went wrong when updating: {res2.text}'))
             else:

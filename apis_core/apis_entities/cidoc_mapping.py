@@ -8,9 +8,7 @@ lang = getattr(settings, 'LANGUAGE_CODE', 'de')
 
 
 def m_add_uris(g, ns, obj, uris):
-    print(uris)
     for u in uris:
-        print(u)
         b_uri = URIRef(u['uri'])
         g.add((obj, OWL.sameAs, b_uri))
     return g
