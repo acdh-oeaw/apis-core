@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django.db.models.query import QuerySet
 
 from .models import (
     InstitutionInstitutionRelation, TextType, CollectionType, VocabsBaseClass,
@@ -8,6 +9,41 @@ from .models import (
     InstitutionEventRelation, InstitutionWorkRelation, PlaceEventRelation, PlaceWorkRelation, PlacePlaceRelation,
     EventWorkRelation, EventEventRelation, WorkWorkRelation, EventType, WorkType, LabelType)
 
+
+###########################################################
+#
+#  Generic Vocabs Serializer
+#
+###########################################################
+
+
+class GenericVocabsSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    userAdded = serializers.SerializerMethodField(method_name="add_user")
+    parent_class = serializers.PrimaryKeyRelatedField(many=False, read_only=True)
+    vocab_name = serializers.SerializerMethodField(method_name="add_vocabname")
+    name = serializers.CharField()
+    label = serializers.CharField()
+
+    def add_user(self, obj):
+        u = User.objects.get(pk=obj.userAdded_id)
+        if u.first_name and u.last_name:
+            return f"{u.last_name}, {u.first_name}"
+        else:
+            return str(u)
+
+    def add_vocabname(self, obj):
+        return str(obj.__class__.__name__)
+
+    def __init__(self, *args, **kwargs):
+        super(GenericVocabsSerializer, self).__init__(*args, **kwargs)
+        if type(self.instance) == QuerySet:
+            rt = self.instance[0]
+        else:
+            rt = self.instance
+        if "Relation" in rt.__class__.__name__:
+            self.fields['name_reverse'] = serializers.CharField()
+            self.fields['label_reverse'] = serializers.CharField()
 
 ###########################################################
 #

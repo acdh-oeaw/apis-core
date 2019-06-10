@@ -1,5 +1,7 @@
 import json
 from datetime import date
+import pickle
+import os
 
 from apis_core.apis_tei.tei import TeiEntCreator
 from django.conf import settings
@@ -45,7 +47,7 @@ class EntityToCIDOC(renderers.BaseRenderer):
         }
 
     def render(self, data1, media_type=None, renderer_context=None, format_1=None, binary=False, store=False):
-        if type(data1) != list:
+        if type(data1) == dict:
             data1 = [data1]
         if format_1 is not None:
             self.format = format_1
@@ -59,8 +61,16 @@ class EntityToCIDOC(renderers.BaseRenderer):
         g.bind('geo', geo, override=False)
         g.bind('owl', OWL, override=False)
         ns = {'cidoc': cidoc, 'geo': geo}
-        for data in data1:
-            g, ent = self.ent_func[data['entity_type']](g, ns, data, drill_down=True)
+        if type(data1) == list:
+            for data in data1:
+                g, ent = self.ent_func[data['entity_type']](g, ns, data, drill_down=True)
+        elif type(data1) == str:
+            directory = os.fsencode(data1)
+            for fn in os.listdir(directory):
+                with open(os.path.join(directory, fn), 'rb') as inf:
+                    data2 = pickle.load(inf)
+                    for data in data2:
+                        g, ent = self.ent_func[data['entity_type']](g, ns, data, drill_down=True)
         g_prov = Graph(store, identifier=URIRef('https://omnipot.acdh.oeaw.ac.at/provenance'))
         g_prov.bind('dct', DCTERMS, override=False)
         g_prov.bind('void', VOID, override=False)

@@ -4,6 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from apis_core.apis_entities.serializers_generic import EntitySerializer
 from apis_core.apis_entities.api_renderers import EntityToCIDOC
 import json
+import pickle
 from django.conf import settings
 import requests
 from rdflib import Graph
@@ -94,8 +95,25 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         ent = ContentType.objects.get(app_label="apis_entities", model=options['entity']).model_class()
         res = []
-        for e in ent.objects.filter(**json.loads(options['filter'])):
-            res.append(EntitySerializer(e).data)
+        objcts = ent.objects.filter(**json.loads(options['filter']))
+        if objcts.objects.filter(uri_set__uri__icontains=' ').count() > 0:
+            self.stdout.write(self.style.ERROR('URIs found that contain whitespaces'))
+            return
+        if objcts.count() > 1000:
+            self.stdout.write(self.style.NOTICE('More than 1000 objects, caching'))
+            cnt = 0
+            while (cnt * 1000) < objcts.count():
+                r = []
+                for e in objcts[1000*cnt:(1000*cnt+1000)]:
+                    r.append(EntitySerializer(e).data)
+                with open(f'serializer_cache/{cnt}.pkl', 'wb') as out:
+                    pickle.dump(r, out)
+                    self.stdout.write(self.style.NOTICE(f'Pickle written to: serializer_cache/{cnt}.pkl'))
+                cnt += 1
+            res = '/home/sennierer/projects/apis-webpage-base/serializer_cache'
+        else:
+            for e in objcts:
+                res.append(EntitySerializer(e).data)
         self.stdout.write(self.style.SUCCESS(f'serialized {len(res)} objects'))
         self.stdout.write(self.style.NOTICE('Starting to create the graph'))
         store = IOMemory()
