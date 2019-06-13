@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from convertdate import julian
+
 from dal import autocomplete
 from .fields import ListSelect2, Select2Multiple
 from django import forms
@@ -112,10 +114,106 @@ def get_entities_form(entity):
                     acc_grp2
                     )
             )
+
             self.fields['status'].required = False
             self.fields['collection'].required = False
             self.fields['start_date_written'].required = False
             self.fields['end_date_written'].required = False
+
+
+            # Loading dynamic help texts at date fields according to their parsing results
+
+            # default help texts underneath date fields
+            help_text_default = "Dates are interpretated by the agreed rules. " \
+                                "If this fails, they can be explicitly set as iso-date by following '&lt;YYYY-MM-DD&gt;'."
+            self.fields['start_date_written'].help_text = help_text_default
+            self.fields['end_date_written'].help_text = help_text_default
+
+            # check if form loads an existing instance
+            if 'instance' in kwargs:
+                instance = kwargs['instance']
+
+                # function for creating string help text from parsed dates
+                def create_help_text(single_date, single_start_date, single_end_date, single_date_written):
+
+                    help_text = ""
+                    single_date_j = ""
+                    if single_date:
+                        # date could be parsed
+
+                        help_text = "Date interpreted as: "
+
+                        # convert gregorian database date format into julian for user layer
+                        single_date_j = julian.from_gregorian(
+                            year=single_date.year,
+                            month=single_date.month,
+                            day=single_date.day
+                        )
+
+                        if single_start_date or single_end_date:
+                            # date has also start or end ranges
+
+                            if single_start_date:
+                                # date has start range
+
+                                # convert to julian
+                                single_start_date_j = julian.from_gregorian(
+                                    year=single_start_date.year,
+                                    month=single_start_date.month,
+                                    day=single_start_date.day
+                                )
+                                help_text += \
+                                    str(single_start_date_j[0]) +"-"+ str(single_start_date_j[1]) +"-"+ str(single_start_date_j[2]) + \
+                                    " until "
+                            else:
+                                help_text += "undefined start until "
+
+                            if single_end_date:
+                                # date has end range
+
+                                # convert to julian
+                                single_end_date_j = julian.from_gregorian(
+                                    year=single_end_date.year,
+                                    month=single_end_date.month,
+                                    day=single_end_date.day
+                                )
+                                help_text += \
+                                    str(single_end_date_j[0]) + "-" + str(single_end_date_j[1]) + "-" + str(single_end_date_j[2])
+                            else:
+                                help_text += "undefined end"
+
+                        else:
+                            # date has no start nor end range. Use single date then.
+
+                            help_text += str(single_date_j[0]) +"-"+ str(single_date_j[1]) +"-"+ str(single_date_j[2])
+
+                    elif single_date_written is not None:
+                        # date field is not empty but it could not be parsed either. Show parsing info and help text
+
+                        help_text = "<b>Date could not be interpreted</b><br>" + help_text_default
+
+                    else:
+                        # date field is completely empty. Show help text only
+
+                        help_text = help_text_default
+
+                    return help_text
+
+                # write results into help texts
+                self.fields['start_date_written'].help_text = create_help_text(
+                    instance.start_date,
+                    instance.start_start_date,
+                    instance.start_end_date,
+                    instance.start_date_written
+                )
+                self.fields['end_date_written'].help_text = create_help_text(
+                    instance.end_date,
+                    instance.end_start_date,
+                    instance.end_end_date,
+                    instance.end_date_written
+                )
+
+
 
         def save(self, *args, **kwargs):
             obj = super(GenericEntitiesForm, self).save(*args, **kwargs)
