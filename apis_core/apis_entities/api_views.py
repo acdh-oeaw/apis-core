@@ -390,7 +390,24 @@ class GetOrCreateEntity(APIView):
     def get(self, request):
         entity = request.query_params.get("entity2", None)
         uri = request.query_params.get("uri", None)
-        ent = GenericRDFParser(uri, entity.title()).get_or_create()
+        if uri.startswith('http:'):
+            ent = GenericRDFParser(uri, entity.title()).get_or_create()
+        else:
+            print(uri)
+            r1 = re.search(r"^[^<]+", uri)
+            r2 = re.search(r"<([^>]+)>", uri)
+            q_d = dict()
+            q_d['name'] = r1
+            if r2:
+                for x in r2.group(1).split(';'):
+                    x2 = x.split('=')
+                    q_d[x2[0].strip()] = x2[1].strip()
+            if entity == 'person':
+                r1_2 = r1.group(0).split(',')
+                if len(r1_2) == 2:
+                    q_d['first_name'] = r1_2[1].strip()
+                    q_d['name'] = r1_2[0].strip()
+            ent = ContentType.objects.get(app_label="apis_entities", model=entity.lower()).model_class().objects.create(**q_d)
         res = {
             "id": ent.pk,
             "url": reverse_lazy(

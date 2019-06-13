@@ -26,11 +26,15 @@ class GenericVocabsSerializer(serializers.Serializer):
     label = serializers.CharField()
 
     def add_user(self, obj):
-        u = User.objects.get(pk=obj.userAdded_id)
-        if u.first_name and u.last_name:
-            return f"{u.last_name}, {u.first_name}"
-        else:
-            return str(u)
+        print(f"user pk: {obj.userAdded_id}")
+        try:
+            u = User.objects.get(pk=obj.userAdded_id)
+            if u.first_name and u.last_name:
+                return f"{u.last_name}, {u.first_name}"
+            else:
+                return str(u)
+        except:
+            return ""
 
     def add_vocabname(self, obj):
         return str(obj.__class__.__name__)

@@ -19,8 +19,9 @@ class VocabToSkos(renderers.BaseRenderer):
 
     media_type = "text/rdf"
 
-    def render(self, data1, media_type=None, renderer_context=None, format1=None, binary=True):
-        g = Graph()
+    def render(self, data1, media_type=None, g=False, renderer_context=None, format1=None, binary=True):
+        if not g:
+            g = Graph()
         set_skos = getattr(settings, "APIS_SKOSMOS")
         base_uri = set_skos.get('url')
         if base_uri.endswith('/'):

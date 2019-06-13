@@ -46,7 +46,7 @@ class EntityToCIDOC(renderers.BaseRenderer):
         'Institution': m_institution,
         }
 
-    def render(self, data1, media_type=None, renderer_context=None, format_1=None, binary=False, store=False):
+    def render(self, data1, media_type=None, renderer_context=None, format_1=None, binary=False, store=False, named_graph=None):
         if type(data1) == dict:
             data1 = [data1]
         if format_1 is not None:
@@ -55,7 +55,10 @@ class EntityToCIDOC(renderers.BaseRenderer):
         geo = Namespace("http://www.opengis.net/ont/geosparql#")
         if not store:
             store = IOMemory()
-        uri_entities = URIRef(f'{base_uri}/entities#')
+        if named_graph:
+            uri_entities = URIRef(named_graph)
+        else:
+            uri_entities = URIRef(f'{base_uri}/entities#')
         g = Graph(store, identifier=uri_entities)
         g.bind('cidoc', cidoc, override=False)
         g.bind('geo', geo, override=False)

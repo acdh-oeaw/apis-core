@@ -3,6 +3,8 @@ from apis_core.apis_entities.models import Person
 from django.contrib.contenttypes.models import ContentType
 from apis_core.apis_entities.serializers_generic import EntitySerializer
 from apis_core.apis_entities.api_renderers import EntityToCIDOC
+from apis_core.apis_vocabularies.serializers import GenericVocabsSerializer
+from apis_core.apis_vocabularies.api_renderers import VocabToSkos
 import json
 import pickle
 from django.conf import settings
@@ -85,6 +87,14 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
+            '--update-vocabs',
+            action='store_true',
+            dest='update-vocabs',
+            default=False,
+            help='Specify whether to update skosmos vocabularies (needs settings in place).',
+        )
+
+        parser.add_argument(
             '--format',
             action='store',
             dest='format',
@@ -96,7 +106,7 @@ class Command(BaseCommand):
         ent = ContentType.objects.get(app_label="apis_entities", model=options['entity']).model_class()
         res = []
         objcts = ent.objects.filter(**json.loads(options['filter']))
-        if objcts.objects.filter(uri_set__uri__icontains=' ').count() > 0:
+        if objcts.filter(uri__uri__icontains=' ').count() > 0:
             self.stdout.write(self.style.ERROR('URIs found that contain whitespaces'))
             return
         if objcts.count() > 1000:
@@ -114,13 +124,21 @@ class Command(BaseCommand):
         else:
             for e in objcts:
                 res.append(EntitySerializer(e).data)
+
         self.stdout.write(self.style.SUCCESS(f'serialized {len(res)} objects'))
         self.stdout.write(self.style.NOTICE('Starting to create the graph'))
         store = IOMemory()
-        fin, store = EntityToCIDOC().render(res, format_1=options['format'], store=store)
+        fin, store = EntityToCIDOC().render(res, format_1=options['format'], store=store, binary=True, named_graph=options['namedgraph'])
+        if options['update-vocabs']:
+            self.stdout.write(self.style.NOTICE('Starting to create the SKOS vocabs.'))
+            for v in ContentType.objects.filter(app_label="apis_vocabularies").exclude(model__in=["vocabnames"]):
+                v_res = v.model_class().objects.all()
+                if v_res.count() > 0:
+                    v_res_ser = GenericVocabsSerializer(v_res, many=True).data
+                    fin = VocabToSkos().render(v_res_ser, g=fin)
         if options['output']:
             with open(options['output'], 'wb') as out:
-                out.write(fin)
+                out.write(fin.serialize(format=options['format']))
             self.stdout.write(self.style.SUCCESS(f'Wrote file to {options["output"]}'))
         if options['update']:
             if not options['triplestore']:
@@ -133,18 +151,18 @@ class Command(BaseCommand):
                 if not url or not username or not password:
                     self.stdout.write(self.style.ERROR('Missing some settings for Triplestore update'))
                     return
+            sparql_serv = SPARQLWrapper(url)
+            sparql_serv.setHTTPAuth(BASIC)
+            sparql_serv.setCredentials(username, password)
+            sparql_serv.setMethod(POST)
+            sparql_serv.setReturnFormat(JSON)
+            sp_count = f"""
+                    SELECT (COUNT(*) AS ?triples)
+                    FROM <{base_uri}/entities#>
+                    WHERE {{ ?s ?p ?o }}
+                    """
             if options['delete']:
                 if not options['namedgraph']:
-                    sparql_serv = SPARQLWrapper(url)
-                    sparql_serv.setHTTPAuth(BASIC)
-                    sparql_serv.setCredentials(username, password)
-                    sparql_serv.setMethod(POST)
-                    sparql_serv.setReturnFormat(JSON)
-                    sp_count = f"""
-                            SELECT (COUNT(*) AS ?triples)
-                            FROM <{base_uri}/entities#>
-                            WHERE {{ ?s ?p ?o }}
-                            """
                     sparql_serv.setQuery(sp_count)
                     res_count_1 = sparql_serv.query().convert()
                     count = int(res_count_1['results']['bindings'][0]['triples']['value'])
@@ -183,7 +201,7 @@ class Command(BaseCommand):
                     """)
                     res4 = sparql_serv.query()
             header = {'Content-Type': map_ct[options['format']][0]}
-            res2 = requests.post(url, headers=header, data=fin, auth=(username, password))
+            res2 = requests.post(url, headers=header, data=fin.serialize(format=options['format']), auth=(username, password))
             sparql_serv.setQuery(sp_count)
             res_count_1 = sparql_serv.query().convert()
             count = int(res_count_1['results']['bindings'][0]['triples']['value'])
