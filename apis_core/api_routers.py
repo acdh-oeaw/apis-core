@@ -11,7 +11,6 @@ from rest_framework.permissions import AllowAny, DjangoObjectPermissions
 from rest_framework.response import Response
 from rest_framework import renderers
 from .api_renderers import NetJsonRenderer
-import rest_framework_filters
 from url_filter.filtersets import ModelFilterSet
 
 
