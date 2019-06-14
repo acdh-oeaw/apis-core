@@ -21,7 +21,7 @@
                     {% if object.get_prev_url %}
                         <h2>
                             <a href="{{ object.get_prev_url }}" style="float:right">
-                                <i class="fas fa-chevron-left" title="previous"></i>
+                                <i data-feather="chevron-left" title="previous"></i>
                             </a>
                         </h2>
                     {% endif %}
@@ -38,19 +38,15 @@
                         {{ object }}
                         {% if user.is_authenticated %}
                             {% if object.get_edit_url %}
-                                <small>
                                     <a href="{{ object.get_edit_url }}">
-                                        <i class="far fa-edit" title="edit"></i>
+                                        <i class="feather-32" data-feather="edit" title="edit"></i>
                                     </a>
-                                </small>
                             {% endif %}
                             {% if object.get_delete_url %}
                                 |
-                                <small>
                                     <a href="{{ object.get_delete_url }}">
-                                        <i class="far fa-trash-alt" title="delete"></i>
+                                        <i class="feather-32" data-feather="trash" title="delete"></i>
                                     </a>
-                                </small>
                             {% endif %}
                         {% endif %}
                     </h2>
@@ -59,7 +55,7 @@
                 {% if object.get_next_url %}
                     <h2>
                         <a href="{{ object.get_next_url}}" style="float:left">
-                            <i class="fas fa-chevron-right" title="next"></i>
+                            <i data-feather="chevron-right" title="next"></i>
                         </a>
                     </h2>
                 {% endif %}
@@ -74,7 +70,7 @@
                             <h3>
                                 General Info
                                 <a href="/apis/api2/entity/{{object.id}}">
-                                    <small><i class="fas fa-database" title="api"></i></small>
+                                    <small><i class="feather-32" data-feather="database" title="API"></i></small>
                                 </a>
                             </h3>
                         </div>
@@ -87,6 +83,18 @@
                                     </th>
                                     <td>
                                         {{ object.name }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Labels
+                                    </th>
+                                    <td>
+                                        {% for x in no_merge_labels %}
+                                            <li>
+                                                <small>{{ x.label_type }}: </small>{{ x.label }}
+                                            </li>
+                                        {% endfor %}
                                     </td>
                                 </tr>
                                 <tr>
