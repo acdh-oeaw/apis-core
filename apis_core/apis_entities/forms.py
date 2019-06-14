@@ -134,7 +134,7 @@ def get_entities_form(entity):
             # Loading dynamic help texts at date fields according to their parsing results
 
             # default
-            help_text_default = "Dates are interpretated by the agreed rules. " \
+            help_text_default = "Dates are interpreted by the agreed rules. " \
                                 "If this fails, they can be explicitly set as iso-date by following '&lt;YYYY-MM-DD&gt;'."
 
             # check if form loads an existing instance
