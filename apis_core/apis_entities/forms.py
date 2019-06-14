@@ -135,7 +135,7 @@ def get_entities_form(entity):
 
             # default
             help_text_default = "Dates are interpreted by defined rules. " \
-                                "If this fails, an iso-date can be explicitly by inserting '&lt;YYYY-MM-DD&gt;'."
+                                "If this fails, an iso-date can be explicitly set with '&lt;YYYY-MM-DD&gt;'."
 
             # check if form loads an existing instance
             if 'instance' in kwargs:
