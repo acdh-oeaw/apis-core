@@ -44,7 +44,16 @@ def get_entities_form(entity):
         class Meta:
             model = ContentType.objects.get(
                 app_label='apis_entities', model=entity.lower()).model_class()
-            exclude = ['start_date', 'end_date', 'text', 'source']
+            exclude = [
+                'start_date',
+                'start_start_date',
+                'start_end_date',
+                'end_date',
+                'end_start_date',
+                'end_end_date',
+                'text',
+                'source',
+            ]
 
         def __init__(self, *args, **kwargs):
             super(GenericEntitiesForm, self).__init__(*args, **kwargs)
@@ -89,6 +98,7 @@ def get_entities_form(entity):
                                 pass
                             self.fields[f].choices = res
                             self.fields[f].initial = res
+
                 if f not in acc_grp2:
                     acc_grp1.append(f)
 
@@ -123,23 +133,44 @@ def get_entities_form(entity):
 
             # Loading dynamic help texts at date fields according to their parsing results
 
-            # default help texts underneath date fields
+            # default
             help_text_default = "Dates are interpretated by the agreed rules. " \
                                 "If this fails, they can be explicitly set as iso-date by following '&lt;YYYY-MM-DD&gt;'."
-            self.fields['start_date_written'].help_text = help_text_default
-            self.fields['end_date_written'].help_text = help_text_default
 
             # check if form loads an existing instance
             if 'instance' in kwargs:
+                # instance exists, thus run the date parse check to inform the user about its results
+
                 instance = kwargs['instance']
 
-                # function for creating string help text from parsed dates
                 def create_help_text(single_date, single_start_date, single_end_date, single_date_written):
+                    """
+                    function for creating string help text from parsed dates, to provide feedback to the user
+                    about the parsing status of a given date field.
+
+                    :param single_date: datetime :
+                        the individual date point (gregorian)
+
+                    :param single_start_date: datetime :
+                        the start range of a date(gregorian)
+
+                    :param single_end_date: datetime :
+                        the endrange of a date(gregorian)
+
+                    :param single_date_written: str :
+                        the textual description of a date field (needed to check if empty or not)
+
+
+                    :return help_text: str :
+                        The text to be displayed underneath a date field, informing the user about the parsing result
+                    """
+
+
+                    # check which of the dates could be parsed to construct the relevant feedback text
 
                     help_text = ""
-                    single_date_j = ""
                     if single_date:
-                        # date could be parsed
+                        # single date could be parsed
 
                         help_text = "Date interpreted as: "
 
@@ -151,7 +182,7 @@ def get_entities_form(entity):
                         )
 
                         if single_start_date or single_end_date:
-                            # date has also start or end ranges
+                            # date has also start or end ranges, then ignore single date
 
                             if single_start_date:
                                 # date has start range
@@ -166,6 +197,8 @@ def get_entities_form(entity):
                                     str(single_start_date_j[0]) +"-"+ str(single_start_date_j[1]) +"-"+ str(single_start_date_j[2]) + \
                                     " until "
                             else:
+                                # date has no start range, then write 'undefined'
+
                                 help_text += "undefined start until "
 
                             if single_end_date:
@@ -180,6 +213,8 @@ def get_entities_form(entity):
                                 help_text += \
                                     str(single_end_date_j[0]) + "-" + str(single_end_date_j[1]) + "-" + str(single_end_date_j[2])
                             else:
+                                # date has no start range, then write 'undefined'
+
                                 help_text += "undefined end"
 
                         else:
@@ -212,6 +247,12 @@ def get_entities_form(entity):
                     instance.end_end_date,
                     instance.end_date_written
                 )
+
+            else:
+                # instance does not exist, load default help text into fields
+
+                self.fields['start_date_written'].help_text = help_text_default
+                self.fields['end_date_written'].help_text = help_text_default
 
 
 
