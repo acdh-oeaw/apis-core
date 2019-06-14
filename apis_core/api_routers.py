@@ -5,12 +5,14 @@ import django.db.models.fields as df_fields
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
-from django_filters.rest_framework import DjangoFilterBackend
+from url_filter.integrations.drf import DjangoFilterBackend
 from rest_framework import filters, generics, pagination, routers, serializers, viewsets
 from rest_framework.permissions import AllowAny, DjangoObjectPermissions
 from rest_framework.response import Response
 from rest_framework import renderers
 from .api_renderers import NetJsonRenderer
+import rest_framework_filters
+from url_filter.filtersets import ModelFilterSet
 
 
 def deep_get(dictionary, keys, default=None):
@@ -51,32 +53,26 @@ class LabelSerializer(serializers.Serializer):
 
 
 def create_generic_api_viewset(**kwargs):
+
+    class GenericFilterSet(ModelFilterSet):
+        class Meta(object):
+            model = ContentType.objects.get(app_label=kwargs.get("app_label"), model=kwargs.get("entity")).model_class() 
+ 
+    
     class GenericAPIViewSet(viewsets.ModelViewSet):
+        pagination_class = CustomPagination
         entity_str = kwargs.get("entity")
         app_label = kwargs.get("app_label")
         entity = ContentType.objects.get(
             app_label=app_label, model=entity_str.lower()
         ).model_class()
-        pagination_class = CustomPagination
         model = entity
         queryset = entity.objects.all()
-        permission_classes = (DjangoObjectPermissions,)
-        filter_backends = (DjangoFilterBackend, filters.SearchFilter)
+        filter_backends = (DjangoFilterBackend, )
         depth = 2
         test_search = getattr(settings, app_label.upper(), False)
         renderer_classes = (renderers.JSONRenderer, renderers.BrowsableAPIRenderer, NetJsonRenderer)
-        if test_search:
-            search_fields = deep_get(test_search, "search", [])
-            filter_fields = deep_get(test_search, "list_filters", [])
-            search_fields = deep_get(
-                test_search, "{}.search".format(entity_str), search_fields
-            )
-            filter_fields = deep_get(
-                test_search, "{}.list_filters".format(entity_str), filter_fields
-            )
-            if filter_fields is not None:
-                filterset_fields = [x[0] for x in filter_fields]
-
+        filter_class = GenericFilterSet
         def get_serializer_class(self):
             entity_str = self.entity_str
             entity = self.entity
