@@ -9,7 +9,6 @@ from apis_core.apis_vocabularies.models import (
     EventType,
     InstitutionType,
     PlaceType,
-    ProfessionType,
     Title,
     PassageLanguage,
     PassageType,
