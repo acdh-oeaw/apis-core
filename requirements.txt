@@ -12,7 +12,7 @@ django-registration==2.4.1
 django-reversion==2.0.13
 django-reversion-compare==0.8.4
 django-tables2==1.21.1
-django-url-filter==0-3.12
+django-url-filter==0.3.12
 djangorestframework==3.7.7
 djangorestframework-csv==2.1.0
 djangorestframework-xml==1.3.0
