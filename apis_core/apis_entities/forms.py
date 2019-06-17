@@ -131,129 +131,143 @@ def get_entities_form(entity):
             self.fields['end_date_written'].required = False
 
 
-            # Loading dynamic help texts at date fields according to their parsing results
+            def create_date_help_texts(form, kwargs):
+                """
+                Loading dynamic help texts underneath date fields, communicating the parsing results or errors to the user
 
-            # default
-            help_text_default = "Dates are interpreted by defined rules. " \
-                                "If this fails, an iso-date can be explicitly set with '&lt;YYYY-MM-DD&gt;'."
+                :param form: GenericEntitiesForm :
+                    The form object, into which fields' the help texts are written
 
-            # check if form loads an existing instance
-            if 'instance' in kwargs:
-                # instance exists, thus run the date parse check to inform the user about its results
-
-                instance = kwargs['instance']
-
-                def create_help_text(single_date, single_start_date, single_end_date, single_date_written):
-                    """
-                    function for creating string help text from parsed dates, to provide feedback to the user
-                    about the parsing status of a given date field.
-
-                    :param single_date: datetime :
-                        the individual date point (gregorian)
-
-                    :param single_start_date: datetime :
-                        the start range of a date(gregorian)
-
-                    :param single_end_date: datetime :
-                        the endrange of a date(gregorian)
-
-                    :param single_date_written: str :
-                        the textual description of a date field (needed to check if empty or not)
+                :param kwargs: dict
+                    The argument dictionary being passed to the parent function __init__ of GenericEntitiesForm,
+                    where the existing instance is contained if form is called on an existing object, if form is called
+                    for the creation of a new object, then just write the default help text.
+                """
 
 
-                    :return help_text: str :
-                        The text to be displayed underneath a date field, informing the user about the parsing result
-                    """
+                # default text
+                help_text_default = "Dates are interpreted by defined rules. " \
+                                    "If this fails, an iso-date can be explicitly set with '&lt;YYYY-MM-DD&gt;'."
+
+                # check if form loads an existing instance
+                if 'instance' in kwargs:
+                    # instance exists, thus run the date parse check to inform the user about its results
+
+                    instance = kwargs['instance']
+
+                    def create_date_help_text_individual(single_date, single_start_date, single_end_date, single_date_written):
+                        """
+                        function for creating string help text from parsed dates, to provide feedback to the user
+                        about the parsing status of a given date field.
 
 
-                    # check which of the dates could be parsed to construct the relevant feedback text
+                        :param single_date: datetime :
+                            the individual date point (gregorian)
 
-                    help_text = ""
-                    if single_date:
-                        # single date could be parsed
+                        :param single_start_date: datetime :
+                            the start range of a date(gregorian)
 
-                        help_text = "Date interpreted as: "
+                        :param single_end_date: datetime :
+                            the endrange of a date(gregorian)
 
-                        # convert gregorian database date format into julian for user layer
-                        single_date_j = julian.from_gregorian(
-                            year=single_date.year,
-                            month=single_date.month,
-                            day=single_date.day
-                        )
+                        :param single_date_written: str :
+                            the textual description of a date field (needed to check if empty or not)
 
-                        if single_start_date or single_end_date:
-                            # date has also start or end ranges, then ignore single date
 
-                            if single_start_date:
-                                # date has start range
+                        :return help_text: str :
+                            The text to be displayed underneath a date field, informing the user about the parsing result
+                        """
 
-                                # convert to julian
-                                single_start_date_j = julian.from_gregorian(
-                                    year=single_start_date.year,
-                                    month=single_start_date.month,
-                                    day=single_start_date.day
-                                )
-                                help_text += \
-                                    str(single_start_date_j[0]) +"-"+ str(single_start_date_j[1]) +"-"+ str(single_start_date_j[2]) + \
-                                    " until "
+
+                        # check which of the dates could be parsed to construct the relevant feedback text
+
+                        help_text = ""
+                        if single_date:
+                            # single date could be parsed
+
+                            help_text = "Date interpreted as: "
+
+                            # convert gregorian database date format into julian for user layer
+                            single_date_j = julian.from_gregorian(
+                                year=single_date.year,
+                                month=single_date.month,
+                                day=single_date.day
+                            )
+
+                            if single_start_date or single_end_date:
+                                # date has also start or end ranges, then ignore single date
+
+                                if single_start_date:
+                                    # date has start range
+
+                                    # convert to julian
+                                    single_start_date_j = julian.from_gregorian(
+                                        year=single_start_date.year,
+                                        month=single_start_date.month,
+                                        day=single_start_date.day
+                                    )
+                                    help_text += \
+                                        str(single_start_date_j[0]) +"-"+ str(single_start_date_j[1]) +"-"+ str(single_start_date_j[2]) + \
+                                        " until "
+                                else:
+                                    # date has no start range, then write 'undefined'
+
+                                    help_text += "undefined start until "
+
+                                if single_end_date:
+                                    # date has end range
+
+                                    # convert to julian
+                                    single_end_date_j = julian.from_gregorian(
+                                        year=single_end_date.year,
+                                        month=single_end_date.month,
+                                        day=single_end_date.day
+                                    )
+                                    help_text += \
+                                        str(single_end_date_j[0]) + "-" + str(single_end_date_j[1]) + "-" + str(single_end_date_j[2])
+                                else:
+                                    # date has no start range, then write 'undefined'
+
+                                    help_text += "undefined end"
+
                             else:
-                                # date has no start range, then write 'undefined'
+                                # date has no start nor end range. Use single date then.
 
-                                help_text += "undefined start until "
+                                help_text += str(single_date_j[0]) +"-"+ str(single_date_j[1]) +"-"+ str(single_date_j[2])
 
-                            if single_end_date:
-                                # date has end range
+                        elif single_date_written is not None:
+                            # date field is not empty but it could not be parsed either. Show parsing info and help text
 
-                                # convert to julian
-                                single_end_date_j = julian.from_gregorian(
-                                    year=single_end_date.year,
-                                    month=single_end_date.month,
-                                    day=single_end_date.day
-                                )
-                                help_text += \
-                                    str(single_end_date_j[0]) + "-" + str(single_end_date_j[1]) + "-" + str(single_end_date_j[2])
-                            else:
-                                # date has no start range, then write 'undefined'
-
-                                help_text += "undefined end"
+                            help_text = "<b>Date could not be interpreted</b><br>" + help_text_default
 
                         else:
-                            # date has no start nor end range. Use single date then.
+                            # date field is completely empty. Show help text only
 
-                            help_text += str(single_date_j[0]) +"-"+ str(single_date_j[1]) +"-"+ str(single_date_j[2])
+                            help_text = help_text_default
 
-                    elif single_date_written is not None:
-                        # date field is not empty but it could not be parsed either. Show parsing info and help text
+                        return help_text
 
-                        help_text = "<b>Date could not be interpreted</b><br>" + help_text_default
+                    # write results into help texts
+                    form.fields['start_date_written'].help_text = create_date_help_text_individual(
+                        instance.start_date,
+                        instance.start_start_date,
+                        instance.start_end_date,
+                        instance.start_date_written
+                    )
+                    form.fields['end_date_written'].help_text = create_date_help_text_individual(
+                        instance.end_date,
+                        instance.end_start_date,
+                        instance.end_end_date,
+                        instance.end_date_written
+                    )
 
-                    else:
-                        # date field is completely empty. Show help text only
+                else:
+                    # instance does not exist, load default help text into fields
 
-                        help_text = help_text_default
+                    form.fields['start_date_written'].help_text = help_text_default
+                    form.fields['end_date_written'].help_text = help_text_default
 
-                    return help_text
-
-                # write results into help texts
-                self.fields['start_date_written'].help_text = create_help_text(
-                    instance.start_date,
-                    instance.start_start_date,
-                    instance.start_end_date,
-                    instance.start_date_written
-                )
-                self.fields['end_date_written'].help_text = create_help_text(
-                    instance.end_date,
-                    instance.end_start_date,
-                    instance.end_end_date,
-                    instance.end_date_written
-                )
-
-            else:
-                # instance does not exist, load default help text into fields
-
-                self.fields['start_date_written'].help_text = help_text_default
-                self.fields['end_date_written'].help_text = help_text_default
-
+            create_date_help_texts(self, kwargs)
 
 
         def save(self, *args, **kwargs):
