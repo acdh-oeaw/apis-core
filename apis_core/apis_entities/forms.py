@@ -44,6 +44,7 @@ def get_entities_form(entity):
         class Meta:
             model = ContentType.objects.get(
                 app_label='apis_entities', model=entity.lower()).model_class()
+
             exclude = [
                 'start_date',
                 'start_start_date',
@@ -70,6 +71,10 @@ def get_entities_form(entity):
             attrs = {'data-placeholder': 'Type to get suggestions',
                      'data-minimum-input-length': 3,
                      'data-html': True}
+
+            # list to catch all fields that will not be inserted into accordion group acc_grp2
+            fields_list_unsorted = []
+
             for f in self.fields.keys():
                 if type(self.fields[f]) == ModelMultipleChoiceField:
                     v_name_p = str(self.fields[f].queryset.model.__name__)
@@ -100,29 +105,80 @@ def get_entities_form(entity):
                             self.fields[f].initial = res
 
                 if f not in acc_grp2:
-                    acc_grp1.append(f)
+                    # append to unsorted list, so that it can be sorted and afterwards attached to accordion group acc_grp1
+                    fields_list_unsorted.append(f)
 
-            if entity == 'Person':
-                acc_grp1 = Fieldset('Metadata {}'.format(entity.title()))
-                person_field_list = [
-                    'name',
-                    'first_name',
-                    'gender',
-                    'title',
-                    'profession',
-                    'start_date_written',
-                    'end_date_written',
-                    'status',
-                    'collection',
-                ]
-                for x in person_field_list:
-                    acc_grp1.append(x)
+
+            def sort_fields_list(list_unsorted, entity_label):
+                """
+                Sorts a list of model fields according to a defined order.
+
+
+                :param list_unsorted: list
+                    The unsorted list of fields.
+
+                :param entity_label: str
+                    The string representation of entity type, necessary to find the entity-specific ordering (if it is defined)
+
+
+                :return: list
+                    The sorted list if entity-specific ordering was defined, the same unordered list if not.
+                """
+
+                fields_sort_preferences_per_entity = {
+                    'Person': [
+                        'name',
+                        'first_name',
+                        'gender',
+                        'title',
+                        'start_date_written',
+                        'end_date_written',
+                        'status',
+                        'collection',
+                    ],
+                    'Event': [
+                        'name',
+                        'name_english',
+                    ]
+                }
+
+                if entity_label in fields_sort_preferences_per_entity:
+                    # for this entity an ordering was defined, go trough it
+
+                    sort_preferences = fields_sort_preferences_per_entity[entity_label]
+
+                    # list of tuples to be sorted later
+                    field_rank_pair_list = []
+
+                    for field in list_unsorted:
+                        try:
+                            # if this succeeds, then the field has been given a priorites ordering above
+                            field_rank_pair = (field, sort_preferences.index(field))
+
+                        except Exception as e:
+                            # if no ordering for the field was found, then give it 'Inf'
+                            # so that it will be attached at the end.
+                            field_rank_pair = (field, float('Inf'))
+
+                        field_rank_pair_list.append(field_rank_pair)
+
+                    # sort the list according to the second element in each tuple
+                    # and then take the first elements from it and return as list
+                    return [ t[0] for t in sorted(field_rank_pair_list, key=lambda x: x[1]) ]
+
+                else:
+                    # for this entity no ordering was defined, return unsorted list
+                    return list_unsorted
+
+            # sort field list, iterate over it and append each element to the accordion group
+            for f in sort_fields_list(fields_list_unsorted, entity):
+                acc_grp1.append(f)
 
             self.helper.layout = Layout(
                 Accordion(
                     acc_grp1,
                     acc_grp2
-                    )
+                )
             )
 
             self.fields['status'].required = False
