@@ -161,7 +161,6 @@ class TempEntityClass(models.Model):
             super(TempEntityClass, self).save(*args, **kwargs)
         if self.start_date:
             self.start_date = self.start_date
-            print(self.start_date)
         if self.end_date:
             self.end_date = self.end_date
         return self
@@ -304,8 +303,6 @@ class TempEntityClass(models.Model):
             e_b = type(ent).__name__
             if e_a != e_b:
                 continue
-            print(e_b)
-            print(str(ent))
             lt, created = LabelType.objects.get_or_create(name="Legacy name (merge)")
             l_uri, created = LabelType.objects.get_or_create(name="Legacy URI (merge)")
             Label.objects.create(label=str(ent), label_type=lt, temp_entity=self)
@@ -478,7 +475,6 @@ class UriCandidate(models.Model):
         for endp in autocomp_settings[cn.title()]:
             url = re.sub(r"/[a-z]+$", "/entity", endp["url"])
             params = {"id": self.uri}
-            print(url, params)
             res = requests.get(url, params=params, headers=headers)
             if res.status_code == 200:
                 if endp["fields"]["descr"][0] in res.json()["representation"].keys():
