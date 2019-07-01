@@ -9,7 +9,6 @@ from apis_core.apis_vocabularies.models import (
     EventType,
     InstitutionType,
     PlaceType,
-    ProfessionType,
     Title,
     PassageLanguage,
     PassageType,
@@ -126,6 +125,7 @@ class Event(TempEntityClass):
     kind = models.ForeignKey(
         EventType, blank=True, null=True, on_delete=models.SET_NULL
     )
+    name_english = models.CharField(max_length=1024, blank=True, null=True)
 
     def __str__(self):
         if self.name != "":
