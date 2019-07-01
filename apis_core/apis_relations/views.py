@@ -20,7 +20,8 @@ from .forms import PersonLabelForm
 from .models import (
     PersonPlace, PersonPerson, PersonInstitution, InstitutionPlace,
     InstitutionInstitution, PlacePlace, PersonEvent, InstitutionEvent, PlaceEvent, PersonPassage,
-    InstitutionPassage, PlacePassage, EventPassage, PassagePassage, PersonPublication, EventPublication
+    InstitutionPassage, PlacePassage, EventPassage, PassagePassage, PersonPublication, EventPublication,
+    PassagePublication
 )
 from apis_core.apis_metainfo.models import Uri
 from apis_core.apis_entities.models import Person, Institution, Place, Event, Passage, Publication
@@ -59,6 +60,7 @@ registered_forms = {'PassagePassageForm': [PassagePassage, Passage, Passage],
                     'PersonInstitutionHighlighterForm': [PersonInstitution, Person, Institution],
                     'PersonPassageHighlighterForm': [PersonPassage, Person, Passage],
                     'PlacePassageHighlighterForm': [PlacePassage, Place, Passage],
+                    'PassagePublicationHighlighterForm': [PassagePublication, Passage, Publication],
                     'InstitutionPassageHighlighterForm': [InstitutionPassage, Institution, Passage],
                     'InstitutionPlaceForm': [InstitutionPlace, Institution, Place],
                     'InstitutionInstitutionForm': [
@@ -161,6 +163,7 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
         instance_id = ''
     else:
         instance_id = ObjectID
+    print(entity_type, kind_form, SiteID)
     entity_type_str = entity_type
     entity_type = ContentType.objects.get(
         app_label__startswith="apis_", model=entity_type.lower()).model_class()
