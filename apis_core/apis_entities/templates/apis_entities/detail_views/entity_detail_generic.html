@@ -70,7 +70,7 @@
                             <h3>
                                 General Info
                                 <a href="/apis/api2/entity/{{object.id}}">
-                                    <small><i class="fas fa-database" title="api"></i></small>
+                                    <small><i class="feather-32" data-feather="database" title="API"></i></small>
                                 </a>
                             </h3>
                         </div>
@@ -83,6 +83,18 @@
                                     </th>
                                     <td>
                                         {{ object.name }}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>
+                                        Labels
+                                    </th>
+                                    <td>
+                                        {% for x in no_merge_labels %}
+                                            <li>
+                                                <small>{{ x.label_type }}: </small>{{ x.label }}
+                                            </li>
+                                        {% endfor %}
                                     </td>
                                 </tr>
                                 <tr>

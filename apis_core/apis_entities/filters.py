@@ -143,11 +143,17 @@ class PersonListFilter(django_filters.FilterSet):
     gender = django_filters.ChoiceFilter(choices=FILTER_CHOICES)
     start_date = django_filters.DateFilter(label='Date of birth') # Todo: add a datefilter that allows to filter for ranges
     end_date = django_filters.DateFilter(label='Date of death')
-    profession__name = django_filters.CharFilter(lookup_expr='icontains', label='Profession')
+
+    # TODO __sresch__ remove
+    # profession__name = django_filters.CharFilter(lookup_expr='icontains', label='Profession')
 
     class Meta:
         model = Person
-        fields = ['name', 'first_name', 'gender', 'start_date', 'end_date', 'profession__name', 'collection']
+
+        # TODO __sresch__ remove
+        # fields = ['name', 'first_name', 'gender', 'start_date', 'end_date', 'profession__name', 'collection']
+
+        fields = ['name', 'first_name', 'gender', 'start_date', 'end_date', 'collection']
 
     def name_label_filter(self, queryset, name, value):
         """

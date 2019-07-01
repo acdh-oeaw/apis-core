@@ -9,13 +9,8 @@ from apis_core.apis_vocabularies.models import (
     EventType,
     InstitutionType,
     PlaceType,
-    ProfessionType,
     Title,
     PassageLanguage,
-
-    # TOOD __sresch__ : entfernen falls endgueltig nicht mehr benoetigt
-    # PassageDenomination,
-
     PassageType,
     PassageTopics
 )
@@ -41,7 +36,6 @@ class Person(TempEntityClass):
         blank=True,
         null=True,
     )
-    profession = models.ManyToManyField(ProfessionType, blank=True)
     title = models.ManyToManyField(Title, blank=True)
     gender = models.CharField(max_length=15, choices=GENDER_CHOICES, blank=True)
 
@@ -131,6 +125,7 @@ class Event(TempEntityClass):
     kind = models.ForeignKey(
         EventType, blank=True, null=True, on_delete=models.SET_NULL
     )
+    # name_english = models.CharField(max_length=1024, blank=True, null=True)
 
     def __str__(self):
         if self.name != "":

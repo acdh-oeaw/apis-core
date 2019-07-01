@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from convertdate import julian
+
 from dal import autocomplete
 from .fields import ListSelect2, Select2Multiple, Select2
 from django import forms
@@ -42,7 +44,17 @@ def get_entities_form(entity):
         class Meta:
             model = ContentType.objects.get(
                 app_label='apis_entities', model=entity.lower()).model_class()
-            exclude = ['start_date', 'end_date', 'text', 'source']
+
+            exclude = [
+                'start_date',
+                'start_start_date',
+                'start_end_date',
+                'end_date',
+                'end_start_date',
+                'end_end_date',
+                'text',
+                'source',
+            ]
 
         def __init__(self, *args, **kwargs):
             super(GenericEntitiesForm, self).__init__(*args, **kwargs)
@@ -59,6 +71,10 @@ def get_entities_form(entity):
             attrs = {'data-placeholder': 'Type to get suggestions',
                      'data-minimum-input-length': 1,
                      'data-html': True}
+
+            # list to catch all fields that will not be inserted into accordion group acc_grp2
+            fields_list_unsorted = []
+
             for f in self.fields.keys():
                 if isinstance(self.fields[f], (ModelMultipleChoiceField, ModelChoiceField)):
                     v_name_p = str(self.fields[f].queryset.model.__name__)
@@ -101,34 +117,226 @@ def get_entities_form(entity):
                                 except ValueError:
                                     res = ''
                 if f not in acc_grp2:
-                    acc_grp1.append(f)
+                    # append to unsorted list, so that it can be sorted and afterwards attached to accordion group acc_grp1
+                    fields_list_unsorted.append(f)
 
-            if entity == 'Person':
-                acc_grp1 = Fieldset('Metadata {}'.format(entity.title()))
-                person_field_list = [
-                    'name',
-                    'first_name',
-                    'gender',
-                    'title',
-                    'profession',
-                    'start_date_written',
-                    'end_date_written',
-                    'status',
-                    'collection',
-                ]
-                for x in person_field_list:
-                    acc_grp1.append(x)
+
+            def sort_fields_list(list_unsorted, entity_label):
+                """
+                Sorts a list of model fields according to a defined order.
+
+
+                :param list_unsorted: list
+                    The unsorted list of fields.
+
+                :param entity_label: str
+                    The string representation of entity type, necessary to find the entity-specific ordering (if it is defined)
+
+
+                :return: list
+                    The sorted list if entity-specific ordering was defined, the same unordered list if not.
+                """
+
+                fields_sort_preferences_per_entity = {
+                    'Person': [
+                        'name',
+                        'first_name',
+                        'gender',
+                        'title',
+                        'start_date_written',
+                        'end_date_written',
+                        'status',
+                        'collection',
+                    ],
+                    'Event': [
+                        'name',
+                        'name_english',
+                    ]
+                }
+
+                if entity_label in fields_sort_preferences_per_entity:
+                    # for this entity an ordering was defined, go trough it
+
+                    sort_preferences = fields_sort_preferences_per_entity[entity_label]
+
+                    # list of tuples to be sorted later
+                    field_rank_pair_list = []
+
+                    for field in list_unsorted:
+                        try:
+                            # if this succeeds, then the field has been given a priorites ordering above
+                            field_rank_pair = (field, sort_preferences.index(field))
+
+                        except Exception as e:
+                            # if no ordering for the field was found, then give it 'Inf'
+                            # so that it will be attached at the end.
+                            field_rank_pair = (field, float('Inf'))
+
+                        field_rank_pair_list.append(field_rank_pair)
+
+                    # sort the list according to the second element in each tuple
+                    # and then take the first elements from it and return as list
+                    return [ t[0] for t in sorted(field_rank_pair_list, key=lambda x: x[1]) ]
+
+                else:
+                    # for this entity no ordering was defined, return unsorted list
+                    return list_unsorted
+
+            # sort field list, iterate over it and append each element to the accordion group
+            for f in sort_fields_list(fields_list_unsorted, entity):
+                acc_grp1.append(f)
 
             self.helper.layout = Layout(
                 Accordion(
                     acc_grp1,
                     acc_grp2
-                    )
+                )
             )
+
             self.fields['status'].required = False
             self.fields['collection'].required = False
             self.fields['start_date_written'].required = False
             self.fields['end_date_written'].required = False
+
+
+            def create_date_help_texts(form, kwargs):
+                """
+                Loading dynamic help texts underneath date fields, communicating the parsing results or errors to the user
+
+                :param form: GenericEntitiesForm :
+                    The form object, into which fields' the help texts are written
+
+                :param kwargs: dict
+                    The argument dictionary being passed to the parent function __init__ of GenericEntitiesForm,
+                    where the existing instance is contained if form is called on an existing object, if form is called
+                    for the creation of a new object, then just write the default help text.
+                """
+
+
+                # default text
+                help_text_default = "Dates are interpreted by defined rules. " \
+                                    "If this fails, an iso-date can be explicitly set with '&lt;YYYY-MM-DD&gt;'."
+
+                # check if form loads an existing instance
+                if 'instance' in kwargs:
+                    # instance exists, thus run the date parse check to inform the user about its results
+
+                    instance = kwargs['instance']
+
+                    def create_date_help_text_individual(single_date, single_start_date, single_end_date, single_date_written):
+                        """
+                        function for creating string help text from parsed dates, to provide feedback to the user
+                        about the parsing status of a given date field.
+
+
+                        :param single_date: datetime :
+                            the individual date point (gregorian)
+
+                        :param single_start_date: datetime :
+                            the start range of a date(gregorian)
+
+                        :param single_end_date: datetime :
+                            the endrange of a date(gregorian)
+
+                        :param single_date_written: str :
+                            the textual description of a date field (needed to check if empty or not)
+
+
+                        :return help_text: str :
+                            The text to be displayed underneath a date field, informing the user about the parsing result
+                        """
+
+
+                        # check which of the dates could be parsed to construct the relevant feedback text
+
+                        help_text = ""
+                        if single_date:
+                            # single date could be parsed
+
+                            help_text = "Date interpreted as: "
+
+                            # convert gregorian database date format into julian for user layer
+                            single_date_j = julian.from_gregorian(
+                                year=single_date.year,
+                                month=single_date.month,
+                                day=single_date.day
+                            )
+
+                            if single_start_date or single_end_date:
+                                # date has also start or end ranges, then ignore single date
+
+                                if single_start_date:
+                                    # date has start range
+
+                                    # convert to julian
+                                    single_start_date_j = julian.from_gregorian(
+                                        year=single_start_date.year,
+                                        month=single_start_date.month,
+                                        day=single_start_date.day
+                                    )
+                                    help_text += \
+                                        str(single_start_date_j[0]) +"-"+ str(single_start_date_j[1]) +"-"+ str(single_start_date_j[2]) + \
+                                        " until "
+                                else:
+                                    # date has no start range, then write 'undefined'
+
+                                    help_text += "undefined start until "
+
+                                if single_end_date:
+                                    # date has end range
+
+                                    # convert to julian
+                                    single_end_date_j = julian.from_gregorian(
+                                        year=single_end_date.year,
+                                        month=single_end_date.month,
+                                        day=single_end_date.day
+                                    )
+                                    help_text += \
+                                        str(single_end_date_j[0]) + "-" + str(single_end_date_j[1]) + "-" + str(single_end_date_j[2])
+                                else:
+                                    # date has no start range, then write 'undefined'
+
+                                    help_text += "undefined end"
+
+                            else:
+                                # date has no start nor end range. Use single date then.
+
+                                help_text += str(single_date_j[0]) +"-"+ str(single_date_j[1]) +"-"+ str(single_date_j[2])
+
+                        elif single_date_written is not None:
+                            # date field is not empty but it could not be parsed either. Show parsing info and help text
+
+                            help_text = "<b>Date could not be interpreted</b><br>" + help_text_default
+
+                        else:
+                            # date field is completely empty. Show help text only
+
+                            help_text = help_text_default
+
+                        return help_text
+
+                    # write results into help texts
+                    form.fields['start_date_written'].help_text = create_date_help_text_individual(
+                        instance.start_date,
+                        instance.start_start_date,
+                        instance.start_end_date,
+                        instance.start_date_written
+                    )
+                    form.fields['end_date_written'].help_text = create_date_help_text_individual(
+                        instance.end_date,
+                        instance.end_start_date,
+                        instance.end_end_date,
+                        instance.end_date_written
+                    )
+
+                else:
+                    # instance does not exist, load default help text into fields
+
+                    form.fields['start_date_written'].help_text = help_text_default
+                    form.fields['end_date_written'].help_text = help_text_default
+
+            create_date_help_texts(self, kwargs)
+
 
         def save(self, *args, **kwargs):
             obj = super(GenericEntitiesForm, self).save(*args, **kwargs)
