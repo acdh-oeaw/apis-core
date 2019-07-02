@@ -52,9 +52,11 @@ class TempEntityClass(models.Model):
     start_date = models.DateField(blank=True, null=True)
     start_start_date = models.DateField(blank=True, null=True)
     start_end_date = models.DateField(blank=True, null=True)
+    start_date_is_exact = models.BooleanField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     end_start_date = models.DateField(blank=True, null=True)
     end_end_date = models.DateField(blank=True, null=True)
+    end_date_is_exact = models.BooleanField(blank=True, null=True)
     start_date_written = models.CharField(
         max_length=255,
         blank=True,
@@ -317,6 +319,7 @@ class TempEntityClass(models.Model):
                 date_single = None
                 date_ab = None
                 date_bis = None
+                date_is_exact = None
 
 
                 # split for angle brackets
@@ -362,14 +365,29 @@ class TempEntityClass(models.Model):
 
                 else:
                     # date string contains no angle brackets. Interpret the possible date formats
+                    date_string = date_string.lower()
+                    date_string = date_string.replace(" ","")
 
                     # helper variables
                     found_ab = False
                     found_bis = False
                     found_single = False
 
+                    if "genau" in date_string and "ungenau" not in date_string :
+                        date_is_exact = True
+                    elif "ungenau" in date_string :
+                        date_is_exact = False
+                    # elif "genau" in date_string and "ungenau" in date_string :
+                    #     raise ValueError("Both keywords 'genau' and 'ungenau were provided'")
+                    else:
+                        date_is_exact = True
+
+                    date_string = date_string.replace("ungenau", "")
+                    date_string = date_string.replace("genau", "")
+
+
                     # split by allowed keywords 'ab' and 'bis' and iterate over them
-                    date_split_ab_bis = re.split(r"(ab|bis)", date_split_angle[0].lower())
+                    date_split_ab_bis = re.split(r"(ab|bis)", date_string)
                     for i, v in enumerate(date_split_ab_bis):
 
                         if v == "ab":
@@ -429,22 +447,24 @@ class TempEntityClass(models.Model):
 
                         date_single = date_bis
 
-                return date_single, date_ab, date_bis
+                return date_single, date_ab, date_bis, date_is_exact
 
             # overwrite every field with None as default
-            temp_entity_class.start_date = None
-            temp_entity_class.start_start_date = None
-            temp_entity_class.start_end_date = None
-            temp_entity_class.end_date = None
-            temp_entity_class.end_start_date = None
-            temp_entity_class.end_end_date = None
+            start_date = None
+            start_start_date = None
+            start_end_date = None
+            start_date_is_exact = None
+            end_date = None
+            end_start_date = None
+            end_end_date = None
+            end_date_is_exact = None
 
 
             if temp_entity_class.start_date_written:
                 # some user input of a start date is there, parse it
 
                 try:
-                    temp_entity_class.start_date, temp_entity_class.start_start_date, temp_entity_class.start_end_date = \
+                    start_date, start_start_date, start_end_date, start_date_is_exact = \
                         parse_date_individual(temp_entity_class.start_date_written)
                 except Exception as e:
                     print("Could not parse date: ", temp_entity_class.start_date_written, "ERROR:", e)
@@ -453,10 +473,20 @@ class TempEntityClass(models.Model):
                 # some user input of an end date is there, parse it
 
                 try:
-                    temp_entity_class.end_date, temp_entity_class.end_start_date, temp_entity_class.end_end_date = \
+                    end_date, end_start_date, end_end_date, end_date_is_exact = \
                         parse_date_individual(temp_entity_class.end_date_written)
                 except Exception as e:
                     print("Could not parse date: ", temp_entity_class.end_date_written, "ERROR:", e)
+
+
+            temp_entity_class.start_date = start_date
+            temp_entity_class.start_start_date = start_start_date
+            temp_entity_class.start_end_date = start_end_date
+            temp_entity_class.start_date_is_exact = start_date_is_exact
+            temp_entity_class.end_date = end_date
+            temp_entity_class.end_start_date = end_start_date
+            temp_entity_class.end_end_date = end_end_date
+            temp_entity_class.end_date_is_exact = end_date_is_exact
 
         if parse_dates:
             parse_dates_func(self)

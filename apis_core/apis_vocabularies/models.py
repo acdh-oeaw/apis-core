@@ -29,6 +29,8 @@ class VocabsBaseClass(models.Model):
         ('del', 'deleted')
     )
     name = models.CharField(max_length=255, verbose_name='Name')
+    name_english = models.CharField(max_length=255, verbose_name='Name (EN)', null=True)
+
     description = models.TextField(
         blank=True,
         help_text="Brief description of the used term.")
@@ -76,6 +78,12 @@ class RelationBaseClass(VocabsBaseClass):
     name_reverse = models.CharField(
         max_length=255,
         verbose_name='Name reverse',
+        help_text='Inverse relation like: "is sub-class of" vs. "is super-class of".',
+        blank=True)
+
+    name_reverse_english = models.CharField(
+        max_length=255,
+        verbose_name='Name reverse (EN)',
         help_text='Inverse relation like: "is sub-class of" vs. "is super-class of".',
         blank=True)
 

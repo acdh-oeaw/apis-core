@@ -49,9 +49,11 @@ def get_entities_form(entity):
                 'start_date',
                 'start_start_date',
                 'start_end_date',
+                'start_date_is_exact',
                 'end_date',
                 'end_start_date',
                 'end_end_date',
+                'end_date_is_exact',
                 'text',
                 'source',
             ]
@@ -151,6 +153,15 @@ def get_entities_form(entity):
                     'Event': [
                         'name',
                         'name_english',
+                    ],
+                    'Institution': [
+                        'name',
+                        'name_english',
+                        'end_date_written',
+                    ],
+                    'Place': [
+                        'name',
+                        'name_english'
                     ]
                 }
 
@@ -223,7 +234,7 @@ def get_entities_form(entity):
 
                     instance = kwargs['instance']
 
-                    def create_date_help_text_individual(single_date, single_start_date, single_end_date, single_date_written):
+                    def create_date_help_text_individual(single_date, single_start_date, single_end_date, single_date_is_exact, single_date_written):
                         """
                         function for creating string help text from parsed dates, to provide feedback to the user
                         about the parsing status of a given date field.
@@ -253,7 +264,11 @@ def get_entities_form(entity):
                         if single_date:
                             # single date could be parsed
 
-                            help_text = "Date interpreted as: "
+                            help_text = "Date interpreted as "
+                            if single_date_is_exact:
+                                help_text += "exactly: "
+                            else:
+                                help_text += "not exactly: "
 
                             # convert gregorian database date format into julian for user layer
                             single_date_j = julian.from_gregorian(
@@ -304,7 +319,7 @@ def get_entities_form(entity):
                                 help_text += str(single_date_j[0]) +"-"+ str(single_date_j[1]) +"-"+ str(single_date_j[2])
 
                         elif single_date_written is not None:
-                            # date field is not empty but it could not be parsed either. Show parsing info and help text
+                            # date input field is not empty but it could not be parsed either. Show parsing info and help text
 
                             help_text = "<b>Date could not be interpreted</b><br>" + help_text_default
 
@@ -320,12 +335,14 @@ def get_entities_form(entity):
                         instance.start_date,
                         instance.start_start_date,
                         instance.start_end_date,
+                        instance.start_date_is_exact,
                         instance.start_date_written
                     )
                     form.fields['end_date_written'].help_text = create_date_help_text_individual(
                         instance.end_date,
                         instance.end_start_date,
                         instance.end_end_date,
+                        instance.end_date_is_exact,
                         instance.end_date_written
                     )
 

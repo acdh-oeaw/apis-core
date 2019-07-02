@@ -77,6 +77,7 @@ class Place(TempEntityClass):
     )
     lat = models.FloatField(blank=True, null=True, verbose_name="latitude")
     lng = models.FloatField(blank=True, null=True, verbose_name="longitude")
+    name_english = models.CharField(max_length=1024, blank=True, null=True)
 
     def __str__(self):
         if self.name != "":
@@ -100,6 +101,7 @@ class Institution(TempEntityClass):
     kind = models.ForeignKey(
         InstitutionType, blank=True, null=True, on_delete=models.SET_NULL
     )
+    name_english = models.CharField(max_length=1024, blank=True, null=True)
 
     def __str__(self):
         if self.name != "":
@@ -125,7 +127,7 @@ class Event(TempEntityClass):
     kind = models.ForeignKey(
         EventType, blank=True, null=True, on_delete=models.SET_NULL
     )
-    # name_english = models.CharField(max_length=1024, blank=True, null=True)
+    name_english = models.CharField(max_length=1024, blank=True, null=True)
 
     def __str__(self):
         if self.name != "":
