@@ -42,7 +42,7 @@ def add_apis_settings(request):
         res['highlighter_active'] = True
     else:
         res['highlighter_active'] = False
-    if 'apis_bibsomomy' in settings.INSTALLED_APPS:
+    if 'apis_bibsonomy' in settings.INSTALLED_APPS:
         res['bibsonomy_active'] = True
     else:
         res['bibsonomy_active'] = False
