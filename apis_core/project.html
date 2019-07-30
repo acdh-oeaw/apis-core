@@ -1,0 +1,12 @@
+{% extends "webpage/base.html" %}
+{% load staticfiles %}
+{% load webpage_extras %}
+{% block title %} About {% endblock %}
+{% block content %}
+<div class="container">
+    <h1>{% projects_metadata 'title' %}</h1>
+    <p>
+        {% projects_metadata 'description' %}
+    </p>
+</div>
+{% endblock %}

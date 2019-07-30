@@ -40,7 +40,7 @@ sett_RDF_generic = {
                     {
                         'name': 'long',
                         'identifiers': (
-                            (('objects','lng', wgs84 + 'long', None),),
+                            (('objects', 'lng', wgs84 + 'long', None),),
                         )
                     },
                     {
