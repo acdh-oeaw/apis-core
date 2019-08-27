@@ -136,7 +136,7 @@ def create_generic_api_viewset(**kwargs):
                                 view_name="apis:apis_api:{}-detail".format(
                                     f.related_model.__name__.lower()
                                 ),
-                                read_only=True,
+                                queryset=f.related_model.objects.all(),
                                 many=True,
                             )
                         elif (
@@ -155,7 +155,7 @@ def create_generic_api_viewset(**kwargs):
                                 view_name="apis:apis_api:{}-detail".format(
                                     f.related_model.__name__.lower()
                                 ),
-                                read_only=True,
+                                queryset=f.related_model.objects.all(),
                             )
 
             return CustomSerializer
