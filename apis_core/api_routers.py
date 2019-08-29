@@ -138,6 +138,7 @@ def create_generic_api_viewset(**kwargs):
                                 ),
                                 queryset=f.related_model.objects.all(),
                                 many=True,
+                                allow_null=True,
                             )
                         elif (
                             f.__class__.__name__ == "ForeignKey"
@@ -156,6 +157,7 @@ def create_generic_api_viewset(**kwargs):
                                     f.related_model.__name__.lower()
                                 ),
                                 queryset=f.related_model.objects.all(),
+                                allow_null=True
                             )
 
             return CustomSerializer
