@@ -8,7 +8,12 @@ class NetJsonRenderer(renderers.JSONRenderer):
     format = "json+net"
 
     def render(self, data, media_type=None, renderer_context=None):
-        test = re.search(r"/relations/([^/]+)/", data["results"][0]["url"])
+        try:
+            test = re.search(r"/relations/([^/]+)/", data["results"][0]["url"])
+        except IndexError:
+            return super().render(
+                data, accepted_media_type=media_type, renderer_context=renderer_context
+            )
         if test:
             rel = test.group(1)
             for r in data["results"][0].keys():
