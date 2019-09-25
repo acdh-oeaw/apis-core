@@ -228,8 +228,11 @@ class EntityToProsopogrAPhI(renderers.BaseRenderer):
                                 ext_stc = True
                     if not ext_stc:
                         s["statementType"] = [t1]
-                    if len(rel_1["annotation"]) > 0:
-                        s['statementContent'] = rel_1["annotation"][0]["text"]
+                    try:
+                        if len(rel_1["annotation"]) > 0:
+                            s['statementContent'] = rel_1["annotation"][0]["text"]
+                    except TypeError:
+                        pass
                         #stct = {
                         #    "@id": "Annotation_{}".format(rel_1["annotation"][0]["id"]),
                         #    "label": rel_1["annotation"][0]["text"]
