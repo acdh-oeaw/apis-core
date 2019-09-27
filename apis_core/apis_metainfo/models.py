@@ -1,6 +1,7 @@
+import math
 import re
 import unicodedata
-from datetime import datetime
+from datetime import datetime, timedelta
 from difflib import SequenceMatcher
 from dateutil.parser import parse
 import requests
@@ -52,24 +53,22 @@ class TempEntityClass(models.Model):
         help_text="Should be set to True, if the data record holds up quality standards.",
     )
     start_date = models.DateField(blank=True, null=True)
+    start_start_date = models.DateField(blank=True, null=True)
+    start_end_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
+    end_start_date = models.DateField(blank=True, null=True)
+    end_end_date = models.DateField(blank=True, null=True)
     start_date_written = models.CharField(
         max_length=255,
         blank=True,
         null=True,
         verbose_name="Start",
-        help_text="""Please enter a date. You can use any string to describe the date.
-        The system tries to parse the given string into valid date formats (the string is preserved).
-        To explicitly set the iso-date use '&lt;YYYY-MM-DD'&gt;. To explicitly delete the iso-date use '&lt;&gt;' """,
     )
     end_date_written = models.CharField(
         max_length=255,
         blank=True,
         null=True,
         verbose_name="End",
-        help_text="""Please enter a date. You can use any string to describe the date.
-        The system tries to parse the given string into valid date formats (the string is preserved).
-        To explicitly set the iso-date use '&lt;YYYY-MM-DD'&gt;. To explicitly delete the iso-date use '&lt;&gt;' """,
     )
     text = models.ManyToManyField("Text", blank=True)
     collection = models.ManyToManyField("Collection")
@@ -96,73 +95,366 @@ class TempEntityClass(models.Model):
         """Adaption of the save() method of the class to automatically parse string-dates into date objects
         """
 
-        def match_date(date):
-            """Function to parse string-dates into python date objects.
+        def parse_dates_func(temp_entity_class):
             """
-            date = date.strip()
-            m1 = re.search(r'<([^>]*)>', date)
-            dr_1 = False
-            if m1:
-                dr_1 = m1.group(1)
-                dr2 = date
-                if len(dr_1) == 0:
-                    dr = None
-                    dr_1 = False
+            function to parse the two date fields (start_date, end_date) of a TempEntityClass instance
+
+            :param temp_entity_class: TempEntityClass
+                the instance which fields' should be parsed from
+                and into which depending sub fields the parsed sub dates and ranges should be written to
+            """
+
+
+            def parse_date_individual(date_string):
+                """
+                function to parse a string date field of an entity
+
+                :param date_string : str :
+                    the field value passed by a user
+
+                :return date_single : datetime :
+                    single date which represents either the precise date given by user or median in between a range.
+
+                :return date_ab : datetime :
+                    starting date of a range if user passed a range value either implicit or explicit.
+
+                :return date_bis : datetime :
+                    ending date of a range if user passed a range value either implicit or explicit.
+                """
+
+
+                def parse_date_range_individual(date, ab=False, bis=False):
+                    """
+                    As a sub function to parse_date, this function parse_date_individual handles a very single date since
+                    in a text field a user can pass multiple dates.
+
+
+                    :param date : str :
+                        recognized sub string which potentially is a date (in julian calendar format)
+
+                    :param ab : boolean : optional
+                        indicates if a single date shall be intepreted as a starting date of a range
+
+                    :param bis : boolean : optional
+                        indicates if a single date shall be intepreted as an ending date of a range
+
+
+                    :return tuple (datetime, datetime) :
+                        two datetime objects representing the dates.
+                        Two indicate that an implicit single date range was given (e.g. a year without months or days).
+                        Has to be further processed then since it can be either a starting or ending date range.
+                    or
+                    :return datetime :
+                        One datetime object representing the date.
+                        if a single date was given.
+                    """
+
+
+                    def get_last_day_of_month(month, year):
+                        """
+                        Helper function to return the last day of a given month and year (respecting leap years)
+
+                        :param month : int
+
+                        :param year : int
+
+                        :return day : int
+                        """
+
+                        if month in [1, 3, 5, 7, 8, 10, 12]:
+                            # 31 day months
+                            return 31
+                        elif month in [4, 6, 9, 11]:
+                            # 30 day months
+                            return 30
+                        elif month == 2:
+                            # special case february, differentiate leap years with respect to gregorian leap rules
+                            if year % 4 == 0:
+                                if year % 100 == 0:
+                                    if year % 400 == 0:
+                                        # divisible by 4, by 100, by 400
+                                        # thus is leap year
+                                        return 29
+                                    else:
+                                        # divisible by 4, by 100, not by 400
+                                        # thus is not leap yar
+                                        return 28
+                                else:
+                                    # divisible by 4, not by 100, if by 400 doesn't matter
+                                    # thus is leap year
+                                    return 29
+                            else:
+                                # not divisible by 4, if by 100 or by 400 doesn't matter
+                                return 28
+                        else:
+                            # no valid month
+                            raise ValueError("Month " + str(month) + " does not exist.")
+
+
+
+                    # replace all kinds of delimiters
+                    date = date.replace(" ", "").replace("-", ".").replace("/", ".").replace("\\", ".")
+
+                    # parse into variables for use later
+                    year = None
+                    month = None
+                    day = None
+
+                    # check for all kind of Y-M-D combinations
+                    if re.match(r"\d{3,4}$", date):
+                        # year
+                        year = int(date)
+
+                    elif re.match(r"\d{1,2}\.\d{3,4}$", date):
+                        # month - year
+                        tmp = re.split(r"\.", date)
+                        month = int(tmp[0])
+                        year = int(tmp[1])
+
+                    elif re.match(r"\d{1,2}\.\d{1,2}\.\d{3,4}$", date):
+                        # day - month - year
+                        tmp = re.split(r"\.", date)
+                        day = int(tmp[0])
+                        month = int(tmp[1])
+                        year = int(tmp[2])
+
+                    elif re.match(r"\d{3,4}\.\d{1,2}\.?$", date):
+                        # year - month
+                        tmp = re.split(r"\.", date)
+                        year = int(tmp[0])
+                        month = int(tmp[1])
+
+                    elif re.match(r"\d{3,4}\.\d{1,2}\.\d{1,2}\.?$", date):
+                        # year - month - day
+                        tmp = re.split(r"\.", date)
+                        year = int(tmp[0])
+                        month = int(tmp[1])
+                        day = int(tmp[2])
+                    else:
+                        # No sensical interpretation found
+                        raise ValueError("Could not interpret date.")
+
+
+                    if (ab and bis) or year is None:
+                        # both ab and bis in one single date are not valid, neither is the absence of a year.
+                        raise ValueError("Could not interpret date.")
+
+                    elif not ab and not bis and (month is None or day is None):
+                        # if both ab and bis are False and either month or day is empty, then it was given
+                        # an implicit date range (range of all months if given a year or all days if given a month)
+
+                        # construct implicit month range
+                        if month is None:
+                            month_ab = 1
+                            month_bis = 12
+                        else:
+                            month_ab = month
+                            month_bis = month
+
+                        # construct implicit day range
+                        if day is None:
+                            day_ab = 1
+                            day_bis = get_last_day_of_month(month_bis, year)
+                        else:
+                            day_ab = day
+                            day_bis = day
+
+
+                        # return a tuple from a single date (which the calling function has to further process)
+                        return (
+                            datetime(year=year, month=month_ab, day=day_ab),
+                            datetime(year=year, month=month_bis, day=day_bis)
+                        )
+
+                    else:
+                        # Either ab or bis is True. Then use the respective beginning or end of range and construct a precise date
+                        # Or both ab and bis are False. Then construct a precise date from parsed values
+
+                        # construct implicit month range if month is None
+                        if month is None:
+                            if ab and not bis:
+                                # is a starting date, thus take first month of year
+                                month = 1
+                            elif not ab and bis:
+                                # is an ending date, thus take last month of year
+                                month = 12
+
+                        # construct implicit day range if day is None
+                        if day is None:
+                            if ab and not bis:
+                                # is a starting date, thus take first day of month
+                                day = 1
+                            elif not ab and bis:
+                                # is an ending date, thus take last month of year
+                                day = get_last_day_of_month(month=month, year=year)
+
+                        return datetime(year=year, month=month, day=day)
+
+
+                # return variables
+                date_single = None
+                date_ab = None
+                date_bis = None
+
+                # split for angle brackets, check if explicit iso date is contained within them
+                date_split_angle = re.split(r"(<.*?>)", date_string)
+
+                if len(date_split_angle) > 1:
+                    # date string contains angle brackets. Parse them, ignore the rest
+
+                    if len(date_split_angle) > 3:
+                        # invalid case
+                        raise ValueError("Too many angle brackets.")
+
+                    elif len(date_split_angle) == 3:
+                        # the right amount of substrings, indicating exactly one pair of angle brackets.
+                        # Parse the iso date in between
+
+                        # remove angle brackets and split by commas
+                        dates_iso = date_split_angle[1][1:-1]
+
+                        # check for commas, which would indicate that either one iso date or three are being input
+                        dates_iso = dates_iso.split(",")
+                        if len(dates_iso) != 1 and len(dates_iso) != 3:
+                            # only either one iso date or three are allowed
+                            raise ValueError(
+                                "Incorrect number of dates given. Within angle brackets only one or three (separated by commas) are allowed.")
+
+                        elif len(dates_iso) == 3:
+                            # three iso dates indicate further start and end dates
+
+                            # parse start date
+                            date_ab_string = dates_iso[1].strip()
+                            if date_ab_string != "":
+                                date_ab = parse_date_range_individual(date_ab_string)
+
+                            # parse end date
+                            date_bis_string = dates_iso[2].strip()
+                            if date_bis_string != "":
+                                date_bis = parse_date_range_individual(date_bis_string)
+
+                        # parse single date
+                        date_single_string = dates_iso[0].strip()
+                        if date_single_string != "":
+                            date_single = parse_date_range_individual(date_single_string)
+
+
                 else:
-                    try:
-                        dr = parse(dr_1)
-                    except ValueError:
-                        dr = None
-            else:
-                date = date.replace("-", ".")
-                if re.match(r"[0-9]{4}$", date):
-                    dr = datetime.strptime(date, "%Y")
-                    dr2 = date
-                elif re.match(r"[0-9]{1,2}\.[0-9]{1,2}\.[0-9]{4}$", date):
-                    dr = datetime.strptime(date, "%d.%m.%Y")
-                    dr2 = date
-                elif re.match(r"[0-9]{4}\.\.\.$", date):
-                    dr = datetime.strptime(date, "%Y...")
-                    dr2 = re.match(r"([0-9]{4})\.\.\.$", date).group(1)
-                elif re.match(r"[0-9]{4}\.[0-9]{1,2}\.\.$", date):
-                    dr = datetime.strptime(date, "%Y.%m..")
-                    dr2 = re.match(r"([0-9]{4})\.([0-9]{1,2})\.\.$", date).group(2)
-                    +"." + re.match(r"([0-9]{4})\.([0-9]{1,2})\.\.$", date).group(1)
-                elif re.match(r"[0-9]{4}\.[0-9]{1,2}\.[0-9]{1,2}$", date):
-                    dr = datetime.strptime(date, "%Y.%m.%d")
-                    dr3 = re.match(r"([0-9]{4})\.([0-9]{1,2})\.([0-9]{1,2})$", date)
-                    dr2 = dr3.group(3) + "." + dr3.group(2) + "." + dr3.group(1)
-                else:
-                    dr = False
-                    dr2 = date
-            return dr, dr2
+                    # date string contains no angle brackets. Interpret the possible date formats
+                    date_string = date_string.lower()
+                    date_string = date_string.replace(" ","")
+
+                    # helper variables for the following loop
+                    found_ab = False
+                    found_bis = False
+                    found_single = False
+
+                    # split by allowed keywords 'ab' and 'bis' and iterate over them
+                    date_split_ab_bis = re.split(r"(ab|bis)", date_string)
+                    for i, v in enumerate(date_split_ab_bis):
+
+                        if v == "ab":
+                            # indicates that the next value must be a start date
+
+                            if found_ab or found_single:
+                                # if already found a ab_date or single date before then there is non-conformative redundancy
+                                raise ValueError("Redundant dates found.")
+                            found_ab = True
+
+                            # parse the next value which must be a parsable date string
+                            date_ab = parse_date_range_individual(date_split_ab_bis[i + 1], ab=True)
+
+                        elif v == "bis":
+                            # indicates that the next value must be an end date
+
+                            if found_bis or found_single:
+                                # if already found a bis_date or single date before then there is non-conformative redundancy
+                                raise ValueError("Redundant dates found.")
+                            found_bis = True
+
+                            # parse the next value which must be a parsable date string
+                            date_bis = parse_date_range_individual(date_split_ab_bis[i + 1], bis=True)
+
+                        elif v != "" and not found_ab and not found_bis and not found_single:
+                            # indicates that this value must be a date
+
+                            found_single = True
+
+                            # parse the this value which must be a parsable date string
+                            date_single = parse_date_range_individual(v)
+
+                            if type(date_single) is tuple:
+                                #  if result of parse_date_range_individual is a tuple then the date was an implict range.
+                                #  Then split it into start and end dates
+                                date_ab = date_single[0]
+                                date_bis = date_single[1]
+
+                    if date_ab and date_bis:
+                        # date is a range
+
+                        if date_ab > date_bis:
+                            raise ValueError("'ab-date' must be before 'bis-date' in time")
+
+                        # calculate difference between start and end date of range,
+                        # and use it to calculate a single date for usage as median.
+                        days_delta_half = math.floor((date_bis - date_ab).days / 2, )
+                        date_single = date_ab + timedelta(days=days_delta_half)
+
+                    elif date_ab is not None and date_bis is None:
+                        # date is only the start of a range, save it also as the single date
+
+                        date_single = date_ab
+
+                    elif date_ab is None and date_bis is not None:
+                        # date is only the end of a range, save it also as the single date
+
+                        date_single = date_bis
+
+                return date_single, date_ab, date_bis
+
+            # overwrite every field with None as default
+            start_date = None
+            start_start_date = None
+            start_end_date = None
+            end_date = None
+            end_start_date = None
+            end_end_date = None
+
+
+            if temp_entity_class.start_date_written:
+                # If some textual user input of a start date is there, then parse it
+
+                try:
+                    start_date, start_start_date, start_end_date = \
+                        parse_date_individual(temp_entity_class.start_date_written)
+                except Exception as e:
+                    print("Could not parse date: ", temp_entity_class.start_date_written, "ERROR:", e)
+
+            if temp_entity_class.end_date_written:
+                # If some textual user input of an end date is there, then parse it
+
+                try:
+                    end_date, end_start_date, end_end_date = \
+                        parse_date_individual(temp_entity_class.end_date_written)
+                except Exception as e:
+                    print("Could not parse date: ", temp_entity_class.end_date_written, "ERROR:", e)
+
+
+            temp_entity_class.start_date = start_date
+            temp_entity_class.start_start_date = start_start_date
+            temp_entity_class.start_end_date = start_end_date
+            temp_entity_class.end_date = end_date
+            temp_entity_class.end_start_date = end_start_date
+            temp_entity_class.end_end_date = end_end_date
 
         if parse_dates:
-            if self.start_date_written:
-                start_date, self.start_date_written = match_date(
-                    self.start_date_written
-                )
-                if start_date or start_date is None:
-                    self.start_date = start_date
-            else:
-                self.start_date = self.start_date_written = None
-            if self.end_date_written:
-                end_date, self.end_date_written = match_date(self.end_date_written)
-                if end_date or end_date is None:
-                    self.end_date = end_date
-            else:
-                self.end_date = self.end_date_written = None
-            if self.name:
-                self.name = unicodedata.normalize("NFC", self.name)
-            super(TempEntityClass, self).save(*args, **kwargs)
-        else:
-            if self.name:
-                self.name = unicodedata.normalize("NFC", self.name)
-            super(TempEntityClass, self).save(*args, **kwargs)
-        if self.start_date:
-            self.start_date = self.start_date
-        if self.end_date:
-            self.end_date = self.end_date
+            parse_dates_func(self)
+
+        if self.name:
+            self.name = unicodedata.normalize("NFC", self.name)
+
+        super(TempEntityClass, self).save(*args, **kwargs)
+
         return self
 
     def get_child_entity(self):
