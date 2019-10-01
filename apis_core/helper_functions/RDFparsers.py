@@ -30,16 +30,9 @@ def harmonize_geonames_id(uri):
 
     """checks if a geonames Url points to geonames' rdf expression"""
 
-    if uri.startswith("http://www.geonames.org/"):
+    if 'geonames' in uri:
         geo_id = "".join(re.findall(r'\d', uri))
-        return "http://sws.geonames.org/{}".format(geo_id)
-
-    elif uri.startswith("http://geonames.org/"):
-        geo_id = "".join(re.findall(r'\d', uri))
-        return "http://sws.geonames.org/{}".format(geo_id)
-    # elif uri.endswith('/'):
-    #     return uri[:-1]
-
+        return "http://sws.geonames.org/{}/".format(geo_id)
     else:
         return uri
 
