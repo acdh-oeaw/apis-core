@@ -7,7 +7,7 @@ from rest_framework import filters
 
 
 class GetVisJson(ListAPIView):
-
+    schema = None
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     depth = 2
     # TODO: add a generic filter thing

@@ -9,6 +9,7 @@ from apis_core.apis_relations.models import PersonPlace, PlacePlace
 from reversion.models import Version
 from reversion import revisions as reversion
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
+from apis_core.helper_functions.RDFParserNew import RDFParserNew
 
 from datetime import datetime
 from guardian.shortcuts import assign_perm, remove_perm, get_objects_for_user
@@ -18,7 +19,7 @@ from django.contrib.auth.models import Permission
 from django.db.models import Q
 
 
-class RDFPersonParserTestCase(TestCase):
+class RDFPersonParerTestCase(TestCase):
     #fixtures = ['fixtures_3_5_17.json']
     uriP = 'http://d-nb.info/gnd/11868499X'
     kindP = 'Person'
@@ -141,3 +142,19 @@ class RDFPlaceParserTestCase(TestCase):
         cc = Place.objects.filter(uri__uri=self.uriGeon).distinct()
         self.assertEqual(cc.count(), 1)
 
+
+
+class RDFPlaceParserNewTestCase(TestCase):
+    #fixtures = ['fixtures_3_5_17.json']
+    kindP = 'Place'
+    uriGeon = 'http://sws.geonames.org/2761369/'
+
+    def test_parse_place(self):
+        o = RDFParserNew(self.uriGeon, self.kindP)
+        o.create_objct()
+        print(o._foreign_keys)
+        print(o.objct)
+        print(o._attributes)
+        print(o.objct.name, o.objct.lat)
+        print(o._foreign_keys)
+        self.assertEqual(o.objct.lat, '48.20849')

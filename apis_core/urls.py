@@ -1,3 +1,6 @@
+from rest_framework.decorators import api_view, renderer_classes
+from rest_framework import response, schemas
+from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
 from apis_core.apis_entities.api_views import (
     EventViewSet,
     InstitutionViewSet,
@@ -62,14 +65,16 @@ from apis_core.apis_vocabularies.api_views import (
     WorkWorkRelationViewSet,
 )
 from django.conf import settings
+from django.urls import path
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.views.static import serve
 from rest_framework import routers
-
+from rest_framework.schemas import get_schema_view
 from .api_routers import create_generic_api_viewset
+from rest_framework_swagger.views import get_swagger_view
 
 app_name = "apis_core"
 
@@ -111,8 +116,38 @@ router.register(r"users", UserViewSet)
 router.register(r"GeoJsonPlace", PlaceGeoJsonViewSet, "PlaceGeoJson")
 router.register(r"NetJson", NetJsonViewSet, "NetJson")
 
+
+@api_view()
+@renderer_classes([SwaggerUIRenderer, OpenAPIRenderer])
+def schema_view(request):
+    generator = schemas.SchemaGenerator(title='APIS API')
+    return response.Response(generator.get_schema(request=request))
+
+
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view as get_schema_view2
+from drf_yasg import openapi
+
+
+schema_view2 = get_schema_view2(
+   openapi.Info(
+      title="Snippets API",
+      default_version='v1',
+      description="Test description",
+      terms_of_service="https://www.google.com/policies/terms/",
+      contact=openapi.Contact(email="contact@snippets.local"),
+      license=openapi.License(name="BSD License"),
+   ),
+   public=True,
+   permission_classes=(permissions.AllowAny,),
+)
+
+
 urlpatterns = [
     url(r"^admin/", admin.site.urls),
+    url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view2.without_ui(cache_timeout=-1), name='schema-json'),
+    url(r'^swagger/$', schema_view2.with_ui('swagger', cache_timeout=-1), name='schema-swagger-ui'),
+    url(r'^redoc/$', schema_view2.with_ui('redoc', cache_timeout=-1), name='schema-redoc'),
     url(r"labels/", include("apis_core.apis_labels.urls", namespace="apis_labels")),
     url(r"tei/", include("apis_core.apis_tei.tei_urls", namespace="apis_tei")),
     url(
@@ -139,6 +174,12 @@ urlpatterns = [
     url(
         r"^api/", include((router.urls, "apis_core"), namespace="apis_api")
     ),  # routers do not support namespaces out of the box
+    path('openapi-2', schema_view),
+    path('openapi-api', get_schema_view(
+        title="APIS",
+        description="APIS API schema definition",
+        urlconf='apis_core.apis_entities.api_urls',
+    ), name='openapi-schema-api'),
     url(r"^api2/", include("apis_core.apis_entities.api_urls", namespace="apis_api2")),
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # url(r'^api-schema/', schema_view),

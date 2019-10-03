@@ -3,7 +3,7 @@ from django.test import TestCase
 from rest_framework.authtoken.models import Token
 
 from .models import Place, Person
-from relations.models import PersonPlace
+from apis_core.apis_relations.models import PersonPlace
 from vocabularies.models import PersonPlaceRelation
 
 
