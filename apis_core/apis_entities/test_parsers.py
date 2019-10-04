@@ -158,3 +158,4 @@ class RDFPlaceParserNewTestCase(TestCase):
         print(o.objct.name, o.objct.lat)
         print(o._foreign_keys)
         self.assertEqual(o.objct.lat, '48.20849')
+        o.save()

@@ -3,8 +3,9 @@ import re
 import pandas as pd
 import rdflib
 from django.contrib.contenttypes.models import ContentType
+from rdflib import URIRef
 
-from apis_core.default_settings.RDF_settings_new import sett_RDF_generic
+from apis_core.default_settings.RDF_settings_new import sett_RDF_generic, sameAs
 from apis_core.apis_metainfo.models import Uri as genUri, Collection, Uri
 from django.db.models.fields import CharField as TCharField
 from django.db.models.fields import FloatField as TFloatField
@@ -12,7 +13,6 @@ from django.db.models.fields.related import ForeignKey as TForeignKey
 from django.db.models.fields.related import ManyToManyField as TManyToMany
 
 from apis_core.helper_functions.RDFparsers import harmonize_geonames_id
-
 
 
 class RDFParserNew(object):
@@ -23,6 +23,7 @@ class RDFParserNew(object):
             if v['base_url'] in self.uri:
                 res['data'] = v
         res['matching'] = sett_RDF_generic[self.kind]['matching']
+        res['sameAs'] = sameAs
         return res
 
     def _parse(self):
@@ -40,13 +41,16 @@ class RDFParserNew(object):
         return res
 
     def _add_same_as(self):
-        
+        for sa in self._settings['sameAs']:
+            for su in self._graph.objects((self._subject, URIRef(sa))):
+                Uri.objects.create(uri=su, entity=self.objct)
 
-    def get_or_create(self):
+    def get_or_create(self, depth=2):
         if not self.created:
             return self.objct
         else:
             if not self.saved:
+                self.create_objct(depth=depth)
                 ob = self.save()
                 return ob
             else:
@@ -70,15 +74,31 @@ class RDFParserNew(object):
         self.saved = True
         self._objct_uri.entity = self.objct
         self._objct_uri.save()
+        self._add_same_as()
         for lab in self.labels:
             lab.temp_entity = self.objct
             lab.save()
         for obj in self.related_objcts:
-            if hasattr(obj, 'related_' + self.kind.lower() + 'B'):
-                setattr(obj, 'related_' + self.kind.lower() + 'A_id', self.objct.pk)
-            else:
-                setattr(obj, 'related_' + self.kind.lower() + '_id', self.objct.pk)
-            obj.save()
+            print(obj)
+            for u3 in obj[1]:
+                ent1 = RDFParserNew(u3, obj[2]).get_or_create(depth=0)
+                print(obj[2], self._app_label_relations, self.kind)
+                if obj[2].lower() == self.kind.lower():
+                    mod = ContentType.objects.get(model=f"{self.kind.lower()*2}", app_label=self._app_label_relations).model_class()()
+                    setattr(mod, 'related_' + self.kind.lower() + 'A_id', self.objct.pk)
+                    setattr(mod, 'related_' + self.kind.lower() + 'B_id', ent1.pk)
+                else:
+                    mod = ContentType.objects.filter(model__icontains=obj[2], app_label=self._app_label_relations).get(
+                        model__icontains=self.kind).model_class()()
+                    setattr(mod, 'related_' + self.kind.lower() + '_id', self.objct.pk)
+                    setattr(mod, 'related_' + obj[2].lower() + '_id', ent1.pk)
+                voc = mod._meta.get_field('relation_type').related_model
+                voc1, created = voc.objects.get_or_create(name=obj[0])
+                setattr(mod, 'relation_type_id', voc1.pk)
+                print(voc1)
+                print(ent1)
+                print(mod)
+                mod.save()
         return self.objct
 
     @staticmethod
@@ -97,6 +117,11 @@ class RDFParserNew(object):
         if len(string) > 255:
             string = string[:250] + '...'
         return string
+
+    @staticmethod
+    def _normalize_uri(uri):
+        # TODO: implement method to normalize uris to canonic form
+        return uri
 
     def _create_related(self, depth=2):
         for s in self._settings['matching']['linked objects']:
@@ -142,6 +167,11 @@ class RDFParserNew(object):
                         c_dict_f[s2['accessor']] = self._prep_string(s2['string'].format(**data),
                     self._settings['matching']['attributes'][s].get('regex', None))
                     self._foreign_keys.append((s, self.objct._meta.get_field(s).related_model, c_dict_f))
+        if depth > 0:
+            for v in self._settings['matching']['linked objects']:
+                at1 = v['object'].split('.')
+                u2 = self._attributes[at1[0]][at1[-1]].tolist()
+                self.related_objcts.append((v['kind'], u2, v['type']))
         self.objct = self.objct(**c_dict)
 
     def __init__(self, uri, kind, app_label_entities="apis_entities", app_label_relations="apis_relations",
@@ -165,16 +195,18 @@ class RDFParserNew(object):
                 return False, False
 
         self.objct = ContentType.objects.get(app_label=app_label_entities, model=kind).model_class()
+        self._app_label_relations = app_label_relations
         self.kind = kind
         self._foreign_keys = []
         self._m2m = []
+        self.uri = self._normalize_uri(uri)
+        self._objct_uri = Uri(uri=self.uri)
+        self._subject = URIRef(self.uri)
         self.related_objcts = []
         owl = "http://www.w3.org/2002/07/owl#"
         force = kwargs.get('force', None)
-        labels = []
-        related_objcts = []
-        uri = harmonize_geonames_id(uri)
-        self.uri = uri
+        self.labels = []
+        self.related_objcts = []
 
         self.saved = False
         test = exist(self.uri, create_uri=True)

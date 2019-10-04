@@ -4,6 +4,11 @@ gndo = 'http://d-nb.info/standards/elementset/gnd#'
 owl = "http://www.w3.org/2002/07/owl#"
 geo = "http://www.opengis.net/ont/geosparql#"
 
+sameAs = [
+    "http://schema.org/sameAs",
+    "http://www.w3.org/2002/07/owl#sameAs"
+]
+
 sett_RDF_generic = {
     'Place': {
         'data': [
@@ -54,6 +59,16 @@ sett_RDF_generic = {
                                 """,
 
                     },
+                    {'name': 'parent',
+                     'sparql': """
+                            PREFIX gn: <http://www.geonames.org/ontology#>
+                            SELECT ?parent
+                            WHERE {{
+                                <{subject}> gn:parentCountry ?parent
+                            }}
+                            """,
+
+                     },
                 ]
             },
             {
@@ -115,16 +130,7 @@ sett_RDF_generic = {
             {
                 'type': 'Place',
                 'kind': 'located in',
-                'object': (
-                    ('parentFeature', None),
-            )
-            },
-            {
-                'type': 'Place',
-                'kind': 'located in',
-                'object': (
-                    ('parentCountry', None),
-            )
+                'object': 'parent'
             },
             ],
         }
