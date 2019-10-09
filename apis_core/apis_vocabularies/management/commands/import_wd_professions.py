@@ -1,55 +1,48 @@
-import re
 import requests
 from django.core.management.base import BaseCommand, CommandError
 
-import pandas as pd
-from rdflib import Graph, Literal, BNode, Namespace, RDF, URIRef
-from rdflib.namespace import DC, FOAF
-
-from apis_vocabularies.models import ProfessionType
-
-
-def get_professions():
-    """ helper function to fetch all profession entities from wikidata
-        :return: pandas dataframe with wikidata-id|label
-    url = 'https://query.wikidata.org/sparql'
-    """
-
-    query = """
-    SELECT ?item ?itemLabel
-    WHERE
-    {
-      ?item wdt:P31 wd:Q28640.
-      SERVICE wikibase:label { bd:serviceParam wikibase:language "en". }
-    }
-    """
-    r = requests.get(url, params={'format': 'json', 'query': query})
-    data = r.json()
-    df = pd.DataFrame(
-        [[x['item']['value'], x['itemLabel']['value']] for x in data['results']['bindings']]
-    )
-    df.drop(df.loc[df[1].str.startswith("Q")].index, inplace=True)
-    df.drop(df.loc[df[1].str.startswith("L")].index, inplace=True)
-    return df
+from apis_core.apis_vocabularies.models import ProfessionType
 
 
 class Command(BaseCommand):
     # Show this when the user types help
     help = "fetches profession entities from wiki data and imports them as apis ProfessionType"
 
-    def handle(self, *args, **kwargs):
-        for i, row in get_professions().iterrows():
-            wd_id = row[0].split('/')[-1]
-            name = f"{row[1]} ({wd_id})"
-            item, _ = ProfessionType.objects.get_or_create(
-                name=name
-            )
-            g = rdflib.Graph()
-            my_graph = g.parse(row[0])
-            description = row[0]
-            for s, p, o in g.triples((URIRef(row[0]), ns_schema.description, None)):
-                if o.language == "en":
-                    description = o._value
-            # TODO: fetch parent class
-            item.description = description
-            item.save()
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--lang',
+            default="en",
+            help='A two digit language code. Defaults to en',
+        )
+
+    def handle(self, *args, **options):
+        url = 'https://query.wikidata.org/sparql'
+        query = """
+        SELECT ?item ?itemLabel ?description
+        WHERE
+        {
+          ?item wdt:P31 wd:Q28640.
+          ?item schema:description ?description FILTER(lang(?description) = "%s")  .
+          SERVICE wikibase:label { bd:serviceParam wikibase:language "%s". }
+        }
+        """
+        lang = options['lang']
+        r = requests.get(url, params={'format': 'json', 'query': query % (lang, lang)})
+        data = r.json()
+        data = [
+            [
+                x['item']['value'],
+                x['itemLabel']['value'],
+                x['description']['value']
+            ] for x in data['results']['bindings']
+        ]
+        for x in data:
+            if x[1].startswith('Q') or x[1].startswith('L'):
+                pass
+            else:
+                label = f"{x[1]} ({x[0].split('/')[-1]})"
+                item, _ = ProfessionType.objects.get_or_create(
+                    name=label
+                )
+                item.description = x[2]
+                print(item)
