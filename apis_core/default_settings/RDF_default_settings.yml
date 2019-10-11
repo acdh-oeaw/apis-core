@@ -1,0 +1,142 @@
+Place:
+  data:
+    - base_url: http://sws.geonames.org/
+      attributes:
+        - name: name
+          sparql: |
+            PREFIX gn: <http://www.geonames.org/ontology#>
+            SELECT ?prefName (LANG(?prefName) AS ?lang)
+            WHERE {
+              ?subject gn:officialName ?prefName
+              FILTER (LANGMATCHES(LANG(?prefName), "de") || LANGMATCHES(LANG(?prefName), "en"))
+                  }
+        - name: altName
+          sparql: |
+            PREFIX gn: <http://www.geonames.org/ontology#>
+            SELECT ?altName (LANG(?altName) AS ?lang)
+            WHERE {
+              ?subject gn:alternateName ?altName
+              FILTER (LANGMATCHES(LANG(?altName), "de") || LANGMATCHES(LANG(?altName), "en"))
+                  }
+        - name: kind
+          sparql: |
+            PREFIX gn: <http://www.geonames.org/ontology#>
+            SELECT ?kind
+            WHERE {
+              ?subject gn:featureCode ?kind
+                  }
+        - name: lat-long
+          sparql: |
+            PREFIX gn: <http://www.geonames.org/ontology#>
+            PREFIX wgs84_pos: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+            SELECT ?lat ?long
+              WHERE {
+                ?subject wgs84_pos:lat ?lat;
+                wgs84_pos:long ?long
+                    }
+        - name: parent
+          sparql: |
+            PREFIX gn: <http://www.geonames.org/ontology#>
+            SELECT ?parent
+              WHERE {
+                ?subject gn:parentCountry ?parent
+                    }
+    - base_url: http://d-nb.info/gnd/
+      attributes:
+        - name: name
+          sparql: |
+            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            SELECT ?prefName
+              WHERE {
+                ?subject gndo:preferredNameForThePlaceOrGeographicName ?prefName
+                }
+        - name: lat-long-gnd
+          sparql: |
+            PREFIX geo: <http://www.opengis.net/ont/geosparql#>
+            SELECT ?point
+              WHERE {
+                ?subject geo:hasGeometry ?geo1 .
+                ?geo1 geo:asWKT ?point
+                }
+  matching:
+    attributes:
+      name:
+        string: '{prefName}'
+        regex: null
+      kind: 
+        string: '{kind}'
+        accessor: name
+        regex: null
+      lat:
+        domain: geonames.org
+        identifier: lat-long
+        string: '{lat}'
+      lng:
+        domain: geonames.org
+        identifier: lat-long
+        string: '{long}'
+      lng-gnd:
+        domain: d-nb.info
+        identifier: lat-long-gnd
+        field name: lng
+        string: '{point}'
+        regex:
+          - '([0-9\.]+)'
+          - 1
+      lat-gnd:
+        domain: d-nb.info
+        identifier: lat-long-gnd
+        field name: lat
+        string: "{point}"
+        regex:
+          - \d\s\+([0-9\.]+)
+          - 1
+
+    labels:
+      - label type: alternative name
+        identifier: altName
+    linked objects:
+      - type: Place
+        kind: located in
+        identifier: parent
+Person:
+  data:
+    - base_url: d-nb.info
+      attributes:
+        - name: name
+          sparql: |
+            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+
+            SELECT ?name ?first_name
+
+            WHERE {
+              ?subject gndo:preferredNameForThePerson ?name .
+              OPTIONAL {
+              ?subject gndo:preferredNameEntityForThePerson ?med .
+              ?med gndo:forename ?first_name;
+                    gndo:surname ?name2 .
+                BIND(?name2 as ?name)
+            }
+            }
+        - name: profession
+          sparql: |
+            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+
+            SELECT ?profession
+
+            WHERE {
+              ?subject gndo:professionOrOccupation ?profession
+            }
+  matching:
+    prefLabels:
+      - http://d-nb.info/standards/elementset/gnd#preferredNameForTheSubjectHeading
+    attributes:
+      name:
+        string: '{name}'
+      first_name:
+        identifier: name
+        string: '{first_name}'
+      profession:
+        string: '{profession}'
+        accessor: name
+        linked: true
