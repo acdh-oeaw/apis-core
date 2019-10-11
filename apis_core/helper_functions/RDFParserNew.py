@@ -9,7 +9,7 @@ import yaml
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
 from rdflib import URIRef, RDFS
-from rdflib.namespace import SKOS
+from rdflib.namespace import SKOS, OWL
 
 from apis_core.apis_labels.models import Label
 from apis_core.apis_vocabularies.models import LabelType
@@ -52,6 +52,14 @@ fmt = PartialFormatter()
 
 
 class RDFParserNew(object):
+
+    @property
+    def _settings_complete(self):
+        base_dir = getattr(settings, 'BASE_DIR')
+        sett_file = os.path.join(base_dir, getattr(settings, 'APIS_GENERICRDF_SETTINGS', 'apis_core/default_settings/RDF_default_settings.yml'))
+        sett = yaml.load(open(sett_file, 'r'))
+        return sett
+
     @property
     def _settings(self):
         """
@@ -76,6 +84,27 @@ class RDFParserNew(object):
         """
         g = rdflib.Graph()
         g.parse(f"{self.uri}")
+        if self._use_preferred:
+            lst_pref = []
+            pref_fin = []
+            u = None
+            count = 0
+            u = self._settings_complete[self.kind]['data'][count]['base_url']
+            while u:
+                if u not in self.uri:
+                    lst_pref.append(u)
+                    count += 1
+                    u = self._settings_complete[self.kind]['data'][count]['base_url']
+                else:
+                    u = False
+            for o in g.objects(URIRef(self.uri), OWL.sameAs):
+                for idx1, o2 in enumerate(lst_pref):
+                    if o2 in str(o):
+                        pref_fin.append((idx1, o))
+            if len(pref_fin) > 0:
+                pref_fin.sort(key=lambda tup: tup[0])
+                self._parse = g.parse(pref_fin[0][1])
+                self.uri = pref_fin[0][1]
         self._graph = g
         res = dict()
         for s in self._settings['data']['attributes']:
@@ -306,7 +335,7 @@ class RDFParserNew(object):
                     cols = [x for x in df.columns if x != 'lang']
                     for c in cols:
                         data[c] = df.at[0, c]
-                    local_string = self._settings['matching']['attributes'][s]['string'].format(**data)
+                    local_string = fmt.format(self._settings['matching']['attributes'][s]['string'], **data)
                     c_dict_f[access] = self._prep_string(local_string, local_regex, local_linked)
                 self._foreign_keys.append((field_name, self.objct._meta.get_field(s).related_model, c_dict_f))
             elif isinstance(fields_1, TManyToMany):
@@ -318,7 +347,7 @@ class RDFParserNew(object):
                         for c in cols:
                             data[c] = row[c]
                         c_dict_f = dict()
-                        local_string = self._settings['matching']['attributes'][s]['string'].format(**data)
+                        local_string = fmt.format(self._settings['matching']['attributes'][s]['string'], **data)
                         c_dict_f[access] = self._prep_string(local_string, local_regex, local_linked)
                     self._m2m.append((field_name, self.objct._meta.get_field(s).related_model, c_dict_f))
         if 'labels' in self._settings['matching'].keys():
@@ -338,13 +367,14 @@ class RDFParserNew(object):
         self.objct = self.objct(**c_dict)
 
     def __init__(self, uri, kind, app_label_entities="apis_entities", app_label_relations="apis_relations",
-                 app_label_vocabularies="apis_vocabularies", **kwargs):
+                 app_label_vocabularies="apis_vocabularies", use_preferred=False, **kwargs):
         """
         :param uri: (url) Uri to parse the object from (http://test.at). The uri must start with a base url mentioned in the RDF parser settings file.
         :param kind: (string) Kind of entity (Person, Place, Institution, Work, Event)
         :param app_label_entities: (string) Name of the Django app that contains the entities that we create.
         :param app_label_relations: (string) Name of the Django app that contains the relations for the merging process.
         :param app_label_vocabularies: (string) Name of the Django app that contains the vocabularies defining the entities and relations.
+        :param use_preferred: (boolean) if True forwards to preferred sources defined in sameAs
         """
 
         def exist(uri, create_uri=False):
@@ -356,6 +386,7 @@ class RDFParserNew(object):
             else:
                 return False, False
 
+        self._use_preferred = use_preferred
         self.objct = ContentType.objects.get(app_label=app_label_entities, model=kind).model_class()
         self._app_label_relations = app_label_relations
         self.kind = kind

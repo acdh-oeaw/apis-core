@@ -203,3 +203,9 @@ class RDFPlaceParserNewTestCase(TestCase):
         o.merge(o2)
         print(o.objct.uri_set.all())
 
+    def test_place_of_birth(self):
+        o = RDFParserNew('http://d-nb.info/gnd/118566512', 'Person')
+        o.create_objct()
+        o.save()
+        for p in PersonPlace.objects.all():
+            print(p.related_place.name, p.related_place.uri_set.all())

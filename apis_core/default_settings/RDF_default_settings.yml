@@ -145,6 +145,15 @@ Person:
             WHERE {
               ?subject gndo:dateOfDeath ?end_date_written
             }
+        - name: place_of_birth
+          sparql: |
+            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+
+            SELECT ?place_of_birth
+
+            WHERE {
+              ?subject gndo:placeOfBirth ?place_of_birth
+            }
   matching:
     prefLabels:
       - http://d-nb.info/standards/elementset/gnd#preferredNameForTheSubjectHeading
@@ -162,3 +171,7 @@ Person:
         string: '{profession}'
         accessor: name
         linked: true
+    linked objects:
+      - type: Place
+        kind: Place of Birth
+        identifier: place_of_birth
