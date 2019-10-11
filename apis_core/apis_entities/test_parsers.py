@@ -163,12 +163,12 @@ class RDFPlaceParserNewTestCase(TestCase):
         print(f"related objects: {o.related_objcts}")
         for oo in o.labels:
             print(oo.label, oo.isoCode_639_3)
-        o3 = RDFParserNew('http://d-nb.info/gnd/4066009-6', 'Place')
-        print(o3.objct)
-        o3.create_objct()
-        o4 = o3.save()
-        print(o4.name)
-        print(o4.lng, o4.lat)
+        #o3 = RDFParserNew('http://d-nb.info/gnd/4066009-6', 'Place')
+        #print(o3.objct)
+        #o3.create_objct()
+        #o4 = o3.save()
+        #print(o4.name)
+        #print(o4.lng, o4.lat)
 
     def test_parse_person(self):
         o = RDFParserNew('http://d-nb.info/gnd/118650130', 'Person')
