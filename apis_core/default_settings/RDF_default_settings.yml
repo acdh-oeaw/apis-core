@@ -127,6 +127,24 @@ Person:
             WHERE {
               ?subject gndo:professionOrOccupation ?profession
             }
+        - name: start_date_written
+          sparql: |
+            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+
+            SELECT ?start_date_written
+
+            WHERE {
+              ?subject gndo:dateOfBirth ?start_date_written
+            }
+        - name: end_date_written
+          sparql: |
+            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+
+            SELECT ?end_date_written
+
+            WHERE {
+              ?subject gndo:dateOfDeath ?end_date_written
+            }
   matching:
     prefLabels:
       - http://d-nb.info/standards/elementset/gnd#preferredNameForTheSubjectHeading
@@ -136,6 +154,10 @@ Person:
       first_name:
         identifier: name
         string: '{first_name}'
+      start_date_written:
+        string: '{start_date_written}'
+      end_date_written:
+        string: '{end_date_written}'
       profession:
         string: '{profession}'
         accessor: name

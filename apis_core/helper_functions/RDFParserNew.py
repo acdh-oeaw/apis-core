@@ -7,6 +7,7 @@ import pandas as pd
 import rdflib
 import yaml
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import FieldError
 from rdflib import URIRef, RDFS
 from rdflib.namespace import SKOS
 
@@ -66,7 +67,6 @@ class RDFParserNew(object):
                 res['data'] = v
         res['matching'] = sett[self.kind]['matching']
         res['sameAs'] = sameAs
-        print(res)
         return res
 
     def _parse(self):
@@ -81,7 +81,6 @@ class RDFParserNew(object):
         for s in self._settings['data']['attributes']:
             sp = s.get('sparql', False)
             if sp:
-                print(sp)
                 sp2 = self._sparql_to_pandas(g.query(sp, initBindings={'subject': URIRef(self.uri)}))
                 res[s.get('name', 'no identifier provided')] = pd.DataFrame(sp2)
         self._attributes = res
@@ -146,10 +145,8 @@ class RDFParserNew(object):
             attr2, created = obj[1].objects.get_or_create(**obj[2])
             getattr(self.objct, obj[0]).add(attr2)
         for obj in self.related_objcts:
-            print(obj)
             for u3 in obj[1]:
                 ent1 = RDFParserNew(u3, obj[2]).get_or_create(depth=0)
-                print(obj[2], self._app_label_relations, self.kind)
                 if obj[2].lower() == self.kind.lower():
                     mod = ContentType.objects.get(model=f"{self.kind.lower()*2}", app_label=self._app_label_relations).model_class()()
                     setattr(mod, 'related_' + self.kind.lower() + 'A_id', self.objct.pk)
@@ -162,9 +159,6 @@ class RDFParserNew(object):
                 voc = mod._meta.get_field('relation_type').related_model
                 voc1, created = voc.objects.get_or_create(name=obj[0])
                 setattr(mod, 'relation_type_id', voc1.pk)
-                print(voc1)
-                print(ent1)
-                print(mod)
                 mod.save()
                 rel_obj_new.append(mod)
         self.related_objcts = rel_obj_new
@@ -226,8 +220,55 @@ class RDFParserNew(object):
                 m = re.match(dom['regex'], uri)
                 if m:
                     uri = dom['replace'].format(m.group(1))
-                    print(uri)
         return uri
+
+    def merge(self, m_obj, app_label_relations='apis_relations'):
+        """
+        :param m_obj: the object to merge with (must be an django model object instance)
+        :param app_label_relations: (string) the label of the Django app that contains the relations
+        :return: django object saved to db or False if nothing was saved
+        """
+        for rel in ContentType.objects.filter(app_label=app_label_relations, model__icontains=self.kind.lower()):
+            rel_q = {'related_' + self.kind.lower(): m_obj}
+            rel2 = rel.model_class()
+            try:
+                for rel_exst in rel2.objects.filter(**rel_q):
+                    setattr(rel_exst, 'related_'+self.kind.lower()+'_id', self.objct.pk)
+                    rel_exst.save()
+            except FieldError:  # e.g. PlacePlace relations have different related_ fields
+                rel_q = {'related_' + self.kind.lower()+'A': m_obj}
+                for rel_exst in rel2.objects.filter(**rel_q):
+                    setattr(rel_exst, 'related_'+self.kind.lower()+'A_id', self.objct.pk)
+                    rel_exst.save()
+                rel_q = {'related_' + self.kind.lower() + 'B': m_obj}
+                for rel_exst in rel2.objects.filter(**rel_q):
+                    setattr(rel_exst, 'related_'+self.kind.lower()+'B_id', self.objct.pk)
+                    rel_exst.save()
+        for z in genUri.objects.filter(entity=m_obj):
+            z.entity_id = self.objct.pk
+            z.save()
+        for z in Label.objects.filter(temp_entity=m_obj):
+            z.temp_entity_id = self.objct.pk
+            z.save()
+        if hasattr(m_obj, 'first_name'):
+            legacy_name = '{}, {}'.format(m_obj.name, m_obj.first_name)
+        else:
+            legacy_name = m_obj.name
+        lt, created = LabelType.objects.get_or_create(name='legacy name')
+        Label.objects.create(temp_entity_id=self.objct.pk, label=legacy_name, label_type=lt)
+        for col in m_obj.collection.all():
+            self.objct.collection.add(col)
+        if 'apis_highlighter' in settings.INSTALLED_APPS:
+            for ann in m_obj.annotation_set.all():  # Todo: check if this works now with highlighter
+                ann.entity_link.remove(m_obj)
+                ann.entity_link.add(self.objct)
+        for txt in m_obj.text.all():
+            self.objct.text.add(txt)
+        if m_obj.source:
+            self.objct.source = m_obj.source
+            self.objct.save()
+        m_obj.delete()
+        return self.objct
 
 
     def create_objct(self, depth=2):
@@ -287,7 +328,6 @@ class RDFParserNew(object):
                     u2 = self._attributes[at1[0]][[at1[-1], 'lang']]
                     for idx, row in u2.iterrows():
                         self.labels.append((row[at1[-1]], row['lang'], lab['label type']))
-                    print(self.labels)
 
         if depth > 0 and 'linked objects' in self._settings['matching'].keys():
             for v in self._settings['matching']['linked objects']:
@@ -325,7 +365,6 @@ class RDFParserNew(object):
         self._objct_uri = Uri(uri=self.uri)
         self._subject = URIRef(self.uri)
         self.related_objcts = []
-        owl = "http://www.w3.org/2002/07/owl#"
         force = kwargs.get('force', None)
         self.labels = []
         self.related_objcts = []
@@ -338,5 +377,4 @@ class RDFParserNew(object):
         else:
             self.created = True
             o = self._parse()
-            print('worked')
 

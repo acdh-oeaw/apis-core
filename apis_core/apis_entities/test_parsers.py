@@ -189,6 +189,17 @@ class RDFPlaceParserNewTestCase(TestCase):
         print(f"name: {o3.objct.name}, {o3.objct.first_name}")
         print(o3._foreign_keys)
         self.assertEqual(o3.objct.name, 'Kreisky')
+        self.assertEqual(o3.objct.start_date_written, '1911-01-22')
         o4 = o3.save()
         print(o4)
         print(o4.profession.all())
+        print(o4.start_date)
+
+    def test_merge(self):
+        o = RDFParserNew('http://d-nb.info/gnd/118566512', 'Person')
+        o.create_objct()
+        o.save()
+        o2 = RDFParserNew('http://d-nb.info/gnd/170686299', 'Person').get_or_create()
+        o.merge(o2)
+        print(o.objct.uri_set.all())
+
