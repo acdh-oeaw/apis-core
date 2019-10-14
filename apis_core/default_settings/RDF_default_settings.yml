@@ -175,3 +175,57 @@ Person:
       - type: Place
         kind: Place of Birth
         identifier: place_of_birth
+Institution:
+  data:
+    - base_url: d-nb.info
+      attributes:
+        - name: name
+          sparql: |
+            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            SELECT ?name
+              WHERE {
+                ?subject gndo:preferredNameForTheCorporateBody ?name
+                }
+        - name: altName
+          sparql: |
+            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            SELECT ?altName
+              WHERE {
+                ?subject gndo:variantNameForTheCorporateBody ?altName
+                }
+        - name: place
+          sparql: |
+            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            SELECT ?place
+              WHERE {
+                ?subject gndo:placeOfBusiness ?place
+                }
+        - name: start_date_written
+          sparql: |
+            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            SELECT ?start_date_written
+              WHERE {
+                ?subject gndo:dateOfEstablishment ?start_date_written
+                }
+        - name: end_date_written
+          sparql: |
+            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            SELECT ?end_date_written
+              WHERE {
+                ?subject gndo:dateOfTermination ?end_date_written
+                }
+  matching:
+    attributes:
+      name:
+        string: '{name}'
+      start_date_written:
+        string: '{start_date_written}'
+      end_date_written:
+        string: '{end_date_written}'
+    linked objects:
+      - type: Place
+        kind: located in
+        identifier: place
+    labels:
+      - label type: alternative name
+        identifier: altName

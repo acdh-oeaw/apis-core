@@ -354,6 +354,8 @@ class RDFParserNew(object):
             for lab in self._settings['matching']['labels']:
                 at1 = lab['identifier'].split('.')
                 if at1[0] in self._attributes.keys():
+                    if 'lang' not in self._attributes[at1[0]]:
+                        self._attributes[at1[0]]['lang'] = 'deu'
                     u2 = self._attributes[at1[0]][[at1[-1], 'lang']]
                     for idx, row in u2.iterrows():
                         self.labels.append((row[at1[-1]], row['lang'], lab['label type']))

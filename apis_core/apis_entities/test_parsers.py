@@ -5,7 +5,7 @@ from .models import Person, Place, Institution, Work, Event
 from apis_core.apis_metainfo.models import Text, Collection, Source, Uri, UriCandidate
 from apis_core.apis_vocabularies.models import PersonPlaceRelation
 from apis_core.apis_labels.models import Label
-from apis_core.apis_relations.models import PersonPlace, PlacePlace
+from apis_core.apis_relations.models import PersonPlace, PlacePlace, InstitutionPlace
 from reversion.models import Version
 from reversion import revisions as reversion
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
@@ -209,3 +209,11 @@ class RDFPlaceParserNewTestCase(TestCase):
         o.save()
         for p in PersonPlace.objects.all():
             print(p.related_place.name, p.related_place.uri_set.all())
+
+    def test_institution(self):
+        o = RDFParserNew('http://d-nb.info/gnd/1001454-8', 'Institution')
+        o.create_objct()
+        o2 = o.save()
+        print(o2.pk, o2.start_date, o2.start_date_written)
+        print(InstitutionPlace.objects.filter(related_institution_id=o2.pk))
+        print(o2.label_set.all().values_list('label'))
