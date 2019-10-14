@@ -53,6 +53,8 @@ fmt = PartialFormatter()
 
 class RDFParserNew(object):
 
+    _reserved_uris = []
+
     @property
     def _settings_complete(self):
         base_dir = getattr(settings, 'BASE_DIR')
@@ -395,14 +397,15 @@ class RDFParserNew(object):
         :param use_preferred: (boolean) if True forwards to preferred sources defined in sameAs
         """
 
-        def exist(uri, create_uri=False):
+        def exist(uri):
             if self.objct.objects.filter(uri__uri=uri).count() > 0:
                 return True, self.objct.objects.get(uri__uri=uri)
-            elif create_uri:
-                self._objct_uri = Uri.objects.create(uri=uri)
-                return False, False
             else:
-                return False, False
+                if uri in RDFParserNew._reserved_uris:
+                    raise ValueError("URI used by other instance")
+                else:
+                    RDFParserNew._reserved_uris.append(uri)
+                    return False, False
 
         self._use_preferred = use_preferred
         self.objct = ContentType.objects.get(app_label=app_label_entities, model=kind).model_class()
@@ -419,7 +422,7 @@ class RDFParserNew(object):
         self.related_objcts = []
 
         self.saved = False
-        test = exist(self.uri, create_uri=True)
+        test = exist(self.uri)
         if test[0] and not force:
             self.objct = test[1]
             self.created = False

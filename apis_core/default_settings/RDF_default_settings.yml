@@ -83,17 +83,17 @@ Place:
         data type: float
       lng-gnd:
         domain: d-nb.info
-        identifier: lat-long-gnd
+        identifier: lat-long-gnd.point
         field name: lng
-        string: '{point}'
+        data type: float
         regex:
           - '([0-9\.]+)'
           - 1
       lat-gnd:
         domain: d-nb.info
-        identifier: lat-long-gnd
+        identifier: lat-long-gnd.point
         field name: lat
-        string: "{point}"
+        data type: float
         regex:
           - \d\s\+([0-9\.]+)
           - 1

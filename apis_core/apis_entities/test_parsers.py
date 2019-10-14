@@ -149,7 +149,7 @@ class RDFPlaceParserNewTestCase(TestCase):
     def test_parse_place(self):
         plc = [("http://www.geonames.org/6951114/bad-zell.html", "Bad Zell", 48.34906, "http://sws.geonames.org/2782113/", "http://www.geonames.org/ontology#P.PPL"),
                ("http://sws.geonames.org/2779275/", "Freistadt", 48.51103, "http://sws.geonames.org/2782113/", "http://www.geonames.org/ontology#P.PPL"),
-               ("http://sws.geonames.org/2761369", "Wien", 48.20849, "http://sws.geonames.org/2782113/", "http://www.geonames.org/ontology#P.PPLC")
+               ("http://sws.geonames.org/2761369", "Vienna", 48.20849, "http://sws.geonames.org/2782113/", "http://www.geonames.org/ontology#P.PPLC")
                ]
         for p in plc:
             o = RDFParserNew(p[0], 'Place')
@@ -200,7 +200,7 @@ class RDFPlaceParserNewTestCase(TestCase):
         o.create_objct()
         o.save()
         for p in PersonPlace.objects.all():
-            print(p.related_place.name, p.related_place.uri_set.all())
+            print(p.related_place.name, p.related_place.uri_set.all(), p.related_place.lat)
 
     def test_institution(self):
         o = RDFParserNew('http://d-nb.info/gnd/1001454-8', 'Institution')
@@ -209,3 +209,7 @@ class RDFPlaceParserNewTestCase(TestCase):
         print(o2.pk, o2.start_date, o2.start_date_written)
         print(InstitutionPlace.objects.filter(related_institution_id=o2.pk))
         print(o2.label_set.all().values_list('label'))
+        
+    def test_use_uri_twice(self):
+        o = RDFParserNew("http://www.geonames.org/6951114/bad-zell.html", "Place")
+        self.assertRaises(ValueError, RDFParserNew, "http://www.geonames.org/6951114/bad-zell.html", "Place")
