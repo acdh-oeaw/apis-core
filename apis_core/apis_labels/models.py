@@ -17,6 +17,8 @@ class Label(models.Model):
         verbose_name='ISO Code', default='deu')
     label_type = models.ForeignKey(LabelType, blank=True, null=True,
                                    on_delete=models.SET_NULL)
+
+    # TODO __sresch__ add related_name="label_set" here to be consistent with other usages throughout django
     temp_entity = models.ForeignKey("apis_metainfo.TempEntityClass", on_delete=models.CASCADE)
 
     def get_web_object(self):
@@ -32,3 +34,6 @@ class Label(models.Model):
             self.label = unicodedata.normalize('NFC', self.label)
         super(Label, self).save(*args, **kwargs)
         return self
+
+    def __str__(self):
+        return self.label

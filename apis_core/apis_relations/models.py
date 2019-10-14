@@ -4,6 +4,8 @@ import reversion
 from django.db.models import Q
 import operator
 import pdb
+import inspect
+import sys
 
 from apis_core.apis_entities.models import Person, Place, Institution, Event, Work
 from apis_core.apis_metainfo.models import TempEntityClass
@@ -59,13 +61,75 @@ class AnnotationRelationLinkManager(models.Manager):
 
 #######################################################################
 #
+# GenericRelation
+#
+#######################################################################
+#
+class GenericRelation(TempEntityClass):
+    """
+    Abstract super class which encapsulates common logic between the different relations and provides various methods
+    relating to either all or a specific relations.
+    """
+
+    class Meta:
+        abstract = True
+
+    _all_relation_classes = None
+    _all_relation_names = None
+
+
+    # Methods dealing with all relationtypes
+    ####################################################################################################################
+
+    @classmethod
+    def get_all_relation_classes(cls):
+        """
+        :return: list of all python classes of the relations defined within this models' module
+        """
+
+        if cls._all_relation_classes == None:
+
+            relation_classes = []
+            relation_names = []
+
+            for relation_name, relation_class in inspect.getmembers(
+                    sys.modules[__name__], inspect.isclass):
+
+                if relation_class.__module__ == "apis_core.apis_relations.models" and \
+                        relation_class.__name__ != "AnnotationRelationLinkManager" and \
+                        relation_class.__name__ != "GenericRelation":
+
+                    relation_classes.append(relation_class)
+                    relation_names.append(relation_name.lower())
+
+            cls._all_relation_classes = relation_classes
+            cls._all_relation_names = relation_names
+
+        return cls._all_relation_classes
+
+    @classmethod
+    def get_all_relation_names(cls):
+        """
+        :return: list of all class names in lower case of the relations defined within this models' module
+        """
+
+        if cls._all_relation_classes == None:
+
+            cls.get_all_relation_classes()
+
+        return cls._all_relation_names
+
+
+
+#######################################################################
+#
 # Person - ... - Relation
 #
 #######################################################################
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PersonPerson(TempEntityClass):
+class PersonPerson(GenericRelation):
     """Defines and describes a relation between a Person and another Person
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PersonPersonRelation`
@@ -128,7 +192,7 @@ class PersonPerson(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PersonPlace(TempEntityClass):
+class PersonPlace(GenericRelation):
     """Defines and describes a relation between a Person and a Place
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PersonPlaceRelation`
@@ -167,7 +231,7 @@ class PersonPlace(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PersonInstitution(TempEntityClass):
+class PersonInstitution(GenericRelation):
     """ Defines and describes a relation between a Person and a Institution
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PersonInstitutionRelation`
@@ -203,7 +267,7 @@ class PersonInstitution(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PersonEvent(TempEntityClass):
+class PersonEvent(GenericRelation):
     """ Defines and describes a relation bewteen a Person and an Event
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PersonEventRelation`
@@ -238,7 +302,7 @@ class PersonEvent(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PersonWork(TempEntityClass):
+class PersonWork(GenericRelation):
     """ Defines and describes a relation between a Person and a Work
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PersonWorkRelation`
@@ -280,7 +344,7 @@ class PersonWork(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class InstitutionInstitution(TempEntityClass):
+class InstitutionInstitution(GenericRelation):
     """ Defines and describes a relation between two Institutions
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.InstitutionInstitutionRelation`
@@ -331,7 +395,7 @@ class InstitutionInstitution(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class InstitutionPlace(TempEntityClass):
+class InstitutionPlace(GenericRelation):
     """Describes a relation bewteen an Institution  and a Place
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.InstitutionPlaceRelation`
@@ -365,7 +429,7 @@ class InstitutionPlace(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class InstitutionEvent(TempEntityClass):
+class InstitutionEvent(GenericRelation):
     """Describes a relation bewteen an Institution and an Event
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.InstitutionEventRelation`
@@ -398,7 +462,7 @@ class InstitutionEvent(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class InstitutionWork(TempEntityClass):
+class InstitutionWork(GenericRelation):
     """Describes a relation bewteen an Institution and a Work
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.InstitutionWorkRelation`
@@ -439,7 +503,7 @@ class InstitutionWork(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PlacePlace(TempEntityClass):
+class PlacePlace(GenericRelation):
     """Describes a relation bewteen an Place  and a Place
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PlacePlaceRelation`
@@ -498,7 +562,7 @@ class PlacePlace(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PlaceEvent(TempEntityClass):
+class PlaceEvent(GenericRelation):
     """Describes a relation between an Place and an Event
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PlaceEventRelation`
@@ -535,7 +599,7 @@ class PlaceEvent(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PlaceWork(TempEntityClass):
+class PlaceWork(GenericRelation):
     """Describes a relation between an Place and a Work
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PlaceWorkRelation`
@@ -579,7 +643,7 @@ class PlaceWork(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class EventEvent(TempEntityClass):
+class EventEvent(GenericRelation):
     """Describes a relation between an Event and an Event
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.EventEventRelation`
@@ -639,7 +703,7 @@ class EventEvent(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class EventWork(TempEntityClass):
+class EventWork(GenericRelation):
     """Describes a relation between an Event and a Work
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.EventWorkRelation`
@@ -683,7 +747,7 @@ class EventWork(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class WorkWork(TempEntityClass):
+class WorkWork(GenericRelation):
     """Describes a relation between an Work and a Work
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.WorkWorkRelation`

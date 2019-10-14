@@ -3,7 +3,8 @@ from reversion import revisions as reversion
 from django.contrib.auth.models import User
 from django.utils.functional import cached_property
 import re
-
+import sys
+import inspect
 import unicodedata
 
 
@@ -192,37 +193,130 @@ class TextType(VocabsBaseClass):
 #######################################################################
 
 
+class GenericRelationType(RelationBaseClass):
+    """
+    Abstract super class which encapsulates common logic between the different relationtypes and provides various methods
+    relating to either all or a specific relationtypes.
+    """
+
+    class Meta:
+        abstract = True
+
+    _all_relationtype_classes = None
+    _all_relationtype_names = None
+    _related_entity_field_names = None
+
+
+    # Methods dealing with all relationtypes
+    ####################################################################################################################
+    
+    @classmethod
+    def get_all_relationtype_classes(cls):
+        """
+        :return: list of all python classes of the relationtypes defined within this models' module  
+        """
+
+        if cls._all_relationtype_classes == None:
+
+            relationtype_classes = []
+            relationtype_names = []
+
+            for relationtype_name, relationtype_class in inspect.getmembers(
+                    sys.modules[__name__], inspect.isclass):
+
+                if relationtype_class.__module__ == "apis_core.apis_vocabularies.models" and \
+                        relationtype_name.endswith("Relation"):
+
+                    relationtype_classes.append(relationtype_class)
+                    relationtype_names.append(relationtype_name.lower())
+
+            cls._all_relationtype_classes = relationtype_classes
+            cls._all_relationtype_names = relationtype_names
+
+        return cls._all_relationtype_classes
+
+
+    @classmethod
+    def get_all_relationtype_names(cls):
+        """
+        :return: list of all class names in lower case of the relationtypes defined within this models' module
+        """
+
+        if cls._all_relationtype_names == None:
+
+            cls.get_all_relationtype_classes()
+
+        return cls._all_relationtype_names
+
+
+    # Methods dealing with related entities
+    ####################################################################################################################
+    
+    @classmethod
+    def get_related_entity_field_names(cls):
+        """
+        :return: a list of names of all ManyToMany field names relating to entities from the respective relationtype class
+
+        E.g. for PersonPersonRelation.get_related_entity_field_names() or personpersonrelation_instance.get_related_entity_field_names() ->
+        ['personB_set', 'personA_set']
+
+        Note: this method depends on the 'generate_relation_fields' method in apis_entities.models which wires the ManyToMany Fields into the
+        entities and respective relationtypes. It is nevertheless defined here within GenericRelationType for documentational purpose.
+        """
+
+        if cls._related_entity_field_names == None:
+            raise Exception("_related_entity_field_names was not initialized yet.")
+        else:
+            return cls._related_entity_field_names
+
+
+    @classmethod
+    def add_related_entity_field_name(cls, entity_field_name):
+        """
+        :param entity_field_name: the name of one of several ManyToMany fields created automatically
+        :return: None
+
+        Note: this method depends on the 'generate_relation_fields' method in apis_entities.models which wires the ManyToMany Fields into the
+        entities and respective relationtypes. It is nevertheless defined here within GenericRelationType for documentational purpose.
+        """
+
+        if cls._related_entity_field_names == None:
+            cls._related_entity_field_names = []
+
+        cls._related_entity_field_names.append(entity_field_name)
+
+
 #######################################################################
 # Person-Relation-Types
 #######################################################################
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PersonPersonRelation(RelationBaseClass):
+class PersonPersonRelation(GenericRelationType):
     """Holds controlled vocabularies relation types of Persons and Persons"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PersonPlaceRelation(RelationBaseClass):
+class PersonPlaceRelation(GenericRelationType):
     """Holds controlled vocabularies relation types of Persons and Places"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PersonInstitutionRelation(RelationBaseClass):
+class PersonInstitutionRelation(GenericRelationType):
     """Holds controlled vocabularies relation types of Persons and Persons"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PersonEventRelation(RelationBaseClass):
+class PersonEventRelation(GenericRelationType):
     """Holds controlled vocabularies relation types of Persons and Events"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PersonWorkRelation(RelationBaseClass):
+class PersonWorkRelation(GenericRelationType):
     """Holds controlled vocabularies relation types of Persons and Works"""
     pass
 
@@ -233,25 +327,25 @@ class PersonWorkRelation(RelationBaseClass):
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class InstitutionEventRelation(RelationBaseClass):
+class InstitutionEventRelation(GenericRelationType):
     """Holds controlled vocabularies relation types of Institutions and Events."""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class InstitutionPlaceRelation(RelationBaseClass):
+class InstitutionPlaceRelation(GenericRelationType):
     """Holds controlled vocabularies relation types of Institutions and Places."""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class InstitutionInstitutionRelation(RelationBaseClass):
+class InstitutionInstitutionRelation(GenericRelationType):
     """Holds controlled vocabularies relation types of Institutions and Institutions."""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class InstitutionWorkRelation(RelationBaseClass):
+class InstitutionWorkRelation(GenericRelationType):
     """Holds controlled vocabularies relation types of Institutions and Works."""
     pass
 
@@ -261,19 +355,19 @@ class InstitutionWorkRelation(RelationBaseClass):
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PlacePlaceRelation(RelationBaseClass):
+class PlacePlaceRelation(GenericRelationType):
     """Holds controlled vocabularies relation types of Places and Places"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PlaceEventRelation(RelationBaseClass):
+class PlaceEventRelation(GenericRelationType):
     """Holds controlled vocabularies relation types of Places and Events"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PlaceWorkRelation(RelationBaseClass):
+class PlaceWorkRelation(GenericRelationType):
     """Holds controlled vocabularies relation types of Places and Works"""
     pass
 
@@ -284,13 +378,13 @@ class PlaceWorkRelation(RelationBaseClass):
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class EventEventRelation(RelationBaseClass):
+class EventEventRelation(GenericRelationType):
     """Holds controlled vocabularies relation types of Events and Events"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class EventWorkRelation(RelationBaseClass):
+class EventWorkRelation(GenericRelationType):
     """Holds controlled vocabularies relation types of Events and Works"""
     pass
 
@@ -301,6 +395,6 @@ class EventWorkRelation(RelationBaseClass):
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class WorkWorkRelation(RelationBaseClass):
+class WorkWorkRelation(GenericRelationType):
     """Holds controlled vocabularies relation types of Works and Works"""
     pass

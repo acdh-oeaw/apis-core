@@ -39,6 +39,8 @@ class SearchForm(forms.Form):
 
 
 def get_entities_form(entity):
+
+    # TODO __sresch__ : consider moving this class outside of the function call to avoid redundant class definitions
     class GenericEntitiesForm(forms.ModelForm):
         class Meta:
             model = ContentType.objects.get(
@@ -56,6 +58,9 @@ def get_entities_form(entity):
                 'text',
                 'source',
             ]
+            exclude.extend(model.get_related_entity_field_names())
+            exclude.extend(model.get_related_relationtype_field_names())
+
 
         def __init__(self, *args, **kwargs):
             super(GenericEntitiesForm, self).__init__(*args, **kwargs)
