@@ -145,12 +145,12 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
         # __sresch__ : comment and un-comment the respective self.filter = .. lines to experiment with the existing filter or my suggestion
         #
         # ORIGINAL
-        self.filter = get_generic_list_filter(self.entity.title())(self.request.GET, queryset=qs)
+        # self.filter = get_generic_list_filter(self.entity.title())(self.request.GET, queryset=qs)
         #
         # MODIFIED
         # TODO __sresch__ : investiage how class instantiation can be avoided so that a singleton object is returened instead
-        # from . import filters__sresch__suggestion
-        # self.filter = filters__sresch__suggestion.get_list_filter_of_entity(self.entity.title())(self.request.GET, queryset=qs)
+        from . import filters__sresch__suggestion
+        self.filter = filters__sresch__suggestion.get_list_filter_of_entity(self.entity.title())(self.request.GET, queryset=qs)
 
 
         self.filter.form.helper = self.formhelper_class()
