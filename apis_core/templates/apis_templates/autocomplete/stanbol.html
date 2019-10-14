@@ -7,7 +7,7 @@
 </span>
 {% if choice.lat %}
 <script>
-        
+
             $('#auto_{{ choice.ac_type }}_{{ forloop.counter }}').tooltipster({
                 functionReady: function(origin, content) {
                     if ($('#tooltip_map_{{ choice.ac_type }}_{{ forloop.counter }}').children().length == 0){
@@ -15,17 +15,17 @@
                     center: [51.505, -0.09],
                     zoom: 5,
                     zoomControl: false});
-                    L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     maxZoom: 18,
-                    id: 'mapbox.light',
-                    accessToken: 'pk.eyJ1IjoiY3NhZTgwOTIiLCJhIjoiY2lnM2FoZWpjMDJqZnY1a2gxdWl6a29kaiJ9.FQXlsKIu60WhiXLrfI59VA'
+
+
                 }).addTo(map);
                     console.log({{choice.lat}});
                     L.marker([{{choice.lat}}, {{choice.long}}]).addTo(map);
                     map.setView([{{choice.lat}}, {{choice.long}}], 8);}},
                 content: $('<div id="tooltip_map_{{ choice.ac_type }}_{{ forloop.counter }}" style="height:300px; width:300px"></div>'),
                 position: 'left',
-                
+
             });
 
     </script>

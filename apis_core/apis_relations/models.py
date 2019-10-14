@@ -599,8 +599,43 @@ class EventEvent(TempEntityClass):
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
-        return "{} ({}) {}".format(
-            self.related_event, self.relation_type, self.related_event)
+        return "{} ({}) {}".format(self.related_eventA, self.relation_type, self.related_eventB)
+
+    def get_table_dict(self, entity):
+        """Dict for the tabels in the html view
+
+        :param entity: Object of type :class:`entities.models.Event`; Used to determine which Event is the main antity
+            and which one the related.
+        :return:
+        """
+        if self.related_eventA == entity:
+            rel_event = self.related_eventB
+            rel_type = self.relation_type.name
+        elif self.related_eventB == entity:
+            rel_event = self.related_eventA
+            rel_type = self.relation_type.name_reverse
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': rel_type,
+            'related_event': rel_event,
+            'start_date': self.start_date,
+            'end_date': self.end_date}
+        return result
+
+    def get_web_object(self):
+        """Used in some html views.
+
+        :return: Dict with object properties
+        """
+        result = {
+            'relation_pk': self.pk,
+            'relation_type': self.relation_type.name,
+            'related_eventA': self.related_eventA.name,
+            'related_eventB': self.related_eventB.name,
+            'start_date': self.start_date_written,
+            'end_date': self.end_date_written}
+        return result
+
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
@@ -667,6 +702,9 @@ class WorkWork(TempEntityClass):
     objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
+    def __str__(self):
+        return "{} ({}) {}".format(self.related_workA, self.relation_type, self.related_workB)
+
     def get_table_dict(self, entity):
         """Dict for the tabels in the html view
 
@@ -702,5 +740,3 @@ class WorkWork(TempEntityClass):
             'end_date': self.end_date_written}
         return result
 
-    def __str__(self):
-        return "{} ({}) {}".format(self.related_workA, self.relation_type, self.related_workB)
