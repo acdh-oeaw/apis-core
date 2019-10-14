@@ -4,19 +4,26 @@ Place:
       attributes:
         - name: name
           sparql: |
-            PREFIX gn: <http://www.geonames.org/ontology#>
             SELECT ?prefName (LANG(?prefName) AS ?lang)
             WHERE {
-              ?subject gn:officialName ?prefName
-              FILTER (LANGMATCHES(LANG(?prefName), "de") || LANGMATCHES(LANG(?prefName), "en"))
+            {
+              ?subject gn:name ?prefName}
+              UNION {
+                ?subject gn:officialName ?prefName
+              } 
+              UNION {
+                ?subject gn:alternateName ?prefName
+              }
+              FILTER (LANGMATCHES(LANG(?prefName), "de") || LANGMATCHES(LANG(?prefName), "en") || LANG(?prefName) = "")
                   }
+            ORDER BY ?lang
         - name: altName
           sparql: |
             PREFIX gn: <http://www.geonames.org/ontology#>
             SELECT ?altName (LANG(?altName) AS ?lang)
             WHERE {
               ?subject gn:alternateName ?altName
-              FILTER (LANGMATCHES(LANG(?altName), "de") || LANGMATCHES(LANG(?altName), "en"))
+              FILTER (LANGMATCHES(LANG(?altName), "de") || LANGMATCHES(LANG(?altName), "en") || LANG(?prefName) = "")
                   }
         - name: kind
           sparql: |
@@ -62,19 +69,18 @@ Place:
     attributes:
       name:
         string: '{prefName}'
-        regex: null
       kind: 
         string: '{kind}'
         accessor: name
         regex: null
       lat:
         domain: geonames.org
-        identifier: lat-long
-        string: '{lat}'
+        identifier: lat-long.lat
+        data type: float
       lng:
         domain: geonames.org
-        identifier: lat-long
-        string: '{long}'
+        identifier: lat-long.long
+        data type: float
       lng-gnd:
         domain: d-nb.info
         identifier: lat-long-gnd

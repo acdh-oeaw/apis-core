@@ -205,33 +205,41 @@ class RDFParserNew(object):
             sp2[idx] = {str(key): str(value) for (key, value) in s2.items()}
         return sp2
 
-    def _prep_string(self, string, regex, linked=False):
+    def _prep_string(self, string, regex, linked=False, data_type=False):
         """
         Function that converts SPARQL return value to string used in Django attributes
         :param string: (str) Format string with values ingested from SPARQL query (via Pandas DF)
         :param regex: (tuple) tuple of regex and group to use (regex, group)
         :return: (str) converted string
         """
+        conv_mapping = {
+            'str': str,
+            'string': str,
+            'float': float,
+            'int': int,
+            'integer': int
+        }
         if string is None:
             return None
-        if not isinstance(string, str):
-            raise ValueError(f"{string} is not a string")
-        if regex:
-            m = re.search(regex[0], string)
-            if m:
-                string = m.group(regex[1])
-            else:
-                return None
-        if linked:
-            g1 = rdflib.Graph()
-            g1.parse(string)
-            pref1 = (SKOS.prefLabel, RDFS.label)
-            pref1 += tuple([URIRef(x) for x in self._settings['matching']['prefLabels']])
-            string = g1.preferredLabel(URIRef(string), labelProperties=pref1)
-            if len(string) > 0:
-                string = str(string[0][1])
-        if len(string) > 255:
-            string = string[:250] + '...'
+        if isinstance(string, str):
+            if regex:
+                m = re.search(regex[0], string)
+                if m:
+                    string = m.group(regex[1])
+                else:
+                    return None
+            if len(string) > 255:
+                string = string[:250] + '...'
+            if linked:
+                g1 = rdflib.Graph()
+                g1.parse(string)
+                pref1 = (SKOS.prefLabel, RDFS.label)
+                pref1 += tuple([URIRef(x) for x in self._settings['matching']['prefLabels']])
+                string = g1.preferredLabel(URIRef(string), labelProperties=pref1)
+                if len(string) > 0:
+                    string = str(string[0][1])
+        if data_type:
+            string = conv_mapping[data_type](string)
         return string
 
     @staticmethod
@@ -317,7 +325,8 @@ class RDFParserNew(object):
             fields_1 = self.objct._meta.get_field(field_name)
             local_regex = self._settings['matching']['attributes'][s].get('regex', None)
             local_linked = self._settings['matching']['attributes'][s].get('linked', None)
-            id_1 = self._settings['matching']['attributes'][s].get('identifier', s)
+            local_data_type = self._settings['matching']['attributes'][s].get('data type', False)
+            id_1 = self._settings['matching']['attributes'][s].get('identifier', s).split('.')[0]
             if isinstance(fields_1, TCharField) or isinstance(fields_1, TFloatField):
                 data = dict()
                 if id_1 in self._attributes.keys():
@@ -325,8 +334,12 @@ class RDFParserNew(object):
                     cols = [x for x in df.columns if x != 'lang']
                     for c in cols:
                         data[c] = df.at[0, c]
-                    local_string = fmt.format(self._settings['matching']['attributes'][s]['string'], **data)
-                    c_dict[field_name] = self._prep_string(local_string, local_regex, local_linked)
+                    print(f"data: {data}")
+                    if 'string' in self._settings['matching']['attributes'][s].keys():
+                        local_string = fmt.format(self._settings['matching']['attributes'][s]['string'], **data)
+                    else:
+                        local_string = data[self._settings['matching']['attributes'][s]['identifier'].split('.')[-1]]
+                    c_dict[field_name] = self._prep_string(local_string, local_regex, local_linked, local_data_type)
             elif isinstance(fields_1, TForeignKey):
                 data = dict()
                 c_dict_f = dict()
@@ -336,7 +349,7 @@ class RDFParserNew(object):
                     for c in cols:
                         data[c] = df.at[0, c]
                     local_string = fmt.format(self._settings['matching']['attributes'][s]['string'], **data)
-                    c_dict_f[access] = self._prep_string(local_string, local_regex, local_linked)
+                    c_dict_f[access] = self._prep_string(local_string, local_regex, local_linked, local_data_type)
                 self._foreign_keys.append((field_name, self.objct._meta.get_field(s).related_model, c_dict_f))
             elif isinstance(fields_1, TManyToMany):
                 df = self._attributes[id_1]
@@ -348,12 +361,15 @@ class RDFParserNew(object):
                             data[c] = row[c]
                         c_dict_f = dict()
                         local_string = fmt.format(self._settings['matching']['attributes'][s]['string'], **data)
-                        c_dict_f[access] = self._prep_string(local_string, local_regex, local_linked)
+                        c_dict_f[access] = self._prep_string(local_string, local_regex, local_linked, local_data_type)
                     self._m2m.append((field_name, self.objct._meta.get_field(s).related_model, c_dict_f))
         if 'labels' in self._settings['matching'].keys():
             for lab in self._settings['matching']['labels']:
                 at1 = lab['identifier'].split('.')
                 if at1[0] in self._attributes.keys():
+                    if at1[-1] not in self._attributes[at1[0]].columns:
+                        print('label_missing')
+                        continue
                     if 'lang' not in self._attributes[at1[0]]:
                         self._attributes[at1[0]]['lang'] = 'deu'
                     u2 = self._attributes[at1[0]][[at1[-1], 'lang']]

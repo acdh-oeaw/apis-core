@@ -145,30 +145,22 @@ class RDFPlaceParserTestCase(TestCase):
 
 
 class RDFPlaceParserNewTestCase(TestCase):
-    #fixtures = ['fixtures_3_5_17.json']
-    kindP = 'Place'
-    uriGeon = 'http://sws.geonames.org/2761369/'
 
     def test_parse_place(self):
-        o = RDFParserNew(self.uriGeon, self.kindP)
-        o.create_objct()
-        print(o._foreign_keys)
-        print(o.objct)
-        print(o._attributes)
-        print(o.objct.name, o.objct.lat)
-        print(o._foreign_keys)
-        self.assertEqual(o.objct.lat, '48.20849')
-        o2 = o.save()
-        print(o2)
-        print(f"related objects: {o.related_objcts}")
-        for oo in o.labels:
-            print(oo.label, oo.isoCode_639_3)
-        #o3 = RDFParserNew('http://d-nb.info/gnd/4066009-6', 'Place')
-        #print(o3.objct)
-        #o3.create_objct()
-        #o4 = o3.save()
-        #print(o4.name)
-        #print(o4.lng, o4.lat)
+        plc = [("http://www.geonames.org/6951114/bad-zell.html", "Bad Zell", 48.34906, "http://sws.geonames.org/2782113/", "http://www.geonames.org/ontology#P.PPL"),
+               ("http://sws.geonames.org/2779275/", "Freistadt", 48.51103, "http://sws.geonames.org/2782113/", "http://www.geonames.org/ontology#P.PPL"),
+               ("http://sws.geonames.org/2761369", "Wien", 48.20849, "http://sws.geonames.org/2782113/", "http://www.geonames.org/ontology#P.PPLC")
+               ]
+        for p in plc:
+            o = RDFParserNew(p[0], 'Place')
+            o.create_objct()
+            o2 = o.save()
+            print(type(o2.lat))
+            self.assertEqual(o2.lat, float(p[2]))
+            self.assertEqual(o2.name, p[1])
+            self.assertEqual(o2.kind.name, p[4])
+
+
 
     def test_parse_person(self):
         o = RDFParserNew('http://d-nb.info/gnd/118650130', 'Person')
