@@ -302,6 +302,13 @@ class TempEntityClass(models.Model):
                 if len(date_split_angle) > 1:
                     # date string contains angle brackets. Parse them, ignore the rest
 
+                    def parse_iso_date(date_string):
+                        date_string_split = date_string.split("-")
+                        try:
+                            return datetime(year=int(date_string_split[0]), month=int(date_string_split[1]), day=int(date_string_split[2]) )
+                        except:
+                            raise ValueError("Invalid iso date: ", date_string)
+
                     if len(date_split_angle) > 3:
                         # invalid case
                         raise ValueError("Too many angle brackets.")
@@ -326,17 +333,17 @@ class TempEntityClass(models.Model):
                             # parse start date
                             date_ab_string = dates_iso[1].strip()
                             if date_ab_string != "":
-                                date_ab = parse_date_range_individual(date_ab_string)
+                                date_ab = parse_iso_date(date_ab_string)
 
                             # parse end date
                             date_bis_string = dates_iso[2].strip()
                             if date_bis_string != "":
-                                date_bis = parse_date_range_individual(date_bis_string)
+                                date_bis = parse_iso_date(date_bis_string)
 
                         # parse single date
                         date_single_string = dates_iso[0].strip()
                         if date_single_string != "":
-                            date_single = parse_date_range_individual(date_single_string)
+                            date_single = parse_iso_date(date_single_string)
 
 
                 else:
