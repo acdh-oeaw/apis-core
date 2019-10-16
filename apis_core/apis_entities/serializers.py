@@ -164,6 +164,34 @@ class GeoJsonSerializer(serializers.BaseSerializer):
             return ''
 
 
+
+class GeoJsonSerializerTheme(serializers.BaseSerializer):
+
+    def to_representation(self, obj):
+        url_r = reverse_lazy(
+            'apis:apis_core:place-detail',
+            kwargs={'pk': str(obj.related_place_id)}
+        )
+        if obj.related_place.lng:
+            r = {"geometry": {
+                "type": "Point",
+                "coordinates": [obj.related_place.lng, obj.related_place.lat]
+            },
+                "type": "Feature",
+                "properties": {
+                    "name": obj.related_place.name,
+                    "uris": [x.uri for x in obj.related_place.uri_set.all()],
+                    "kind": obj.related_place.kind.name,
+                    "url": url_r,
+                    "relation_kind": obj.relation_type.name
+                },
+                "id": url_r
+            }
+            return r
+        else:
+            return ''
+
+
 class NetJsonEdgeSerializer(serializers.BaseSerializer):
 
     def to_representation(self, obj):
