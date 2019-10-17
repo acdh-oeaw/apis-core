@@ -17,6 +17,7 @@ from apis_core.apis_entities.fields import ListSelect2
 #from dal.autocomplete import ListSelect2
 from apis_core.apis_metainfo.models import TempEntityClass, Text
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
+from apis_core.apis_metainfo.forms import get_date_help_text_default, get_date_help_text_from_dates
 from .tables import *
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
@@ -251,3 +252,24 @@ class GenericRelationForm(forms.ModelForm):
                 'HL_start',
                 'HL_end',
                 'HL_text_id'])
+
+        if instance.start_date_written:
+            self.fields['start_date_written'].help_text = get_date_help_text_from_dates(
+                instance.start_date,
+                instance.start_start_date,
+                instance.start_end_date,
+                instance.start_date_written
+            )
+        else:
+            self.fields['start_date_written'].help_text = get_date_help_text_default()
+
+        if instance.end_date_written:
+            self.fields['end_date_written'].help_text = get_date_help_text_from_dates(
+                instance.end_date,
+                instance.end_start_date,
+                instance.end_end_date,
+                instance.end_date_written
+            )
+        else:
+            self.fields['end_date_written'].help_text = get_date_help_text_default()
+

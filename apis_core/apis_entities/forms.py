@@ -18,6 +18,7 @@ from django.conf import settings
 from .models import Person, Place, Institution, Event, Work
 from apis_core.apis_vocabularies.models import TextType
 from apis_core.apis_metainfo.models import Text, Uri, Collection
+from apis_core.apis_metainfo.forms import get_date_help_text_from_dates, get_date_help_text_default
 
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
 
@@ -209,131 +210,30 @@ def get_entities_form(entity):
             self.fields['end_date_written'].required = False
 
 
-            def create_date_help_texts(form, kwargs):
-                """
-                Loading dynamic help texts underneath date fields, communicating the parsing results or errors to the user
+            # check if form loads an existing instance
+            if 'instance' in kwargs:
+                # instance exists, thus run the date parse check to inform the user about its results
 
-                :param form: GenericEntitiesForm :
-                    The form object, into which fields' the help texts are written
+                instance = kwargs['instance']
 
-                :param kwargs: dict
-                    The argument dictionary being passed to the parent function __init__ of GenericEntitiesForm,
-                    where the existing instance is contained - if form is called on an existing object, if form is called
-                    for the creation of a new object, then just write the default help text.
-                """
+                self.fields['start_date_written'].help_text = get_date_help_text_from_dates(
+                    instance.start_date,
+                    instance.start_start_date,
+                    instance.start_end_date,
+                    instance.start_date_written
+                )
+                self.fields['end_date_written'].help_text = get_date_help_text_from_dates(
+                    instance.end_date,
+                    instance.end_start_date,
+                    instance.end_end_date,
+                    instance.end_date_written
+                )
 
+            else:
+                # instance does not exist, load default help text into fields
 
-                # default text
-                help_text_default = "Dates are interpreted by defined rules. " \
-                                    "If this fails, an iso-date can be explicitly set with '&lt;YYYY-MM-DD&gt;'."
-
-                # check if form loads an existing instance
-                if 'instance' in kwargs:
-                    # instance exists, thus run the date parse check to inform the user about its results
-
-                    instance = kwargs['instance']
-
-                    def create_date_help_text_individual(single_date, single_start_date, single_end_date, single_date_written):
-                        """
-                        function for creating string help text from parsed dates, to provide feedback to the user
-                        about the parsing status of a given date field.
-
-                        :param single_date: datetime :
-                            the individual date point
-
-                        :param single_start_date: datetime :
-                            the start range of a date
-
-                        :param single_end_date: datetime :
-                            the endrange of a date
-
-                        :param single_date_written: str :
-                            the textual user entry of a date field (needed to check if empty or not)
-
-                        :return help_text: str :
-                            The text to be displayed underneath a date field, informing the user about the parsing result
-                        """
-
-
-                        # check which of the dates could be parsed to construct the relevant feedback text
-
-                        help_text = ""
-                        if single_date:
-                            # single date could be parsed
-
-                            help_text = "Date interpreted as "
-
-                            if single_start_date or single_end_date:
-                                # date has also start or end ranges, then ignore single date
-
-                                if single_start_date:
-                                    # date has start range
-
-                                    help_text += \
-                                        str(single_start_date.year) + '-' + \
-                                        str(single_start_date.month) + '-' + \
-                                        str(single_start_date.day) + ' until'
-
-                                else:
-                                    # date has no start range, then write 'undefined'
-
-                                    help_text += "undefined start until "
-
-                                if single_end_date:
-                                    # date has end range
-
-                                    help_text += \
-                                        str(single_end_date.year) + '-' + \
-                                        str(single_end_date.month) + '-' + \
-                                        str(single_end_date.day)
-
-                                else:
-                                    # date has no start range, then write 'undefined'
-
-                                    help_text += "undefined end"
-
-                            else:
-                                # date has no start nor end range. Use single date then.
-
-                                help_text += \
-                                    str(single_date.year) + '-' + \
-                                    str(single_date.month) + '-' + \
-                                    str(single_date.day)
-
-                        elif single_date_written is not None:
-                            # date input field is not empty but it could not be parsed either. Show parsing info and help text
-
-                            help_text = "<b>Date could not be interpreted</b><br>" + help_text_default
-
-                        else:
-                            # date field is completely empty. Show help text only
-
-                            help_text = help_text_default
-
-                        return help_text
-
-
-                    # write results into help texts
-                    form.fields['start_date_written'].help_text = create_date_help_text_individual(
-                        instance.start_date,
-                        instance.start_start_date,
-                        instance.start_end_date,
-                        instance.start_date_written
-                    )
-                    form.fields['end_date_written'].help_text = create_date_help_text_individual(
-                        instance.end_date,
-                        instance.end_start_date,
-                        instance.end_end_date,
-                        instance.end_date_written
-                    )
-
-                else:
-                    # instance does not exist, load default help text into fields
-
-                    form.fields['start_date_written'].help_text = help_text_default
-                    form.fields['end_date_written'].help_text = help_text_default
-
-            create_date_help_texts(self, kwargs)
+                self.fields['start_date_written'].help_text = get_date_help_text_default()
+                self.fields['end_date_written'].help_text = get_date_help_text_default()
 
 
 

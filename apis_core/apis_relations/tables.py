@@ -55,7 +55,7 @@ def get_generic_relations_table(relation, entity, detail=None):
         class Meta:
             empty_text = empty_text_default
             model = ct.model_class()
-            fields = ['start_date', 'end_date']
+            fields = ['start_date_written', 'end_date_written']
             attrs = {
                 "class": "table table-hover table-striped table-condensed",
                 "id": name[0].title()[:2]+name[1].title()[:2]+"_conn"}
@@ -82,7 +82,7 @@ def get_generic_relations_table(relation, entity, detail=None):
             )
             super(GenericRelationsTable, self).__init__(*args, **kwargs)
             self.sequence = (
-                'delete', 'ref', 'start_date', 'end_date', 'relation_type',
+                'delete', 'ref', 'start_date_written', 'end_date_written', 'relation_type',
                 'related_' + rel_ent.lower(), 'edit'
             )
 
@@ -93,7 +93,7 @@ def get_generic_relations_table(relation, entity, detail=None):
             class Meta:
                 empty_text = empty_text_default
                 model = ct.model_class()
-                fields = ['start_date', 'end_date']
+                fields = ['start_date_written', 'end_date_written']
                 attrs = {
                     "class": "table table-hover table-striped table-condensed",
                     "id": name[0].title()[:2]+name[1].title()[:2]+"_conn"}
@@ -111,7 +111,7 @@ def get_generic_relations_table(relation, entity, detail=None):
                         verbose_name='relation type', accessor='relation_type.{}'.format(rel_type))
                 super(GenericRelationsTable, self).__init__(*args, **kwargs)
                 self.sequence = (
-                    'start_date', 'end_date', 'relation_type', 'related_' + rel_ent.lower()
+                    'start_date_written', 'end_date_written', 'relation_type', 'related_' + rel_ent.lower()
                 )
         return GenericRelationsDetailTable
     else:
