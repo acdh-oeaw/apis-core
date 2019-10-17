@@ -170,20 +170,20 @@ class GeoJsonSerializerTheme(serializers.BaseSerializer):
     def to_representation(self, obj):
         url_r = reverse_lazy(
             'apis:apis_core:place-detail',
-            kwargs={'pk': str(obj.related_place_id)}
+            kwargs={'pk': str(obj[0].pk)}
         )
-        if obj.related_place.lng:
+        if obj[0].lng:
             r = {"geometry": {
                 "type": "Point",
-                "coordinates": [obj.related_place.lng, obj.related_place.lat]
+                "coordinates": [obj[0].lng, obj[0].lat]
             },
                 "type": "Feature",
                 "properties": {
-                    "name": obj.related_place.name,
-                    "uris": [x.uri for x in obj.related_place.uri_set.all()],
-                    "kind": obj.related_place.kind.name,
+                    "name": obj[0].name,
+                    "uris": [x.uri for x in obj[0].uri_set.all()],
+                    "kind": obj[0].kind.name,
                     "url": url_r,
-                    "relation_kind": obj.relation_type.name
+                    "relation_kind": ", ".join([x[0].name for x in obj[1]])
                 },
                 "id": url_r
             }

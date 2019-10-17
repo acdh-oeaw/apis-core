@@ -428,7 +428,14 @@ class GetRelatedPlaces(APIView):
     def get(self, request):
         person_pk = request.query_params.get("person_id", None)
         relation_types = request.query_params.get("relation_types", None)
+        place_pk = dict()
+        res = []
         p = PersonPlace.objects.select_related('related_place').filter(related_person_id=person_pk)
-        print(p)
-        res = GeoJsonSerializerTheme(p, many=True)
+        for pp in p:
+            if pp.related_place_id not in place_pk:
+                res.append((pp.related_place, [(pp.relation_type, pp.start_date, pp.end_date)]))
+                place_pk[pp.related_place_id] = len(res)-1
+            else:
+                res[place_pk[pp.related_place_id]][1].append((pp.relation_type, pp.start_date, pp.end_date))
+        res = GeoJsonSerializerTheme(res, many=True)
         return Response(res.data)
