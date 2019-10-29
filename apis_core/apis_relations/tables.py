@@ -18,7 +18,7 @@ def get_generic_relation_listview_table(relation):
     relation_model_class = ct.model_class()
     model_fields = relation_model_class._meta.get_fields(include_parents=False)
     field_names = [x.name for x in model_fields[1:]]
-    all_field_names = field_names + ['start_date', 'end_date']
+    all_field_names = field_names + ['start_date_written', 'end_date_written']
 
     class GenericRelationListViewTable(tables.Table):
 
