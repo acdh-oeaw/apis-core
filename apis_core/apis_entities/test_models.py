@@ -124,9 +124,13 @@ class PermissionsModelTestCase(TestCase):
             },
             #format='json'
             )
-        print(res.content)
-        print(res.status_code)
-        #self.assertEqual(res.status_code, 403)
+        self.assertEqual(res.status_code, 403)
+
+    def test_no_perm_view(self):
+        res = self.c.get(
+            reverse('apis:apis_core:person-detail', kwargs={'pk': self.pers.pk}),
+        )
+        self.assertEqual(res.status_code, 200)
 
     def test_perm(self):
         self.pers.collection.add(self.col)
