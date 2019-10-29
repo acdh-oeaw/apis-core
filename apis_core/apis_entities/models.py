@@ -171,13 +171,12 @@ class Work(TempEntityClass):
 @receiver(post_save, sender=Place, dispatch_uid="create_default_uri")
 def create_default_uri(sender, instance, **kwargs):
     uri = Uri.objects.filter(entity=instance)
-    if uri.count() == 0:
-        uri_c = "http://{}{}".format(
-            BASE_URI,
-            reverse("apis_core:apis_api2:GetEntityGeneric", kwargs={"pk": instance.pk}),
-        )
-        uri2 = Uri(uri=uri_c, domain="apis default", entity=instance)
-        uri2.save()
+    uri_c = "http://{}{}".format(
+        BASE_URI,
+        reverse("apis_core:apis_api2:GetEntityGeneric", kwargs={"pk": instance.pk}),
+    )
+    uri2 = Uri(uri=uri_c, domain="apis default", entity=instance)
+    uri2.save()
 
 
 @receiver(
