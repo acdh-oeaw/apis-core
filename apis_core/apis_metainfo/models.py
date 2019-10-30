@@ -110,10 +110,8 @@ class TempEntityClass(models.Model):
                 """
                 function to parse a string date field of an entity
 
-
                 :param date_string : str :
                     the field value passed by a user
-
 
                 :return date_single : datetime :
                     single date which represents either the precise date given by user or median in between a range.
@@ -123,6 +121,9 @@ class TempEntityClass(models.Model):
 
                 :return date_bis : datetime :
                     ending date of a range if user passed a range value either implicit or explicit.
+
+                :return date_is_exact : boolean :
+                    True if date was decided to be exact, False otherwise
                 """
 
 
@@ -142,7 +143,7 @@ class TempEntityClass(models.Model):
                         indicates if a single date shall be intepreted as an ending date of a range
 
 
-                    :return tupel (datetime, datetime) :
+                    :return tuple (datetime, datetime) :
                         two datetime objects representing the gregorian dates.
                         Two indicate that an implicit single date range was given (e.g. a year without months or days).
                         Has to be further processed then since it can be either a starting or ending date range.
@@ -155,12 +156,11 @@ class TempEntityClass(models.Model):
 
                     def get_last_day_of_month(month, year):
                         """
-                        Helper function to return the last day of a given month and year (respecing leap years)
-
+                        Helper function to return the last day of a given month and year (respecting leap years)
 
                         :param month : int
-                        :param year : int
 
+                        :param year : int
 
                         :return day : int
                         """
@@ -172,7 +172,7 @@ class TempEntityClass(models.Model):
                             # 30 day months
                             return 30
                         elif month == 2:
-                            # special case februaray, differentiate leap years (with respect to the julian calendar)
+                            # special case february, differentiate leap years (with respect to the julian calendar)
                             if year % 4 == 0:
                                 return 29
                             else:
@@ -210,9 +210,9 @@ class TempEntityClass(models.Model):
                     month = None
                     day = None
 
+                    # check for all kind of Y-M-D combinations
                     if re.match(r"\d{3,4}$", date):
                         # year
-
                         year = int(date)
 
                     elif re.match(r"\d{1,2}\.\d{3,4}$", date):
@@ -286,9 +286,10 @@ class TempEntityClass(models.Model):
                         )
 
                     else:
-                        # either ab or bis date was given. Construct the respective beginning or end of range.
+                        # Either ab or bis is True. Then use the respective beginning or end of range and construct a precise date
+                        # Or both ab and bis are False. Then construct a precise date from parsed values
 
-                        # construct implicit month range
+                        # construct implicit month range if month is None
                         if month is None:
                             if ab and not bis:
                                 # is a starting date, thus take first month of year
@@ -297,7 +298,7 @@ class TempEntityClass(models.Model):
                                 # is an ending date, thus take last month of year
                                 month = 12
 
-                        # construct implicit day range
+                        # construct implicit day range if day is None
                         if day is None:
                             if ab and not bis:
                                 # is a starting date, thus take first day of month
@@ -321,8 +322,7 @@ class TempEntityClass(models.Model):
                 date_bis = None
                 date_is_exact = None
 
-
-                # split for angle brackets
+                # split for angle brackets, check if explicit iso date is contained within them
                 date_split_angle = re.split(r"(<.*?>)", date_string)
 
                 if len(date_split_angle) > 1:
@@ -333,11 +333,13 @@ class TempEntityClass(models.Model):
                         raise ValueError("Too many angle brackets.")
 
                     elif len(date_split_angle) == 3:
-                        # the right amount of substring, indicating exactly one pair of angle brackets.
+                        # the right amount of substrings, indicating exactly one pair of angle brackets.
                         # Parse the iso date in between
 
                         # remove angle brackets and split by commas
                         dates_iso = date_split_angle[1][1:-1]
+
+                        # check for commas, which would indicate that either one iso date or three are being input
                         dates_iso = dates_iso.split(",")
                         if len(dates_iso) != 1 and len(dates_iso) != 3:
                             # only either one iso date or three are allowed
@@ -368,7 +370,7 @@ class TempEntityClass(models.Model):
                     date_string = date_string.lower()
                     date_string = date_string.replace(" ","")
 
-                    # helper variables
+                    ## helper variables for the following loop
                     found_ab = False
                     found_bis = False
                     found_single = False
@@ -377,6 +379,7 @@ class TempEntityClass(models.Model):
                         date_is_exact = True
                     elif "ungenau" in date_string :
                         date_is_exact = False
+                    # TODO __sresch__ : inspect this again to confirm functionality
                     # elif "genau" in date_string and "ungenau" in date_string :
                     #     raise ValueError("Both keywords 'genau' and 'ungenau were provided'")
                     else:
@@ -394,7 +397,7 @@ class TempEntityClass(models.Model):
                             # indicates that the next value must be a start date
 
                             if found_ab or found_single:
-                                # if already found before then there is non-allowed redundancy
+                                # if already found a ab_date or single date before then there is non-conformative redundancy
                                 raise ValueError("Redundant dates found.")
                             found_ab = True
 
@@ -405,7 +408,7 @@ class TempEntityClass(models.Model):
                             # indicates that the next value must be an end date
 
                             if found_bis or found_single:
-                                # if already found before then there is non-allowed redundancy
+                                # if already found a bis_date or single date before then there is non-conformative redundancy
                                 raise ValueError("Redundant dates found.")
                             found_bis = True
 
@@ -421,8 +424,8 @@ class TempEntityClass(models.Model):
                             date_single = parse_date_range_individual(v)
 
                             if type(date_single) is tuple:
-                                #  if type is a tuple then it was an implict range.
-                                #  split it into start and end dates
+                                #  if result of parse_date_range_individual is a tuple then the date was an implict range.
+                                #  Then split it into start and end dates
                                 date_ab = date_single[0]
                                 date_bis = date_single[1]
 
@@ -430,7 +433,7 @@ class TempEntityClass(models.Model):
                         # date is a range
 
                         if date_ab > date_bis:
-                            raise ValueError("'ab-date' must be before 'bis-date'")
+                            raise ValueError("'ab-date' must be before 'bis-date' in time")
 
                         # calculate difference between start and end date of range,
                         # and use it to calculate a single date for usage as median.
@@ -461,7 +464,7 @@ class TempEntityClass(models.Model):
 
 
             if temp_entity_class.start_date_written:
-                # some user input of a start date is there, parse it
+                # If some textual user input of a start date is there, then parse it
 
                 try:
                     start_date, start_start_date, start_end_date, start_date_is_exact = \
@@ -470,7 +473,7 @@ class TempEntityClass(models.Model):
                     print("Could not parse date: ", temp_entity_class.start_date_written, "ERROR:", e)
 
             if temp_entity_class.end_date_written:
-                # some user input of an end date is there, parse it
+                # If some textual user input of an end date is there, then parse it
 
                 try:
                     end_date, end_start_date, end_end_date, end_date_is_exact = \

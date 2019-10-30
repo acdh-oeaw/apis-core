@@ -219,7 +219,7 @@ def get_entities_form(entity):
 
                 :param kwargs: dict
                     The argument dictionary being passed to the parent function __init__ of GenericEntitiesForm,
-                    where the existing instance is contained if form is called on an existing object, if form is called
+                    where the existing instance is contained - if form is called on an existing object, if form is called
                     for the creation of a new object, then just write the default help text.
                 """
 
@@ -239,19 +239,17 @@ def get_entities_form(entity):
                         function for creating string help text from parsed dates, to provide feedback to the user
                         about the parsing status of a given date field.
 
-
                         :param single_date: datetime :
                             the individual date point (gregorian)
 
                         :param single_start_date: datetime :
-                            the start range of a date(gregorian)
+                            the start range of a date (gregorian)
 
                         :param single_end_date: datetime :
-                            the endrange of a date(gregorian)
+                            the endrange of a date (gregorian)
 
                         :param single_date_written: str :
-                            the textual description of a date field (needed to check if empty or not)
-
+                            the textual user entry of a date field (needed to check if empty or not)
 
                         :return help_text: str :
                             The text to be displayed underneath a date field, informing the user about the parsing result
@@ -329,6 +327,7 @@ def get_entities_form(entity):
                             help_text = help_text_default
 
                         return help_text
+
 
                     # write results into help texts
                     form.fields['start_date_written'].help_text = create_date_help_text_individual(
