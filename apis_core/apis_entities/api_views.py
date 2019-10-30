@@ -8,13 +8,14 @@ from io import TextIOWrapper
 import requests
 from apis_core.apis_metainfo.api_renderers import PaginatedCSVRenderer
 from apis_core.apis_metainfo.models import TempEntityClass, Uri
+from apis_core.apis_relations.models import PersonPlace, InstitutionPlace
 from apis_core.apis_vocabularies.models import VocabsBaseClass
 from apis_core.default_settings.NER_settings import autocomp_settings, stb_base
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
 from apis_core.helper_functions.stanbolQueries import find_loc
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from django.http import Http404
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -41,6 +42,7 @@ from .serializers import (
     PersonSerializer,
     PlaceSerializer,
     WorkSerializer,
+    GeoJsonSerializerTheme
 )
 from .serializers_generic import EntitySerializer
 
@@ -393,7 +395,6 @@ class GetOrCreateEntity(APIView):
         if uri.startswith('http:'):
             ent = GenericRDFParser(uri, entity.title()).get_or_create()
         else:
-            print(uri)
             r1 = re.search(r"^[^<]+", uri)
             r2 = re.search(r"<([^>]+)>", uri)
             q_d = dict()
@@ -417,3 +418,24 @@ class GetOrCreateEntity(APIView):
             ),
         }
         return Response(res)
+
+
+class GetRelatedPlaces(APIView):
+    map_qs = {
+        'institution': Prefetch('personinstitution_set__related_institution__institutionplace_set', queryset=InstitutionPlace.objects.select_related('related_place'))
+    }
+
+    def get(self, request):
+        person_pk = request.query_params.get("person_id", None)
+        relation_types = request.query_params.get("relation_types", None)
+        place_pk = dict()
+        res = []
+        p = PersonPlace.objects.select_related('related_place').filter(related_person_id=person_pk)
+        for pp in p:
+            if pp.related_place_id not in place_pk:
+                res.append((pp.related_place, [(pp.relation_type, pp.start_date, pp.end_date)]))
+                place_pk[pp.related_place_id] = len(res)-1
+            else:
+                res[place_pk[pp.related_place_id]][1].append((pp.relation_type, pp.start_date, pp.end_date))
+        res = GeoJsonSerializerTheme(res, many=True)
+        return Response(res.data)

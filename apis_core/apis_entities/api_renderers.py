@@ -46,8 +46,8 @@ class EntityToCIDOC(renderers.BaseRenderer):
         'Institution': m_institution,
         }
 
-    def render(self, data1, media_type=None, renderer_context=None, format_1=None, binary=False, store=False, named_graph=None):
-        if type(data1) == dict:
+    def render(self, data1, media_type=None, renderer_context=None, format_1=None, binary=False, store=False, named_graph=None, provenance=False):
+        if isinstance(data1, dict):
             data1 = [data1]
         if format_1 is not None:
             self.format = format_1
@@ -74,20 +74,21 @@ class EntityToCIDOC(renderers.BaseRenderer):
                     data2 = pickle.load(inf)
                     for data in data2:
                         g, ent = self.ent_func[data['entity_type']](g, ns, data, drill_down=True)
-        g_prov = Graph(store, identifier=URIRef('https://omnipot.acdh.oeaw.ac.at/provenance'))
-        g_prov.bind('dct', DCTERMS, override=False)
-        g_prov.bind('void', VOID, override=False)
-        g_prov.add((uri_entities, DCTERMS.title, Literal(PROJECT_METADATA['title'], lang=lang)))
-        g_prov.add((uri_entities, DCTERMS.description, Literal(PROJECT_METADATA['description'], lang=lang)))
-        g_prov.add((uri_entities, DCTERMS.creator, Literal(PROJECT_METADATA['author'], lang=lang)))
-        g_prov.add((uri_entities, DCTERMS.publisher, Literal('ACDH-OeAW', lang=lang)))
-        g_prov.add((uri_entities, DCTERMS.source, URIRef(base_uri)))
-        g_prov.add((uri_entities, DCTERMS.created, Literal(str(date.today()), datatype=XSD.date)))
-        g_prov, g = generateVoID(g, dataset=uri_entities, res=g_prov)
+        if provenance:
+            g_prov = Graph(store, identifier=URIRef('https://omnipot.acdh.oeaw.ac.at/provenance'))
+            g_prov.bind('dct', DCTERMS, override=False)
+            g_prov.bind('void', VOID, override=False)
+            g_prov.add((uri_entities, DCTERMS.title, Literal(PROJECT_METADATA['title'], lang=lang)))
+            g_prov.add((uri_entities, DCTERMS.description, Literal(PROJECT_METADATA['description'], lang=lang)))
+            g_prov.add((uri_entities, DCTERMS.creator, Literal(PROJECT_METADATA['author'], lang=lang)))
+            g_prov.add((uri_entities, DCTERMS.publisher, Literal('ACDH-OeAW', lang=lang)))
+            g_prov.add((uri_entities, DCTERMS.source, URIRef(base_uri)))
+            g_prov.add((uri_entities, DCTERMS.created, Literal(str(date.today()), datatype=XSD.date)))
+            g_prov, g = generateVoID(g, dataset=uri_entities, res=g_prov)
         g_all = ConjunctiveGraph(store=store)
         if binary:
             return g_all, store
-        return g_all.serialize(format=self.format.split('+')[-1]), store
+        return g_all.serialize(format=self.format.split('+')[-1])
 
 
 class EntityToCIDOCXML(EntityToCIDOC):
