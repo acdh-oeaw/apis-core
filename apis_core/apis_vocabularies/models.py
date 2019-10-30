@@ -3,9 +3,9 @@ from reversion import revisions as reversion
 from django.contrib.auth.models import User
 from django.utils.functional import cached_property
 import re
+import unicodedata
 import sys
 import inspect
-import unicodedata
 
 
 @reversion.register()

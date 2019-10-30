@@ -1,199 +1,221 @@
 import django_filters
-from apis_core.apis_vocabularies.models import WorkWorkRelation
 from django.db.models import Q
-
 from apis_core.apis_entities.models import *
-from apis_core.apis_labels.models import Label
+from django.conf import settings
 
+# TODO __sresch__ : Turn the logic of returing a filter object into a singleton pattern
+# TODO __sresch__ : use the order of list of filter fields in settings
 
-# TODO __sresch__ : Turn this class and its filter classes into singleton patterns to ensure no redundant instantiations
-class EntityFilterHandler():
 
-    _entity_filter_dict = {}
+# TODO __sresch__ : make the various filters conjunctive with each other instead of disjunctive as they are now
+class GenericListFilter(django_filters.FilterSet):
 
-    @classmethod
-    def get_filter(cls, entity):
-        return cls._entity_filter_dict[entity]
+    name = django_filters.CharFilter(method="name_label_filter", label="Name or Label")
 
+    # TODO __sresch__ : look into how the date values can be intercepted so that they can be parsed with the same logic as in edit forms
+    start_date = django_filters.DateFromToRangeFilter()
+    end_date = django_filters.DateFromToRangeFilter()
 
-    # TODO __sresch__ : make the various filters conjunctive with each other instead of disjunctive as they are now
-    class GenericListFilter(django_filters.FilterSet):
+    collection = django_filters.ModelMultipleChoiceFilter(queryset=Collection.objects.all())
 
+    # TODO __sresch__ : look into how to change these into auto-complete fields
+    related_entity_name = django_filters.CharFilter(method="related_entity_name_filter", label="related entity")
+    related_relationtype_name = django_filters.CharFilter(method="related_relationtype_name_filter", label="relationtype")
 
-        def construct_lookup_from_wildcard(self, value):
+    # TODO __sresch__ : find a way to get a dropdown of available RelationTypes. This underneath does not work
+    # related_relationtype_name = django_filters.ModelChoiceFilter(
+    #     label="related_relationtype_name",
+    #     queryset=WorkWorkRelation.objects.all()
+    # )
 
-            search_startswith = False
-            search_endswith = False
 
-            if value.startswith("*"):
-                value = value[1:]
-                search_startswith = True
+    def __init__(self, *args, **kwargs):
 
-            if value.endswith("*"):
-                value = value[:-1]
-                search_endswith = True
+        super().__init__(*args, **kwargs)
 
-            if search_startswith and not search_endswith:
-                return "__iendswith", value
+        enabled_filters = settings.APIS_ENTITIES[self.Meta.model.__name__]["list_filters"]
 
-            elif not search_startswith and search_endswith:
-                return "__istartswith", value
+        filters_dict_tmp = {}
 
-            elif search_startswith and search_endswith:
-                return "__icontains", value
+        for filter_name, filter_object in self.filters.items():
 
-            else:
-                return "__exact", value
+            if filter_name in enabled_filters:
 
+                filter_settings = enabled_filters[filter_name]
 
-        def string_exact_filter(self, queryset, name, value):
-            return queryset.filter(name__exact=value)
+                if "method" in filter_settings:
+                    filter_object.method = filter_settings["method"]
 
+                if "label" in filter_settings:
+                    filter_object.label = filter_settings["label"]
 
-        def string_icontains_filter(self, queryset, name, value):
-            return queryset.filter(name__icontains=value)
+                filters_dict_tmp[filter_name] = filter_object
 
+        self.filters = filters_dict_tmp
 
-        def string_wildcard_filter(self, queryset, name, value):
-            lookup, value = self.construct_lookup_from_wildcard(value)
-            return queryset.filter(**{name + lookup : value})
 
 
+    def construct_lookup_from_wildcard(self, value):
+        """
+        Parses user input for wildcards and returns the respective django lookup string and the trimmed value
+        E.g.
+            "*example" -> "__iendswith", "example"
+            "example*" -> "__istartswith", "example"
+            "*example*" -> "__icontains", "example"
+            ""example"" -> "__exact", "example"
 
-        def name_filter(self, queryset, name, value):
+        :param value : str : text to be parsed for *
+        :return: (lookup : str, value : str)
+        """
 
-            lookup, value = self.construct_lookup_from_wildcard(value)
+        search_startswith = False
+        search_endswith = False
 
-            queryset_related_label=queryset.filter(**{"label__label"+lookup : value})
-            queryset_self_name=queryset.filter(**{name+lookup : value})
+        if value.startswith("*"):
+            value = value[1:]
+            search_startswith = True
 
-            return queryset_related_label.union(queryset_self_name).distinct().order_by("name")
+        if value.endswith("*"):
+            value = value[:-1]
+            search_endswith = True
 
+        if search_startswith and not search_endswith:
+            return "__iendswith", value
 
-        def related_entity_name_filter(self, queryset, name, value):
+        elif not search_startswith and search_endswith:
+            return "__istartswith", value
 
-            lookup, value = self.construct_lookup_from_wildcard(value)
+        elif search_startswith and search_endswith:
+            return "__icontains", value
 
-            q_args = Q()
+        else:
+            return "__exact", value
 
-            for entity_field_name in queryset.model.get_related_entity_field_names():
 
-                q_args = q_args | Q(**{entity_field_name + "__name"+lookup : value})
+    def string_wildcard_filter(self, queryset, name, value):
+        lookup, value = self.construct_lookup_from_wildcard(value)
+        return queryset.filter(**{name + lookup : value})
 
-            return queryset.filter(q_args).distinct().order_by("name")
 
 
+    def name_label_filter(self, queryset, name, value):
+        # TODO __sresch__ : include alternative names queries
 
-        def related_relationtype_name_filter(self, queryset, name, value):
+        lookup, value = self.construct_lookup_from_wildcard(value)
 
-            lookup_detail, value = self.construct_lookup_from_wildcard(value)
+        queryset_related_label=queryset.filter(**{"label__label"+lookup : value})
+        queryset_self_name=queryset.filter(**{name+lookup : value})
 
-            q_args = Q()
+        return queryset_related_label.union(queryset_self_name).distinct().order_by("name")
 
-            for relationtype_field_name in queryset.model.get_related_relationtype_field_names():
 
-                base_lookup = relationtype_field_name + "__name" + lookup_detail
-                q_args = q_args | Q(**{base_lookup : value})
 
-            return queryset.filter(q_args).distinct().order_by("name")
+    def related_entity_name_filter(self, queryset, name, value):
 
+        lookup, value = self.construct_lookup_from_wildcard(value)
 
-        name = django_filters.CharFilter(method="name_filter")
-        start_date = django_filters.DateFromToRangeFilter()
-        end_date = django_filters.DateFromToRangeFilter()
-        related_entity_name = django_filters.CharFilter(method="related_entity_name_filter", label="related_entity_name")
-        related_relationtype_name = django_filters.CharFilter(method="related_relationtype_name_filter", label="related_relationtype_name")
-        collection = django_filters.ModelMultipleChoiceFilter(queryset=Collection.objects.all())
+        q_args = Q()
 
-        # TODO __sresch__ : find a way to get a dropdown of available RelationTypes. This underneath does not work
-        # related_relationtype_name = django_filters.ModelChoiceFilter(
-        #     label="related_relationtype_name",
-        #     queryset=WorkWorkRelation.objects.all()
-        # )
+        for entity_field_name in queryset.model.get_related_entity_field_names():
 
+            q_args = q_args | Q(**{entity_field_name + "__name"+lookup : value})
 
+        return queryset.filter(q_args).distinct().order_by("name")
 
 
-    class PersonListFilter(GenericListFilter):
 
-        gender = django_filters.ChoiceFilter(choices=(('', 'any'), ('male', 'male'), ('female', 'female')))
-        profession__name = django_filters.CharFilter(method="string_wildcard_filter")
-        name = django_filters.CharFilter(method="person_name_filter")
+    def related_relationtype_name_filter(self, queryset, name, value):
 
-        class Meta:
-            model = Person
-            fields = []
+        lookup_detail, value = self.construct_lookup_from_wildcard(value)
 
+        q_args = Q()
 
+        for relationtype_field_name in queryset.model.get_related_relationtype_field_names():
 
-        def person_name_filter(self, queryset, name, value):
+            base_lookup = relationtype_field_name + "__name" + lookup_detail
+            q_args = q_args | Q(**{base_lookup : value})
 
-            queryset_standard_name=self.name_filter(queryset, name, value)
-            lookup, value = self.construct_lookup_from_wildcard(value)
-            queryset_first_name=queryset.filter(**{"first_name"+lookup : value})
+        return queryset.filter(q_args).distinct().order_by("name")
 
-            # TODO __sresch__ : to fix, union of the two querysets throw exception
-            # result_qs = queryset_standard_name.union(queryset_first_name)
-            # return result_qs
-            #
-            # until the above is fixed, return this queryset
-            return queryset_standard_name
 
 
 
 
-    class PlaceListFilter(GenericListFilter):
+class PersonListFilter(GenericListFilter):
 
-        # TODO __sresch__ : decide on margin tolerance of input, now the number must be precise
-        lng = django_filters.NumberFilter(label='Longitude')
-        lat = django_filters.NumberFilter(label='Latitude')
+    gender = django_filters.ChoiceFilter(choices=(('', 'any'), ('male', 'male'), ('female', 'female')))
+    profession = django_filters.CharFilter(method="string_wildcard_filter")
+    title = django_filters.CharFilter(method="string_wildcard_filter")
+    name = django_filters.CharFilter(method="person_name_filter", label="Name or Label of person")
 
-        class Meta:
-            model = Place
-            fields = []
+    class Meta:
+        model = Person
+        exclude = []
 
 
+    def person_name_filter(self, queryset, name, value):
 
-    class InstitutionListFilter(GenericListFilter):
+        queryset_standard_name=self.name_label_filter(queryset, name, value)
 
-        class Meta:
-            model = Institution
-            fields = []
+        # TODO __sresch__ : does not work, union of the two querysets throws exception
+        # lookup, value = self.construct_lookup_from_wildcard(value)
+        #
+        # queryset_first_name=queryset.filter(**{"first_name"+lookup : value})
+        #
+        # result_qs = queryset_standard_name.union(queryset_first_name)
+        # return result_qs
+        #
+        # until the above is fixed, return this queryset
+        return queryset_standard_name
 
 
 
 
-    class EventListFilter(GenericListFilter):
+class PlaceListFilter(GenericListFilter):
 
-        class Meta:
-            model = Event
-            fields = []
+    # TODO __sresch__ : decide on margin tolerance of input, now the number must be precise
+    lng = django_filters.NumberFilter(label='Longitude')
+    lat = django_filters.NumberFilter(label='Latitude')
 
+    class Meta:
+        model = Place
+        exclude = []
 
 
 
-    class WorkListFilter(GenericListFilter):
+class InstitutionListFilter(GenericListFilter):
 
-        kind = django_filters.ModelChoiceFilter(queryset=WorkType.objects.all())
+    class Meta:
+        model = Institution
+        exclude = []
 
-        class Meta:
-            model = Work
-            fields = []
 
 
+class EventListFilter(GenericListFilter):
 
+    class Meta:
+        model = Event
+        exclude = []
 
-    _entity_filter_dict["person"] = PersonListFilter
-    _entity_filter_dict["place"] = PlaceListFilter
-    _entity_filter_dict["institution"] = InstitutionListFilter
-    _entity_filter_dict["event"] = EventListFilter
-    _entity_filter_dict["work"] = WorkListFilter
 
 
+class WorkListFilter(GenericListFilter):
 
+    kind = django_filters.ModelChoiceFilter(queryset=WorkType.objects.all())
 
+    class Meta:
+        model = Work
+        exclude = []
 
 
 def get_list_filter_of_entity(entity):
 
-    return EntityFilterHandler.get_filter(entity.lower())
+    entity_filter_dict = {
+        "person": PersonListFilter,
+        "place": PlaceListFilter,
+        "institution": InstitutionListFilter,
+        "event": EventListFilter,
+        "work": WorkListFilter,
+    }
+
+    return entity_filter_dict[entity.lower()]
