@@ -744,7 +744,6 @@ class PlacePublication(GenericRelation):
         return result
 
 
-
 #######################################################################
 #
 #   Event - ... - Relation

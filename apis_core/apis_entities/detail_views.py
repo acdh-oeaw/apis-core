@@ -106,11 +106,19 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
             iiif = False
         iiif_server = getattr(settings, "APIS_IIIF_SERVER", None)
         iiif_info_json = instance.name
+        try:
+            no_merge_labels = [
+                x for x in object_labels if not x.label_type.name.startswith('Legacy')
+            ]
+        except AttributeError:
+            no_merge_labels = []
         return HttpResponse(template.render(
             request=request, context={
                 'entity_type': entity,
                 'object': instance,
                 'right_card': side_bar,
+                'no_merge_labels': no_merge_labels,
+                'object_lables': object_labels,
                 'object_texts': object_texts,
                 'object_lod': object_lod,
                 'tei': tei,

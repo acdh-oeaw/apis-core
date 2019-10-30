@@ -1,0 +1,281 @@
+{% extends "webpage/base.html" %}
+
+{% block Titel %}Create/Modify a Place{% endblock %}
+{% block scriptHeader %}
+{% include 'autocomplete_light/static.html' %}
+{% endblock %}
+{% block content %}
+{% load crispy_forms_tags %}
+<div class="row">
+<form action="" method="post">
+    <div class="col-md-6">
+        <div class="card card-default">
+            <div class="card-heading">
+            	<h3><strong>{{ instance }}</strong></h3>
+            </div>
+            <div class="card-body">
+                <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingOneOne">
+                          <h4 class="card-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOneOne" aria-expanded="false" aria-controls="collapseFour">
+                                Texts
+                            </a>
+                          </h4>
+                        </div>
+                        <div id="collapseOneOne" class="card-collapse collapse" role="tabcard" aria-labelledby="headingFour">
+                          <div class="card-body">
+                          {% if form_text %}
+                        
+                            {% crispy form_text %}
+
+                          {% endif %}
+                                
+                          </div>
+                        </div>
+                      </div>
+                	
+                	{% csrf_token %}
+                	{% crispy form %}
+                    {% if instance %}
+                        <a class ="btn btn-danger btn-sm" href="{% url 'apis:apis_entities:place_delete' pk=instance.id %}">delete</a>
+                    {% endif %}
+                    <input class="btn btn-primary" type="submit" value="create/modify" />
+                
+            </div>
+        </div>
+    </div>
+</form>
+
+    <div class="col-md-6">
+        <div class="card card-default">
+            <div class="card-heading">
+                <h3>related to</h3>
+            </div>
+            <div class="card-body"> 
+                <div class="card-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingOne">
+                            <h4 class="card-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Map
+                                </a>
+                            </h4>
+                        </div>
+                
+                <div id="collapseOne" class="card-collapse collapse in" role="tabcard" aria-labelledby="headingOne">
+                            <div id="tab_Map" class="card-body">
+                                <div id="map" style="height: 400px;"></div>
+                </div>
+                        </div>
+                    </div>
+                <hr/>
+                <div class="card-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingOne">
+                            <h4 class="card-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+                                    Places
+                                </a>
+                            </h4>
+                        </div>
+                
+                <div id="collapseTwo" class="card-collapse collapse" role="tabcard" aria-labelledby="headingTwo">
+                            <div id="tab_placePlace" class="card-body">
+                                {% if object_place %}
+                <table class="table table-bordered">
+<!--                     <thead>
+                        <th>relation</th>
+                        <th>to</th>
+                    </thead>
+                    <tbody> -->
+                        {% for x in object_place %}
+                            <tr>
+                                <td>{{ x.start_date_written }}</td>
+                                <td>{{ x.relation_type }}</td>
+                                <td>{% if x.related_placeA.pk == instance.pk %}<a href="{% url 'apis:apis_entities:place_edit' x.related_placeB.pk %}">{{x.related_placeB}}</a>{% else %}<a href="{% url 'apis:apis_entities:place_edit' x.related_placeA.pk %}">{{x.related_placeA}}</a>{% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+                </div>
+                        </div>
+                    </div>
+                <hr/>
+                <div class="card-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingThree">
+                            <h4 class="card-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+                                    Persons
+                                </a>
+                            </h4>
+                        </div>
+                
+                <div id="collapseThree" class="card-collapse collapse" role="tabcard" aria-labelledby="headingThree">
+                            <div id="tab_placePerson" class="card-body">
+                {% if object_person %} 
+                <table class="table table-bordered">
+<!--                     <thead>
+                        <th>relation</th>
+                        <th>to</th>
+                    </thead>
+                    <tbody> -->
+                        {% for x in object_person %}
+                            <tr>
+                                <td>{{ x.relation_type.name_reverse }}</td>
+                                <td><a onclick='popupCreateObject("{% url 'admin:relations_personplace_change' x.id %}")'>{{ x.related_person }}</a></td>
+                                <td><a href="{% url 'apis:apis_entities:person_edit' pk=x.related_person.id %}"> reverse</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+
+                </div>
+                        </div>
+                    </div>
+                <hr/>
+
+                <div class="card-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingFour">
+                            <h4 class="card-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="true" aria-controls="collapseFour">
+                                    Institutions
+                                </a>
+                            </h4>
+                        </div>
+                
+                <div id="collapseFour" class="card-collapse collapse" role="tabcard" aria-labelledby="headingOne">
+                            <div id="tab_placeInstitution" class="card-body">
+                                {% if object_institution %} 
+                <table class="table table-bordered">
+<!--                     <thead>
+                        <th>relation</th>
+                        <th>to</th>
+                    </thead>
+                    <tbody> -->
+                        {% for x in object_institution %}
+                            <tr>
+                                <td>{{ x.relation_type }}</td>
+                                <td><a onclick='popupCreateObject("{% url 'admin:relations_personinstitution_change' x.id %}")'>{{ x.related_institution }}</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+                </div>
+                        </div>
+                    </div>
+                <hr/>               
+                <div class="card-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingFive">
+                            <h4 class="card-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="true" aria-controls="collapseFive">
+                                    Events
+                                </a>
+                            </h4>
+                        </div>
+                
+                <div id="collapseFive" class="card-collapse collapse" role="tabcard" aria-labelledby="headingFive">
+                            <div id="tab_placeEvent" class="card-body">
+                                {% if object_event %}
+                <table class="table table-bordered">
+                    <!-- <thead>
+                        <th>relation</th>
+                        <th>to</th>
+                    </thead> -->
+                    <tbody>
+                        {% for x in object_event %}
+                            <tr>
+                                <td>{{ x.relation_type }}</td>
+                                <td><a onclick='popupCreateObject("{% url 'admin:relations_personevent_change' x.id %}")'>{{ x.related_event }}</a></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %} 
+                </div>
+                        </div>
+                    </div>
+                <hr/>                
+                
+                <div class="card-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingSix">
+                            <h4 class="card-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="true" aria-controls="collapseSix">
+                                    LOD
+                                </a>
+                            </h4>
+                        </div>
+                
+                <div id="collapseSix" class="card-collapse collapse" role="tabcard" aria-labelledby="headingSix">
+                            <div id="tab_LOD" class="card-body">
+                                {% if uri %}
+                <p>
+                <b>distinct Uri:</b>&nbsp;<a href="{{ uri.0.uri }}">{{ uri.0.uri }}</a>
+                {% endif %}
+                {% if uri_candidates %}
+                <b>ambigue Uris:</b>&nbsp;{% for uri in uri_candidates %}<a href="{{ uri.uri }}">{{ uri.uri }}</a>, {% endfor %}
+                {% endif %}
+                </p>
+                </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+  
+{% endblock %}
+{% block scripts %}
+{{block.super}}
+<script type="text/javascript">
+    function popupCreateObject(url) {
+        var MyWindow = window.open(url,"","width=500, height=500");
+    };
+</script>
+
+<script type="text/javascript">
+    function onEachFeature(feature, layer) {
+            var popupContent = "<p>Place</p>";
+
+            if (feature.properties && feature.properties.popupContent) {
+                popupContent += feature.properties.popupContent;
+            }
+
+            layer.bindPopup(popupContent);
+        };
+    
+
+        var mymap = L.map('map').setView([51.505, -0.09], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>', 
+    maxZoom: 18,
+    
+    
+}).addTo(mymap);
+        $.ajax({
+                type: 'GET',
+                url: '{% url 'apis:apis_entities:getGeoJson' %}',
+                data: {'object_id': {{instance.pk}}},
+                success: function(data) {
+                    console.log(data);
+                    var markers = L.markerClusterGroup();
+                    var geoJsonLayer = L.geoJson(data, {onEachFeature: onEachFeature});
+                    markers.addLayer(geoJsonLayer);
+                    mymap.addLayer(markers);
+                    mymap.fitBounds(markers.getBounds(), {'maxZoom': 12});
+                }
+            });
+
+     $.ApisMaps = {}
+     $.ApisMaps.PlaceMap = mymap   
+     console.log('map placed')
+    
+
+</script>
+
+{% endblock %}

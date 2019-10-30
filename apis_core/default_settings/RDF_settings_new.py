@@ -4,57 +4,71 @@ gndo = 'http://d-nb.info/standards/elementset/gnd#'
 owl = "http://www.w3.org/2002/07/owl#"
 geo = "http://www.opengis.net/ont/geosparql#"
 
+sameAs = [
+    "http://schema.org/sameAs",
+    "http://www.w3.org/2002/07/owl#sameAs"
+]
+
 sett_RDF_generic = {
     'Place': {
         'data': [
             {
                 'base_url': 'http://sws.geonames.org/',
-                'url_appendix': 'about.rdf',
-                'kind': (
-                    (gno + 'featureCode', None),
-                    ),
                 'attributes': [
                     {
                         'name': 'name',
-                        'identifiers': (
-                            (('objects', 'prefName', gno + 'officialName', ('language', 'de')),),
-                            (('objects', 'prefName', gno + 'officialName', ('language', 'en')),),
-                            (('objects', 'prefName', gno + 'name', None),),
-                            (('objects', 'prefName', gno + 'alternateName', ('language', 'de')),),
-                            (('objects', 'prefName', gno + 'alternateName', ('language', 'en')),)
-                        )
+                        'sparql': """
+                                PREFIX gn: <http://www.geonames.org/ontology#>
+                                SELECT ?prefName (LANG(?prefName) AS ?lang)
+                                WHERE {{
+                                    <{subject}> gn:officialName ?prefName
+                                    FILTER (LANGMATCHES(LANG(?prefName), "de") || LANGMATCHES(LANG(?prefName), "en"))
+                                }}
+                                """,
                     },
                     {
-                        'name': 'label',
-                        'identifiers': (
-                            (('objects', 'label', gno + 'alternateName', ('language', 'de')),),
-                            (('objects', 'label', gno + 'alternateName', ('language', 'en')),)
-                        )
+                        'name': 'altName',
+                        'sparql': """
+                                PREFIX gn: <http://www.geonames.org/ontology#>
+                                SELECT ?altName (LANG(?altName) AS ?lang)
+                                WHERE {{
+                                    <{subject}> gn:alternateName ?altName
+                                    FILTER (LANGMATCHES(LANG(?altName), "de") || LANGMATCHES(LANG(?altName), "en"))
+                                }}
+                                """,
                     },
                     {
-                        'name': 'lat',
-                        'identifiers': (
-                            (('objects', 'lat', wgs84 + 'lat', None),),
-                        )
+                        'name': 'kind',
+                        'sparql': """
+                                PREFIX gn: <http://www.geonames.org/ontology#>
+                                SELECT ?kind
+                                WHERE {{
+                                    <{subject}> gn:featureCode ?kind
+                                }}
+                                """,
                     },
-                    {
-                        'name': 'long',
-                        'identifiers': (
-                            (('objects', 'lng', wgs84 + 'long', None),),
-                        )
+                    {'name': 'lat-long',
+                        'sparql': """
+                                PREFIX gn: <http://www.geonames.org/ontology#>
+                                PREFIX wgs84_pos: <http://www.w3.org/2003/01/geo/wgs84_pos#>
+                                SELECT ?lat ?long
+                                WHERE {{
+                                    <{subject}> wgs84_pos:lat ?lat;
+                                                wgs84_pos:long ?long
+                                }}
+                                """,
+
                     },
-                    {
-                        'name': 'parentFeature',
-                        'identifiers': (
-                            (('objects', 'parentFeature', gno + 'parentFeature', None),),
-                        )
-                    },
-                    {
-                        'name': 'parentCountry',
-                        'identifiers': (
-                            (('objects', 'parentCountry', gno + 'parentCountry', None),),
-                        )
-                    },
+                    {'name': 'parent',
+                     'sparql': """
+                            PREFIX gn: <http://www.geonames.org/ontology#>
+                            SELECT ?parent
+                            WHERE {{
+                                <{subject}> gn:parentCountry ?parent
+                            }}
+                            """,
+
+                     },
                 ]
             },
             {
@@ -88,17 +102,23 @@ sett_RDF_generic = {
         ],
         'matching': {
             'attributes': {
-                'name': (
-                    (('prefName', None),),
-                ),
-                'lat': (
-                    (('lat', None),),
-                    (('latlong_geonode', ('Point \( [+-]([0-9\.]+) [+-]([0-9\.]+)', 2)),)
-                ),
-                'lng': (
-                    (('lng', None),),
-                    (('latlong_geonode', ('Point \( [+-]([0-9\.]+) [+-]([0-9\.]+)', 1)),)
-                ),
+                'name': {
+                    'string': '{prefName}',
+                    'regex': None
+                },
+                'kind': [{
+                    'string': '{kind}',
+                    'accessor': 'name',
+                    'regex': None
+                    },],
+                'lat': {
+                    'identifier': 'lat-long',
+                    'string': '{lat}'
+                },
+                'lng': {
+                    'identifier': 'lat-long',
+                    'string': '{long}'
+                }
             },
             'labels': {
                 'alternative name': (
@@ -110,16 +130,7 @@ sett_RDF_generic = {
             {
                 'type': 'Place',
                 'kind': 'located in',
-                'object': (
-                    ('parentFeature', None),
-            )
-            },
-            {
-                'type': 'Place',
-                'kind': 'located in',
-                'object': (
-                    ('parentCountry', None),
-            )
+                'object': 'parent'
             },
             ],
         }
@@ -209,12 +220,7 @@ sett_RDF_generic = {
         ],
         'matching': {
             'attributes': {
-                'name': (
-                    (('surname', None),
-                    ),
-                    (('personalNameAddition', None),
-                    )
-                ),
+                'name': "{self}",
                 'first_name': (
                     (('forename', None),),
                     (('personalName', None),
@@ -374,9 +380,7 @@ sett_RDF_generic = {
         ],
         'matching': {
             'attributes': {
-                'name': (
-                    (('prefName', None),),
-                ),
+                'name': "{prefName}",
                 'start_date_written': (
                     (('start', None),),
                 ),

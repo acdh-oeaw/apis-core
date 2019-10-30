@@ -2,10 +2,16 @@ import re
 
 from apis_core.apis_labels.serializers import LabelSerializer
 from apis_core.apis_vocabularies.models import ProfessionType
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.query import QuerySet
 from django.urls import reverse
 from rest_framework import serializers
+from reversion.models import Version
+
+base_uri = getattr(settings, 'APIS_BASE_URI', 'http://apis.info')
+if base_uri.endswith('/'):
+    base_uri = base_uri[:-1]
 
 
 class CollectionSerializer(serializers.Serializer):
@@ -13,10 +19,10 @@ class CollectionSerializer(serializers.Serializer):
     name = serializers.CharField()
 
 
-class ProfessionTypeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ProfessionType
-        fields = ("id", "name", "label")
+class VocabsSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    name = serializers.CharField()
+    label = serializers.CharField()
 
 
 class EntityUriSerializer(serializers.Serializer):
@@ -26,11 +32,28 @@ class EntityUriSerializer(serializers.Serializer):
 
 class EntitySerializer(serializers.Serializer):
     id = serializers.IntegerField()
+    url = serializers.SerializerMethodField(method_name="add_url")
     name = serializers.CharField()
     start_date = serializers.DateField()
     end_date = serializers.DateField()
     uris = EntityUriSerializer(source="uri_set", many=True)
     labels = LabelSerializer(source="label_set", many=True)
+    revisions = serializers.SerializerMethodField(method_name="add_revisions")
+
+    def add_revisions(self, obj):
+        ver = Version.objects.get_for_object(obj)
+        res = []
+        for v in ver:
+            usr_1 = getattr(v.revision, 'user', None)
+            if usr_1 is not None:
+                usr_1 = usr_1.username
+            else:
+                usr_1 = "Not specified"
+            res.append({
+                "id": v.id,
+                "date_created": v.revision.date_created,
+                "user_created": usr_1}) 
+        return res
 
     def add_relations(self, obj):
         res = {}
@@ -72,6 +95,10 @@ class EntitySerializer(serializers.Serializer):
     def add_entity_type(self, obj):
         return str(obj.__class__.__name__)
 
+    def add_url(self, obj):
+        url = f"{base_uri}{reverse('apis_core:apis_api2:GetEntityGeneric', kwargs={'pk': obj.pk})}"
+        return url
+
     def __init__(self, *args, depth_ent=1, **kwargs):
         super(EntitySerializer, self).__init__(*args, **kwargs)
         if type(self.instance) == QuerySet:
@@ -88,11 +115,17 @@ class EntitySerializer(serializers.Serializer):
                 "FloatField",
             ]:
                 self.fields[f.name] = getattr(serializers, field_name)()
+            elif field_name in ['ForeignKey', 'ManyToMany']:
+                if str(f.related_model.__module__).endswith('apis_vocabularies.models'):
+                    many = False
+                    if f.many_to_many or f.one_to_many:
+                        many = True
+                    self.fields[f.name] = VocabsSerializer(many=many)
         for f in inst._meta.many_to_many:
-            if f.name == "profession":
-                self.fields["profession"] = ProfessionTypeSerializer(many=True)
-            elif f.name == "collection":
+            if f.name == "collection":
                 self.fields["collection"] = CollectionSerializer(many=True)
+            elif str(f.related_model.__module__).endswith('apis_vocabularies.models'):
+                self.fields[f.name] = VocabsSerializer(many=True)
         self.fields["entity_type"] = serializers.SerializerMethodField(
             method_name="add_entity_type"
         )
@@ -105,6 +138,51 @@ class EntitySerializer(serializers.Serializer):
 class RelationEntitySerializer(serializers.Serializer):
     id = serializers.IntegerField()
     relation_type = serializers.SerializerMethodField(method_name="add_relation_label")
+    annotation = serializers.SerializerMethodField(method_name="add_annotations")
+    revisions = serializers.SerializerMethodField(method_name="add_revisions")
+
+    def add_revisions(self, obj):
+        ver = Version.objects.get_for_object(obj)
+        res = []
+        for v in ver:
+            usr_1 = getattr(v.revision, 'user', None)
+            if usr_1 is not None:
+                usr_1 = usr_1.username
+            else:
+                usr_1 = "Not specified"
+            res.append({
+                "id": v.id,
+                "date_created": v.revision.date_created,
+                "user_created": usr_1})
+        return res
+
+    def add_annotations(self, obj):
+        if "apis_highlighter" in settings.INSTALLED_APPS:
+            res = []
+            offs = 50
+            for an in obj.annotation_set.all():
+                r1 = dict()
+                r1["id"] = an.pk
+                r1["user"] = an.user_added.username
+                text = an.text.text
+                if offs < an.start:
+                    s = an.start - offs
+                else:
+                    s = 0
+                if offs + an.end < len(text):
+                    e = an.end + offs
+                else:
+                    e = len(text)
+                r1["annotation"] = text[an.start : an.end]
+                r1["text"] = text[s:e]
+                r1["text"] = "{}<annotation>{}</annotation>{}".format(r1["text"][:an.start-s], r1["text"][an.start-s:an.end-s], r1["text"][an.end-s:])
+                r1["string_offset"] = "{}-{}".format(an.start, an.end)
+                # r1["text_url"] = self.context["request"].build_absolute_uri(
+                #        reverse("apis_core:apis_api:text-detail", kwargs={"pk": an.text_id})
+                # )
+                r1["text_url"] = f"{base_uri}{reverse('apis_core:apis_api:text-detail', kwargs={'pk': an.text_id})}"
+                res.append(r1)
+            return res
 
     def add_entity(self, obj):
         return EntitySerializer(
@@ -114,19 +192,7 @@ class RelationEntitySerializer(serializers.Serializer):
     def add_relation_label(self, obj):
         cm = obj.__class__.__name__
         res_1 = dict()
-        request_1 = self.context.get("request", None)
-        if request_1 is not None:
-            res_1["url"] = self.context["request"].build_absolute_uri(
-                reverse(
-                    "apis_core:apis_api:{}relation-detail".format(cm).lower(),
-                    kwargs={"pk": obj.relation_type.pk},
-                )
-            )
-        else:
-            res_1["url"] = reverse(
-                "apis_core:apis_api:{}relation-detail".format(cm).lower(),
-                kwargs={"pk": obj.relation_type.pk},
-            )
+        res_1["url"] = f"{base_uri}{reverse('apis_core:apis_api:{}relation-detail'.format(cm).lower(), kwargs={'pk': obj.relation_type.pk},)}"
         if self.reverse and len(obj.relation_type.label_reverse) > 0:
             res_1["label"] = obj.relation_type.label_reverse
         elif self.reverse:

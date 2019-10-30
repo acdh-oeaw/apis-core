@@ -5,10 +5,11 @@ from .models import Person, Place, Institution, Passage, Event
 from apis_core.apis_metainfo.models import Text, Collection, Source, Uri, UriCandidate
 from apis_core.apis_vocabularies.models import PersonPlaceRelation
 from apis_core.apis_labels.models import Label
-from apis_core.apis_relations.models import PersonPlace, PlacePlace
+from apis_core.apis_relations.models import PersonPlace, PlacePlace, InstitutionPlace
 from reversion.models import Version
 from reversion import revisions as reversion
 from apis_core.helper_functions.RDFparsers import GenericRDFParser
+from apis_core.helper_functions.RDFParserNew import RDFParserNew
 
 from datetime import datetime
 from guardian.shortcuts import assign_perm, remove_perm, get_objects_for_user
@@ -18,7 +19,7 @@ from django.contrib.auth.models import Permission
 from django.db.models import Q
 
 
-class RDFPersonParserTestCase(TestCase):
+class RDFPersonParerTestCase(TestCase):
     #fixtures = ['fixtures_3_5_17.json']
     uriP = 'http://d-nb.info/gnd/11868499X'
     kindP = 'Person'
@@ -141,3 +142,74 @@ class RDFPlaceParserTestCase(TestCase):
         cc = Place.objects.filter(uri__uri=self.uriGeon).distinct()
         self.assertEqual(cc.count(), 1)
 
+
+
+class RDFPlaceParserNewTestCase(TestCase):
+
+    def test_parse_place(self):
+        plc = [("http://www.geonames.org/6951114/bad-zell.html", "Bad Zell", 48.34906, "http://sws.geonames.org/2782113/", "http://www.geonames.org/ontology#P.PPL"),
+               ("http://sws.geonames.org/2779275/", "Freistadt", 48.51103, "http://sws.geonames.org/2782113/", "http://www.geonames.org/ontology#P.PPL"),
+               ("http://sws.geonames.org/2761369", "Vienna", 48.20849, "http://sws.geonames.org/2782113/", "http://www.geonames.org/ontology#P.PPLC")
+               ]
+        for p in plc:
+            o = RDFParserNew(p[0], 'Place')
+            o.create_objct()
+            o2 = o.save()
+            print(type(o2.lat))
+            self.assertEqual(o2.lat, float(p[2]))
+            self.assertEqual(o2.name, p[1])
+            self.assertEqual(o2.kind.name, p[4])
+
+
+
+    def test_parse_person(self):
+        o = RDFParserNew('http://d-nb.info/gnd/118650130', 'Person')
+        o.create_objct()
+        print(o._foreign_keys)
+        print(o.objct)
+        print(o._attributes)
+        print(o.objct.name)
+        print(o._foreign_keys)
+        self.assertEqual(o.objct.name, 'Aristoteles')
+        o2 = o.save()
+        print(o2)
+        o3 = RDFParserNew('http://d-nb.info/gnd/118566512', 'Person')
+        o3.create_objct()
+        print(o3._foreign_keys)
+        print(o3.objct)
+        print(o3._attributes)
+        print(f"name: {o3.objct.name}, {o3.objct.first_name}")
+        print(o3._foreign_keys)
+        self.assertEqual(o3.objct.name, 'Kreisky')
+        self.assertEqual(o3.objct.start_date_written, '1911-01-22')
+        o4 = o3.save()
+        print(o4)
+        print(o4.profession.all())
+        print(o4.start_date)
+
+    def test_merge(self):
+        o = RDFParserNew('http://d-nb.info/gnd/118566512', 'Person')
+        o.create_objct()
+        o.save()
+        o2 = RDFParserNew('http://d-nb.info/gnd/170686299', 'Person').get_or_create()
+        o.merge(o2)
+        print(o.objct.uri_set.all())
+
+    def test_place_of_birth(self):
+        o = RDFParserNew('http://d-nb.info/gnd/118566512', 'Person')
+        o.create_objct()
+        o.save()
+        for p in PersonPlace.objects.all():
+            print(p.related_place.name, p.related_place.uri_set.all(), p.related_place.lat)
+
+    def test_institution(self):
+        o = RDFParserNew('http://d-nb.info/gnd/1001454-8', 'Institution')
+        o.create_objct()
+        o2 = o.save()
+        print(o2.pk, o2.start_date, o2.start_date_written)
+        print(InstitutionPlace.objects.filter(related_institution_id=o2.pk))
+        print(o2.label_set.all().values_list('label'))
+        
+    def test_use_uri_twice(self):
+        o = RDFParserNew("http://www.geonames.org/6951114/bad-zell.html", "Place")
+        self.assertRaises(ValueError, RDFParserNew, "http://www.geonames.org/6951114/bad-zell.html", "Place")

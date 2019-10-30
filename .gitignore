@@ -1,3 +1,4 @@
+**.eggs/
 *.ipynb
 *.pyc
 *.idea

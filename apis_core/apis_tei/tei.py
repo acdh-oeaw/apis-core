@@ -2,6 +2,7 @@ import lxml.etree as ET
 from xml.sax.saxutils import escape, unescape
 
 from django.utils.text import slugify
+from django.conf import settings
 
 from . partials import TEI_NSMAP, tei_gen_header
 
@@ -12,10 +13,11 @@ def custom_escape(somestring):
 
 
 class TeiEntCreator():
-    def __init__(self, ent_dict, base_url='https://provide/some/base/url/'):
+    def __init__(self, ent_dict, base_url='apis/api2/'):
         self.nsmap = TEI_NSMAP
         self.project = "APIS"
-        self.base_url = base_url
+        s_url = getattr(settings, 'APIS_BASE_URI', 'http://apis.info/')
+        self.base_url = f"{s_url}{base_url}"
         self.ent_dict = ent_dict
         self.ent_name = custom_escape(ent_dict.get('name', 'No name provided'))
         self.ent_type = ent_dict.get('entity_type')
@@ -34,8 +36,12 @@ class TeiEntCreator():
                 rel = {}
                 rel['rel_type'] = x
                 rel['rel_label'] = slugify(y['relation_type']['label'])
-                rel['target'] = y[ent_key]['id']
-                rel['target_name'] = y[ent_key]['name']
+                if 'target' in y.keys():
+                    key_1 = 'target'
+                else:
+                    key_1 = 'source'
+                rel['target'] = y[key_1]['id']
+                rel['target_name'] = y[key_1]['name']
                 group.append(rel)
             if group:
                 relations.append(group)

@@ -15,9 +15,11 @@ from apis_core.apis_vocabularies.models import CollectionType, LabelType, TextTy
 
 # from helper_functions.highlighter import highlight_text
 from apis_core.default_settings.NER_settings import autocomp_settings
+from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models.query import QuerySet
 from django.db.models.signals import m2m_changed, post_save
@@ -25,6 +27,8 @@ from django.dispatch import receiver
 from django.urls import NoReverseMatch, reverse
 from django.utils.functional import cached_property
 from model_utils.managers import InheritanceManager
+
+from .validators import date_validator
 
 NEXT_PREV = getattr(settings, "APIS_NEXT_PREV", True)
 
@@ -61,13 +65,13 @@ class TempEntityClass(models.Model):
         max_length=255,
         blank=True,
         null=True,
-        verbose_name="Start",
+        verbose_name="Start"
     )
     end_date_written = models.CharField(
         max_length=255,
         blank=True,
         null=True,
-        verbose_name="End",
+        verbose_name="End"
     )
     text = models.ManyToManyField("Text", blank=True)
     collection = models.ManyToManyField("Collection")
@@ -85,9 +89,9 @@ class TempEntityClass(models.Model):
         if self.name != "" and hasattr(
             self, "first_name"
         ):  # relation usually don´t have names
-            return "{}, {}".format(self.name, self.first_name)
+            return "{}, {} (ID: {})".format(self.name, self.first_name, self.id)
         elif self.name != "":
-            return self.name
+            return "{} (ID: {})".format(self.name, self.id)
         else:
             return "(ID: {})".format(self.id)
 
@@ -250,8 +254,8 @@ class TempEntityClass(models.Model):
                         raise ValueError("Could not interpret date.")
 
                     elif not ab and not bis and (month is None or day is None):
-                        # if both ab and bis are False and either month or day is empty, then an individual date was given
-                        # with implicit range (range of all months if given a year or all days if given a month)
+                        # if both ab and bis are False and either month or day is empty, then it was given
+                        # an implicit date range (range of all months if given a year or all days if given a month)
 
                         # construct implicit month range
                         if month is None:
@@ -328,6 +332,13 @@ class TempEntityClass(models.Model):
                 if len(date_split_angle) > 1:
                     # date string contains angle brackets. Parse them, ignore the rest
 
+                    def parse_iso_date(date_string):
+                        date_string_split = date_string.split("-")
+                        try:
+                            return datetime(year=int(date_string_split[0]), month=int(date_string_split[1]), day=int(date_string_split[2]) )
+                        except:
+                            raise ValueError("Invalid iso date: ", date_string)
+
                     if len(date_split_angle) > 3:
                         # invalid case
                         raise ValueError("Too many angle brackets.")
@@ -352,17 +363,17 @@ class TempEntityClass(models.Model):
                             # parse start date
                             date_ab_string = dates_iso[1].strip()
                             if date_ab_string != "":
-                                date_ab = parse_date_range_individual(date_ab_string)
+                                date_ab = parse_iso_date(date_ab_string)
 
                             # parse end date
                             date_bis_string = dates_iso[2].strip()
                             if date_bis_string != "":
-                                date_bis = parse_date_range_individual(date_bis_string)
+                                date_bis = parse_iso_date(date_bis_string)
 
                         # parse single date
                         date_single_string = dates_iso[0].strip()
                         if date_single_string != "":
-                            date_single = parse_date_range_individual(date_single_string)
+                            date_single = parse_iso_date(date_single_string)
 
 
                 else:
@@ -501,6 +512,17 @@ class TempEntityClass(models.Model):
 
         return self
 
+    def get_child_entity(self):
+        for x in [x for x in apps.all_models['apis_entities'].values()]:
+            if x.__name__ in list(settings.APIS_ENTITIES.keys()):
+                try:
+                    my_ent = x.objects.get(id=self.id)
+                    return my_ent
+                    break
+                except ObjectDoesNotExist:
+                    pass
+        return None
+
     @classmethod
     def get_listview_url(self):
         entity = self.__name__.lower()
@@ -619,8 +641,6 @@ class TempEntityClass(models.Model):
             e_b = type(ent).__name__
             if e_a != e_b:
                 continue
-            print(e_b)
-            print(str(ent))
             lt, created = LabelType.objects.get_or_create(name="Legacy name (merge)")
             l_uri, created = LabelType.objects.get_or_create(name="Legacy URI (merge)")
             Label.objects.create(label=str(ent), label_type=lt, temp_entity=self)
@@ -748,9 +768,28 @@ class Uri(models.Model):
             "relation_pk": self.pk,
             "relation_type": "uri",
             "related_entity": self.entity.name,
+            "related_entity_url": self.entity.get_absolute_url(),
+            "related_entity_class_name": self.entity.__class__.__name__.lower(),
             "uri": self.uri,
         }
         return result
+
+    @classmethod
+    def get_listview_url(self):
+        return reverse("apis_core:apis_metainfo:uri_browse")
+
+    @classmethod
+    def get_createview_url(self):
+        return reverse('apis_core:apis_metainfo:uri_create')
+
+    def get_absolute_url(self):
+        return reverse('apis_core:apis_metainfo:uri_detail', kwargs={'pk': self.id})
+
+    def get_delete_url(self):
+        return reverse('apis_core:apis_metainfo:uri_delete', kwargs={'pk': self.id})
+
+    def get_edit_url(self):
+        return reverse('apis_core:apis_metainfo:uri_edit', kwargs={'pk': self.id})
 
 
 @reversion.register()
@@ -774,7 +813,6 @@ class UriCandidate(models.Model):
         for endp in autocomp_settings[cn.title()]:
             url = re.sub(r"/[a-z]+$", "/entity", endp["url"])
             params = {"id": self.uri}
-            print(url, params)
             res = requests.get(url, params=params, headers=headers)
             if res.status_code == 200:
                 if endp["fields"]["descr"][0] in res.json()["representation"].keys():
