@@ -3,7 +3,6 @@ import json
 import reversion
 from reversion_compare.views import HistoryCompareDetailView
 from reversion.models import Version
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -21,9 +20,8 @@ from django.db.models import Q
 from django_tables2 import SingleTableView
 from django_tables2 import RequestConfig
 from django_tables2.export.views import ExportMixin
-
+from .filters import get_list_filter_of_entity
 from apis_core.helper_functions.utils import access_for_all
-
 from .models import Person, Place, Institution, Event, Work
 from apis_core.apis_vocabularies.models import LabelType
 from apis_core.apis_metainfo.models import Uri, UriCandidate, TempEntityClass, Text
@@ -33,7 +31,6 @@ from apis_core.helper_functions.utils import (
     access_for_all, access_for_all_function, ENTITIES_DEFAULT_COLS
 )
 from apis_core.apis_labels.models import Label
-
 from .forms import (
     FullTextForm, SearchForm, GenericFilterFormHelper,
     NetworkVizFilterForm, PersonResolveUriForm,
@@ -43,7 +40,6 @@ from .tables import (
     PersonTable, PlaceTable, InstitutionTable, EventTable, WorkTable,
     get_entities_table
 )
-from .filters import get_generic_list_filter
 
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
@@ -140,19 +136,7 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
         qs = ContentType.objects.get(
             app_label__startswith='apis_', model=self.entity.lower()
         ).model_class().objects.all()
-
-
-        # __sresch__ : comment and un-comment the respective self.filter = .. lines to experiment with the existing filter or my suggestion
-        #
-        # ORIGINAL
-        # self.filter = get_generic_list_filter(self.entity.title())(self.request.GET, queryset=qs)
-        #
-        # MODIFIED
-        # TODO __sresch__ : investiage how class instantiation can be avoided so that a singleton object is returened instead
-        from . import filters__sresch__suggestion
-        self.filter = filters__sresch__suggestion.get_list_filter_of_entity(self.entity.title())(self.request.GET, queryset=qs)
-
-
+        self.filter = get_list_filter_of_entity(self.entity.title())(self.request.GET, queryset=qs)
         self.filter.form.helper = self.formhelper_class()
         return self.filter.qs
 
