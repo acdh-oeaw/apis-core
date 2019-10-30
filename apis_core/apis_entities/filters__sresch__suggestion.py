@@ -35,23 +35,36 @@ class GenericListFilter(django_filters.FilterSet):
 
         enabled_filters = settings.APIS_ENTITIES[self.Meta.model.__name__]["list_filters"]
 
-        filters_dict_tmp = {}
+        filter_dict_tmp = {}
+        default_filter_dict = self.filters
 
-        for filter_name, filter_object in self.filters.items():
+        for enabled_filter in enabled_filters:
 
-            if filter_name in enabled_filters:
+            if type(enabled_filter) == str and enabled_filter in default_filter_dict:
 
-                filter_settings = enabled_filters[filter_name]
+                filter_dict_tmp[enabled_filter] = default_filter_dict[enabled_filter]
 
-                if "method" in filter_settings:
-                    filter_object.method = filter_settings["method"]
+            elif type(enabled_filter) == dict:
 
-                if "label" in filter_settings:
-                    filter_object.label = filter_settings["label"]
+                enabled_filter_key = list(enabled_filter.keys())[0]
 
-                filters_dict_tmp[filter_name] = filter_object
+                if enabled_filter_key in default_filter_dict:
 
-        self.filters = filters_dict_tmp
+                    enabled_filter_settings_dict = enabled_filter[enabled_filter_key]
+
+                    if "method" in enabled_filter_settings_dict:
+                        default_filter_dict[enabled_filter_key].method = enabled_filter_settings_dict["method"]
+
+                    if "label" in enabled_filter_settings_dict:
+                        default_filter_dict[enabled_filter_key].label = enabled_filter_settings_dict["label"]
+
+                    filter_dict_tmp[enabled_filter_key] = default_filter_dict[enabled_filter_key]
+
+                else:
+                    raise ValueError("Expected either str or dict as type for an individual filter in the settings file.",
+                            "\nGot instead:", type(enabled_filter))
+
+        self.filters = filter_dict_tmp
 
 
 
