@@ -53,7 +53,7 @@ def get_date_help_text_default():
 
 
 
-def get_date_help_text_from_dates(single_date, single_start_date, single_end_date, single_date_written):
+def get_date_help_text_from_dates(single_date, single_start_date, single_end_date, single_date_written, single_date_is_exact):
     """
     function for creating string help text from parsed dates, to provide feedback to the user
     about the parsing status of a given date field.
@@ -83,16 +83,28 @@ def get_date_help_text_from_dates(single_date, single_start_date, single_end_dat
 
         help_text = "Date interpreted as "
 
+        if single_date_is_exact:
+            help_text += "exactly: "
+        else:
+            help_text += "not exactly: "
+
         if single_start_date or single_end_date:
             # date has also start or end ranges, then ignore single date
 
             if single_start_date:
                 # date has start range
 
+                # convert gregorian database date format into julian for user layer
+                single_start_date_j = julian.from_gregorian(
+                    year=single_start_date.year,
+                    month=single_start_date.month,
+                    day=single_start_date.day
+                )
+
                 help_text += \
-                    str(single_start_date.year) + "-" + \
-                    str(single_start_date.month) + "-" + \
-                    str(single_start_date.day) + " until "
+                    str(single_start_date_j[0]) + "-" + \
+                    str(single_start_date_j[1]) + "-" + \
+                    str(single_start_date_j[2]) + " until "
 
             else:
                 # date has no start range, then write "undefined"
@@ -102,10 +114,17 @@ def get_date_help_text_from_dates(single_date, single_start_date, single_end_dat
             if single_end_date:
                 # date has end range
 
+                # convert gregorian database date format into julian for user layer
+                single_end_date_j = julian.from_gregorian(
+                    year=single_end_date.year,
+                    month=single_end_date.month,
+                    day=single_end_date.day
+                )
+
                 help_text += \
-                    str(single_end_date.year) + "-" + \
-                    str(single_end_date.month) + "-" + \
-                    str(single_end_date.day)
+                    str(single_end_date_j[0]) + "-" + \
+                    str(single_end_date_j[1]) + "-" + \
+                    str(single_end_date_j[2])
 
             else:
                 # date has no start range, then write "undefined"
@@ -115,10 +134,17 @@ def get_date_help_text_from_dates(single_date, single_start_date, single_end_dat
         else:
             # date has no start nor end range. Use single date then.
 
+            # convert gregorian database date format into julian for user layer
+            single_date_j = julian.from_gregorian(
+                year=single_date.year,
+                month=single_date.month,
+                day=single_date.day
+            )
+
             help_text += \
-                str(single_date.year) + "-" + \
-                str(single_date.month) + "-" + \
-                str(single_date.day)
+                str(single_date_j[0]) + "-" + \
+                str(single_date_j[1]) + "-" + \
+                str(single_date_j[2])
 
     elif single_date_written is not None:
         # date input field is not empty but it could not be parsed either. Show parsing info and help text

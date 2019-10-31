@@ -32,7 +32,7 @@ from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
 from .api_renderers import EntityToCIDOC, EntityToTEI
-from .models import Event, Institution, Person, Place, Work
+from .models import Event, Institution, Person, Place, Passage, Publication
 from .serializers import (
     EventSerializer,
     GeoJsonSerializer,
@@ -41,7 +41,11 @@ from .serializers import (
     NetJsonNodeSerializer,
     PersonSerializer,
     PlaceSerializer,
-    WorkSerializer,
+
+    # TODO __sresch__ : serializer stuff
+    # PassageSerializer,
+    # PublicationSerializer,
+
     GeoJsonSerializerTheme
 )
 from .serializers_generic import EntitySerializer
@@ -175,7 +179,9 @@ class PassageViewSet(viewsets.ModelViewSet):
     the kind of the passage (separated object)."""
     permission_classes = (DjangoObjectPermissions,)
     queryset = Passage.objects.all()
-    serializer_class = PassageSerializer
+
+    # TODO __sresch__ : serializer stuff
+    # serializer_class = PassageSerializer
     pagination_class = StandardResultsSetPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     depth = 2

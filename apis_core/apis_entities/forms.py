@@ -58,6 +58,8 @@ def get_entities_form(entity):
                 'text',
                 'source',
             ]
+            exclude.extend(model.get_related_entity_field_names())
+            exclude.extend(model.get_related_relationtype_field_names())
 
         def __init__(self, *args, **kwargs):
             super(GenericEntitiesForm, self).__init__(*args, **kwargs)
@@ -221,13 +223,15 @@ def get_entities_form(entity):
                     instance.start_date,
                     instance.start_start_date,
                     instance.start_end_date,
-                    instance.start_date_written
+                    instance.start_date_written,
+                    instance.start_date_is_exact
                 )
                 self.fields['end_date_written'].help_text = get_date_help_text_from_dates(
                     instance.end_date,
                     instance.end_start_date,
                     instance.end_end_date,
-                    instance.end_date_written
+                    instance.end_date_written,
+                    instance.end_date_is_exact
                 )
 
             else:

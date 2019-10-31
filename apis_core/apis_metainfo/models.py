@@ -28,8 +28,6 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.functional import cached_property
 from model_utils.managers import InheritanceManager
 
-from .validators import date_validator
-
 NEXT_PREV = getattr(settings, "APIS_NEXT_PREV", True)
 
 

@@ -3,6 +3,7 @@ from rest_framework import serializers
 from .models import Institution, Person, Place, Event, Passage
 import re
 
+# TODO __sresch__ : add PublicationSerializer
 
 class BaseEntitySerializer(serializers.HyperlinkedModelSerializer):
     uri_set = serializers.HyperlinkedRelatedField(
