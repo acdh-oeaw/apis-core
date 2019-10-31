@@ -21,4 +21,6 @@ bower_components/
 dist
 build
 apis_core.egg-info
-migrations/
+
+migrations/*
+!migrations/__init__.py
