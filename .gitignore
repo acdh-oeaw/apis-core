@@ -22,5 +22,7 @@ dist
 build
 apis_core.egg-info
 
-migrations/*
+
+# ignore all within all migrations folders except for __init__.py
+**/migrations/*
 !migrations/__init__.py
