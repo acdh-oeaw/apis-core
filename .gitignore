@@ -21,3 +21,9 @@ bower_components/
 dist
 build
 apis_core.egg-info
+
+
+# ignore all within all migrations folders except for __init__.py
+**/migrations/*
+!migrations/__init__.py
+
