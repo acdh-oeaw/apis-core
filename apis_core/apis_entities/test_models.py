@@ -63,6 +63,37 @@ class PersonModelTestCase(TestCase):
         self.assertEqual(p.first_name, self.first_name)
         self.assertEqual(p.start_date_written, self.start_date)
         self.assertEqual(p.start_date, datetime.strptime(self.start_date, '%d.%m.%Y'))
+
+    def test_date_parsing_year(self):
+        p = Person.objects.create(
+            name=self.name,
+            first_name=self.first_name,
+            start_date_written='1880',
+            end_date_written='1890')
+        self.assertEqual(p.start_start_date, datetime.strptime('1.1.1880', '%d.%m.%Y'))
+        self.assertEqual(p.start_end_date, datetime.strptime('31.12.1880', '%d.%m.%Y'))
+        self.assertEqual(p.end_start_date, datetime.strptime('1.1.1890', '%d.%m.%Y'))
+        self.assertEqual(p.end_end_date, datetime.strptime('31.12.1890', '%d.%m.%Y'))
+        self.assertEqual(p.start_date, datetime.strptime('1.7.1880', '%d.%m.%Y'))
+
+    def test_date_parsing_override(self):
+        p = Person.objects.create(
+            name=self.name,
+            first_name=self.first_name,
+            start_date_written='1880<1880-02-01>',
+            end_date_written='1890<1890-05-01>')
+        self.assertEqual(p.start_date, datetime.strptime('1.2.1880', '%d.%m.%Y'))
+        self.assertEqual(p.end_date, datetime.strptime('1.5.1890', '%d.%m.%Y'))
+
+    def test_date_parsing_override_range(self):
+        p = Person.objects.create(
+            name=self.name,
+            first_name=self.first_name,
+            start_date_written='1880<1880-05-01,1880-01-01,1880-12-31>',
+            end_date_written='1890<1890-05-01>')
+        self.assertEqual(p.start_start_date, datetime.strptime('1.1.1880', '%d.%m.%Y'))
+        self.assertEqual(p.start_date, datetime.strptime('1.5.1880', '%d.%m.%Y'))
+        self.assertEqual(p.start_end_date, datetime.strptime('31.12.1880', '%d.%m.%Y'))
 '''
     def test_object_reversion(self):
         with reversion.create_revision():

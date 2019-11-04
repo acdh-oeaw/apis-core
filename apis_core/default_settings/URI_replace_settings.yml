@@ -4,4 +4,4 @@ mappings:
     replace: 'http://sws.geonames.org/{}/'
   - domain: d-nb.info
     regex: '^https?://(?:[^.]*[.])?d-nb.info/gnd/([0-9A-Za-u\-]+)'
-    replace: 'http://d-nb.info/gnd/{}'
+    replace: 'https://d-nb.info/gnd/{}'

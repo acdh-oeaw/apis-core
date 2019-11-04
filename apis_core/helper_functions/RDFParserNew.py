@@ -177,7 +177,7 @@ class RDFParserNew(object):
             getattr(self.objct, obj[0]).add(attr2)
         for obj in self.related_objcts:
             for u3 in obj[1]:
-                ent1 = RDFParserNew(u3, obj[2]).get_or_create(depth=0)
+                ent1 = RDFParserNew(u3, obj[2], uri_check=self._uri_check).get_or_create(depth=0)
                 if obj[2].lower() == self.kind.lower():
                     mod = ContentType.objects.get(model=f"{self.kind.lower()*2}", app_label=self._app_label_relations).model_class()()
                     setattr(mod, 'related_' + self.kind.lower() + 'A_id', self.objct.pk)
@@ -340,7 +340,7 @@ class RDFParserNew(object):
                     if 'string' in self._settings['matching']['attributes'][s].keys():
                         local_string = fmt.format(self._settings['matching']['attributes'][s]['string'], **data)
                     else:
-                        local_string = data[self._settings['matching']['attributes'][s]['identifier'].split('.')[-1]]
+                        local_string = fmt.format("{"+self._settings['matching']['attributes'][s]['identifier'].split('.')[-1]+"}", **data)
                     c_dict[field_name] = self._prep_string(local_string, local_regex, local_linked, local_data_type)
             elif isinstance(fields_1, TForeignKey):
                 data = dict()
@@ -387,7 +387,7 @@ class RDFParserNew(object):
         self.objct = self.objct(**c_dict)
 
     def __init__(self, uri, kind, app_label_entities="apis_entities", app_label_relations="apis_relations",
-                 app_label_vocabularies="apis_vocabularies", use_preferred=False, **kwargs):
+                 app_label_vocabularies="apis_vocabularies", use_preferred=False, uri_check=True, **kwargs):
         """
         :param uri: (url) Uri to parse the object from (http://test.at). The uri must start with a base url mentioned in the RDF parser settings file.
         :param kind: (string) Kind of entity (Person, Place, Institution, Work, Event)
@@ -401,12 +401,14 @@ class RDFParserNew(object):
             if self.objct.objects.filter(uri__uri=uri).count() > 0:
                 return True, self.objct.objects.get(uri__uri=uri)
             else:
-                if uri in RDFParserNew._reserved_uris:
+                if uri in RDFParserNew._reserved_uris and uri_check:
                     raise ValueError("URI used by other instance")
-                else:
+                elif uri_check:
                     RDFParserNew._reserved_uris.append(uri)
                     return False, False
-
+                else:
+                    return False, False
+        self._uri_check = uri_check
         self._use_preferred = use_preferred
         self.objct = ContentType.objects.get(app_label=app_label_entities, model=kind).model_class()
         self._app_label_relations = app_label_relations
@@ -426,6 +428,7 @@ class RDFParserNew(object):
         if test[0] and not force:
             self.objct = test[1]
             self.created = False
+            print('not created')
         else:
             self.created = True
             o = self._parse()
