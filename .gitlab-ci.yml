@@ -1,4 +1,7 @@
 trigger_build:
+  only:
+     refs:
+         - master
   stage: deploy
   script:
     - apk --no-cache add curl
