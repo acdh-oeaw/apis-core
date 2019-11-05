@@ -1,4 +1,5 @@
 trigger_build:
   stage: deploy
   script:
+    - apk --no-cache add curl
     - "curl -X POST -F token=17d81e2942e24da9fa44e8b3acd6a8 -F ref=master https://gitlab.com/api/v4/projects/14495575/trigger/pipeline"
