@@ -603,12 +603,10 @@ class TempEntityClass(models.Model):
             if e_a != e_b:
                 continue
             lt, created = LabelType.objects.get_or_create(name="Legacy name (merge)")
-            l_uri, created = LabelType.objects.get_or_create(name="Legacy URI (merge)")
             Label.objects.create(label=str(ent), label_type=lt, temp_entity=self)
             for u in Uri.objects.filter(entity=ent):
-                Label.objects.create(
-                    label=str(u.uri), label_type=l_uri, temp_entity=self
-                )
+                u.entity = self
+                u.save()
             for l in Label.objects.filter(temp_entity=ent):
                 l.temp_entity = self
                 l.save()
