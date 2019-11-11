@@ -1,3 +1,5 @@
+import time
+
 from django.test import TestCase
 from django.contrib.auth.models import User, Group
 
@@ -212,3 +214,9 @@ class RDFPlaceParserNewTestCase(TestCase):
         
     def test_use_uri_twice(self):
         self.assertRaises(ValueError, RDFParserNew, "http://www.geonames.org/6951114/bad-zell.html", "Place")
+
+    def test_uri_twice_later(self):
+        o = RDFParserNew('https://sws.geonames.org/2778843', 'Place', preserve_uri_minutes=0.5)
+        self.assertRaises(ValueError, RDFParserNew, 'https://sws.geonames.org/2778843', "Place", preserve_uri_minutes=0.5)
+        time.sleep(35)
+        o2 = RDFParserNew('https://sws.geonames.org/2778843', 'Place', preserve_uri_minutes=0.5).get_or_create()

@@ -2,6 +2,7 @@ import json
 import os
 import re
 import string
+import time
 
 import pandas as pd
 import rdflib
@@ -53,13 +54,11 @@ fmt = PartialFormatter()
 
 class RDFParserNew(object):
 
-    _reserved_uris = []
+    _reserved_uris = dict()
 
     @property
     def _settings_complete(self):
-        base_dir = getattr(settings, 'BASE_DIR')
-        sett_file = os.path.join(base_dir, getattr(settings, 'APIS_GENERICRDF_SETTINGS', 'apis_core/default_settings/RDF_default_settings.yml'))
-        sett = yaml.load(open(sett_file, 'r'))
+        sett = yaml.load(open(self._rdf_settings_file, 'r'))
         return sett
 
     @property
@@ -68,9 +67,7 @@ class RDFParserNew(object):
         Reads settings file and saves it
         :return: (dict) dict of settings file
         """
-        base_dir = getattr(settings, 'BASE_DIR')
-        sett_file = os.path.join(base_dir, getattr(settings, 'APIS_GENERICRDF_SETTINGS', 'apis_core/default_settings/RDF_default_settings.yml'))
-        sett = yaml.load(open(sett_file, 'r'))
+        sett = yaml.load(open(self._rdf_settings_file, 'r'))
         res = {'data': []}
         for v in sett[self.kind]['data']:
             if v['base_url'] in self.uri:
@@ -78,6 +75,22 @@ class RDFParserNew(object):
         res['matching'] = sett[self.kind]['matching']
         res['sameAs'] = sameAs
         return res
+
+    def _exist(self, uri, uri_check=True):
+        if self.objct.objects.filter(uri__uri=uri).count() > 0:
+            return True, self.objct.objects.get(uri__uri=uri)
+        else:
+            if uri in RDFParserNew._reserved_uris.keys() and uri_check:
+                if (time.time() - RDFParserNew._reserved_uris[uri]) < (self._preserve_uri_minutes*60):
+                    raise ValueError("URI used by other instance")
+                else:
+                    RDFParserNew._reserved_uris[uri] = time.time()
+                    return False, False
+            elif uri_check:
+                RDFParserNew._reserved_uris[uri] = time.time()
+                return False, False
+            else:
+                return False, False
 
     def _parse(self):
         """
@@ -244,16 +257,13 @@ class RDFParserNew(object):
             string = conv_mapping[data_type](string)
         return string
 
-    @staticmethod
-    def _normalize_uri(uri):
+    def _normalize_uri(self, uri):
         """
         Normalizes URIs to canonical form
         :param uri: (url) URI to normalize
         :return: (url) converted URI
         """
-        base_dir = getattr(settings, 'BASE_DIR')
-        sett_file = os.path.join(base_dir, getattr(settings, 'APIS_GENERICRDF_NORMALIZATION', 'apis_core/default_settings/URI_replace_settings.yml'))
-        sett = yaml.load(open(sett_file, 'r'))
+        sett = yaml.load(open(self._uri_settings_file, 'r'))
         for dom in sett['mappings']:
             if dom['domain'] in uri:
                 m = re.match(dom['regex'], uri)
@@ -387,7 +397,8 @@ class RDFParserNew(object):
         self.objct = self.objct(**c_dict)
 
     def __init__(self, uri, kind, app_label_entities="apis_entities", app_label_relations="apis_relations",
-                 app_label_vocabularies="apis_vocabularies", use_preferred=False, uri_check=True, **kwargs):
+                 app_label_vocabularies="apis_vocabularies", rdf_settings='apis_core/default_settings/RDF_default_settings.yml',
+                 uri_settings="apis_core/default_settings/URI_replace_settings.yml", preserve_uri_minutes=5, use_preferred=False, uri_check=True, **kwargs):
         """
         :param uri: (url) Uri to parse the object from (http://test.at). The uri must start with a base url mentioned in the RDF parser settings file.
         :param kind: (string) Kind of entity (Person, Place, Institution, Work, Event)
@@ -397,17 +408,13 @@ class RDFParserNew(object):
         :param use_preferred: (boolean) if True forwards to preferred sources defined in sameAs
         """
 
-        def exist(uri):
-            if self.objct.objects.filter(uri__uri=uri).count() > 0:
-                return True, self.objct.objects.get(uri__uri=uri)
-            else:
-                if uri in RDFParserNew._reserved_uris and uri_check:
-                    raise ValueError("URI used by other instance")
-                elif uri_check:
-                    RDFParserNew._reserved_uris.append(uri)
-                    return False, False
-                else:
-                    return False, False
+        self._rdf_settings_file = rdf_settings
+        sett_file =  getattr(settings, 'APIS_GENERICRDF_SETTINGS', False)
+        if sett_file:
+            base_dir = getattr(settings, 'BASE_DIR')
+            self._rdf_settings_file = os.path.join(base_dir, sett_file)
+        self._uri_settings_file = uri_settings
+        self._preserve_uri_minutes = preserve_uri_minutes
         self._uri_check = uri_check
         self._use_preferred = use_preferred
         self.objct = ContentType.objects.get(app_label=app_label_entities, model=kind).model_class()
@@ -424,7 +431,7 @@ class RDFParserNew(object):
         self.related_objcts = []
 
         self.saved = False
-        test = exist(self.uri)
+        test = self._exist(self.uri, uri_check=uri_check)
         if test[0] and not force:
             self.objct = test[1]
             self.created = False
