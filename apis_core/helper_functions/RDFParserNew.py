@@ -76,6 +76,15 @@ class RDFParserNew(object):
         res['sameAs'] = sameAs
         return res
 
+    @staticmethod
+    def _clean_uri_store():
+        del_items = []
+        for key, value in RDFParserNew._reserved_uris.items():
+            if (time.time() - value) > (30 * 60):
+                del_items.append(key)
+        for d in del_items:
+            del RDFParserNew._reserved_uris[d]
+
     def _exist(self, uri, uri_check=True):
         if self.objct.objects.filter(uri__uri=uri).count() > 0:
             return True, self.objct.objects.get(uri__uri=uri)
@@ -190,7 +199,7 @@ class RDFParserNew(object):
             getattr(self.objct, obj[0]).add(attr2)
         for obj in self.related_objcts:
             for u3 in obj[1]:
-                ent1 = RDFParserNew(u3, obj[2], uri_check=self._uri_check).get_or_create(depth=0)
+                ent1 = RDFParserNew(u3, obj[2], uri_check=self._uri_check, preserve_uri_minutes=self._preserve_uri_minutes).get_or_create(depth=0)
                 if obj[2].lower() == self.kind.lower():
                     mod = ContentType.objects.get(model=f"{self.kind.lower()*2}", app_label=self._app_label_relations).model_class()()
                     setattr(mod, 'related_' + self.kind.lower() + 'A_id', self.objct.pk)
@@ -408,6 +417,7 @@ class RDFParserNew(object):
         :param use_preferred: (boolean) if True forwards to preferred sources defined in sameAs
         """
 
+        self._clean_uri_store()
         self._rdf_settings_file = rdf_settings
         sett_file =  getattr(settings, 'APIS_GENERICRDF_SETTINGS', False)
         if sett_file:
