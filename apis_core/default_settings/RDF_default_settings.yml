@@ -69,7 +69,8 @@ Place:
     attributes:
       name:
         string: '{prefName}'
-      kind: 
+      kind:
+        domain: geonames.org
         string: '{kind}'
         accessor: name
         regex: null

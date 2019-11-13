@@ -9,7 +9,6 @@ from apis_core.apis_labels.models import Label
 from apis_core.apis_relations.models import PersonPlace
 from reversion.models import Version
 from reversion import revisions as reversion
-from apis_core.helper_functions.RDFparsers import GenericRDFParser
 
 from datetime import datetime
 from guardian.shortcuts import assign_perm, remove_perm, get_objects_for_user

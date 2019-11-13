@@ -786,7 +786,7 @@ class UriCandidate(models.Model):
                 return (label, desc)
 
 
-@receiver(post_save, sender=Uri, dispatch_uid="remove_default_uri")
-def remove_default_uri(sender, instance, **kwargs):
-    if Uri.objects.filter(entity=instance.entity).count() > 1:
-        Uri.objects.filter(entity=instance.entity, domain="apis default").delete()
+#@receiver(post_save, sender=Uri, dispatch_uid="remove_default_uri")
+#def remove_default_uri(sender, instance, **kwargs):
+#    if Uri.objects.filter(entity=instance.entity).count() > 1:
+#        Uri.objects.filter(entity=instance.entity, domain="apis default").delete()
