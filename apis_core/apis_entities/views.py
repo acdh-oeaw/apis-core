@@ -28,7 +28,7 @@ from .models import Person, Place, Institution, Event, Work
 from apis_core.apis_vocabularies.models import LabelType
 from apis_core.apis_metainfo.models import Uri, UriCandidate, TempEntityClass, Text
 from apis_core.helper_functions.stanbolQueries import retrieve_obj
-from apis_core.helper_functions.RDFparsers import GenericRDFParser
+from apis_core.helper_functions.RDFParser import RDFParser
 from apis_core.helper_functions.utils import (
     access_for_all, access_for_all_function, ENTITIES_DEFAULT_COLS
 )
@@ -450,7 +450,7 @@ def resolve_ambigue_place(request, pk, uri):
     with reversion.create_revision():
         uri = 'http://'+uri
         entity = Place.objects.get(pk=pk)
-        pl_n = GenericRDFParser(uri, kind='Place')
+        pl_n = RDFParser(uri, kind='Place').create_objct()
         pl_n_1 = pl_n.save()
         pl_n_1 = pl_n.merge(entity)
         url = pl_n_1.get_absolute_url()
