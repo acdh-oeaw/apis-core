@@ -85,6 +85,7 @@ class RDFParser(object):
             del RDFParser._reserved_uris[d]
 
     def _exist(self, uri, uri_check=True):
+
         if self.objct.objects.filter(uri__uri=uri).count() > 0:
             return True, self.objct.objects.get(uri__uri=uri)
         else:
