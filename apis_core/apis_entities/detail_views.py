@@ -31,6 +31,7 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
         return access
 
     def get(self, request, *args, **kwargs):
+
         entity = kwargs['entity'].lower()
         pk = kwargs['pk']
         entity_model = ContentType.objects.get(

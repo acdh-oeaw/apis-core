@@ -1,0 +1,9 @@
+trigger_build:
+  only:
+     refs:
+         - master
+  stage: deploy
+  trigger: acdh-oeaw/apis/apis-webpage-base
+  variables:
+      APIS_TRIGGERD_BY: 'apis-core'
+      APIS_VERSION: '0.9'

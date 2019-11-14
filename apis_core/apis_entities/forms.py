@@ -20,7 +20,7 @@ from apis_core.apis_vocabularies.models import TextType
 from apis_core.apis_metainfo.models import Text, Uri, Collection
 from apis_core.apis_metainfo.forms import get_date_help_text_from_dates, get_date_help_text_default
 
-from apis_core.helper_functions.RDFparsers import GenericRDFParser
+from apis_core.helper_functions.RDFParser import RDFParser
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.models import AnnotationProject
@@ -256,7 +256,7 @@ def get_entities_form(entity):
 class GenericEntitiesStanbolForm(forms.Form):
     def save(self, *args, **kwargs):
         cd = self.cleaned_data
-        entity = GenericRDFParser(cd['entity'], self.entity.title()).get_or_create()
+        entity = RDFParser(cd['entity'], self.entity.title()).get_or_create()
         return entity
 
     def __init__(self, entity, *args, **kwargs):

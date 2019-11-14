@@ -43,7 +43,7 @@ class Command(BaseCommand):
             action='store',
             dest='entity',
             default='Person',
-            help='Specify a dictionary of filter arguments for the Person queryset.',
+            help='Specify the named entity to serialize.',
         )
 
         parser.add_argument(
@@ -102,6 +102,30 @@ class Command(BaseCommand):
             help='Format to use (xml, trig, n3, turtle, nquads, trix).',
         )
 
+        parser.add_argument(
+            '--provenance',
+            action='store_true',
+            dest='provenance',
+            default=True,
+            help='Specify whether to add void provenance graph (Boolean, Default: True).',
+        )
+
+        parser.add_argument(
+            '--use-cache',
+            action='store_true',
+            dest='use-cache',
+            default=False,
+            help='Set if you want to use the cached files instead of serializing them egain (Boolean, Default: False).',
+        )
+
+        parser.add_argument(
+            '--include-vocabs',
+            action='store_true',
+            dest='include-vocabs',
+            default=False,
+            help='Set if xou want to include the vocabs in the entities graph (Boolean, Default: False).',
+        )
+
     def handle(self, *args, **options):
         ent = ContentType.objects.get(app_label="apis_entities", model=options['entity']).model_class()
         res = []
@@ -109,7 +133,7 @@ class Command(BaseCommand):
         if objcts.filter(uri__uri__icontains=' ').count() > 0:
             self.stdout.write(self.style.ERROR('URIs found that contain whitespaces'))
             return
-        if objcts.count() > 1000:
+        if objcts.count() > 1000 and not options['use-cache']:
             self.stdout.write(self.style.NOTICE('More than 1000 objects, caching'))
             cnt = 0
             while (cnt * 1000) < objcts.count():
@@ -121,24 +145,34 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.NOTICE(f'Pickle written to: serializer_cache/{cnt}.pkl'))
                 cnt += 1
             res = '/home/sennierer/projects/apis-webpage-base/serializer_cache'
-        else:
+        elif not options['use-cache']:
             for e in objcts:
                 res.append(EntitySerializer(e).data)
-
+        elif options['use-cache']:
+            self.stdout.write(self.style.NOTICE('using cache for serializing'))
+            res = '/home/sennierer/projects/apis-webpage-base/serializer_cache'
         self.stdout.write(self.style.SUCCESS(f'serialized {len(res)} objects'))
         self.stdout.write(self.style.NOTICE('Starting to create the graph'))
         store = IOMemory()
-        fin, store = EntityToCIDOC().render(res, format_1=options['format'], store=store, binary=True, named_graph=options['namedgraph'])
+        fin, store = EntityToCIDOC().render(res, format_1=options['format'], store=store, binary=True, named_graph=options['namedgraph'], provenance=options['provenance'])
         if options['update-vocabs']:
             self.stdout.write(self.style.NOTICE('Starting to create the SKOS vocabs.'))
+            if options['include-vocabs']:
+                graph2 = fin
+            else:
+                graph2 = Graph()
             for v in ContentType.objects.filter(app_label="apis_vocabularies").exclude(model__in=["vocabnames"]):
                 v_res = v.model_class().objects.all()
                 if v_res.count() > 0:
                     v_res_ser = GenericVocabsSerializer(v_res, many=True).data
-                    fin = VocabToSkos().render(v_res_ser, g=fin)
+                    graph2 = VocabToSkos().render(v_res_ser, g=graph2)
+            fin_vocab = graph2
         if options['output']:
             with open(options['output'], 'wb') as out:
                 out.write(fin.serialize(format=options['format']))
+            if options['update-vocabs']:
+                with open(f"{options['output'].split('.')[0]+'_vocabs.'+options['output'].split('.')[1]}", 'wb') as out2:
+                    out2.write(fin_vocab.serialize(format=options['format']))
             self.stdout.write(self.style.SUCCESS(f'Wrote file to {options["output"]}'))
         if options['update']:
             if not options['triplestore']:
@@ -162,30 +196,15 @@ class Command(BaseCommand):
                     WHERE {{ ?s ?p ?o }}
                     """
             if options['delete']:
-                if not options['namedgraph']:
-                    sparql_serv.setQuery(sp_count)
-                    res_count_1 = sparql_serv.query().convert()
-                    count = int(res_count_1['results']['bindings'][0]['triples']['value'])
-                    if count > 0:
-                        self.stdout.write(self.style.NOTICE(f'Found {count} triples in named graph >> deleting'))
-                    params = {'c': f'<{base_uri}/entities#>'}
-                    res3 = requests.delete(url, auth=(username, password), headers={'Accept': 'application/xml'}, params=params)
-                    self.stdout.write(self.style.NOTICE(f'Deleted the graph: {res3.text} {res3.status_code}'))
-                    for f in ['class', 'property']:
-                        sparql_serv.setQuery(f"""
-                            PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-                            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
-                            PREFIX void: <http://rdfs.org/ns/void#>
-
-
-                            DELETE WHERE {{
-                                GRAPH <https://omnipot.acdh.oeaw.ac.at/provenance> {{
-                                    <{base_uri}/entities#> void:{f}Partition ?o.
-                                    ?o ?p ?s
-                                    }}
-                                    }}
-                        """)
-                        res4 = sparql_serv.query().convert()
+                sparql_serv.setQuery(sp_count)
+                res_count_1 = sparql_serv.query().convert()
+                count = int(res_count_1['results']['bindings'][0]['triples']['value'])
+                if count > 0:
+                    self.stdout.write(self.style.NOTICE(f'Found {count} triples in named graph >> deleting'))
+                params = {'c': f'<{base_uri}/entities#>'}
+                res3 = requests.delete(url, auth=(username, password), headers={'Accept': 'application/xml'}, params=params)
+                self.stdout.write(self.style.NOTICE(f'Deleted the graph: {res3.text} {res3.status_code}'))
+                for f in ['class', 'property']:
                     sparql_serv.setQuery(f"""
                         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
                         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
@@ -193,13 +212,27 @@ class Command(BaseCommand):
 
 
                         DELETE WHERE {{
-                          GRAPH <https://omnipot.acdh.oeaw.ac.at/provenance> {{
-                            <{base_uri}/entities#> ?p ?o.
-                            
-                        }}
-                        }}
+                            GRAPH <https://omnipot.acdh.oeaw.ac.at/provenance> {{
+                                <{base_uri}/entities#> void:{f}Partition ?o.
+                                ?o ?p ?s
+                                }}
+                                }}
                     """)
-                    res4 = sparql_serv.query()
+                    res4 = sparql_serv.query().convert()
+                sparql_serv.setQuery(f"""
+                    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                    PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+                    PREFIX void: <http://rdfs.org/ns/void#>
+
+
+                    DELETE WHERE {{
+                      GRAPH <https://omnipot.acdh.oeaw.ac.at/provenance> {{
+                        <{base_uri}/entities#> ?p ?o.
+                        
+                    }}
+                    }}
+                """)
+                res4 = sparql_serv.query()
             header = {'Content-Type': map_ct[options['format']][0]}
             res2 = requests.post(url, headers=header, data=fin.serialize(format=options['format']), auth=(username, password))
             sparql_serv.setQuery(sp_count)

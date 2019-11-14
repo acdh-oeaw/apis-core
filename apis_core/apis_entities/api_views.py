@@ -11,7 +11,7 @@ from apis_core.apis_metainfo.models import TempEntityClass, Uri
 from apis_core.apis_relations.models import PersonPlace, InstitutionPlace
 from apis_core.apis_vocabularies.models import VocabsBaseClass
 from apis_core.default_settings.NER_settings import autocomp_settings, stb_base
-from apis_core.helper_functions.RDFparsers import GenericRDFParser
+from apis_core.helper_functions.RDFParser import RDFParser
 from apis_core.helper_functions.stanbolQueries import find_loc
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -393,7 +393,7 @@ class GetOrCreateEntity(APIView):
         entity = request.query_params.get("entity2", None)
         uri = request.query_params.get("uri", None)
         if uri.startswith('http:'):
-            ent = GenericRDFParser(uri, entity.title()).get_or_create()
+            ent = RDFParser(uri, entity.title()).get_or_create()
         else:
             r1 = re.search(r"^[^<]+", uri)
             r2 = re.search(r"<([^>]+)>", uri)
