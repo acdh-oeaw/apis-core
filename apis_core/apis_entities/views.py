@@ -21,9 +21,8 @@ from django.db.models import Q
 from django_tables2 import SingleTableView
 from django_tables2 import RequestConfig
 from django_tables2.export.views import ExportMixin
-
+from .filters import get_list_filter_of_entity
 from apis_core.helper_functions.utils import access_for_all
-
 from .models import Person, Place, Institution, Event, Passage
 from apis_core.apis_vocabularies.models import LabelType
 from apis_core.apis_metainfo.models import Uri, UriCandidate, TempEntityClass, Text
@@ -42,10 +41,6 @@ from .forms import (
 from .tables import (
     PersonTable, PlaceTable, InstitutionTable, EventTable, PassageTable,
     get_entities_table
-)
-from .filters import (
-    PersonListFilter, PlaceListFilter, InstitutionListFilter, EventListFilter, PassageListFilter,
-    get_generic_list_filter
 )
 
 
@@ -143,7 +138,7 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
         qs = ContentType.objects.get(
             app_label__startswith='apis_', model=self.entity.lower()
         ).model_class().objects.all()
-        self.filter = get_generic_list_filter(self.entity.title())(self.request.GET, queryset=qs)
+        self.filter = get_list_filter_of_entity(self.entity.title())(self.request.GET, queryset=qs)
         self.filter.form.helper = self.formhelper_class()
         return self.filter.qs
 

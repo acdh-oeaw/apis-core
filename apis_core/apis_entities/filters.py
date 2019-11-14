@@ -1,212 +1,301 @@
 import django_filters
-from dal import autocomplete
-from django.forms import ModelMultipleChoiceField
-from django.urls import reverse
-
-from .models import Person, Place, Institution, Event, Passage
 from django.db.models import Q
+from apis_core.apis_entities.models import *
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
+
+# The following classes define the filter sets respective to their models.
+# Also by what was enabled in the global settings file (or disabled by not explicitley enabling it).
+# Hence by default all filters of all model's fields (automatically generated) and all filters manually defined below
+# are at first created and then deleted by what was enabled in the settings file
+#
+# There is a few overrides happening here, which are in order:
+# 1.) The filters defined in GenericListFilter
+# 2.) The filters automatically defined in model specific ListFilters (by stating exclude = [] in the Meta class)
+# 3.) The filters manually defined in model specific ListFilters (by manual field definitions in the Filter class itself)
+# If anything is redefined in a step further it overrides the field from the step before
+#
+# Additionally, in the global settings file:
+# The filters defined there can provide a dictionary which can have a "method" or "label" key-value pair
+# where then such a key-value from the settings is overriding the respective key-value of a filter defined in this module
+# (e.g. using a different method)
+
+# TODO __sresch__ : Turn the logic of returing a filter object into a singleton pattern to avoid redundant instantiations
+# TODO __sresch__ : use the order of list of filter fields in settings
+# TODO __sresch__ : make the various filters conjunctive with each other instead of disjunctive as they are now
 
 
-django_filters.filters.LOOKUP_TYPES = [
-    ('', '---------'),
-    ('icontains', 'Contains (case insensitive)'),
-    ('exact', 'Is equal to'),
-    ('iexact', 'Is equal to (case insensitive)'),
-    ('not_exact', 'Is not equal to'),
-    ('lt', 'Lesser than/before'),
-    ('gt', 'Greater than/after'),
-    ('gte', 'Greater than or equal to'),
-    ('lte', 'Lesser than or equal to'),
-    ('startswith', 'Starts with'),
-    ('endswith', 'Ends with'),
-    ('contains', 'Contains'),
-    ('not_contains', 'Does not contain'),
-]
+#######################################################################
+#
+#   Generic super class for sharing filters accross all entities
+#
+#######################################################################
+
+class GenericListFilter(django_filters.FilterSet):
+
+    fields_to_exclude = getattr(settings, "APIS_RELATIONS_FILTER_EXCLUDE", [])
+
+    name = django_filters.CharFilter(method="name_label_filter", label="Name or Label")
+    collection = django_filters.ModelMultipleChoiceFilter(queryset=Collection.objects.all())
+
+    # TODO __sresch__ : look into how the date values can be intercepted so that they can be parsed with the same logic as in edit forms
+    start_date = django_filters.DateFromToRangeFilter()
+    end_date = django_filters.DateFromToRangeFilter()
+
+    # TODO __sresch__ : look into how to change these into auto-complete fields
+    related_entity_name = django_filters.CharFilter(method="related_entity_name_filter", label="related entity")
+    related_relationtype_name = django_filters.CharFilter(method="related_relationtype_name_filter", label="relationtype")
 
 
-def get_generic_list_filter(entity):
-    class GenericListFilter(django_filters.FilterSet):
-        def name_label_filter(self, queryset, name, value):
+    def __init__(self, *args, **kwargs):
+
+        # call super init foremost to create dictionary of filters which will be processed further below
+        super().__init__(*args, **kwargs)
+
+        def eliminate_unused_filters(default_filter_dict):
             """
-            Filter for including the alternative names in the names search. The types of labels included in the query are
-            currently hardcoded in a list.
+            Method to read in from the settings file which filters should be enabled / disabled and if there are
+            methods or labels to override the default ones.
 
-            :param queryset: queryset that the filters are applied on
-            :param name: name of the attribute to filter on (not used as label types are hardcoded)
-            :param value: value for the filter
-            :return: filtered queryset
+            :param default_filter_dict: the default filter dictionary created on filter class instantiation
+                (which comprises filters defined: in GenericListFilter, in specific model ListFilter and their defaults)
+
+            :return: a new dictionary which is a subset of the input dictionary and only contains the filters which
+                are referenced in the settings file (and if there were methods or labels also referenced, using them)
             """
-            alternate_names = getattr(settings, "APIS_ALTERNATE_NAMES", ['alternative name'])
-            res = []
-            orig_value = value
-            for n in ['name', 'label__label']:
-                value = orig_value
-                f = '{}__'.format(n)
-                if value.startswith('"') and value.endswith('"'):
-                    value = value[1:-1]
-                else:
-                    f += 'i'
-                if value.startswith('*') and value.endswith('*'):
-                    f += 'contains'
-                    value = value[1:-1]
-                elif value.startswith('*'):
-                    f += 'endswith'
-                    value = value[1:]
-                elif value.endswith('*'):
-                    f += 'startswith'
-                    value = value[:-1]
-                else:
-                    f += 'exact'
-                if n == 'label__label':
-                    res.append(Q(**{f: value, 'label__label_type__name__in': alternate_names}))
-                else:
-                    res.append(Q(**{f: value}))
-            return queryset.filter(res[0] | res[1] ).distinct()
 
-        def wildcard_filter(self, queryset, name, value):
-            f = '{}__'.format(name)
-            if value.startswith('"') and value.endswith('"'):
-                value = value[1:-1]
-            else:
-                f += 'i'
-            if value.startswith('*') and value.endswith('*'):
-                f += 'contains'
-                value = value[1:-1]
-            elif value.startswith('*'):
-                f += 'endswith'
-                value = value[1:]
-            elif value.endswith('*'):
-                f += 'startswith'
-                value = value[:-1]
-            else:
-                f += 'exact'
-            return queryset.filter(**{f: value})
+            enabled_filters = settings.APIS_ENTITIES[self.Meta.model.__name__]["list_filters"]
 
-        class Meta:
-            model = ContentType.objects.get(
-                app_label__startswith='apis_', model=entity.lower()).model_class()
+            filter_dict_tmp = {}
 
-            try:
-                if 'list_filters' in settings.APIS_ENTITIES[entity.title()].keys():
-                    fields = [
-                        x[0] for x in settings.APIS_ENTITIES[entity.title()]['list_filters']
-                    ]
-            except KeyError:
-                exclude = ('MetaInfo',
-                           'collection',
-                           'references',
-                           'notes',
-                           'review',
-                           'start_date_written',
-                           'end_date_written',
-                           'source',
-                           'tempentityclass_ptr',
-                           'id',
-                           'annotation_set_relation',
-                           'text')
+            for enabled_filter in enabled_filters:
 
-        def __init__(self, *args, **kwargs):
-            attrs = {'data-placeholder': 'Type to get suggestions',
-                     'data-minimum-input-length': 3,
-                     'data-html': True}
-            super(GenericListFilter, self).__init__(*args, **kwargs)
-            try:
-                if 'list_filters' in settings.APIS_ENTITIES[entity.title()].keys():
-                    for f in settings.APIS_ENTITIES[entity.title()]['list_filters']:
-                        for ff in f[1].keys():
-                            setattr(self.filters[f[0]], ff, f[1][ff])
-            except KeyError:
-                pass
-            for f in self.filters.keys():
-                if type(self.filters[f].field) == ModelMultipleChoiceField:
-                    v_name_p = str(self.filters[f].queryset.model.__name__)
-                    if ContentType.objects.get(app_label__in=[
-                        'apis_entities', 'apis_metainfo', 'apis_relations',
-                        'apis_vocabularies', 'apis_labels'
-                    ], model=v_name_p.lower()).app_label.lower() == 'vocabularies':
-                        self.filters[f].field.widget = autocomplete.Select2Multiple(
-                            url=reverse('vocabularies:generic_vocabularies_autocomplete', kwargs={
-                                'vocab': v_name_p.lower(),
-                                'direct': 'normal'
-                            }),
-                            attrs=attrs)
+                if type(enabled_filter) == str and enabled_filter in default_filter_dict:
+                    # If string then just use it, if a filter with such a name is already defined
 
-    return GenericListFilter
+                    filter_dict_tmp[enabled_filter] = default_filter_dict[enabled_filter]
 
 
-class PersonListFilter(django_filters.FilterSet):
-    FILTER_CHOICES = (('', 'any'), ('male', 'male'), ('female', 'female'))
-    name = django_filters.CharFilter(method='name_label_filter', label='Name')
-    first_name = django_filters.CharFilter(lookup_expr='icontains', label='First Name')
-    gender = django_filters.ChoiceFilter(choices=FILTER_CHOICES)
-    start_date = django_filters.DateFilter(label='Date of birth') # Todo: add a datefilter that allows to filter for ranges
-    end_date = django_filters.DateFilter(label='Date of death')
+                elif type(enabled_filter) == dict:
+                    # if a dictionary, then look further into if there is a method or label which overrides the defaults
 
-    # TODO __sresch__ remove
-    # profession__name = django_filters.CharFilter(lookup_expr='icontains', label='Profession')
+                    enabled_filter_key = list(enabled_filter.keys())[0]
+
+                    if enabled_filter_key in default_filter_dict:
+
+                        # get the dictionary which contains potential method or label overrides
+                        enabled_filter_settings_dict = enabled_filter[enabled_filter_key]
+
+                        if "method" in enabled_filter_settings_dict:
+                            default_filter_dict[enabled_filter_key].method = enabled_filter_settings_dict["method"]
+
+                        if "label" in enabled_filter_settings_dict:
+                            default_filter_dict[enabled_filter_key].label = enabled_filter_settings_dict["label"]
+
+                        filter_dict_tmp[enabled_filter_key] = default_filter_dict[enabled_filter_key]
+
+                    else:
+                        raise ValueError("Expected either str or dict as type for an individual filter in the settings file.",
+                                "\nGot instead:", type(enabled_filter))
+
+            return filter_dict_tmp
+
+        self.filters = eliminate_unused_filters(self.filters)
+
+
+
+    def construct_lookup_from_wildcard(self, value):
+        """
+        Parses user input for wildcards and returns a tuple containing the interpreted django lookup string and the trimmed value
+        E.g.
+            "*example" -> ("__iendswith", "example")
+            "example*" -> ("__istartswith", "example")
+            "*example*" -> ("__icontains", "example")
+            ""example"" -> ("__exact", "example")
+
+        :param value : str : text to be parsed for *
+        :return: (lookup : str, value : str)
+        """
+
+        search_startswith = False
+        search_endswith = False
+
+        if value.startswith("*"):
+            value = value[1:]
+            search_startswith = True
+
+        if value.endswith("*"):
+            value = value[:-1]
+            search_endswith = True
+
+        if search_startswith and not search_endswith:
+            return "__iendswith", value
+
+        elif not search_startswith and search_endswith:
+            return "__istartswith", value
+
+        elif search_startswith and search_endswith:
+            return "__icontains", value
+
+        else:
+            return "__exact", value
+
+
+    def string_wildcard_filter(self, queryset, name, value):
+        lookup, value = self.construct_lookup_from_wildcard(value)
+        return queryset.filter(**{name + lookup : value})
+
+
+
+    def name_label_filter(self, queryset, name, value):
+        # TODO __sresch__ : include alternative names queries
+
+        lookup, value = self.construct_lookup_from_wildcard(value)
+
+        queryset_related_label=queryset.filter(**{"label__label"+lookup : value})
+        queryset_self_name=queryset.filter(**{name+lookup : value})
+
+        return queryset_related_label.union(queryset_self_name).distinct().order_by("name")
+
+
+
+    def related_entity_name_filter(self, queryset, name, value):
+
+        lookup, value = self.construct_lookup_from_wildcard(value)
+
+        q_args = Q()
+
+        for entity_field_name in queryset.model.get_related_entity_field_names():
+
+            q_args = q_args | Q(**{entity_field_name + "__name"+lookup : value})
+
+        return queryset.filter(q_args).distinct().order_by("name")
+
+
+
+    def related_relationtype_name_filter(self, queryset, name, value):
+
+        lookup_detail, value = self.construct_lookup_from_wildcard(value)
+
+        q_args = Q()
+
+        for relationtype_field_name in queryset.model.get_related_relationtype_field_names():
+
+            base_lookup = relationtype_field_name + "__name" + lookup_detail
+            q_args = q_args | Q(**{base_lookup : value})
+
+        return queryset.filter(q_args).distinct().order_by("name")
+
+
+
+
+#######################################################################
+#
+#   Overriding Entity filter classes
+#
+#######################################################################
+
+
+class PersonListFilter(GenericListFilter):
+
+    gender = django_filters.ChoiceFilter(choices=(('', 'any'), ('male', 'male'), ('female', 'female')))
+    profession = django_filters.CharFilter(method="string_wildcard_filter")
+    title = django_filters.CharFilter(method="string_wildcard_filter")
+    name = django_filters.CharFilter(method="person_name_filter", label="Name or Label of person")
 
     class Meta:
         model = Person
-
-        # TODO __sresch__ remove
-        # fields = ['name', 'first_name', 'gender', 'start_date', 'end_date', 'profession__name', 'collection']
-
-        fields = ['name', 'first_name', 'gender', 'start_date', 'end_date', 'collection']
-
-    def name_label_filter(self, queryset, name, value):
-        """
-        Filter for including the alternative names in the names search. The types of labels included in the query are
-        currently hardcoded in a list.
-
-        :param queryset: queryset that the filters are applied on
-        :param name: name of the attribute to filter on (not used as label types are hardcoded)
-        :param value: value for the filter
-        :return: filtered queryset
-        """
-        return queryset.filter(Q(name__icontains=value)|
-                               Q(label__label__icontains=value, label__label_type__name__in=alternate_names)).distinct()
+        exclude = GenericListFilter.fields_to_exclude
 
 
-class PlaceListFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(lookup_expr='icontains', label='Name')
-    lng = django_filters.NumberFilter(label='Longitude') # Todo: add filters that allow ranges
+    def person_name_filter(self, queryset, name, value):
+
+        queryset_standard_name=self.name_label_filter(queryset, name, value)
+
+        # TODO __sresch__ : Look into why the commented code below does not work. Union of the two querysets throws an exception for some reason.
+        # lookup, value = self.construct_lookup_from_wildcard(value)
+        #
+        # queryset_first_name=queryset.filter(**{"first_name"+lookup : value})
+        #
+        # result_qs = queryset_standard_name.union(queryset_first_name)
+        # return result_qs
+        #
+        # until the above is fixed, return this queryset
+        return queryset_standard_name
+
+
+
+
+class PlaceListFilter(GenericListFilter):
+
+    # TODO __sresch__ : decide on margin tolerance of input, for now the number must be precise
+    lng = django_filters.NumberFilter(label='Longitude')
     lat = django_filters.NumberFilter(label='Latitude')
-    status = django_filters.CharFilter(lookup_expr='icontains')
 
     class Meta:
         model = Place
-        fields = ['name', 'status', 'lng', 'lat', 'collection']
+        exclude = GenericListFilter.fields_to_exclude
 
 
-class InstitutionListFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(lookup_expr='icontains', label='Name')
-    start_date = django_filters.DateFilter(label='Date of foundation')
-    end_date = django_filters.DateFilter(label='Date of closing')
+class InstitutionListFilter(GenericListFilter):
 
     class Meta:
         model = Institution
-        fields = ['name', 'start_date', 'end_date', 'collection']
+        exclude = GenericListFilter.fields_to_exclude
 
 
-class EventListFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(lookup_expr='icontains', label='Name')
-    start_date = django_filters.DateFilter(label='Start date')
-    end_date = django_filters.DateFilter(label='End date')
-    kind__name = django_filters.CharFilter(lookup_expr='icontains', label='Kind')
+
+class EventListFilter(GenericListFilter):
 
     class Meta:
         model = Event
-        fields = ['name', 'start_date', 'end_date', 'kind__name', 'collection']
+        exclude = GenericListFilter.fields_to_exclude
 
 
-class PassageListFilter(django_filters.FilterSet):
-    name = django_filters.CharFilter(lookup_expr='icontains', label='Name')
-    start_date = django_filters.DateFilter(label='Start date')
-    end_date = django_filters.DateFilter(label='End date')
-    kind__name = django_filters.CharFilter(lookup_expr='icontains', label='Kind')
+
+class PassageListFilter(GenericListFilter):
+
+    kind = django_filters.ModelChoiceFilter(queryset=PassageType.objects.all())
 
     class Meta:
         model = Passage
-        fields = ['name', 'start_date', 'end_date', 'kind__name', 'collection']
+        exclude = GenericListFilter.fields_to_exclude
+
+
+
+class PublicationListFilter(GenericListFilter):
+
+    class Meta:
+        model = Publication
+        exclude = GenericListFilter.fields_to_exclude
+
+
+def get_list_filter_of_entity(entity):
+    """
+    Main method to be called somewhere else in the codebase in order to get the FilterClass respective to the entity string input
+
+    :param entity: str: type of entity
+    :return: Entity specific FilterClass
+    """
+
+    el = entity.lower()
+
+    if el == "person":
+        return PersonListFilter
+
+    elif el == "place":
+        return PlaceListFilter
+
+    elif el == "institution":
+        return InstitutionListFilter
+
+    elif el == "event":
+        return EventListFilter
+
+    elif el == "passage":
+        return PassageListFilter
+
+    elif el == "publication":
+        return PublicationListFilter
+
+    else:
+        raise ValueError("Could not find respective filter for given entity type:", el)
