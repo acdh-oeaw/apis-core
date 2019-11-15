@@ -203,7 +203,7 @@ class PersonListFilter(GenericListFilter):
     class Meta:
         model = Person
         # exclude nothings means to load all fields of given model and use them as filters respective to their type
-        exclude = []
+        exclude = getattr(settings, 'APIS_RELATIONS_FILTER_EXCLUDE', [])
 
 
     def person_name_filter(self, queryset, name, value):
@@ -233,7 +233,7 @@ class PlaceListFilter(GenericListFilter):
     class Meta:
         model = Place
         # exclude nothings means to load all fields of given model and use them as filters respective to their type
-        exclude = []
+        exclude = getattr(settings, 'APIS_RELATIONS_FILTER_EXCLUDE', [])
 
 
 
@@ -242,7 +242,7 @@ class InstitutionListFilter(GenericListFilter):
     class Meta:
         model = Institution
         # exclude nothings means to load all fields of given model and use them as filters respective to their type
-        exclude = []
+        exclude = getattr(settings, 'APIS_RELATIONS_FILTER_EXCLUDE', [])
 
 
 
@@ -251,7 +251,7 @@ class EventListFilter(GenericListFilter):
     class Meta:
         model = Event
         # exclude nothings means to load all fields of given model and use them as filters respective to their type
-        exclude = []
+        exclude = getattr(settings, 'APIS_RELATIONS_FILTER_EXCLUDE', [])
 
 
 
@@ -262,7 +262,7 @@ class WorkListFilter(GenericListFilter):
     class Meta:
         model = Work
         # exclude nothings means to load all fields of given model and use them as filters respective to their type
-        exclude = []
+        exclude = getattr(settings, 'APIS_RELATIONS_FILTER_EXCLUDE', [])
 
 
 def get_list_filter_of_entity(entity):
