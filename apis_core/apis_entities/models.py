@@ -627,8 +627,12 @@ class Work(GenericEntity):
 @receiver(post_save, sender=Place, dispatch_uid="create_default_uri")
 def create_default_uri(sender, instance, **kwargs):
     if kwargs['created']:
-        uri_c = "http://{}{}".format(
-            BASE_URI,
+        if BASE_URI.endswith('/'):
+            base1 = BASE_URI[:-1]
+        else:
+            base1 = BASE_URI
+        uri_c = "{}{}".format(
+            base1,
             reverse("apis_core:apis_api2:GetEntityGeneric", kwargs={"pk": instance.pk}),
         )
         uri2 = Uri(uri=uri_c, domain="apis default", entity=instance)
