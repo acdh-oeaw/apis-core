@@ -50,6 +50,16 @@
                         </div>
                         <div class="card-body">
                             <form action="" method="post">
+
+                                <button
+                                        hidden=True
+                                        class="bibsonomy-anker-hidden"
+                                        data-bibs-contenttype={{ entity_type }}
+                                        data-bibs-object_pk={{instance.pk}}
+                                        data-bibs-form-elements="first_name|name|start_date_written|end_date_written|lat">
+                                    Ref
+                                </button>
+
                                 <div class="card card-default">
 
                             	{% crispy form %}

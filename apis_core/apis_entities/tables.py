@@ -1,8 +1,10 @@
 import django_tables2 as tables
+from django.db.models import Q
 from django_tables2.utils import A
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from django.utils.safestring import mark_safe
+
 
 from .models import Person, Place, Institution, Event, Passage
 
@@ -48,11 +50,57 @@ def get_entities_table(entity, edit_v, default_cols=['name', ]):
         if 'id' in default_cols:
             id = tables.LinkColumn()
 
+        if entity.lower() == "passage" or entity.lower() == "publication":
+            person_set = tables.Column(verbose_name="Urheber")
+
         class Meta:
             model = ContentType.objects.get(
                 app_label__startswith='apis_', model=entity.lower()).model_class()
-            fields = default_cols
+
+            fields = None
+
+            # TODO __sresch__ : prototype for now; implement this better
+            if model.__name__ == "Passage" or model.__name__ == "Publication":
+                fields = ['person_set'] + default_cols
+            else:
+                fields = default_cols
             attrs = {"class": "table table-hover table-striped table-condensed"}
+
+        # TODO __sresch__ : prototype for now; implement this better
+        def render_person_set(self, record):
+
+            from apis_core.apis_vocabularies.models import PersonPublicationRelation
+            from apis_core.apis_vocabularies.models import PassagePublicationRelation
+
+            urheber_relation = PersonPublicationRelation.objects.get(name="ist Urheber von")
+
+            if record.__class__.__name__ == "Publication":
+
+                urheber = record.person_set.filter( Q(publication_relationtype_set=urheber_relation) & Q(publication_set=record))
+
+                result_string = ", ".join([str(p.name) for p in urheber])
+
+                return result_string
+
+            elif record.__class__.__name__ == "Passage":
+
+                pubs = record.publication_set.all()
+
+                urheber_list = []
+
+                for pub in pubs:
+                    urheber = pub.person_set.filter( Q(publication_relationtype_set=urheber_relation) & Q(publication_set=pub))
+                    urheber_list.extend(list(urheber.all()))
+
+                result_string = ", ".join([str(p.name) for p in urheber_list])
+
+                return result_string
+
+            else:
+
+                return "-"
+
+
     return GenericEntitiesTable
 
 
