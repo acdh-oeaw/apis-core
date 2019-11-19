@@ -9,7 +9,7 @@ import pandas as pd
 import rdflib
 import yaml
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import FieldError
+from django.core.exceptions import FieldError, MultipleObjectsReturned
 from rdflib import URIRef, RDFS
 from rdflib.namespace import SKOS, OWL
 
@@ -178,8 +178,11 @@ class RDFParser(object):
                 return exist[0].entity
         self.objct.status = 'distinct'
         for obj in self._foreign_keys:
-            attr2, created = obj[1].objects.get_or_create(**obj[2])
-            setattr(self.objct, obj[0], attr2)
+            try:
+                attr2, created = obj[1].objects.get_or_create(**obj[2])
+                setattr(self.objct, obj[0], attr2)
+            except MultipleObjectsReturned:
+                pass
         self.objct.save()
         def_coll, created = Collection.objects.get_or_create(name='Default import collection')
         self.objct.collection.add(def_coll)
@@ -195,8 +198,11 @@ class RDFParser(object):
         self.labels = lab_new
         rel_obj_new = []
         for obj in self._m2m:
-            attr2, created = obj[1].objects.get_or_create(**obj[2])
-            getattr(self.objct, obj[0]).add(attr2)
+            try:
+                attr2, created = obj[1].objects.get_or_create(**obj[2])
+                getattr(self.objct, obj[0]).add(attr2)
+            except MultipleObjectsReturned:
+                pass
         for obj in self.related_objcts:
             for u3 in obj[1]:
                 ent1 = RDFParser(u3, obj[2], uri_check=self._uri_check, preserve_uri_minutes=self._preserve_uri_minutes).get_or_create(depth=0)
@@ -408,8 +414,8 @@ class RDFParser(object):
         self.objct = self.objct(**c_dict)
 
     def __init__(self, uri, kind, app_label_entities="apis_entities", app_label_relations="apis_relations",
-                 app_label_vocabularies="apis_vocabularies", rdf_settings='apis_core/default_settings/RDF_default_settings.yml',
-                 uri_settings="apis_core/default_settings/URI_replace_settings.yml", preserve_uri_minutes=5, use_preferred=False, uri_check=True, **kwargs):
+                 app_label_vocabularies="apis_vocabularies", rdf_settings=os.path.join(settings.BASE_DIR, 'apis_core', 'default_settings', 'RDF_default_settings.yml'),
+                 uri_settings=os.path.join(settings.BASE_DIR, 'apis_core', 'default_settings', "URI_replace_settings.yml"), preserve_uri_minutes=5, use_preferred=False, uri_check=True, **kwargs):
         """
         :param uri: (url) Uri to parse the object from (http://test.at). The uri must start with a base url mentioned in the RDF parser settings file.
         :param kind: (string) Kind of entity (Person, Place, Institution, Work, Event)
