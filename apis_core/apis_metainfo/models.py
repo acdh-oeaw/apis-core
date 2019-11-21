@@ -603,6 +603,16 @@ class TempEntityClass(models.Model):
             if e_a != e_b:
                 continue
             lt, created = LabelType.objects.get_or_create(name="Legacy name (merge)")
+            col_list = list(self.collection.all())
+            for col2 in ent.collection.all():
+                if col2 not in col_list:
+                    self.collection.add(col2)
+            for f in ent._meta.local_many_to_many:
+                if not f.name.endswith('_set'):
+                    sl = list(getattr(self, f.name).all())
+                    for s in getattr(ent, f.name).all():
+                        if s not in sl:
+                            getattr(self, f.name).add(s)
             Label.objects.create(label=str(ent), label_type=lt, temp_entity=self)
             for u in Uri.objects.filter(entity=ent):
                 u.entity = self

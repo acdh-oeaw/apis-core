@@ -4,7 +4,7 @@ from django.urls import reverse
 
 from .models import Person, Place, Institution, Work, Event
 from apis_core.apis_metainfo.models import Text, Collection, Source, Uri, UriCandidate
-from apis_core.apis_vocabularies.models import PersonPlaceRelation
+from apis_core.apis_vocabularies.models import PersonPlaceRelation, ProfessionType
 from apis_core.apis_labels.models import Label
 from apis_core.apis_relations.models import PersonPlace
 from reversion.models import Version
@@ -22,14 +22,20 @@ class PersonModelTestCase(TestCase):
     first_name = 'test first name'
     text = 'kjhkjsdhaslkdhadh lasdjalsk alsjdhaksjdh'
     col_name = 'Test collection'
+    col_name2 = 'Test collection2'
     start_date = '1.3.1930'
     end_date = '4.6.1960'
+    prof1 = 'Lehrer'
+    prof2 = 'Politiker'
 
     @classmethod
     def setUpTestData(cls):
         # Set up data for the whole TestCase
         cls.txt = Text.objects.create(text=cls.text)
         cls.col = Collection.objects.create(name=cls.col_name)
+        cls.col2 = Collection.objects.create(name=cls.col_name2)
+        cls.prof1 = ProfessionType.objects.create(name=cls.prof1)
+        cls.prof2 = ProfessionType.objects.create(name=cls.prof2)
 
     def test_init(self):
         Person()
@@ -93,6 +99,22 @@ class PersonModelTestCase(TestCase):
         self.assertEqual(p.start_start_date, datetime.strptime('1.1.1880', '%d.%m.%Y'))
         self.assertEqual(p.start_date, datetime.strptime('1.5.1880', '%d.%m.%Y'))
         self.assertEqual(p.start_end_date, datetime.strptime('31.12.1880', '%d.%m.%Y'))
+
+    def test_merge_entities(self):
+        p1 = Person.objects.create(
+            name='person1'
+        )
+        p2 = Person.objects.create(
+            name='person2'
+        )
+        p1.collection.add(self.col)
+        p1.profession.add(self.prof1)
+        p2.collection.add(self.col2)
+        p2.profession.add(self.prof2)
+        p1.merge_with(p2)
+        self.assertEqual(p1.collection.all().count(), 2)
+        self.assertEqual(p1.profession.all().count(), 2)
+
 '''
     def test_object_reversion(self):
         with reversion.create_revision():
