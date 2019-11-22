@@ -5,7 +5,7 @@ app_name = 'apis_metainfo'
 
 urlpatterns = [
     url(
-        r'^uri/$',
+        r'^apis/metainfo/uri/$',
         views.UriListView.as_view(),
         name='uri_browse'
     ),
