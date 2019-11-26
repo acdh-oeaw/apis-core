@@ -2,6 +2,7 @@ from dal import autocomplete
 
 from django.contrib import admin
 from django.apps import apps
+from django.conf import settings
 from django.urls import reverse
 from .models import PersonInstitutionRelation
 
@@ -36,7 +37,7 @@ class VocabsRelationAdmin(BaseAdminVocabularies):
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         attrs = {'data-placeholder': 'Type to get suggestions',
-                 'data-minimum-input-length': 3,
+                 'data-minimum-input-length': getattr(settings, "APIS_MIN_CHAR", 3),
                  'data-html': True}
         c_name = db_field.model.__name__
         qs = super(BaseAdminVocabularies, self).get_queryset(request)

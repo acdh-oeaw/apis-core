@@ -140,7 +140,7 @@ def get_generic_relation_filter(entity):
 
         def __init__(self, *args, **kwargs):
             attrs = {'data-placeholder': 'Type to get suggestions',
-                     'data-minimum-input-length': 3,
+                     'data-minimum-input-length': getattr(settings, "APIS_MIN_CHAR", 3),
                      'data-html': True}
             super(GenericListFilter, self).__init__(*args, **kwargs)
             for x in self.filters.keys():

@@ -76,7 +76,7 @@ def get_entities_form(entity):
                         'notes',
                         'review')
             attrs = {'data-placeholder': 'Type to get suggestions',
-                     'data-minimum-input-length': 1,
+                     'data-minimum-input-length': getattr(settings, "APIS_MIN_CHAR", 3),
                      'data-html': True}
 
             # list to catch all fields that will not be inserted into accordion group acc_grp2
@@ -261,7 +261,7 @@ class GenericEntitiesStanbolForm(forms.Form):
 
     def __init__(self, entity, *args, **kwargs):
         attrs = {'data-placeholder': 'Type to get suggestions',
-                 'data-minimum-input-length': 3,
+                 'data-minimum-input-length': getattr(settings, "APIS_MIN_CHAR", 3),
                  'data-html': True,
                  'style': 'width: auto'}
         ent_merge_pk = kwargs.pop('ent_merge_pk', False)
@@ -406,12 +406,12 @@ class NetworkVizFilterForm(forms.Form):
     def __init__(self, *args, **kwargs):
         rel_attrs = {
             'data-placeholder': 'Type to get suggestions',
-            'data-minimum-input-length': 0,
+            'data-minimum-input-length': getattr(settings, "APIS_MIN_CHAR", 3),
             'data-html': True
         }
         attrs = {
             'data-placeholder': 'Type to get suggestions',
-            'data-minimum-input-length': 0,
+            'data-minimum-input-length': getattr(settings, "APIS_MIN_CHAR", 3),
             'data-html': True
         }
         super(NetworkVizFilterForm, self).__init__(*args, **kwargs)
