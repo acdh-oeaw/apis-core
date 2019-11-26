@@ -130,7 +130,7 @@ class GenericRelationForm(forms.ModelForm):
         :type highlighter: bool
         """
         attrs = {'data-placeholder': 'Type to get suggestions',
-                 'data-minimum-input-length': 3,
+                 'data-minimum-input-length': getattr(settings, "APIS_MIN_CHAR", 3),
                  'data-html': True,
                  'style': 'width: 100%'}
         css_notes = 'LS'
@@ -272,4 +272,3 @@ class GenericRelationForm(forms.ModelForm):
             )
         else:
             self.fields['end_date_written'].help_text = get_date_help_text_default()
-
