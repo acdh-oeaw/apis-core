@@ -196,8 +196,8 @@ class GenericListFilter(django_filters.FilterSet):
 class PersonListFilter(GenericListFilter):
 
     gender = django_filters.ChoiceFilter(choices=(('', 'any'), ('male', 'male'), ('female', 'female')))
-    profession = django_filters.CharFilter(method="string_wildcard_filter")
-    title = django_filters.CharFilter(method="string_wildcard_filter")
+    profession = django_filters.CharFilter(method="string_wildcard_filter", field_name='profession__name')
+    title = django_filters.CharFilter(method="string_wildcard_filter", field_name="title__name")
     name = django_filters.CharFilter(method="person_name_filter", label="Name or Label of person")
 
     class Meta:
