@@ -23,6 +23,18 @@ from django.db.models.fields.related import ForeignKey as TForeignKey
 from django.db.models.fields.related import ManyToManyField as TManyToMany
 from django.conf import settings
 
+APIS_RDF_YAML_SETTINGS = getattr(
+        settings,
+        'APIS_RDF_YAML_SETTINGS',
+        os.path.join(settings.BASE_DIR, 'apis_core', 'default_settings', 'RDF_default_settings.yml')
+    )
+
+APIS_RDF_URI_SETTINGS = getattr(
+        settings,
+        'APIS_RDF_URI_SETTINGS',
+        os.path.join(settings.BASE_DIR, 'apis_core', 'default_settings', "URI_replace_settings.yml")
+    )
+
 
 def clean_uri(sett, uri):
     for dom in sett['mappings']:
@@ -418,8 +430,8 @@ class RDFParser(object):
         self.objct = self.objct(**c_dict)
 
     def __init__(self, uri, kind, app_label_entities="apis_entities", app_label_relations="apis_relations",
-                 app_label_vocabularies="apis_vocabularies", rdf_settings=os.path.join(settings.BASE_DIR, 'apis_core', 'default_settings', 'RDF_default_settings.yml'),
-                 uri_settings=os.path.join(settings.BASE_DIR, 'apis_core', 'default_settings', "URI_replace_settings.yml"), preserve_uri_minutes=5, use_preferred=False, uri_check=True, **kwargs):
+                 app_label_vocabularies="apis_vocabularies", rdf_settings=APIS_RDF_YAML_SETTINGS,
+                 uri_settings=APIS_RDF_URI_SETTINGS, preserve_uri_minutes=5, use_preferred=False, uri_check=True, **kwargs):
         """
         :param uri: (url) Uri to parse the object from (http://test.at). The uri must start with a base url mentioned in the RDF parser settings file.
         :param kind: (string) Kind of entity (Person, Place, Institution, Work, Event)
