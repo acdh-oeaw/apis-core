@@ -25,7 +25,8 @@ class TeiEntAc(autocomplete.Select2ListView):
         for r in res[offset:offset+page_size]:
             dates = "time: {} - {}".format(r.start_date, r.end_date)
             f = dict()
-            f['id'] = "{}".format(str(r.id))
+            print(r.uri_set.all()[0])
+            f['id'] = "{}".format(r.uri_set.all()[0])
             if ac_type == 'institution':
                 f['type'] = "org"
             else:
