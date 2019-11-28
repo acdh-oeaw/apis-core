@@ -24,6 +24,15 @@ from django.db.models.fields.related import ManyToManyField as TManyToMany
 from django.conf import settings
 
 
+def clean_uri(sett, uri):
+    for dom in sett['mappings']:
+        if dom['domain'] in uri:
+            m = re.match(dom['regex'], uri)
+            if m:
+                uri = dom['replace'].format(m.group(1))
+    return uri
+
+
 class PartialFormatter(string.Formatter):
 
     def __init__(self, missing='-', bad_fmt='!!'):
@@ -34,7 +43,7 @@ class PartialFormatter(string.Formatter):
             val = super().get_field(field_name, args, kwargs)
         except (KeyError, AttributeError):
             val = None, field_name
-        return val 
+        return val
 
     def format_field(self, value, spec):
         if value is None:
@@ -280,12 +289,7 @@ class RDFParser(object):
         :return: (url) converted URI
         """
         sett = yaml.load(open(self._uri_settings_file, 'r'))
-        for dom in sett['mappings']:
-            if dom['domain'] in uri:
-                m = re.match(dom['regex'], uri)
-                if m:
-                    uri = dom['replace'].format(m.group(1))
-        return uri
+        return clean_uri(sett, uri)
 
     def merge(self, m_obj, app_label_relations='apis_relations'):
         """
@@ -457,4 +461,3 @@ class RDFParser(object):
         else:
             self.created = True
             o = self._parse()
-
