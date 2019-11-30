@@ -443,7 +443,8 @@ def resolve_ambigue_place(request, pk, uri):
     with reversion.create_revision():
         uri = 'http://'+uri
         entity = Place.objects.get(pk=pk)
-        pl_n = RDFParser(uri, kind='Place').create_objct()
+        pl_n = RDFParser(uri, kind='Place')
+        pl_n.create_objct()
         pl_n_1 = pl_n.save()
         pl_n_1 = pl_n.merge(entity)
         url = pl_n_1.get_absolute_url()
