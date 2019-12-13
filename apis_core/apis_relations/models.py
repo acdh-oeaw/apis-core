@@ -813,8 +813,8 @@ def generate_relation_fields():
                             blank=True,
                             null=True,
                             on_delete=models.CASCADE,
-                            related_name=entity_class_name * 2 + "B"
-                            # related_name=relation_field_name_b
+                            # related_name=entity_class_name * 2 + "B"
+                            related_name=relation_field_name_b
                         ).contribute_to_class(relation_class, relation_field_name_a)
 
                         models.ForeignKey(
@@ -822,8 +822,8 @@ def generate_relation_fields():
                             blank=True,
                             null=True,
                             on_delete=models.CASCADE,
-                            related_name=entity_class_name * 2 + "A"
-                            # related_name=relation_field_name_a
+                            # related_name=entity_class_name * 2 + "A"
+                            related_name=relation_field_name_a
                         ).contribute_to_class(relation_class, relation_field_name_b)
 
 
@@ -839,24 +839,6 @@ def generate_relation_fields():
                         relation_class.get_related_entity_nameB = \
                             create_function_get_related_entity_field_name( relation_field_name_b )
 
-
-
-
-
-
-
-                    # def get_relation_nameA(self):
-                    #     return "related_personA"
-                    #
-                    # setattr(relation_class, )
-
-
-
-                    # def get_entity_classB(self):
-                    #     return Person
-                    #
-                    # def get_relation_nameB(self):
-                    #     return "related_personA"
 
                     break
 
