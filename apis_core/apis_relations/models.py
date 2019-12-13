@@ -122,6 +122,14 @@ class GenericRelation(TempEntityClass):
         return cls._all_relation_names
 
 
+    def get_related_entity_instanceA(self):
+        return getattr( self, self.get_related_entity_nameA() )
+
+
+    def get_related_entity_instanceB(self):
+        return getattr( self, self.get_related_entity_nameB() )
+
+
 
 
 #######################################################################
@@ -142,13 +150,6 @@ class PersonPerson(GenericRelation):
 
     relation_type = models.ForeignKey(PersonPersonRelation, blank=True,
                                       null=True, on_delete=models.SET_NULL)
-    related_personA = models.ForeignKey(
-        Person, blank=True, null=True, related_name="related_personA",
-        on_delete=models.CASCADE)
-    related_personB = models.ForeignKey(
-        Person, blank=True, null=True, related_name="related_personB",
-        on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -205,11 +206,6 @@ class PersonPlace(GenericRelation):
 
     relation_type = models.ForeignKey(PersonPlaceRelation, blank=True,
                                       null=True, on_delete=models.SET_NULL)
-    related_person = models.ForeignKey(
-        Person, blank=True, null=True, on_delete=models.CASCADE)
-    related_place = models.ForeignKey(
-        Place, blank=True, null=True, on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -244,11 +240,6 @@ class PersonInstitution(GenericRelation):
 
     relation_type = models.ForeignKey(PersonInstitutionRelation, blank=True,
                                       null=True, on_delete=models.SET_NULL)
-    related_person = models.ForeignKey(
-        Person, blank=True, null=True, on_delete=models.CASCADE)
-    related_institution = models.ForeignKey(
-        Institution, blank=True, null=True, on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -280,11 +271,6 @@ class PersonEvent(GenericRelation):
 
     relation_type = models.ForeignKey(PersonEventRelation, blank=True,
                                       null=True, on_delete=models.SET_NULL)
-    related_person = models.ForeignKey(
-        Person, blank=True, null=True, on_delete=models.CASCADE)
-    related_event = models.ForeignKey(
-        Event, blank=True, null=True, on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -315,11 +301,6 @@ class PersonPassage(GenericRelation):
 
     relation_type = models.ForeignKey(PersonPassageRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
-    related_person = models.ForeignKey(
-        Person, blank=True, null=True, on_delete=models.CASCADE)
-    related_passage = models.ForeignKey(
-        Passage, blank=True, null=True, on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -350,11 +331,6 @@ class PersonPublication(GenericRelation):
 
     relation_type = models.ForeignKey(PersonPublicationRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
-    related_person = models.ForeignKey(
-        Person, blank=True, null=True, on_delete=models.CASCADE)
-    related_publication = models.ForeignKey(
-        Publication, blank=True, null=True, on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -394,13 +370,6 @@ class InstitutionInstitution(GenericRelation):
     relation_type = models.ForeignKey(InstitutionInstitutionRelation,
                                       blank=True, null=True,
                                       on_delete=models.SET_NULL)
-    related_institutionA = models.ForeignKey(
-        Institution, blank=True, null=True, related_name="related_institutionA",
-        on_delete=models.CASCADE)
-    related_institutionB = models.ForeignKey(
-        Institution, blank=True, null=True, related_name="related_institutionB",
-        on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -445,11 +414,6 @@ class InstitutionPlace(GenericRelation):
     relation_type = models.ForeignKey(
         InstitutionPlaceRelation, blank=True, null=True,
         on_delete=models.SET_NULL)
-    related_institution = models.ForeignKey(
-        Institution, blank=True, null=True, on_delete=models.CASCADE)
-    related_place = models.ForeignKey(
-        Place, blank=True, null=True, on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -478,11 +442,6 @@ class InstitutionEvent(GenericRelation):
 
     relation_type = models.ForeignKey(InstitutionEventRelation, blank=True,
                                       null=True, on_delete=models.SET_NULL)
-    related_institution = models.ForeignKey(
-        Institution, blank=True, null=True, on_delete=models.CASCADE)
-    related_event = models.ForeignKey(
-        Event, blank=True, null=True, on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -511,11 +470,6 @@ class InstitutionPassage(GenericRelation):
 
     relation_type = models.ForeignKey(InstitutionPassageRelation, blank=True,
                                       null=True, on_delete=models.SET_NULL)
-    related_institution = models.ForeignKey(
-        Institution, blank=True, null=True, on_delete=models.CASCADE)
-    related_passage = models.ForeignKey(
-        Passage, blank=True, null=True, on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -544,11 +498,6 @@ class InstitutionPublication(GenericRelation):
 
     relation_type = models.ForeignKey(InstitutionPublicationRelation, blank=True,
                                       null=True, on_delete=models.SET_NULL)
-    related_institution = models.ForeignKey(
-        Institution, blank=True, null=True, on_delete=models.CASCADE)
-    related_publication = models.ForeignKey(
-        Publication, blank=True, null=True, on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -585,13 +534,6 @@ class PlacePlace(GenericRelation):
 
     relation_type = models.ForeignKey(PlacePlaceRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
-    related_placeA = models.ForeignKey(
-        Place, blank=True, null=True, related_name="related_placeA",
-        on_delete=models.CASCADE)
-    related_placeB = models.ForeignKey(
-        Place, blank=True, null=True, related_name="related_placeB",
-        on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -644,11 +586,6 @@ class PlaceEvent(GenericRelation):
 
     relation_type = models.ForeignKey(PlaceEventRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
-    related_place = models.ForeignKey(
-        Place, blank=True, null=True, on_delete=models.CASCADE)
-    related_event = models.ForeignKey(
-        Event, blank=True, null=True, on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -681,11 +618,6 @@ class PlacePassage(GenericRelation):
 
     relation_type = models.ForeignKey(PlacePassageRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
-    related_place = models.ForeignKey(
-        Place, blank=True, null=True, on_delete=models.CASCADE)
-    related_passage = models.ForeignKey(
-        Passage, blank=True, null=True, on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -718,11 +650,6 @@ class PlacePublication(GenericRelation):
 
     relation_type = models.ForeignKey(PlacePublicationRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
-    related_place = models.ForeignKey(
-        Place, blank=True, null=True, on_delete=models.CASCADE)
-    related_publication = models.ForeignKey(
-        Publication, blank=True, null=True, on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -762,13 +689,6 @@ class EventEvent(GenericRelation):
 
     relation_type = models.ForeignKey(EventEventRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
-    related_eventA = models.ForeignKey(
-        Event, blank=True, null=True, related_name="related_eventA",
-        on_delete=models.CASCADE)
-    related_eventB = models.ForeignKey(
-        Event, blank=True, null=True, related_name="related_eventB",
-        on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -812,11 +732,6 @@ class EventPassage(GenericRelation):
 
     relation_type = models.ForeignKey(EventPassageRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
-    related_event = models.ForeignKey(
-        Event, blank=True, null=True, on_delete=models.CASCADE)
-    related_passage = models.ForeignKey(
-        Passage, blank=True, null=True, on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -849,11 +764,6 @@ class EventPublication(GenericRelation):
 
     relation_type = models.ForeignKey(EventPublicationRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
-    related_event = models.ForeignKey(
-        Event, blank=True, null=True, on_delete=models.CASCADE)
-    related_publication = models.ForeignKey(
-        Publication, blank=True, null=True, on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -890,13 +800,6 @@ class PassagePassage(GenericRelation):
 
     relation_type = models.ForeignKey(PassagePassageRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
-    related_passageA = models.ForeignKey(
-        Passage, blank=True, null=True, related_name="related_passageA",
-        on_delete=models.CASCADE)
-    related_passageB = models.ForeignKey(
-        Passage, blank=True, null=True, related_name="related_passageB",
-        on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -949,11 +852,6 @@ class PassagePublication(GenericRelation):
     
     relation_type = models.ForeignKey(PassagePublicationRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
-    related_passage = models.ForeignKey(
-        Passage, blank=True, null=True, on_delete=models.CASCADE)
-    related_publication = models.ForeignKey(
-        Publication, blank=True, null=True, on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -994,13 +892,6 @@ class PublicationPublication(GenericRelation):
     
     relation_type = models.ForeignKey(PublicationPublicationRelation, blank=True, null=True,
                                       on_delete=models.SET_NULL)
-    related_publicationA = models.ForeignKey(
-        Publication, blank=True, null=True, related_name="related_publicationA",
-        on_delete=models.CASCADE)
-    related_publicationB = models.ForeignKey(
-        Publication, blank=True, null=True, related_name="related_publicationB",
-        on_delete=models.CASCADE)
-    objects = models.Manager()
     annotation_links = AnnotationRelationLinkManager()
 
     def __str__(self):
@@ -1042,8 +933,106 @@ class PublicationPublication(GenericRelation):
         return result
 
 
-    
-    
-    
-    
-    
+
+
+def generate_relation_fields():
+
+    def create_function_get_related_entity_class(related_entity_class):
+        return classmethod(lambda cls: related_entity_class)
+
+    def create_function_get_related_entity_field_name(related_entity_field_name):
+        return classmethod(lambda cls: related_entity_field_name)
+
+    # TODO __sresch__ : avoid local import
+    from apis_core.apis_entities.models import GenericEntity
+
+    for entity_class_a in GenericEntity.get_all_entity_classes():
+        for entity_class_b in GenericEntity.get_all_entity_classes():
+            for relation_class in GenericRelation.get_all_relation_classes():
+
+                relation_class_name = relation_class.__name__.lower()
+                entity_class_a_name = entity_class_a.__name__.lower()
+                entity_class_b_name = entity_class_b.__name__.lower()
+
+                if entity_class_a_name + entity_class_b_name == relation_class_name:
+
+                    if entity_class_a != entity_class_b:
+
+                        relation_field_name_a = "related_" + entity_class_a_name
+                        relation_field_name_b = "related_" + entity_class_b_name
+
+
+                        models.ForeignKey(
+                            to=entity_class_a,
+                            blank=True,
+                            null=True,
+                            on_delete=models.CASCADE,
+                            related_name=entity_class_a_name + entity_class_b_name
+                        ).contribute_to_class(relation_class, relation_field_name_a)
+
+                        models.ForeignKey(
+                            to=entity_class_b,
+                            blank=True,
+                            null=True,
+                            on_delete=models.CASCADE,
+                            related_name=entity_class_a_name + entity_class_b_name
+                        ).contribute_to_class(relation_class, relation_field_name_b)
+
+
+                        relation_class.get_related_entity_classA = \
+                            create_function_get_related_entity_class( entity_class_a )
+
+                        relation_class.get_related_entity_classB = \
+                            create_function_get_related_entity_class( entity_class_b )
+
+                        relation_class.get_related_entity_nameA = \
+                            create_function_get_related_entity_field_name( relation_field_name_a )
+
+                        relation_class.get_related_entity_nameB = \
+                            create_function_get_related_entity_field_name( relation_field_name_b )
+
+                    else:
+
+                        entity_class_name = entity_class_a_name
+                        entity_class = entity_class_a
+                        relation_field_name_a = "related_" + entity_class_name + "A"
+                        relation_field_name_b = "related_" + entity_class_name + "B"
+
+
+                        models.ForeignKey(
+                            to=entity_class,
+                            blank=True,
+                            null=True,
+                            on_delete=models.CASCADE,
+                            # related_name=entity_class_name * 2 + "B"
+                            related_name=relation_field_name_b
+                        ).contribute_to_class(relation_class, relation_field_name_a)
+
+                        models.ForeignKey(
+                            to=entity_class,
+                            blank=True,
+                            null=True,
+                            on_delete=models.CASCADE,
+                            # related_name=entity_class_name * 2 + "A"
+                            related_name=relation_field_name_a
+                        ).contribute_to_class(relation_class, relation_field_name_b)
+
+
+                        relation_class.get_related_entity_classA = \
+                            create_function_get_related_entity_class( entity_class )
+
+                        relation_class.get_related_entity_classB = \
+                            create_function_get_related_entity_class( entity_class )
+
+                        relation_class.get_related_entity_nameA = \
+                            create_function_get_related_entity_field_name( relation_field_name_a )
+
+                        relation_class.get_related_entity_nameB = \
+                            create_function_get_related_entity_field_name( relation_field_name_b )
+
+
+                    break
+
+
+generate_relation_fields()
+

@@ -297,6 +297,24 @@ class GenericEntity(TempEntityClass):
 
         return cls._related_relation_names
 
+
+    # TODO __sresch__ : implement the following methods to be consistent with other methods
+    #
+    # open question however regards fields such as related_personA and related_personB and where are they generated to be consistent?
+    #
+    # @classmethod
+    # def get_related_relation_field_names(cls):
+    #
+    #     return None
+    #
+    #
+    # @classmethod
+    # def add_related_relation_field_name(cls, relation_field_name):
+    #
+    #     return None
+
+
+
     def get_related_relation_instances(self):
         """
         :return: list of queryset of all relation instances which are somehow related to the calling entity instance
@@ -716,7 +734,7 @@ if "registration" in getattr(settings, "INSTALLED_APPS", []):
 
 def generate_relation_fields():
     """
-    This function goes through every entity, relation, and relationytpe model and automatically wires them together
+    This function goes through every entity, relation, and relationtype model and automatically wires them together
     by setting ManyToMany fields to each other through the relation model. This way the relations of a given entity
     to any other entity or relationtype can be queried much more directly and without the overhead of going through
     the relation model each time.
