@@ -776,7 +776,7 @@ def generate_relation_fields():
                             blank=True,
                             null=True,
                             on_delete=models.CASCADE,
-                            related_name=entity_class_a_name + entity_class_b_name
+                            related_name=entity_class_a_name + entity_class_b_name + "_set"
                         ).contribute_to_class(relation_class, relation_field_name_a)
 
                         models.ForeignKey(
@@ -784,7 +784,7 @@ def generate_relation_fields():
                             blank=True,
                             null=True,
                             on_delete=models.CASCADE,
-                            related_name=entity_class_a_name + entity_class_b_name
+                            related_name=entity_class_a_name + entity_class_b_name + "_set"
                         ).contribute_to_class(relation_class, relation_field_name_b)
 
 
@@ -813,7 +813,8 @@ def generate_relation_fields():
                             blank=True,
                             null=True,
                             on_delete=models.CASCADE,
-                            # related_name=entity_class_name * 2 + "B"
+                            # TODO __sresch__ : use this related name for consistency reasons once most code breaking parts due to this change are identified.
+                            # related_name=entity_class_name * 2 + "B_set"
                             related_name=relation_field_name_b
                         ).contribute_to_class(relation_class, relation_field_name_a)
 
@@ -822,7 +823,8 @@ def generate_relation_fields():
                             blank=True,
                             null=True,
                             on_delete=models.CASCADE,
-                            # related_name=entity_class_name * 2 + "A"
+                            # TODO __sresch__ : use this related name for consistency reasons once most code breaking parts due to this change are identified.
+                            # related_name=entity_class_name * 2 + "A_set"
                             related_name=relation_field_name_a
                         ).contribute_to_class(relation_class, relation_field_name_b)
 

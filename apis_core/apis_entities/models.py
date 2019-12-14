@@ -295,10 +295,25 @@ class GenericEntity(TempEntityClass):
 
                 relation_name = relation_class.__name__.lower()
 
-                if cls.__name__.lower() in relation_name:
+                count_class_name_in_relation_name = relation_name.count( cls.__name__.lower() )
 
-                    relation_classes.append(relation_class)
-                    relation_names.append(relation_name)
+                if count_class_name_in_relation_name >= 1:
+
+                    relation_classes.append( relation_class )
+
+                    if count_class_name_in_relation_name == 2:
+
+                        # TODO __sresch__ : use this related name for consistency reasons once most code breaking parts due to this change are identified.
+                        # relation_names.append( relation_name + "A_set" )
+                        # relation_names.append( relation_name + "B_set" )
+
+                        # until the change above has been implemented, use these fields for downward compatibility reasons
+                        relation_names.append( relation_class.get_related_entity_nameA() )
+                        relation_names.append( relation_class.get_related_entity_nameB() )
+
+                    else:
+
+                        relation_names.append( relation_name + "_set" )
 
             cls._related_relation_classes = relation_classes
             cls._related_relation_names = relation_names
