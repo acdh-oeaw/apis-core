@@ -295,10 +295,25 @@ class GenericEntity(TempEntityClass):
 
                 relation_name = relation_class.__name__.lower()
 
-                if cls.__name__.lower() in relation_name:
+                count_class_name_in_relation_name = relation_name.count( cls.__name__.lower() )
 
-                    relation_classes.append(relation_class)
-                    relation_names.append(relation_name)
+                if count_class_name_in_relation_name >= 1:
+
+                    relation_classes.append( relation_class )
+
+                    if count_class_name_in_relation_name == 2:
+
+                        # TODO __sresch__ : use this related name for consistency reasons once most code breaking parts due to this change are identified.
+                        # relation_names.append( relation_name + "A_set" )
+                        # relation_names.append( relation_name + "B_set" )
+
+                        # until the change above has been implemented, use these fields for downward compatibility reasons
+                        relation_names.append( relation_class.get_related_entity_nameA() )
+                        relation_names.append( relation_class.get_related_entity_nameB() )
+
+                    else:
+
+                        relation_names.append( relation_name + "_set" )
 
             cls._related_relation_classes = relation_classes
             cls._related_relation_names = relation_names
@@ -320,6 +335,23 @@ class GenericEntity(TempEntityClass):
             cls.get_related_relation_classes()
 
         return cls._related_relation_names
+
+
+    # TODO __sresch__ : implement the following methods to be consistent with other methods
+    #
+    # open question however regards fields such as related_personA and related_personB and where are they generated to be consistent?
+    #
+    # @classmethod
+    # def get_related_relation_field_names(cls):
+    #
+    #     return None
+    #
+    #
+    # @classmethod
+    # def add_related_relation_field_name(cls, relation_field_name):
+    #
+    #     return None
+
 
 
     def get_related_relation_instances(self):
@@ -721,7 +753,7 @@ if "registration" in getattr(settings, "INSTALLED_APPS", []):
 
 def generate_relation_fields():
     """
-    This function goes through every entity, relation, and relationytpe model and automatically wires them together
+    This function goes through every entity, relation, and relationtype model and automatically wires them together
     by setting ManyToMany fields to each other through the relation model. This way the relations of a given entity
     to any other entity or relationtype can be queried much more directly and without the overhead of going through
     the relation model each time.

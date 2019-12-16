@@ -1,4 +1,6 @@
+from functools import reduce
 import django_filters
+from apis_core.apis_vocabularies.models import RelationBaseClass
 from django.db.models import Q
 from apis_core.apis_entities.models import *
 from django.conf import settings
@@ -32,6 +34,8 @@ from django.db.models import QuerySet
 #######################################################################
 
 class GenericListFilter(django_filters.FilterSet):
+
+    fields_to_exclude = getattr(settings, "APIS_RELATIONS_FILTER_EXCLUDE", [])
 
     name = django_filters.CharFilter(method="name_label_filter", label="Name or Label")
     collection = django_filters.ModelMultipleChoiceFilter(queryset=Collection.objects.all())
@@ -153,58 +157,156 @@ class GenericListFilter(django_filters.FilterSet):
         queryset_related_label=queryset.filter(**{"label__label"+lookup : value})
         queryset_self_name=queryset.filter(**{name+lookup : value})
 
-        return queryset_related_label.union(queryset_self_name).distinct().order_by("name")
+        return ( queryset_related_label | queryset_self_name ).distinct().all()
 
 
 
     def related_entity_name_filter(self, queryset, name, value):
         """
-        Searches through the all name fields of all related entities
+        Searches through the all name fields of all related entities of a given queryset
+
+        For performance reasons it was not sensible to use django's usual lookup foreign key fields
+        (e.g. Person.objects.filter(personwork__related_work__name__icontains=value))
+        Because such naive (but convenient) django ORM approach starts from a given model, goes to the related relation,
+        goes to the related entity and searches therein. But such lookups create a lot of joins in the underlying sql,
+        which get expensive very fast.
+
+        So the following algorithms reverses this order and always selects primary keys which are then used further to look
+        for related models.
+        Basically what the following does is:
+        step 1: looks up the search value in tempentity class (since all entities inherit from there) and selects their primary keys
+        step 2: uses the keys from step 1 to filter for related relations and selects their primary keys
+        step 3: uses the keys from step 2 to filter for related entities
+        step 4: merge the results from step 3 into one queryset and returns this.
+
+        :param queryset: the queryset currently to be filtered on
+        :param name: Here not used, because this method filters on names of related entities
+        :param value: The value to be filtered for, input by the user or a programmatic call
+        :return: filtered queryset
         """
 
+        # step 1
+        # first find all tempentities where the lookup and value applies, select only their primary keys.
         lookup, value = self.construct_lookup_from_wildcard(value)
+        tempentity_hit = TempEntityClass.objects.filter(**{"name" + lookup: value}).values_list("pk", flat=True)
 
-        queryset_list = []
+        # list for querysets where relations will be saved which are related to the primary keys of the tempentity list above
+        related_relations_to_hit_list = []
 
-        # The following loop creates filtered querysets for each related entity field
-        #   e.g. queryset.filter( person_set__name=value ) and queryset.filter( place_set__name=value )
-        # Later these separate querysets are unionized and returned. This is done in contrast to filtering on the
-        # queryset only once with multiple Q objects which themselves are disjunctively joined
-        #   e.g. queryset.filter( Q(person_set__name=value) | Q(place_set__name=value) )
-        # since it turned out that doing it with Q objects decreases performance dramatically.
-        for related_entity_field_name in queryset.model.get_related_entity_field_names():
-            queryset_list.append(
-                queryset.filter(
-                    **{related_entity_field_name + "__name" + lookup: value} ) )
+        # step 2
+        # iterate over every relation related to the current queryset model (e.g for Person: PersonWork, PersonPerson, etc)
+        for relation_class in queryset.model.get_related_relation_classes():
 
-        # unionize the separate querysets and order them (distinct is not necessary since it is included in union method)
-        return QuerySet.union(*queryset_list).order_by("name")
+            # get the related classes and lookup names of the current relation
+            # (e.g. for PersonWork: class Person, class Work, "related_person", "related_work")
+            related_entity_classA = relation_class.get_related_entity_classA()
+            related_entity_classB = relation_class.get_related_entity_classB()
+            related_entity_nameA = relation_class.get_related_entity_nameA()
+            related_entity_nameB = relation_class.get_related_entity_nameB()
+
+            # Within a relation class, there is two fields which relate to entities, check now which of the two
+            # is the same as the current one.
+            if queryset.model == related_entity_classA:
+
+                # append filtered relation queryset to list for use later
+                related_relations_to_hit_list.append(
+                    # filter the current relation for if the other related entity's pk is in the hit list of tempentity class
+                    # from before (e.g. if a tempentity's name contains "seu", then its primary key will be used here, to check
+                    # if there is a related entity which has the same primary key.
+                    relation_class.objects.filter(
+                        **{related_entity_nameB + "_id__in": tempentity_hit}
+                    ).values_list(related_entity_nameA + "_id", flat=True)
+                )
+
+            # also check the related entity field B (because it can be that both A and B are of the same entity class, e.g. PersonPerson,
+            # or that only A is the other one, e.g. when filtering for Work within PersonWork, then the other related class is Person)
+            if queryset.model == related_entity_classB:
+
+                # same procedure as above, just with related class and related name being reversed.
+                related_relations_to_hit_list.append(
+                    relation_class.objects.filter(
+                        **{related_entity_nameA + "_id__in": tempentity_hit}
+                    ).values_list(related_entity_nameB + "_id", flat=True)
+                )
+
+            # A safety check which should never arise. But if it does, we know there is something wrong with the automated wiring of
+            # entities and their respective relation classes (e.g. for Person, there should never be EventWork arising here)
+            if queryset.model != related_entity_classA and queryset.model != related_entity_classB:
+
+                raise ValueError("queryset model class has a wrong relation class associated!")
+
+        # step 3
+        # Filter the entity queryset for each of the resulting relation querysets produced in the loop before
+        queryset_filtered_list = [ queryset.filter(pk__in=related_relation) for related_relation in related_relations_to_hit_list ]
+
+        # step 4
+        # merge them all
+        result = reduce( lambda a,b : a | b, queryset_filtered_list).distinct()
+
+        return result
+
 
 
 
     def related_relationtype_name_filter(self, queryset, name, value):
         """
-        Searches through the all name fields of all related relation types
+        Searches through the all name fields of all related relationtypes of a given queryset
+
+        The following logic is almost identical to the one in method 'related_entity_name_filter', so please look up its
+        comments for documentational purpose therein.
+
+        Differences are commented however.
+
+        :param queryset: the queryset currently to be filtered on
+        :param name: Here not used, because this method filters on names of related relationtypes
+        :param value: The value to be filtered for, input by the user or a programmatic call
+        :return: filtered queryset
         """
 
         lookup, value = self.construct_lookup_from_wildcard(value)
 
-        queryset_list = []
+        # look up through name and name_reverse of RelationBaseClass
+        relationbaseclass_hit = (
+            RelationBaseClass.objects.filter(**{"name" + lookup: value}).values_list("pk", flat=True) |
+            RelationBaseClass.objects.filter(**{"name_reverse" + lookup: value}).values_list("pk", flat=True)
+        ).distinct()
 
-        # The following loop creates filtered querysets for each related entity field
-        #   e.g. queryset.filter( person_relationtype_set__name=value ) and queryset.filter( place_relationtype_set__name=value )
-        # Later these separate querysets are unionized and returned. This is done in contrast to filtering on the
-        # queryset only once with multiple Q objects which themselves are disjunctively joined
-        #   e.g. queryset.filter( Q(person_relationtype_set__name=value) | Q(place_relationtype_set__name=value) )
-        # since it turned out that doing it with Q objects decreases performance dramatically.
-        for relationtype_field_name in queryset.model.get_related_relationtype_field_names():
-            queryset_list.append(
-                queryset.filter(
-                    **{relationtype_field_name + "__name" + lookup: value} ) )
+        related_relations_to_hit_list = []
 
-        # unionize the separate querysets and order them (distinct is not necessary since it is included in union method)
-        return QuerySet.union(*queryset_list).order_by("name")
+        for relation_class in queryset.model.get_related_relation_classes():
 
+            related_entity_classA = relation_class.get_related_entity_classA()
+            related_entity_classB = relation_class.get_related_entity_classB()
+            related_entity_nameA = relation_class.get_related_entity_nameA()
+            related_entity_nameB = relation_class.get_related_entity_nameB()
+
+            if queryset.model == related_entity_classA:
+
+                # Only difference to method 'related_entity_name_filter' is that the lookup is done on 'relation_type_id'
+                related_relations_to_hit_list.append(
+                    relation_class.objects.filter(
+                        **{"relation_type_id__in": relationbaseclass_hit}
+                    ).values_list(related_entity_nameA + "_id", flat=True)
+                )
+
+            if queryset.model == related_entity_classB:
+
+                # Only difference to method 'related_entity_name_filter' is that the lookup is done on 'relation_type_id'
+                related_relations_to_hit_list.append(
+                    relation_class.objects.filter(
+                        **{"relation_type_id__in": relationbaseclass_hit}
+                    ).values_list(related_entity_nameB + "_id", flat=True)
+                )
+
+            if queryset.model != related_entity_classA and queryset.model != related_entity_classB:
+
+                raise ValueError("queryset model class has a wrong relation class associated!")
+
+        queryset_filtered_list = [ queryset.filter(pk__in=related_relation) for related_relation in related_relations_to_hit_list ]
+
+        result = reduce( lambda a,b : a | b, queryset_filtered_list).distinct()
+
+        return result
 
 
     def related_arbitrary_model_name(self, queryset, name, value):
@@ -219,11 +321,10 @@ class GenericListFilter(django_filters.FilterSet):
                 Using this example of professions, such a lookup would be generated: Person.objects.filter(profession__name__... ) )
         """
 
-        lookup_detail, value = self.construct_lookup_from_wildcard(value)
+        lookup, value = self.construct_lookup_from_wildcard(value)
 
         # name variable is the name of the filter and needs the corresponding field within the model
-        return queryset.filter( **{ name + "__name" + lookup_detail : value } )
-
+        return queryset.filter( **{ name + "__name" + lookup : value } )
 
 
 
@@ -250,7 +351,7 @@ class PersonListFilter(GenericListFilter):
         # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
         # order to load all filters of all model fields by default so that they are available in the first place.
         # Later those which are not referenced in the settings file will be removed again
-        exclude = getattr(settings, 'APIS_RELATIONS_FILTER_EXCLUDE', [])
+        exclude = GenericListFilter.fields_to_exclude
 
 
     def person_name_filter(self, queryset, name, value):
@@ -261,8 +362,8 @@ class PersonListFilter(GenericListFilter):
         queryset_self_name=queryset.filter(**{name+lookup : value})
         queryset_first_name=queryset.filter(**{"first_name"+lookup : value})
 
-        return QuerySet.union(queryset_related_label, queryset_self_name, queryset_first_name)
-
+        # return QuerySet.union(queryset_related_label, queryset_self_name, queryset_first_name)
+        return (queryset_related_label | queryset_self_name | queryset_first_name).distinct().all()
 
 
 
@@ -277,7 +378,7 @@ class PlaceListFilter(GenericListFilter):
         # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
         # order to load all filters of all model fields by default so that they are available in the first place.
         # Later those which are not referenced in the settings file will be removed again
-        exclude = getattr(settings, 'APIS_RELATIONS_FILTER_EXCLUDE', [])
+        exclude = GenericListFilter.fields_to_exclude
 
 
 
@@ -288,7 +389,7 @@ class InstitutionListFilter(GenericListFilter):
         # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
         # order to load all filters of all model fields by default so that they are available in the first place.
         # Later those which are not referenced in the settings file will be removed again
-        exclude = getattr(settings, 'APIS_RELATIONS_FILTER_EXCLUDE', [])
+        exclude = GenericListFilter.fields_to_exclude
 
 
 
@@ -299,7 +400,7 @@ class EventListFilter(GenericListFilter):
         # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
         # order to load all filters of all model fields by default so that they are available in the first place.
         # Later those which are not referenced in the settings file will be removed again
-        exclude = getattr(settings, 'APIS_RELATIONS_FILTER_EXCLUDE', [])
+        exclude = GenericListFilter.fields_to_exclude
 
 
 
@@ -312,7 +413,7 @@ class WorkListFilter(GenericListFilter):
         # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
         # order to load all filters of all model fields by default so that they are available in the first place.
         # Later those which are not referenced in the settings file will be removed again
-        exclude = getattr(settings, 'APIS_RELATIONS_FILTER_EXCLUDE', [])
+        exclude = GenericListFilter.fields_to_exclude
 
 
 def get_list_filter_of_entity(entity):
