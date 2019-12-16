@@ -178,14 +178,16 @@ class PersonPerson(GenericRelation):
         """
         if self.related_personA == entity:
             rel_pers = self.related_personB
-            rel_type = self.relation_type.name
+            rel_type = self.relation_type.label
         elif self.related_personB == entity:
             rel_pers = self.related_personA
-            rel_type = self.relation_type.name_reverse
+            rel_type = self.relation_type.label_reverse
         result = {
             'pk': self.pk,
             'relation_type': rel_type,
             'related_person': rel_pers,
+            'start_date_written': self.start_date_written,
+            'end_date_written': self.end_date_written,
             'start_date': self.start_date,
             'end_date': self.end_date}
         return result
@@ -381,14 +383,16 @@ class InstitutionInstitution(GenericRelation):
     def get_table_dict(self, entity):
         if self.related_institutionA == entity:
             rel_inst = self.related_institutionB
-            rel_type = self.relation_type.name
+            rel_type = self.relation_type.label
         elif self.related_institutionB == entity:
             rel_inst = self.related_institutionA
-            rel_type = self.relation_type.name_reverse
+            rel_type = self.relation_type.label_reverse
         result = {
             'relation_pk': self.pk,
             'relation_type': rel_type,
             'related_institution': rel_inst,
+            'start_date_written': self.start_date_written,
+            'end_date_written': self.end_date_written,
             'start_date': self.start_date,
             'end_date': self.end_date}
         return result
@@ -534,14 +538,16 @@ class PlacePlace(GenericRelation):
         """
         if self.related_placeA == entity:
             rel_place = self.related_placeB
-            rel_type = self.relation_type.name
+            rel_type = self.relation_type.label
         elif self.related_placeB == entity:
             rel_place = self.related_placeA
-            rel_type = self.relation_type.name_reverse
+            rel_type = self.relation_type.label_reverse
         result = {
             'relation_pk': self.pk,
             'relation_type': rel_type,
             'related_place': rel_place,
+            'start_date_written': self.start_date_written,
+            'end_date_written': self.end_date_written,
             'start_date': self.start_date,
             'end_date': self.end_date}
         return result
@@ -674,14 +680,16 @@ class EventEvent(GenericRelation):
         """
         if self.related_eventA == entity:
             rel_event = self.related_eventB
-            rel_type = self.relation_type.name
+            rel_type = self.relation_type.label
         elif self.related_eventB == entity:
             rel_event = self.related_eventA
-            rel_type = self.relation_type.name_reverse
+            rel_type = self.relation_type.label_reverse
         result = {
             'relation_pk': self.pk,
             'relation_type': rel_type,
             'related_event': rel_event,
+            'start_date_written': self.start_date_written,
+            'end_date_written': self.end_date_written,
             'start_date': self.start_date,
             'end_date': self.end_date}
         return result
@@ -778,14 +786,16 @@ class WorkWork(GenericRelation):
         """
         if self.related_workA == entity:
             rel_work = self.related_workB
-            rel_type = self.relation_type.name
+            rel_type = self.relation_type.label
         elif self.related_workB == entity:
             rel_work = self.related_workA
-            rel_type = self.relation_type.name_reverse
+            rel_type = self.relation_type.label_reverse
         result = {
             'relation_pk': self.pk,
             'relation_type': rel_type,
             'related_work': rel_work,
+            'start_date_written': self.start_date_written,
+            'end_date_written': self.end_date_written,
             'start_date': self.start_date,
             'end_date': self.end_date}
         return result
