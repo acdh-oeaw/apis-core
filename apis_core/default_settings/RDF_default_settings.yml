@@ -1,6 +1,6 @@
 Place:
   data:
-    - base_url: http://sws.geonames.org/
+    - base_url: https://sws.geonames.org/
       attributes:
         - name: name
           sparql: |

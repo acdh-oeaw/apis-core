@@ -1,7 +1,7 @@
 mappings:
   - domain: geonames.org
     regex: '^https?://(?:[^.]*[.])?geonames[.]org/([0-9]+)'
-    replace: 'http://sws.geonames.org/{}/'
+    replace: 'https://sws.geonames.org/{}/'
   - domain: d-nb.info
     regex: '^https?://(?:[^.]*[.])?d-nb.info/gnd/([0-9A-Za-u\-]+)'
     replace: 'https://d-nb.info/gnd/{}'
