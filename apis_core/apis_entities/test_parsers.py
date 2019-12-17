@@ -8,11 +8,12 @@ from apis_core.helper_functions.RDFParser import RDFParser
 class RDFPlaceParserNewTestCase(TestCase):
 
     def test_parse_place(self):
-        plc = [("http://www.geonames.org/6951114/bad-zell.html", "Bad Zell", 48.34906, "http://sws.geonames.org/2782113/", "http://www.geonames.org/ontology#P.PPL"),
-               ("http://sws.geonames.org/2779275/", "Freistadt", 48.51103, "http://sws.geonames.org/2782113/", "http://www.geonames.org/ontology#P.PPL"),
-               ("http://sws.geonames.org/2761369", "Vienna", 48.20849, "http://sws.geonames.org/2782113/", "http://www.geonames.org/ontology#P.PPLC")
+        plc = [("http://www.geonames.org/6951114/bad-zell.html", "Bad Zell", 48.34906, "http://sws.geonames.org/2782113/", "https://www.geonames.org/ontology#P.PPL"),
+               ("http://sws.geonames.org/2779275/", "Freistadt", 48.51103, "http://sws.geonames.org/2782113/", "https://www.geonames.org/ontology#P.PPL"),
+               ("http://sws.geonames.org/2761369", "Vienna", 48.20849, "http://sws.geonames.org/2782113/", "https://www.geonames.org/ontology#P.PPLC")
                ]
         for p in plc:
+            print(p)
             o = RDFParser(p[0], 'Place')
             o.create_objct()
             o2 = o.save()
