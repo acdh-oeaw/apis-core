@@ -4,6 +4,8 @@ import sys
 import inspect
 # from reversion import revisions as reversion
 import reversion
+from django.db.models import Q
+
 from apis_core.apis_labels.models import Label
 from apis_core.apis_metainfo.models import Collection, TempEntityClass, Text, Uri
 from apis_core.apis_vocabularies.models import (
@@ -29,8 +31,7 @@ BASE_URI = getattr(settings, "APIS_BASE_URI", "http://apis.info/")
 
 
 
-
-class GenericEntity(TempEntityClass):
+class AbstractEntity(TempEntityClass):
     """
     Abstract super class which encapsulates common logic between the different entity kinds and provides various methods
     relating to either all or a specific entity kind.
@@ -163,8 +164,6 @@ class GenericEntity(TempEntityClass):
 
     _all_entity_classes = None
     _all_entity_names = None
-    _related_relation_classes = None
-    _related_relation_names = None
     _related_relationtype_classes = None
     _related_relationtype_names = None
     _related_entity_field_names = None
@@ -189,7 +188,7 @@ class GenericEntity(TempEntityClass):
             for entity_name, entity_class in inspect.getmembers(sys.modules[__name__], inspect.isclass):
 
                 if entity_class.__module__ == "apis_core.apis_entities.models" and \
-                        entity_name != "GenericEntity":
+                        entity_name != "AbstractEntity":
 
                     entity_classes.append(entity_class)
                     entity_names.append(entity_name.lower())
@@ -216,8 +215,8 @@ class GenericEntity(TempEntityClass):
 
     # Methods dealing with related entities
     ####################################################################################################################
-    
-    
+
+
     @classmethod
     def get_related_entity_field_names(cls):
         """
@@ -227,7 +226,7 @@ class GenericEntity(TempEntityClass):
         ['event_set', 'institution_set', 'personB_set', 'personA_set', 'place_set', 'work_set']
 
         Note: this method depends on the 'generate_relation_fields' method which wires the ManyToMany Fields into the
-        entities and respective relationtypes. It is nevertheless defined here within GenericEntity for documentational purpose.
+        entities and respective relationtypes. It is nevertheless defined here within AbstractEntity for documentational purpose.
         """
 
         if cls._related_entity_field_names == None:
@@ -243,7 +242,7 @@ class GenericEntity(TempEntityClass):
         :return: None
 
         Note: this method depends on the 'generate_relation_fields' method which wires the ManyToMany Fields into the
-        entities and respective relationtypes. It is nevertheless defined here within GenericEntity for documentational purpose.
+        entities and respective relationtypes. It is nevertheless defined here within AbstractEntity for documentational purpose.
         """
 
         if cls._related_entity_field_names == None:
@@ -271,8 +270,8 @@ class GenericEntity(TempEntityClass):
 
     # Methods dealing with related relations
     ####################################################################################################################
-    
-    
+
+
     @classmethod
     def get_related_relation_classes(cls):
         """
@@ -282,75 +281,25 @@ class GenericEntity(TempEntityClass):
         [ InstitutionPlace, PersonPlace, PlaceEvent, PlacePlace, PlaceWork ]
         """
 
-        if cls._related_relation_classes == None:
+        # TODO __sresch__ : check for best practice on local imports vs circularity problems.
+        from apis_core.apis_relations.models import AbstractRelation
 
-            relation_classes = []
-            relation_names = []
+        return AbstractRelation.get_relation_classes_of_entity_class( cls )
 
-            # TODO __sresch__ : check for best practice on local imports vs circularity problems.
-            # These imports are done locally to avoid circular import problems which arise if they are done globally in this module
-            from apis_core.apis_relations.models import GenericRelation
-
-            for relation_class in GenericRelation.get_all_relation_classes():
-
-                relation_name = relation_class.__name__.lower()
-
-                count_class_name_in_relation_name = relation_name.count( cls.__name__.lower() )
-
-                if count_class_name_in_relation_name >= 1:
-
-                    relation_classes.append( relation_class )
-
-                    if count_class_name_in_relation_name == 2:
-
-                        # TODO __sresch__ : use this related name for consistency reasons once most code breaking parts due to this change are identified.
-                        # relation_names.append( relation_name + "A_set" )
-                        # relation_names.append( relation_name + "B_set" )
-
-                        # until the change above has been implemented, use these fields for downward compatibility reasons
-                        relation_names.append( relation_class.get_related_entity_nameA() )
-                        relation_names.append( relation_class.get_related_entity_nameB() )
-
-                    else:
-
-                        relation_names.append( relation_name + "_set" )
-
-            cls._related_relation_classes = relation_classes
-            cls._related_relation_names = relation_names
-
-        return cls._related_relation_classes
 
 
     @classmethod
-    def get_related_relation_names(cls):
+    def get_related_relation_field_names(cls):
         """
         :return: list of class names in lower case of the relations which are related to the respective entity class
 
         E.g. for Place.get_related_relation_names() or place_instance.get_related_relation_names() ->
-        ['institutionplace', 'personplace', 'placeevent', 'placeplace', 'placework']
+        ['institutionplace_set', 'personplace_set', 'placeevent_set', 'placeplace_set', 'placework_set']
         """
+        # TODO __sresch__ : check for best practice on local imports vs circularity problems.
+        from apis_core.apis_relations.models import AbstractRelation
 
-        if cls._related_relation_names == None:
-
-            cls.get_related_relation_classes()
-
-        return cls._related_relation_names
-
-
-    # TODO __sresch__ : implement the following methods to be consistent with other methods
-    #
-    # open question however regards fields such as related_personA and related_personB and where are they generated to be consistent?
-    #
-    # @classmethod
-    # def get_related_relation_field_names(cls):
-    #
-    #     return None
-    #
-    #
-    # @classmethod
-    # def add_related_relation_field_name(cls, relation_field_name):
-    #
-    #     return None
+        return AbstractRelation.get_relation_field_names_of_entity_class(cls)
 
 
 
@@ -360,31 +309,19 @@ class GenericEntity(TempEntityClass):
         """
 
         queryset_list = []
-        self_entity_name = self.__class__.__name__.lower()
 
         for relation_class in self.get_related_relation_classes():
 
-            queryset = None
+            q_args = Q()
 
-            count_occurence = relation_class.__name__.lower().count(self_entity_name)
+            if relation_class.get_related_entity_classA() == self.__class__:
+                q_args |= Q(**{relation_class.get_related_entity_field_nameA(): self})
 
-            # TODO __sresch__ : Try to change it to a call from entity class itself (e.g. Work.eventwork_set.all() )
-            # for now search in the relation model, because somehow somewhere when the entity models
-            # are symmetrical, then the foreign key field in the entity model is called for example relate_workA.all()
-            # find where this is done, and change it
+            if relation_class.get_related_entity_classB() == self.__class__:
+                q_args |= Q(**{relation_class.get_related_entity_field_nameB(): self})
 
-            if count_occurence == 1:
-
-                queryset = relation_class.objects.filter(**{'related_' + self_entity_name.lower(): self})
-
-            elif count_occurence == 2:
-
-                querysetA = relation_class.objects.filter(**{'related_' + self_entity_name.lower() + 'A': self})
-                querysetB = relation_class.objects.filter(**{'related_' + self_entity_name.lower() + 'B': self})
-                queryset = querysetA.union(querysetB).distinct()
-
-            if queryset and len(queryset) > 0:
-                queryset_list.append(queryset)
+            queryset = relation_class.objects.filter( q_args )
+            queryset_list.append( queryset )
 
         return queryset_list
 
@@ -408,9 +345,9 @@ class GenericEntity(TempEntityClass):
 
             # TODO __sresch__ : check for best practice on local imports vs circularity problems.
             # These imports are done locally to avoid circular import problems which arise if they are done globally in this module
-            from apis_core.apis_vocabularies.models import GenericRelationType
+            from apis_core.apis_vocabularies.models import AbstractRelationType
 
-            for relationtype_class in GenericRelationType.get_all_relationtype_classes():
+            for relationtype_class in AbstractRelationType.get_all_relationtype_classes():
 
                 relationtype_name = relationtype_class.__name__.lower()
 
@@ -450,7 +387,7 @@ class GenericEntity(TempEntityClass):
         ['event_relationtype_set', 'institution_relationtype_set', 'personB_relationtype_set', 'personA_relationtype_set', 'place_relationtype_set', 'work_relationtype_set']
 
         Note: this method depends on the 'generate_relation_fields' method which wires the ManyToMany Fields into the
-        entities and respective relationtypes. It is nevertheless defined here within GenericEntity for documentational purpose.
+        entities and respective relationtypes. It is nevertheless defined here within AbstractEntity for documentational purpose.
         """
 
         if cls._related_relationtype_field_names == None:
@@ -466,7 +403,7 @@ class GenericEntity(TempEntityClass):
         :return: None
 
         Note: this method depends on the 'generate_relation_fields' method which wires the ManyToMany Fields into the
-        entities and respective relationtypes. It is nevertheless defined here within GenericEntity for documentational purpose.
+        entities and respective relationtypes. It is nevertheless defined here within AbstractEntity for documentational purpose.
         """
 
         if cls._related_relationtype_field_names == None:
@@ -504,7 +441,7 @@ class GenericEntity(TempEntityClass):
 
 
 @reversion.register(follow=["tempentityclass_ptr"])
-class Person(GenericEntity):
+class Person(AbstractEntity):
     """ A temporalized entity to model a human beeing."""
 
     GENDER_CHOICES = (("female", "female"), ("male", "male"))
@@ -550,7 +487,7 @@ class Person(GenericEntity):
 
 
 @reversion.register(follow=["tempentityclass_ptr"])
-class Place(GenericEntity):
+class Place(AbstractEntity):
     """ A temporalized entity to model a place"""
 
     kind = models.ForeignKey(
@@ -579,7 +516,7 @@ class Place(GenericEntity):
 
 
 @reversion.register(follow=["tempentityclass_ptr"])
-class Institution(GenericEntity):
+class Institution(AbstractEntity):
     kind = models.ForeignKey(
         InstitutionType, blank=True, null=True, on_delete=models.SET_NULL
     )
@@ -606,7 +543,7 @@ class Institution(GenericEntity):
 
 
 @reversion.register(follow=["tempentityclass_ptr"])
-class Event(GenericEntity):
+class Event(AbstractEntity):
     kind = models.ForeignKey(
         EventType, blank=True, null=True, on_delete=models.SET_NULL
     )
@@ -631,7 +568,7 @@ class Event(GenericEntity):
 
 
 @reversion.register(follow=["tempentityclass_ptr"])
-class Work(GenericEntity):
+class Work(AbstractEntity):
     kind = models.ForeignKey(WorkType, blank=True, null=True, on_delete=models.SET_NULL)
 
 
@@ -774,15 +711,15 @@ def generate_relation_fields():
 
     # TODO __sresch__ : check for best practice on local imports vs circularity problems.
     # These imports are done locally to avoid circular import problems which arise if they are done globally in this module
-    from apis_core.apis_relations.models import GenericRelation
-    from apis_core.apis_vocabularies.models import GenericRelationType
+    from apis_core.apis_relations.models import AbstractRelation
+    from apis_core.apis_vocabularies.models import AbstractRelationType
 
 
     # all the classes which are to be iterated over, also in the case of relation and relationtype they are sorted to ensure their proper alignment
-    entity_classes = GenericEntity.get_all_entity_classes()
-    relation_classes = GenericRelation.get_all_relation_classes()
+    entity_classes = AbstractEntity.get_all_entity_classes()
+    relation_classes = AbstractRelation.get_all_relation_classes()
     relation_classes.sort(key=lambda x : x.__name__)
-    relationtype_classes = GenericRelationType.get_all_relationtype_classes()
+    relationtype_classes = AbstractRelationType.get_all_relationtype_classes()
     relationtype_classes.sort(key=lambda x : x.__name__)
 
 
@@ -900,6 +837,9 @@ def generate_relation_fields():
                             through_fields=("relation_type", "related_" + entity_name_B + "B")
                         ).contribute_to_class(relationtype_class, field_name_to_entity_B)
 
+                    # if entity_class_a_name + entity_class_b_name == relation_class_name
+                    # equals to True, then for entity_class_a and entity_class_b, their respective relation class
+                    # has been found, thus interrupt the loop going through these relation classes.
                     break
 
 

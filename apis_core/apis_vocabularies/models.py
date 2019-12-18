@@ -193,7 +193,8 @@ class TextType(VocabsBaseClass):
 #######################################################################
 
 
-class GenericRelationType(RelationBaseClass):
+
+class AbstractRelationType(RelationBaseClass):
     """
     Abstract super class which encapsulates common logic between the different relationtypes and provides various methods
     relating to either all or a specific relationtypes.
@@ -261,7 +262,7 @@ class GenericRelationType(RelationBaseClass):
         ['personB_set', 'personA_set']
 
         Note: this method depends on the 'generate_relation_fields' method in apis_entities.models which wires the ManyToMany Fields into the
-        entities and respective relationtypes. It is nevertheless defined here within GenericRelationType for documentational purpose.
+        entities and respective relationtypes. It is nevertheless defined here within AbstractRelationType for documentational purpose.
         """
 
         if cls._related_entity_field_names == None:
@@ -277,7 +278,7 @@ class GenericRelationType(RelationBaseClass):
         :return: None
 
         Note: this method depends on the 'generate_relation_fields' method in apis_entities.models which wires the ManyToMany Fields into the
-        entities and respective relationtypes. It is nevertheless defined here within GenericRelationType for documentational purpose.
+        entities and respective relationtypes. It is nevertheless defined here within AbstractRelationType for documentational purpose.
         """
 
         if cls._related_entity_field_names == None:
@@ -292,31 +293,31 @@ class GenericRelationType(RelationBaseClass):
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PersonPersonRelation(GenericRelationType):
+class PersonPersonRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Persons and Persons"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PersonPlaceRelation(GenericRelationType):
+class PersonPlaceRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Persons and Places"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PersonInstitutionRelation(GenericRelationType):
+class PersonInstitutionRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Persons and Persons"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PersonEventRelation(GenericRelationType):
+class PersonEventRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Persons and Events"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PersonWorkRelation(GenericRelationType):
+class PersonWorkRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Persons and Works"""
     pass
 
@@ -327,25 +328,25 @@ class PersonWorkRelation(GenericRelationType):
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class InstitutionEventRelation(GenericRelationType):
+class InstitutionEventRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Institutions and Events."""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class InstitutionPlaceRelation(GenericRelationType):
+class InstitutionPlaceRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Institutions and Places."""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class InstitutionInstitutionRelation(GenericRelationType):
+class InstitutionInstitutionRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Institutions and Institutions."""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class InstitutionWorkRelation(GenericRelationType):
+class InstitutionWorkRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Institutions and Works."""
     pass
 
@@ -355,19 +356,19 @@ class InstitutionWorkRelation(GenericRelationType):
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PlacePlaceRelation(GenericRelationType):
+class PlacePlaceRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Places and Places"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PlaceEventRelation(GenericRelationType):
+class PlaceEventRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Places and Events"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class PlaceWorkRelation(GenericRelationType):
+class PlaceWorkRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Places and Works"""
     pass
 
@@ -378,13 +379,13 @@ class PlaceWorkRelation(GenericRelationType):
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class EventEventRelation(GenericRelationType):
+class EventEventRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Events and Events"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class EventWorkRelation(GenericRelationType):
+class EventWorkRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Events and Works"""
     pass
 
@@ -395,6 +396,6 @@ class EventWorkRelation(GenericRelationType):
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
-class WorkWorkRelation(GenericRelationType):
+class WorkWorkRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Works and Works"""
     pass

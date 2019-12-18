@@ -62,11 +62,12 @@ class AnnotationRelationLinkManager(models.Manager):
 
 #######################################################################
 #
-# GenericRelation
+# AbstractRelation
 #
 #######################################################################
 #
-class GenericRelation(TempEntityClass):
+
+class AbstractRelation(TempEntityClass):
     """
     Abstract super class which encapsulates common logic between the different relations and provides various methods
     relating to either all or a specific relations.
@@ -77,28 +78,38 @@ class GenericRelation(TempEntityClass):
 
     _all_relation_classes = None
     _all_relation_names = None
+    _relation_classes_of_entity_class = {}
+    _relation_names_of_entity_class = {}
 
 
-    # Methods dealing with all relationtypes
+    # Methods dealing with all relations
     ####################################################################################################################
+
 
     @classmethod
     def get_all_relation_classes(cls):
         """
+        Instantiates both lists: '_all_relation_classes' and '_all_relation_names'
+
         :return: list of all python classes of the relations defined within this models' module
         """
 
+        # check if not yet instantiated
         if cls._all_relation_classes == None:
+            # if not, then instantiate the private lists
 
             relation_classes = []
             relation_names = []
 
+            # using python's reflective logic, the following loop iterates over all classes of this current module.
             for relation_name, relation_class in inspect.getmembers(
                     sys.modules[__name__], inspect.isclass):
 
-                if relation_class.__module__ == "apis_core.apis_relations.models" and \
+                # check for python classes not to be used.
+                if \
+                        relation_class.__module__ == "apis_core.apis_relations.models" and \
                         relation_class.__name__ != "AnnotationRelationLinkManager" and \
-                        relation_class.__name__ != "GenericRelation":
+                        relation_class.__name__ != "AbstractRelation":
 
                     relation_classes.append(relation_class)
                     relation_names.append(relation_name.lower())
@@ -116,17 +127,146 @@ class GenericRelation(TempEntityClass):
 
         if cls._all_relation_classes == None:
 
+            # The instantion logic of relation_names list is coupled to the instantiation logic of the relation_classes
+            # list done in the method 'get_all_relation_classes'; hence just calling that is sufficient.
             cls.get_all_relation_classes()
 
         return cls._all_relation_names
 
 
+    # Methods dealing with related relations and entities
+    ####################################################################################################################
+
+
+    @classmethod
+    def get_relation_classes_of_entity_class(cls, entity_class):
+        """
+        :param entity_class : class of an entity for which the related relations should be returned
+        :return: a list of relation classes that are related to the entity class
+
+        E.g. AbstractRelation.get_relation_classes_of_entity_class( Person )
+        -> [ PersonEvent, PersonInstitution, PersonPerson, PersonPlace, PersonWork ]
+        """
+
+        return cls._relation_classes_of_entity_class[entity_class]
+
+
+    @classmethod
+    def add_relation_class_of_entity_class(cls, entity_class):
+        """
+        Adds the given entity class to a list which is later retrieved via a dictionary, where the entity class
+        defines the key and the list of related relation classes as its values.
+
+        :param entity_class: the class for which the related relation (the current cls) will be saved into a respective list.
+        :return: None
+        """
+
+        # get the list of the class dictionary, create if not yet exists.
+        relation_class_list = cls._relation_classes_of_entity_class.get(entity_class, [])
+        # append the current relation class to the list.
+        relation_class_list.append(cls)
+        # save into the dictionary, which uses the entity class as key and the extended list above as value.
+        cls._relation_classes_of_entity_class[entity_class] = relation_class_list
+
+
+    @classmethod
+    def get_relation_field_names_of_entity_class(cls, entity_class):
+        """
+        :param entity_class : class of an entity for which the related relation class field names should be returned
+        :return: a list of relation class field names that are related to the entity class
+
+        E.g. AbstractRelation.get_relation_names_of_entity_class( Person )
+        -> [ personevent_set, personinstitution_set, related_personA, related_personB, personplace_set, personwork_set ]
+        """
+
+        return cls._relation_names_of_entity_class[entity_class]
+
+
+    @classmethod
+    def add_relation_name_of_entity_class(cls, relation_name, entity_class):
+        """
+        Adds the given entity class to a list which is later retrieved via a dictionary, where the entity class
+        defines the key and the list of related relation classes as its values.
+
+        :param entity_class: the class for which the related relation (the current cls) will be saved into a respective list.
+        :return: None
+        """
+
+        # get the list of the class dictionary, create if not yet exists.
+        relation_names_list = cls._relation_names_of_entity_class.get(entity_class, [])
+        # append the current relation field name to the list.
+        relation_names_list.append(relation_name)
+        # save into the dictionary, which uses the entity class as key and the extended list above as value.
+        cls._relation_names_of_entity_class[entity_class] = relation_names_list
+
+
     def get_related_entity_instanceA(self):
-        return getattr( self, self.get_related_entity_nameA() )
+        """
+        This method only works on the relation instance of a given relation class.
+        There it returns the instance of an entity on the 'A' side of the given relation instance.
+
+        Note that if your IDE complains about expecting a 'str' instead of 'None' this happens because
+        the method 'get_related_entity_field_nameA()' is only implemented and overridden at runtime in the
+        function 'generated_relation_fields'.
+
+        :return: An entity instance related to the current relation instance
+        """
+        return getattr( self, self.get_related_entity_field_nameA() )
 
 
     def get_related_entity_instanceB(self):
-        return getattr( self, self.get_related_entity_nameB() )
+        """
+        This method only works on the relation instance of a given relation class.
+        There it returns the instance of an entity on the 'B' side of the given relation instance.
+
+        Note that if your IDE complains about expecting a 'str' instead of 'None' this happens because
+        the method 'get_related_entity_field_nameB()' is only implemented and overridden at runtime in the
+        function 'generated_relation_fields'.
+
+        :return: An entity instance related to the current relation instance
+        """
+        return getattr( self, self.get_related_entity_field_nameB() )
+
+
+
+    # method stumps
+    ####################################################################################################################
+    # These stumps merely serve as placeholders so that both IDE and developers know that these methods exist.
+    # They are implemented programmatically in the function 'generated_relation_fields'.
+
+
+    @classmethod
+    def get_related_entity_classA(cls):
+        """
+        :return: the python class of the A side of the current relation class or instance
+        E.g. PersonWork -> Person
+        """
+        return None
+
+    @classmethod
+    def get_related_entity_classB(cls):
+        """
+        :return: the python class of the B side of the current relation class or instance
+        E.g. PersonWork -> Work
+        """
+        return None
+
+    @classmethod
+    def get_related_entity_field_nameA(cls):
+        """
+        :return: the name of the field of the A side of the current relation class or instance
+        E.g. PersonWork -> "related_person"
+        """
+        return None
+
+    @classmethod
+    def get_related_entity_field_nameB(cls):
+        """
+        :return: the name of the field of the B side of the current relation class or instance
+        E.g. PersonWork -> "related_work"
+        """
+        return None
+
 
 
 #######################################################################
@@ -137,7 +277,7 @@ class GenericRelation(TempEntityClass):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PersonPerson(GenericRelation):
+class PersonPerson(AbstractRelation):
     """Defines and describes a relation between a Person and another Person
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PersonPersonRelation`
@@ -196,7 +336,7 @@ class PersonPerson(GenericRelation):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PersonPlace(GenericRelation):
+class PersonPlace(AbstractRelation):
     """Defines and describes a relation between a Person and a Place
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PersonPlaceRelation`
@@ -231,7 +371,7 @@ class PersonPlace(GenericRelation):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PersonInstitution(GenericRelation):
+class PersonInstitution(AbstractRelation):
     """ Defines and describes a relation between a Person and a Institution
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PersonInstitutionRelation`
@@ -263,7 +403,7 @@ class PersonInstitution(GenericRelation):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PersonEvent(GenericRelation):
+class PersonEvent(AbstractRelation):
     """ Defines and describes a relation bewteen a Person and an Event
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PersonEventRelation`
@@ -294,7 +434,7 @@ class PersonEvent(GenericRelation):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PersonWork(GenericRelation):
+class PersonWork(AbstractRelation):
     """ Defines and describes a relation between a Person and a Work
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PersonWorkRelation`
@@ -332,7 +472,7 @@ class PersonWork(GenericRelation):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class InstitutionInstitution(GenericRelation):
+class InstitutionInstitution(AbstractRelation):
     """ Defines and describes a relation between two Institutions
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.InstitutionInstitutionRelation`
@@ -379,7 +519,7 @@ class InstitutionInstitution(GenericRelation):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class InstitutionPlace(GenericRelation):
+class InstitutionPlace(AbstractRelation):
     """Describes a relation bewteen an Institution  and a Place
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.InstitutionPlaceRelation`
@@ -409,7 +549,7 @@ class InstitutionPlace(GenericRelation):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class InstitutionEvent(GenericRelation):
+class InstitutionEvent(AbstractRelation):
     """Describes a relation bewteen an Institution and an Event
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.InstitutionEventRelation`
@@ -438,7 +578,7 @@ class InstitutionEvent(GenericRelation):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class InstitutionWork(GenericRelation):
+class InstitutionWork(AbstractRelation):
     """Describes a relation bewteen an Institution and a Work
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.InstitutionWorkRelation`
@@ -475,7 +615,7 @@ class InstitutionWork(GenericRelation):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PlacePlace(GenericRelation):
+class PlacePlace(AbstractRelation):
     """Describes a relation bewteen an Place  and a Place
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PlacePlaceRelation`
@@ -530,7 +670,7 @@ class PlacePlace(GenericRelation):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PlaceEvent(GenericRelation):
+class PlaceEvent(AbstractRelation):
     """Describes a relation between an Place and an Event
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PlaceEventRelation`
@@ -563,7 +703,7 @@ class PlaceEvent(GenericRelation):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class PlaceWork(GenericRelation):
+class PlaceWork(AbstractRelation):
     """Describes a relation between an Place and a Work
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.PlaceWorkRelation`
@@ -603,7 +743,7 @@ class PlaceWork(GenericRelation):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class EventEvent(GenericRelation):
+class EventEvent(AbstractRelation):
     """Describes a relation between an Event and an Event
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.EventEventRelation`
@@ -659,7 +799,7 @@ class EventEvent(GenericRelation):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class EventWork(GenericRelation):
+class EventWork(AbstractRelation):
     """Describes a relation between an Event and a Work
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.EventWorkRelation`
@@ -699,7 +839,7 @@ class EventWork(GenericRelation):
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
-class WorkWork(GenericRelation):
+class WorkWork(AbstractRelation):
     """Describes a relation between an Work and a Work
 
     :param int relation_type: Foreign Key to :class:`vocabularies.models.WorkWorkRelation`
@@ -753,50 +893,94 @@ class WorkWork(GenericRelation):
         return result
 
 
-
 def generate_relation_fields():
+    """
+    This function goes through every relation automatically and creates the relation fields to their respective entity
+    classes.
+
+    The wiring is done by going reflectively through the python code and finding in the respective model modules the relevant classes.
+
+    Django's ContentType interface could not be used since this relies on full class declaration before calling any models,
+    however since we want to define attributes of models during their declaration, this was not possible and thus python's
+    own code inspection had to be used.
+
+    E.g. for PersonWork these fields are auto-generated: related_person, and related_work.
+    for PersonPerson: related_personA, and related_personB
+
+    This function is called just below.
+
+    :return: None
+    """
+
+    # functions to create classmethods on the relation classes, so that these methods can be called both on
+    # the class level as well as on the instance level.
 
     def create_function_get_related_entity_class(related_entity_class):
+        """
+        :param related_entity_class: the class which the generated class method shall return
+        :return: an anonymous function which is assigned as method with a label respective to relation and entity classes.
+        """
         return classmethod(lambda cls: related_entity_class)
 
     def create_function_get_related_entity_field_name(related_entity_field_name):
+        """
+        :param related_entity_field_name: the name of the related entity which the generated class method shall return
+        :return: an anonymous function which is assigned as method with a label respective to relation and entity classes.
+        """
         return classmethod(lambda cls: related_entity_field_name)
 
-    # TODO __sresch__ : avoid local import
-    from apis_core.apis_entities.models import GenericEntity
+    # TODO __sresch__ : check for best practice on local imports vs circularity problems.
+    from apis_core.apis_entities.models import AbstractEntity
 
-    for entity_class_a in GenericEntity.get_all_entity_classes():
-        for entity_class_b in GenericEntity.get_all_entity_classes():
-            for relation_class in GenericRelation.get_all_relation_classes():
+    # Iterate over all entity classes, twice, so that all relations between all entity classes are covered.
+    for entity_class_a in AbstractEntity.get_all_entity_classes():
+        for entity_class_b in AbstractEntity.get_all_entity_classes():
+            # Additionally iterate over all relation classes, manually defined within this current module.
+            for relation_class in AbstractRelation.get_all_relation_classes():
 
+                # Generate the names of current relation and its relation fields to other entities.
                 relation_class_name = relation_class.__name__.lower()
                 entity_class_a_name = entity_class_a.__name__.lower()
                 entity_class_b_name = entity_class_b.__name__.lower()
 
+                # Check if the two current entity classes align correctly with an existing relation class from this module.
                 if entity_class_a_name + entity_class_b_name == relation_class_name:
 
                     if entity_class_a != entity_class_b:
+                        # If the classes are different, then the related field names need to be set accordingly.
+                        #  E.g. for PersonWork: related_person, and related_work
 
                         relation_field_name_a = "related_" + entity_class_a_name
                         relation_field_name_b = "related_" + entity_class_b_name
 
+                        # To stick to common Django ORM Syntax, set the field name in the related entity class to
+                        # the current relation name and add '_set' to it (since going from the entity one would have
+                        # multiple relation instances possibly.)
+                        relation_field_name_from_entity = entity_class_a_name + entity_class_b_name + "_set"
 
+                        # Create the related entity field A.
                         models.ForeignKey(
                             to=entity_class_a,
                             blank=True,
                             null=True,
                             on_delete=models.CASCADE,
-                            related_name=entity_class_a_name + entity_class_b_name + "_set"
+                            related_name=relation_field_name_from_entity
                         ).contribute_to_class(relation_class, relation_field_name_a)
 
+                        # Create the related entity field B.
                         models.ForeignKey(
                             to=entity_class_b,
                             blank=True,
                             null=True,
                             on_delete=models.CASCADE,
-                            related_name=entity_class_a_name + entity_class_b_name + "_set"
+                            related_name=relation_field_name_from_entity
                         ).contribute_to_class(relation_class, relation_field_name_b)
 
+
+                        # Implemented the following methods programmatically by setting the respective relations,
+                        # entity class references, names, etc.
+                        # Note that these methods are first defined as stumps within AbstractRelation for documentation
+                        # purposes.
 
                         relation_class.get_related_entity_classA = \
                             create_function_get_related_entity_class( entity_class_a )
@@ -804,40 +988,73 @@ def generate_relation_fields():
                         relation_class.get_related_entity_classB = \
                             create_function_get_related_entity_class( entity_class_b )
 
-                        relation_class.get_related_entity_nameA = \
+                        relation_class.get_related_entity_field_nameA = \
                             create_function_get_related_entity_field_name( relation_field_name_a )
 
-                        relation_class.get_related_entity_nameB = \
+                        relation_class.get_related_entity_field_nameB = \
                             create_function_get_related_entity_field_name( relation_field_name_b )
 
+                        relation_class.add_relation_class_of_entity_class(entity_class_a)
+                        relation_class.add_relation_class_of_entity_class(entity_class_b)
+                        relation_class.add_relation_name_of_entity_class(relation_name=relation_field_name_from_entity, entity_class=entity_class_a)
+                        relation_class.add_relation_name_of_entity_class(relation_name=relation_field_name_from_entity, entity_class=entity_class_b)
+
                     else:
+                        # If the classes are not different, then the related field names need to be set accordingly.
+                        #  E.g. for PersonPerson: related_personA, and related_personB
 
                         entity_class_name = entity_class_a_name
                         entity_class = entity_class_a
                         relation_field_name_a = "related_" + entity_class_name + "A"
                         relation_field_name_b = "related_" + entity_class_name + "B"
 
+                        # Within APIS it was manually set that from a given entity which relates to a relation containing
+                        # the same entity class twice (e.g. PersonPerson), within the given entity class the
+                        # field's name was 'related_<entity>A', and 'related_<entity>B' (e.g. Person.related_personA).
+                        # This is not consistent with the other relation fields of a given entity
+                        # (e.g. for PersonWork, in Person and Work, it would refer to the relation via 'personwork_set').
+                        #
+                        # This should be changed, but it would result in crashes where code would not be adapted.
+                        #
+                        # So, for now, in order to not break APIS and to keep downwards-compatibility, the same fields are
+                        # generated as before.
+                        relation_field_name_from_entity_a = relation_field_name_b
+                        relation_field_name_from_entity_b = relation_field_name_a
 
+                        # TODO __sresch__ : use this related name for consistency reasons once most code breaking parts due to this change are identified.
+                        #
+                        # Unfortuantely it does not seem possible to have an Entity refer to a symmetric relation with
+                        # only the relation name (E.g. that both Person A and Person B would refer to the PersonPerson relation
+                        # via 'personperson_set'). So later it will be changed to 'personpersonA_set', and 'personpersonB_set'
+                        # to be a bit more consistent with other usages. So, uncomment the following once breaking parts
+                        # are identified and prepared for it.
+                        #
+                        # relation_field_name_from_entity_a = entity_class_name * 2 + "B_set"
+                        # relation_field_name_from_entity_b = entity_class_name * 2 + "A_set"
+
+                        # Create the related entity field A.
                         models.ForeignKey(
                             to=entity_class,
                             blank=True,
                             null=True,
                             on_delete=models.CASCADE,
-                            # TODO __sresch__ : use this related name for consistency reasons once most code breaking parts due to this change are identified.
-                            # related_name=entity_class_name * 2 + "B_set"
-                            related_name=relation_field_name_b
+                            related_name=relation_field_name_from_entity_a
                         ).contribute_to_class(relation_class, relation_field_name_a)
 
+                        # Create the related entity field B.
                         models.ForeignKey(
                             to=entity_class,
                             blank=True,
                             null=True,
                             on_delete=models.CASCADE,
-                            # TODO __sresch__ : use this related name for consistency reasons once most code breaking parts due to this change are identified.
-                            # related_name=entity_class_name * 2 + "A_set"
-                            related_name=relation_field_name_a
+                            related_name=relation_field_name_from_entity_b
                         ).contribute_to_class(relation_class, relation_field_name_b)
 
+
+                        # Implemented the following methods programmatically by setting the respective relations,
+                        # entity class references, names, etc.
+                        # Note that these methods are first defined as stumps within AbstractRelation for documentation
+                        # purposes.
 
                         relation_class.get_related_entity_classA = \
                             create_function_get_related_entity_class( entity_class )
@@ -845,13 +1062,19 @@ def generate_relation_fields():
                         relation_class.get_related_entity_classB = \
                             create_function_get_related_entity_class( entity_class )
 
-                        relation_class.get_related_entity_nameA = \
+                        relation_class.get_related_entity_field_nameA = \
                             create_function_get_related_entity_field_name( relation_field_name_a )
 
-                        relation_class.get_related_entity_nameB = \
+                        relation_class.get_related_entity_field_nameB = \
                             create_function_get_related_entity_field_name( relation_field_name_b )
 
+                        relation_class.add_relation_class_of_entity_class(entity_class)
+                        relation_class.add_relation_name_of_entity_class(relation_name=relation_field_name_from_entity_a, entity_class=entity_class)
+                        relation_class.add_relation_name_of_entity_class(relation_name=relation_field_name_from_entity_b, entity_class=entity_class)
 
+                    # if entity_class_a_name + entity_class_b_name == relation_class_name
+                    # equals to True, then for entity_class_a and entity_class_b, their respective relation class
+                    # has been found, thus interrupt the loop going through these relation classes.
                     break
 
 
