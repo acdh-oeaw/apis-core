@@ -157,8 +157,10 @@ class AbstractEntity(TempEntityClass):
                     )
 
 
+    # Various Methods enabling convenient shortcuts between entities, relations, fields, etc
+    ####################################################################################################################
 
-    # private class variables used for saving both class dependend and class independent information
+    # private class variables used for saving both class dependent and class independent information
     # for more convenient retrieval later on.
     # Initially defined as empty lists, they will be properly instantiated on their first call
 
@@ -734,20 +736,20 @@ def generate_relation_fields():
             # in order to align the relation_class and relationtype_class with each other.
             for relation_class, relationtype_class in zip(relation_classes, relationtype_classes):
 
-                relation_name = relation_class.__name__.lower()
-                relation_type_name = relationtype_class.__name__.lower()
+                relation_class_name = relation_class.__name__.lower()
+                relationtype_class_name = relationtype_class.__name__.lower()
 
                 # Ensure that relation_class and relationtype_class are indeed talking about the same relation
                 # If this error is thrown then it would indicate misaligment in the models themselves
                 # which would be a critical violation of the models.
-                if relation_name not in relation_type_name:
-                    raise Exception("Mismatch between Relation and RelationType class found! Between:\n",
-                            relation_class, "and", relationtype_class)
+                if relation_class_name not in relationtype_class_name:
+                    raise Exception("Mismatch between Relation and RelationType class found! Between:\n" +
+                            relation_class + " and " + relationtype_class)
 
                 # Check if current relation related to both entities
                 # Note that this way two entites are checked twice, such as person - place and place - person
                 # but however in the relation model only one of these two exists. Thus the right one is picked.
-                if entity_name_A + entity_name_B == relation_name:
+                if entity_name_A + entity_name_B == relation_class_name:
 
                     if entity_name_A != entity_name_B:
 

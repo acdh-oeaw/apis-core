@@ -73,8 +73,22 @@ class AbstractRelation(TempEntityClass):
     relating to either all or a specific relations.
     """
 
+    # TODO __sresch__ : Move the annotation manager into this class and remove it from all subclasses
+    # annotation_links = AnnotationRelationLinkManager()
+
     class Meta:
         abstract = True
+
+    def __str__(self):
+        return "{} ({}) {}".format(self.get_related_entity_instanceA(), self.relation_type, self.get_related_entity_instanceB())
+
+
+    # Various Methods enabling convenient shortcuts between entities, relations, fields, etc
+    ####################################################################################################################
+
+    # private class variables used for saving both class dependent and class independent information
+    # for more convenient retrieval later on.
+    # Initially defined as empty lists, they will be properly instantiated on their first call
 
     _all_relation_classes = None
     _all_relation_names = None
@@ -285,13 +299,7 @@ class PersonPerson(AbstractRelation):
     :param int related_personB: Foreign Key to :class:`entities.models.Person`
     """
 
-    relation_type = models.ForeignKey(PersonPersonRelation, blank=True,
-                                      null=True, on_delete=models.SET_NULL)
-
     annotation_links = AnnotationRelationLinkManager()
-
-    def __str__(self):
-        return "{} ({}) {}".format(self.related_personA, self.relation_type, self.related_personB)
 
     def get_web_object(self):
         """Used in some html views.
@@ -344,13 +352,7 @@ class PersonPlace(AbstractRelation):
     :param int related_place: Foreign Key to :class:`entities.models.Place`
     """
 
-    relation_type = models.ForeignKey(PersonPlaceRelation, blank=True,
-                                      null=True, on_delete=models.SET_NULL)
-
     annotation_links = AnnotationRelationLinkManager()
-
-    def __str__(self):
-        return "{} ({}) {}".format(self.related_person, self.relation_type, self.related_place)
 
     def get_web_object(self):
         """Used in some html views.
@@ -379,14 +381,7 @@ class PersonInstitution(AbstractRelation):
     :param int related_institution: Foreign Key to :class:`entities.models.Institution`
     """
 
-    relation_type = models.ForeignKey(PersonInstitutionRelation, blank=True,
-                                      null=True, on_delete=models.SET_NULL)
-
     annotation_links = AnnotationRelationLinkManager()
-
-    def __str__(self):
-        return "{} ({}) {}".format(
-            self.related_person, self.relation_type, self.related_institution)
 
     def get_web_object(self):
 
@@ -411,13 +406,7 @@ class PersonEvent(AbstractRelation):
     :param int related_event: Foreign Key to :class:`entities.models.Event`
     """
 
-    relation_type = models.ForeignKey(PersonEventRelation, blank=True,
-                                      null=True, on_delete=models.SET_NULL)
-
     annotation_links = AnnotationRelationLinkManager()
-
-    def __str__(self):
-        return "{} ({}) {}".format(self.related_person, self.relation_type, self.related_event)
 
     def get_web_object(self):
 
@@ -442,13 +431,7 @@ class PersonWork(AbstractRelation):
     :param int related_work: Foreign Key to :class:`entities.models.Work`
     """
 
-    relation_type = models.ForeignKey(PersonWorkRelation, blank=True, null=True,
-                                      on_delete=models.SET_NULL)
-
     annotation_links = AnnotationRelationLinkManager()
-
-    def __str__(self):
-        return "{} ({}) {}".format(self.related_person, self.relation_type, self.related_work)
 
     def get_web_object(self):
 
@@ -480,15 +463,7 @@ class InstitutionInstitution(AbstractRelation):
     :param int related_institutionB: Foreign Key to :class:`entities.models.Institution`
     """
 
-    relation_type = models.ForeignKey(InstitutionInstitutionRelation,
-                                      blank=True, null=True,
-                                      on_delete=models.SET_NULL)
-
     annotation_links = AnnotationRelationLinkManager()
-
-    def __str__(self):
-        return "{} ({}) {}".format(
-            self.related_institutionA, self.relation_type, self.related_institutionB)
 
     def get_web_object(self):
         result = {
@@ -527,15 +502,7 @@ class InstitutionPlace(AbstractRelation):
     :param int related_place: Foreign Key to :class:`entities.models.Place`
     """
 
-    relation_type = models.ForeignKey(
-        InstitutionPlaceRelation, blank=True, null=True,
-        on_delete=models.SET_NULL)
-
     annotation_links = AnnotationRelationLinkManager()
-
-    def __str__(self):
-        return "{} ({}) {}".format(
-            self.related_institution, self.relation_type, self.related_place)
 
     def get_web_object(self):
         result = {
@@ -557,14 +524,7 @@ class InstitutionEvent(AbstractRelation):
     :param int related_event: Foreign Key to :class:`entities.models.Event`
     """
 
-    relation_type = models.ForeignKey(InstitutionEventRelation, blank=True,
-                                      null=True, on_delete=models.SET_NULL)
-
     annotation_links = AnnotationRelationLinkManager()
-
-    def __str__(self):
-        return "{} ({}) {}".format(
-            self.related_institution, self.relation_type, self.related_event)
 
     def get_web_object(self):
         result = {
@@ -586,14 +546,7 @@ class InstitutionWork(AbstractRelation):
     :param int related_work: Foreign Key to :class:`entities.models.Work`
     """
 
-    relation_type = models.ForeignKey(InstitutionWorkRelation, blank=True,
-                                      null=True, on_delete=models.SET_NULL)
-
     annotation_links = AnnotationRelationLinkManager()
-
-    def __str__(self):
-        return "{} ({}) {}".format(
-            self.related_institution, self.relation_type, self.related_work)
 
     def get_web_object(self):
         result = {
@@ -623,13 +576,7 @@ class PlacePlace(AbstractRelation):
     :param int related_placeB: Foreign Key to :class:`entities.models.Place`
     """
 
-    relation_type = models.ForeignKey(PlacePlaceRelation, blank=True, null=True,
-                                      on_delete=models.SET_NULL)
-
     annotation_links = AnnotationRelationLinkManager()
-
-    def __str__(self):
-        return "{} ({}) {}".format(self.related_placeA, self.relation_type, self.related_placeB)
 
     def get_table_dict(self, entity):
         """Dict for the tabels in the html view
@@ -678,14 +625,7 @@ class PlaceEvent(AbstractRelation):
     :param int related_event: Foreign Key to :class:`entities.models.Event`
     """
 
-    relation_type = models.ForeignKey(PlaceEventRelation, blank=True, null=True,
-                                      on_delete=models.SET_NULL)
-
     annotation_links = AnnotationRelationLinkManager()
-
-    def __str__(self):
-        return "{} ({}) {}".format(
-            self.related_place, self.relation_type, self.related_event)
 
     def get_web_object(self):
         """Function that returns a dict that is used in html views.
@@ -711,14 +651,7 @@ class PlaceWork(AbstractRelation):
     :param int related_Work: Foreign Key to :class:`entities.models.Work`
     """
 
-    relation_type = models.ForeignKey(PlaceWorkRelation, blank=True, null=True,
-                                      on_delete=models.SET_NULL)
-
     annotation_links = AnnotationRelationLinkManager()
-
-    def __str__(self):
-        return "{} ({}) {}".format(
-            self.related_place, self.relation_type, self.related_work)
 
     def get_web_object(self):
         """Function that returns a dict that is used in html views.
@@ -751,13 +684,7 @@ class EventEvent(AbstractRelation):
     :param int related_eventB: Foreign Key to :class:`entities.models.Event`
     """
 
-    relation_type = models.ForeignKey(EventEventRelation, blank=True, null=True,
-                                      on_delete=models.SET_NULL)
-
     annotation_links = AnnotationRelationLinkManager()
-
-    def __str__(self):
-        return "{} ({}) {}".format(self.related_eventA, self.relation_type, self.related_eventB)
 
     def get_table_dict(self, entity):
         """Dict for the tabels in the html view
@@ -807,14 +734,7 @@ class EventWork(AbstractRelation):
     :param int related_work: Foreign Key to :class:`entities.models.Work`
     """
 
-    relation_type = models.ForeignKey(EventWorkRelation, blank=True, null=True,
-                                      on_delete=models.SET_NULL)
-
     annotation_links = AnnotationRelationLinkManager()
-
-    def __str__(self):
-        return "{} ({}) {}".format(
-            self.related_event, self.relation_type, self.related_work)
 
     def get_web_object(self):
         """Function that returns a dict that is used in html views.
@@ -847,13 +767,7 @@ class WorkWork(AbstractRelation):
     :param int related_workB: Foreign Key to :class:`entities.models.Work`
     """
 
-    relation_type = models.ForeignKey(WorkWorkRelation, blank=True, null=True,
-                                      on_delete=models.SET_NULL)
-
     annotation_links = AnnotationRelationLinkManager()
-
-    def __str__(self):
-        return "{} ({}) {}".format(self.related_workA, self.relation_type, self.related_workB)
 
     def get_table_dict(self, entity):
         """Dict for the tabels in the html view
@@ -931,19 +845,42 @@ def generate_relation_fields():
 
     # TODO __sresch__ : check for best practice on local imports vs circularity problems.
     from apis_core.apis_entities.models import AbstractEntity
+    from apis_core.apis_vocabularies.models import AbstractRelationType
+
+    # all the classes which are to be iterated over, also in the case of relation and relationtype they are sorted to ensure their proper alignment
+    entity_classes = AbstractEntity.get_all_entity_classes()
+    relation_classes = AbstractRelation.get_all_relation_classes()
+    relation_classes.sort(key=lambda x : x.__name__)
+    relationtype_classes = AbstractRelationType.get_all_relationtype_classes()
+    relationtype_classes.sort(key=lambda x : x.__name__)
 
     # Iterate over all entity classes, twice, so that all relations between all entity classes are covered.
     for entity_class_a in AbstractEntity.get_all_entity_classes():
         for entity_class_b in AbstractEntity.get_all_entity_classes():
             # Additionally iterate over all relation classes, manually defined within this current module.
-            for relation_class in AbstractRelation.get_all_relation_classes():
+            # for relation_class in AbstractRelation.get_all_relation_classes():
 
-                # Generate the names of current relation and its relation fields to other entities.
+            # relation_class_name = relation_class.__name__.lower()
+            entity_class_a_name = entity_class_a.__name__.lower()
+            entity_class_b_name = entity_class_b.__name__.lower()
+
+            # inner loop iterating over each of the relation_class and relationtype at the same time, which were sorted before
+            # in order to align the relation_class and relationtype_class with each other.
+            for relation_class, relationtype_class in zip(relation_classes, relationtype_classes):
+
                 relation_class_name = relation_class.__name__.lower()
-                entity_class_a_name = entity_class_a.__name__.lower()
-                entity_class_b_name = entity_class_b.__name__.lower()
+                relationtype_class_name = relationtype_class.__name__.lower()
 
-                # Check if the two current entity classes align correctly with an existing relation class from this module.
+                # Ensure that relation_class and relationtype_class are indeed talking about the same relation
+                # If this error is thrown then it would indicate misaligment in the models themselves
+                # which would be a critical violation of the models.
+                if relation_class_name not in relationtype_class_name:
+                    raise Exception("Mismatch between Relation and RelationType class found! Between:\n" +
+                            relation_class + " and " + relationtype_class)
+
+                # Check if current relation related to both entities
+                # Note that this way two entites are checked twice, such as person - place and place - person
+                # but however in the relation model only one of these two exists. Thus the right one is picked.
                 if entity_class_a_name + entity_class_b_name == relation_class_name:
 
                     if entity_class_a != entity_class_b:
@@ -956,7 +893,7 @@ def generate_relation_fields():
                         # To stick to common Django ORM Syntax, set the field name in the related entity class to
                         # the current relation name and add '_set' to it (since going from the entity one would have
                         # multiple relation instances possibly.)
-                        relation_field_name_from_entity = entity_class_a_name + entity_class_b_name + "_set"
+                        relation_field_name_in_other_class = entity_class_a_name + entity_class_b_name + "_set"
 
                         # Create the related entity field A.
                         models.ForeignKey(
@@ -964,7 +901,7 @@ def generate_relation_fields():
                             blank=True,
                             null=True,
                             on_delete=models.CASCADE,
-                            related_name=relation_field_name_from_entity
+                            related_name=relation_field_name_in_other_class
                         ).contribute_to_class(relation_class, relation_field_name_a)
 
                         # Create the related entity field B.
@@ -973,8 +910,17 @@ def generate_relation_fields():
                             blank=True,
                             null=True,
                             on_delete=models.CASCADE,
-                            related_name=relation_field_name_from_entity
+                            related_name=relation_field_name_in_other_class
                         ).contribute_to_class(relation_class, relation_field_name_b)
+
+                        # Create the related relaiontype field
+                        models.ForeignKey(
+                            to=relationtype_class,
+                            blank=True,
+                            null=True,
+                            on_delete=models.CASCADE,
+                            related_name=relation_field_name_in_other_class
+                        ).contribute_to_class(relation_class, "relation_type")
 
 
                         # Implemented the following methods programmatically by setting the respective relations,
@@ -996,8 +942,8 @@ def generate_relation_fields():
 
                         relation_class.add_relation_class_of_entity_class(entity_class_a)
                         relation_class.add_relation_class_of_entity_class(entity_class_b)
-                        relation_class.add_relation_name_of_entity_class(relation_name=relation_field_name_from_entity, entity_class=entity_class_a)
-                        relation_class.add_relation_name_of_entity_class(relation_name=relation_field_name_from_entity, entity_class=entity_class_b)
+                        relation_class.add_relation_name_of_entity_class(relation_name=relation_field_name_in_other_class, entity_class=entity_class_a)
+                        relation_class.add_relation_name_of_entity_class(relation_name=relation_field_name_in_other_class, entity_class=entity_class_b)
 
                     else:
                         # If the classes are not different, then the related field names need to be set accordingly.
@@ -1018,8 +964,9 @@ def generate_relation_fields():
                         #
                         # So, for now, in order to not break APIS and to keep downwards-compatibility, the same fields are
                         # generated as before.
-                        relation_field_name_from_entity_a = relation_field_name_b
-                        relation_field_name_from_entity_b = relation_field_name_a
+                        relation_field_name_in_other_class_a = relation_field_name_b
+                        relation_field_name_in_other_class_b = relation_field_name_a
+                        relation_field_name_in_other_class = entity_class_a_name + entity_class_b_name + "_set"
 
                         # TODO __sresch__ : use this related name for consistency reasons once most code breaking parts due to this change are identified.
                         #
@@ -1038,7 +985,7 @@ def generate_relation_fields():
                             blank=True,
                             null=True,
                             on_delete=models.CASCADE,
-                            related_name=relation_field_name_from_entity_a
+                            related_name=relation_field_name_in_other_class_a
                         ).contribute_to_class(relation_class, relation_field_name_a)
 
                         # Create the related entity field B.
@@ -1047,8 +994,17 @@ def generate_relation_fields():
                             blank=True,
                             null=True,
                             on_delete=models.CASCADE,
-                            related_name=relation_field_name_from_entity_b
+                            related_name=relation_field_name_in_other_class_b
                         ).contribute_to_class(relation_class, relation_field_name_b)
+
+                        # Create the related relaiontype field
+                        models.ForeignKey(
+                            to=relationtype_class,
+                            blank=True,
+                            null=True,
+                            on_delete=models.CASCADE,
+                            related_name=relation_field_name_in_other_class
+                        ).contribute_to_class(relation_class, "relation_type")
 
 
                         # Implemented the following methods programmatically by setting the respective relations,
@@ -1069,8 +1025,9 @@ def generate_relation_fields():
                             create_function_get_related_entity_field_name( relation_field_name_b )
 
                         relation_class.add_relation_class_of_entity_class(entity_class)
-                        relation_class.add_relation_name_of_entity_class(relation_name=relation_field_name_from_entity_a, entity_class=entity_class)
-                        relation_class.add_relation_name_of_entity_class(relation_name=relation_field_name_from_entity_b, entity_class=entity_class)
+                        relation_class.add_relation_name_of_entity_class(relation_name=relation_field_name_in_other_class_a, entity_class=entity_class)
+                        relation_class.add_relation_name_of_entity_class(relation_name=relation_field_name_in_other_class_b, entity_class=entity_class)
+
 
                     # if entity_class_a_name + entity_class_b_name == relation_class_name
                     # equals to True, then for entity_class_a and entity_class_b, their respective relation class
