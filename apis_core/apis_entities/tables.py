@@ -152,3 +152,7 @@ class PassageTable(tables.Table):
         fields = ['name', 'start_date', 'end_date', 'kind']
         # add class="paleblue" to <table> tag
         attrs = {"class": "table table-hover table-striped table-condensed"}
+
+
+
+# TODO __sresch__ : Create PublicationTable

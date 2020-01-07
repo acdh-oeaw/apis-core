@@ -37,8 +37,7 @@ from .forms import (
     get_entities_form, GenericEntitiesStanbolForm
 )
 from .tables import (
-    PersonTable, PlaceTable, InstitutionTable, EventTable, PassageTable, PublicationTable,
-    get_entities_table
+    PersonTable, PlaceTable, InstitutionTable, EventTable, PassageTable, get_entities_table
 )
 
 

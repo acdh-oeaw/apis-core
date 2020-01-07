@@ -379,6 +379,12 @@ class InstitutionInstitutionRelation(AbstractRelationType):
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
+class InstitutionPassageRelation(AbstractRelationType):
+    """Holds controlled vocabularies relation types of Institutions and Passages."""
+    pass
+
+
+@reversion.register(follow=['relationbaseclass_ptr'])
 class InstitutionPublicationRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Institutions and Passages."""
     pass

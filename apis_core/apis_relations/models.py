@@ -419,7 +419,7 @@ class AbstractRelation(TempEntityClass):
                     # which would be a critical violation of the models.
                     if relation_class_name not in relationtype_class_name:
                         raise Exception("Mismatch between Relation and RelationType class found! Between:\n" +
-                                relation_class + " and " + relationtype_class)
+                                str(relation_class) + " and " + str(relationtype_class))
 
                     # Check if current relation related to both entities
                     # Note that this way two entites are checked twice, such as person - place and place - person
@@ -596,7 +596,6 @@ class PersonPerson(AbstractRelation):
     annotation_links = AnnotationRelationLinkManager()
 
 
-
 @reversion.register(follow=['tempentityclass_ptr'])
 class PersonPlace(AbstractRelation):
 
@@ -604,6 +603,12 @@ class PersonPlace(AbstractRelation):
 
 
 # PlacePerson = PersonPlace TODO __sresch__
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class PersonInstitution(AbstractRelation):
+
+    annotation_links = AnnotationRelationLinkManager()
+
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class PersonEvent(AbstractRelation):
@@ -655,6 +660,12 @@ class InstitutionPassage(AbstractRelation):
     annotation_links = AnnotationRelationLinkManager()
 
 
+@reversion.register(follow=['tempentityclass_ptr'])
+class InstitutionPublication(AbstractRelation):
+
+    annotation_links = AnnotationRelationLinkManager()
+
+
 
 #######################################################################
 #
@@ -681,6 +692,12 @@ class PlacePassage(AbstractRelation):
     annotation_links = AnnotationRelationLinkManager()
 
 
+@reversion.register(follow=['tempentityclass_ptr'])
+class PlacePublication(AbstractRelation):
+
+    annotation_links = AnnotationRelationLinkManager()
+
+
 
 #######################################################################
 #
@@ -695,9 +712,14 @@ class EventEvent(AbstractRelation):
     annotation_links = AnnotationRelationLinkManager()
 
 
-
 @reversion.register(follow=['tempentityclass_ptr'])
 class EventPassage(AbstractRelation):
+
+    annotation_links = AnnotationRelationLinkManager()
+
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class EventPublication(AbstractRelation):
 
     annotation_links = AnnotationRelationLinkManager()
 
@@ -711,6 +733,25 @@ class EventPassage(AbstractRelation):
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class PassagePassage(AbstractRelation):
+
+    annotation_links = AnnotationRelationLinkManager()
+
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class PassagePublication(AbstractRelation):
+
+    annotation_links = AnnotationRelationLinkManager()
+
+
+#######################################################################
+#
+#   Publication - ... - Relation
+#
+#######################################################################
+
+
+@reversion.register(follow=['tempentityclass_ptr'])
+class PublicationPublication(AbstractRelation):
 
     annotation_links = AnnotationRelationLinkManager()
 
