@@ -21,7 +21,7 @@ from apis_core.apis_vocabularies.models import TextType
 from apis_core.apis_metainfo.models import Text, Uri, Collection
 from apis_core.apis_metainfo.forms import get_date_help_text_from_dates, get_date_help_text_default
 
-from apis_core.helper_functions.RDFparsers import GenericRDFParser
+from apis_core.helper_functions.RDFParser import RDFParser
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.models import AnnotationProject
@@ -41,6 +41,8 @@ class SearchForm(forms.Form):
 
 
 def get_entities_form(entity):
+
+    # TODO __sresch__ : consider moving this class outside of the function call to avoid redundant class definitions
     class GenericEntitiesForm(forms.ModelForm):
         class Meta:
             model = ContentType.objects.get(
@@ -61,6 +63,7 @@ def get_entities_form(entity):
             exclude.extend(model.get_related_entity_field_names())
             exclude.extend(model.get_related_relationtype_field_names())
 
+
         def __init__(self, *args, **kwargs):
             super(GenericEntitiesForm, self).__init__(*args, **kwargs)
             self.helper = FormHelper()
@@ -74,7 +77,7 @@ def get_entities_form(entity):
                 'notes',
                 'review')
             attrs = {'data-placeholder': 'Type to get suggestions',
-                     'data-minimum-input-length': 1,
+                     'data-minimum-input-length': getattr(settings, "APIS_MIN_CHAR", 3),
                      'data-html': True}
 
             # list to catch all fields that will not be inserted into accordion group acc_grp2
@@ -110,7 +113,7 @@ def get_entities_form(entity):
                                     for x in getattr(self.instance, f).all():
                                         res.append((x.pk, x.label))
                                 except ValueError:
-                                    pass 
+                                    pass
                                 self.fields[f].initial = res
                                 self.fields[f].choices = res
                             else:
@@ -200,13 +203,13 @@ def get_entities_form(entity):
             for f in sort_fields_list(fields_list_unsorted, entity):
                 acc_grp1.append(f)
 
+
             self.helper.layout = Layout(
                 Accordion(
                     acc_grp1,
                     acc_grp2
                 )
             )
-
             self.fields['status'].required = False
             self.fields['collection'].required = False
             self.fields['start_date_written'].required = False
@@ -256,12 +259,12 @@ def get_entities_form(entity):
 class GenericEntitiesStanbolForm(forms.Form):
     def save(self, *args, **kwargs):
         cd = self.cleaned_data
-        entity = GenericRDFParser(cd['entity'], self.entity.title()).get_or_create()
+        entity = RDFParser(cd['entity'], self.entity.title()).get_or_create()
         return entity
 
     def __init__(self, entity, *args, **kwargs):
         attrs = {'data-placeholder': 'Type to get suggestions',
-                 'data-minimum-input-length': 3,
+                 'data-minimum-input-length': getattr(settings, "APIS_MIN_CHAR", 3),
                  'data-html': True,
                  'style': 'width: auto'}
         ent_merge_pk = kwargs.pop('ent_merge_pk', False)
@@ -406,12 +409,12 @@ class NetworkVizFilterForm(forms.Form):
     def __init__(self, *args, **kwargs):
         rel_attrs = {
             'data-placeholder': 'Type to get suggestions',
-            'data-minimum-input-length': 0,
+            'data-minimum-input-length': getattr(settings, "APIS_MIN_CHAR", 3),
             'data-html': True
         }
         attrs = {
             'data-placeholder': 'Type to get suggestions',
-            'data-minimum-input-length': 0,
+            'data-minimum-input-length': getattr(settings, "APIS_MIN_CHAR", 3),
             'data-html': True
         }
         super(NetworkVizFilterForm, self).__init__(*args, **kwargs)

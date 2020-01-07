@@ -3,7 +3,6 @@ import json
 import reversion
 from reversion_compare.views import HistoryCompareDetailView
 from reversion.models import Version
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -23,23 +22,22 @@ from django_tables2 import RequestConfig
 from django_tables2.export.views import ExportMixin
 from .filters import get_list_filter_of_entity
 from apis_core.helper_functions.utils import access_for_all
-from .models import Person, Place, Institution, Event, Passage
+from .models import Person, Place, Institution, Event, Passage, Publication
 from apis_core.apis_vocabularies.models import LabelType
 from apis_core.apis_metainfo.models import Uri, UriCandidate, TempEntityClass, Text
 from apis_core.helper_functions.stanbolQueries import retrieve_obj
-from apis_core.helper_functions.RDFparsers import GenericRDFParser
+from apis_core.helper_functions.RDFParser import RDFParser
 from apis_core.helper_functions.utils import (
     access_for_all, access_for_all_function, ENTITIES_DEFAULT_COLS
 )
 from apis_core.apis_labels.models import Label
-
 from .forms import (
     FullTextForm, SearchForm, GenericFilterFormHelper,
     NetworkVizFilterForm, PersonResolveUriForm,
     get_entities_form, GenericEntitiesStanbolForm
 )
 from .tables import (
-    PersonTable, PlaceTable, InstitutionTable, EventTable, PassageTable,
+    PersonTable, PlaceTable, InstitutionTable, EventTable, PassageTable, PublicationTable,
     get_entities_table
 )
 
@@ -445,7 +443,8 @@ def resolve_ambigue_place(request, pk, uri):
     with reversion.create_revision():
         uri = 'http://'+uri
         entity = Place.objects.get(pk=pk)
-        pl_n = GenericRDFParser(uri, kind='Place')
+        pl_n = RDFParser(uri, kind='Place')
+        pl_n.create_objct()
         pl_n_1 = pl_n.save()
         pl_n_1 = pl_n.merge(entity)
         url = pl_n_1.get_absolute_url()

@@ -2,6 +2,7 @@ from dal import autocomplete
 
 from django.contrib import admin
 from django.apps import apps
+from django.conf import settings
 from django.urls import reverse
 from .models import PersonInstitutionRelation
 
@@ -29,14 +30,9 @@ class BaseAdminVocabularies(admin.ModelAdmin):
             obj.userAdded = request.user
         obj.save()
 
-
-class VocabsRelationAdmin(BaseAdminVocabularies):
-    list_display = ('name', 'label')
-    search_fields = ('name', 'parent_class__name')
-
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         attrs = {'data-placeholder': 'Type to get suggestions',
-                 'data-minimum-input-length': 3,
+                 'data-minimum-input-length': getattr(settings, "APIS_MIN_CHAR", 3),
                  'data-html': True}
         c_name = db_field.model.__name__
         qs = super(BaseAdminVocabularies, self).get_queryset(request)
@@ -52,12 +48,18 @@ class VocabsRelationAdmin(BaseAdminVocabularies):
                 kwargs={
                     'vocab': self.model.__name__.lower(),
                     'direct': 'normal'
-                    }
-                ), attrs=attrs)
+                }
+            ), attrs=attrs)
 
-        return super(VocabsRelationAdmin, self).formfield_for_foreignkey(
+        return super(BaseAdminVocabularies, self).formfield_for_foreignkey(
             db_field, request, **kwargs
         )
+
+
+class VocabsRelationAdmin(BaseAdminVocabularies):
+    list_display = ('name', 'label')
+    search_fields = ('name', 'parent_class__name')
+
 
 
 app = apps.get_app_config('apis_vocabularies')

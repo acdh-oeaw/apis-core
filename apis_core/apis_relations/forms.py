@@ -20,7 +20,7 @@ from apis_core.apis_vocabularies.models import (
     InstitutionInstitutionRelation, PersonPersonRelation
 )
 from apis_core.apis_labels.models import Label
-from apis_core.helper_functions.RDFparsers import GenericRDFParser
+from apis_core.helper_functions.RDFParser import RDFParser
 from dal import autocomplete
 
 
@@ -101,5 +101,5 @@ class PlaceEntityForm(forms.Form):
         cd = self.cleaned_data
         pl = Place.get_or_create_uri(cd['place_uri'])
         if not pl:
-            pl = GenericRDFParser(cd['place_uri'], 'Place').get_or_create()
+            pl = RDFParser(cd['place_uri'], 'Place').get_or_create()
         return pl

@@ -1,6 +1,6 @@
 Place:
   data:
-    - base_url: http://sws.geonames.org/
+    - base_url: https://sws.geonames.org/
       attributes:
         - name: name
           sparql: |
@@ -48,11 +48,11 @@ Place:
               WHERE {
                 ?subject gn:parentCountry ?parent
                     }
-    - base_url: http://d-nb.info/gnd/
+    - base_url: d-nb.info
       attributes:
         - name: name
           sparql: |
-            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            PREFIX gndo: <https://d-nb.info/standards/elementset/gnd#>
             SELECT ?prefName
               WHERE {
                 ?subject gndo:preferredNameForThePlaceOrGeographicName ?prefName
@@ -69,7 +69,8 @@ Place:
     attributes:
       name:
         string: '{prefName}'
-      kind: 
+      kind:
+        domain: geonames.org
         string: '{kind}'
         accessor: name
         regex: null
@@ -111,7 +112,7 @@ Person:
       attributes:
         - name: name
           sparql: |
-            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            PREFIX gndo: <https://d-nb.info/standards/elementset/gnd#>
 
             SELECT ?name ?first_name
 
@@ -126,7 +127,7 @@ Person:
             }
         - name: profession
           sparql: |
-            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            PREFIX gndo: <https://d-nb.info/standards/elementset/gnd#>
 
             SELECT ?profession
 
@@ -135,7 +136,7 @@ Person:
             }
         - name: start_date_written
           sparql: |
-            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            PREFIX gndo: <https://d-nb.info/standards/elementset/gnd#>
 
             SELECT ?start_date_written
 
@@ -144,7 +145,7 @@ Person:
             }
         - name: end_date_written
           sparql: |
-            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            PREFIX gndo: <https://d-nb.info/standards/elementset/gnd#>
 
             SELECT ?end_date_written
 
@@ -153,7 +154,7 @@ Person:
             }
         - name: place_of_birth
           sparql: |
-            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            PREFIX gndo: <https://d-nb.info/standards/elementset/gnd#>
 
             SELECT ?place_of_birth
 
@@ -162,7 +163,7 @@ Person:
             }
   matching:
     prefLabels:
-      - http://d-nb.info/standards/elementset/gnd#preferredNameForTheSubjectHeading
+      - https://d-nb.info/standards/elementset/gnd#preferredNameForTheSubjectHeading
     attributes:
       name:
         string: '{name}'
@@ -187,35 +188,35 @@ Institution:
       attributes:
         - name: name
           sparql: |
-            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            PREFIX gndo: <https://d-nb.info/standards/elementset/gnd#>
             SELECT ?name
               WHERE {
                 ?subject gndo:preferredNameForTheCorporateBody ?name
                 }
         - name: altName
           sparql: |
-            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            PREFIX gndo: <https://d-nb.info/standards/elementset/gnd#>
             SELECT ?altName
               WHERE {
                 ?subject gndo:variantNameForTheCorporateBody ?altName
                 }
         - name: place
           sparql: |
-            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            PREFIX gndo: <https://d-nb.info/standards/elementset/gnd#>
             SELECT ?place
               WHERE {
                 ?subject gndo:placeOfBusiness ?place
                 }
         - name: start_date_written
           sparql: |
-            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            PREFIX gndo: <https://d-nb.info/standards/elementset/gnd#>
             SELECT ?start_date_written
               WHERE {
                 ?subject gndo:dateOfEstablishment ?start_date_written
                 }
         - name: end_date_written
           sparql: |
-            PREFIX gndo: <http://d-nb.info/standards/elementset/gnd#>
+            PREFIX gndo: <https://d-nb.info/standards/elementset/gnd#>
             SELECT ?end_date_written
               WHERE {
                 ?subject gndo:dateOfTermination ?end_date_written
@@ -231,7 +232,7 @@ Institution:
     linked objects:
       - type: Place
         kind: located in
-        identifier: place
+        identifier: place.place
     labels:
       - label type: alternative name
         identifier: altName

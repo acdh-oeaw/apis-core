@@ -4,6 +4,8 @@ import sys
 import inspect
 # from reversion import revisions as reversion
 import reversion
+from django.db.models import Q
+
 from apis_core.apis_labels.models import Label
 from apis_core.apis_metainfo.models import Collection, TempEntityClass, Text, Uri
 from apis_core.apis_vocabularies.models import (
@@ -18,15 +20,19 @@ from apis_core.apis_vocabularies.models import (
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db import models
-from django.db.models.signals import m2m_changed, post_save
+from django.db.models.signals import m2m_changed, post_save, class_prepared
 from django.dispatch import receiver
 from django.urls import reverse
 from guardian.shortcuts import assign_perm, remove_perm
+from django.contrib.contenttypes.models import ContentType
+
 
 BASE_URI = getattr(settings, "APIS_BASE_URI", "http://apis.info/")
 
 
-class GenericEntity(TempEntityClass):
+
+
+class AbstractEntity(TempEntityClass):
     """
     Abstract super class which encapsulates common logic between the different entity kinds and provides various methods
     relating to either all or a specific entity kind.
@@ -43,7 +49,49 @@ class GenericEntity(TempEntityClass):
         super().__init__(*args, **kwargs)
         self.__class__.create_relation_methods_from_manytomany_fields()
 
-    # TODO __sresch__ : consider moving this block of logic for creation of related_entity_instances functions to generate_relation_fields
+
+
+    # Methods dealing with individual data retrievals of instances
+    ####################################################################################################################
+
+
+    def to_str_new(self):
+
+        if self.__class__ == Person:
+
+            if self.first_name != "" and self.name != "":
+                return "{}, {}".format(self.name, self.first_name)
+            elif self.first_name != "" and self.name == "":
+                return "{}, {}".format("no surename provided", self.first_name)
+            elif self.first_name == "" and self.name != "":
+                return self.name
+            elif self.first_name == "" and self.name == "":
+                return "no name provided"
+
+        else:
+
+            if self.name != "":
+                return self.name
+            else:
+                return "no name provided"
+
+    @classmethod
+    def get_or_create_uri_new(cls, uri):
+        uri = str(uri)
+        try:
+            if re.match(r"^[0-9]*$", uri):
+                p = cls.objects.get(pk=uri)
+            else:
+                p = cls.objects.get(uri__uri=uri)
+            return p
+        except:
+            print("Found no object corresponding to given uri.")
+            return False
+
+
+    # Various Methods enabling convenient shortcuts between entities, relations, fields, etc
+    ####################################################################################################################
+
     @classmethod
     def create_relation_methods_from_manytomany_fields(cls):
         """
@@ -103,6 +151,7 @@ class GenericEntity(TempEntityClass):
                         getattr(self, entityB_manytomany_field).all())
                 ).distinct()
 
+
         for entity_name in cls.get_all_entity_names():
             # Iterate over each entity defined within this models' module
 
@@ -149,21 +198,23 @@ class GenericEntity(TempEntityClass):
                         create_function_from_manytomany_field_to_other_entity(entity_manytomany_field)
                     )
 
-    # private class variables used for saving both class dependend and class independent information
+
+
+    # private class variables used for saving both class dependent and class independent information
     # for more convenient retrieval later on.
     # Initially defined as empty lists, they will be properly instantiated on their first call
 
     _all_entity_classes = None
     _all_entity_names = None
-    _related_relation_classes = None
-    _related_relation_names = None
     _related_relationtype_classes = None
     _related_relationtype_names = None
     _related_entity_field_names = None
     _related_relationtype_field_names = None
 
+
     # Methods dealing with all entities
     ####################################################################################################################
+
 
     @classmethod
     def get_all_entity_classes(cls):
@@ -179,14 +230,17 @@ class GenericEntity(TempEntityClass):
             for entity_name, entity_class in inspect.getmembers(sys.modules[__name__], inspect.isclass):
 
                 if entity_class.__module__ == "apis_core.apis_entities.models" and \
-                        entity_name != "GenericEntity":
+                        entity_name != "AbstractEntity":
+
                     entity_classes.append(entity_class)
                     entity_names.append(entity_name.lower())
+
 
             cls._all_entity_classes = entity_classes
             cls._all_entity_names = entity_names
 
         return cls._all_entity_classes
+
 
     @classmethod
     def get_all_entity_names(cls):
@@ -195,12 +249,15 @@ class GenericEntity(TempEntityClass):
         """
 
         if cls._all_entity_names == None:
+
             cls.get_all_entity_classes()
 
         return cls._all_entity_names
 
+
     # Methods dealing with related entities
     ####################################################################################################################
+
 
     @classmethod
     def get_related_entity_field_names(cls):
@@ -211,13 +268,14 @@ class GenericEntity(TempEntityClass):
         ['event_set', 'institution_set', 'personB_set', 'personA_set', 'place_set', 'work_set']
 
         Note: this method depends on the 'generate_relation_fields' method which wires the ManyToMany Fields into the
-        entities and respective relationtypes. It is nevertheless defined here within GenericEntity for documentational purpose.
+        entities and respective relationtypes. It is nevertheless defined here within AbstractEntity for documentational purpose.
         """
 
         if cls._related_entity_field_names == None:
             raise Exception("_related_entity_field_names was not initialized yet.")
         else:
             return cls._related_entity_field_names
+
 
     @classmethod
     def add_related_entity_field_name(cls, entity_field_name):
@@ -226,13 +284,14 @@ class GenericEntity(TempEntityClass):
         :return: None
 
         Note: this method depends on the 'generate_relation_fields' method which wires the ManyToMany Fields into the
-        entities and respective relationtypes. It is nevertheless defined here within GenericEntity for documentational purpose.
+        entities and respective relationtypes. It is nevertheless defined here within AbstractEntity for documentational purpose.
         """
 
         if cls._related_entity_field_names == None:
             cls._related_entity_field_names = []
 
         cls._related_entity_field_names.append(entity_field_name)
+
 
     def get_related_entity_instances(self):
         """
@@ -249,8 +308,11 @@ class GenericEntity(TempEntityClass):
 
         return queryset_list
 
+
+
     # Methods dealing with related relations
     ####################################################################################################################
+
 
     @classmethod
     def get_related_relation_classes(cls):
@@ -261,73 +323,25 @@ class GenericEntity(TempEntityClass):
         [ InstitutionPlace, PersonPlace, PlaceEvent, PlacePlace, PlaceWork ]
         """
 
-        if cls._related_relation_classes == None:
+        # TODO __sresch__ : check for best practice on local imports vs circularity problems.
+        from apis_core.apis_relations.models import AbstractRelation
 
-            relation_classes = []
-            relation_names = []
+        return AbstractRelation.get_relation_classes_of_entity_class( cls )
 
-            # TODO __sresch__ : check for best practice on local imports vs circularity problems.
-            # These imports are done locally to avoid circular import problems which arise if they are done globally in this module
-            from apis_core.apis_relations.models import GenericRelation
 
-            for relation_class in GenericRelation.get_all_relation_classes():
-
-                relation_name = relation_class.__name__.lower()
-
-                count_class_name_in_relation_name = relation_name.count( cls.__name__.lower() )
-
-                if count_class_name_in_relation_name >= 1:
-
-                    relation_classes.append( relation_class )
-
-                    if count_class_name_in_relation_name == 2:
-
-                        # TODO __sresch__ : use this related name for consistency reasons once most code breaking parts due to this change are identified.
-                        # relation_names.append( relation_name + "A_set" )
-                        # relation_names.append( relation_name + "B_set" )
-
-                        # until the change above has been implemented, use these fields for downward compatibility reasons
-                        relation_names.append( relation_class.get_related_entity_nameA() )
-                        relation_names.append( relation_class.get_related_entity_nameB() )
-
-                    else:
-
-                        relation_names.append( relation_name + "_set" )
-
-            cls._related_relation_classes = relation_classes
-            cls._related_relation_names = relation_names
-
-        return cls._related_relation_classes
 
     @classmethod
-    def get_related_relation_names(cls):
+    def get_related_relation_field_names(cls):
         """
         :return: list of class names in lower case of the relations which are related to the respective entity class
 
         E.g. for Place.get_related_relation_names() or place_instance.get_related_relation_names() ->
-        ['institutionplace', 'personplace', 'placeevent', 'placeplace', 'placework']
+        ['institutionplace_set', 'personplace_set', 'placeevent_set', 'placeplace_set', 'placework_set']
         """
+        # TODO __sresch__ : check for best practice on local imports vs circularity problems.
+        from apis_core.apis_relations.models import AbstractRelation
 
-        if cls._related_relation_names == None:
-            cls.get_related_relation_classes()
-
-        return cls._related_relation_names
-
-
-    # TODO __sresch__ : implement the following methods to be consistent with other methods
-    #
-    # open question however regards fields such as related_personA and related_personB and where are they generated to be consistent?
-    #
-    # @classmethod
-    # def get_related_relation_field_names(cls):
-    #
-    #     return None
-    #
-    #
-    # @classmethod
-    # def add_related_relation_field_name(cls, relation_field_name):
-    #
-    #     return None
+        return AbstractRelation.get_relation_field_names_of_entity_class(cls)
 
 
 
@@ -337,33 +351,22 @@ class GenericEntity(TempEntityClass):
         """
 
         queryset_list = []
-        self_entity_name = self.__class__.__name__.lower()
 
         for relation_class in self.get_related_relation_classes():
 
-            queryset = None
+            q_args = Q()
 
-            count_occurence = relation_class.__name__.lower().count(self_entity_name)
+            if relation_class.get_related_entity_classA() == self.__class__:
+                q_args |= Q(**{relation_class.get_related_entity_field_nameA(): self})
 
-            # TODO __sresch__ : Try to change it to a call from entity class itself (e.g. Work.eventwork_set.all() )
-            # for now search in the relation model, because somehow somewhere when the entity models
-            # are symmetrical, then the foreign key field in the entity model is called for example relate_workA.all()
-            # find where this is done, and change it
+            if relation_class.get_related_entity_classB() == self.__class__:
+                q_args |= Q(**{relation_class.get_related_entity_field_nameB(): self})
 
-            if count_occurence == 1:
-
-                queryset = relation_class.objects.filter(**{'related_' + self_entity_name.lower(): self})
-
-            elif count_occurence == 2:
-
-                querysetA = relation_class.objects.filter(**{'related_' + self_entity_name.lower() + 'A': self})
-                querysetB = relation_class.objects.filter(**{'related_' + self_entity_name.lower() + 'B': self})
-                queryset = querysetA.union(querysetB).distinct()
-
-            if queryset and len(queryset) > 0:
-                queryset_list.append(queryset)
+            queryset = relation_class.objects.filter( q_args )
+            queryset_list.append( queryset )
 
         return queryset_list
+
 
     # Methods dealing with related relationtypes
     ####################################################################################################################
@@ -384,13 +387,14 @@ class GenericEntity(TempEntityClass):
 
             # TODO __sresch__ : check for best practice on local imports vs circularity problems.
             # These imports are done locally to avoid circular import problems which arise if they are done globally in this module
-            from apis_core.apis_vocabularies.models import GenericRelationType
+            from apis_core.apis_vocabularies.models import AbstractRelationType
 
-            for relationtype_class in GenericRelationType.get_all_relationtype_classes():
+            for relationtype_class in AbstractRelationType.get_all_relationtype_classes():
 
                 relationtype_name = relationtype_class.__name__.lower()
 
                 if cls.__name__.lower() in relationtype_name:
+
                     relationtype_classes.append(relationtype_class)
                     relationtype_names.append(relationtype_name)
 
@@ -398,6 +402,7 @@ class GenericEntity(TempEntityClass):
             cls._related_relationtype_names = relationtype_names
 
         return cls._related_relationtype_classes
+
 
     @classmethod
     def get_related_relationtype_names(cls):
@@ -409,9 +414,11 @@ class GenericEntity(TempEntityClass):
         """
 
         if cls._related_relationtype_names == None:
+
             cls.get_related_relationtype_classes()
 
         return cls._related_relationtype_names
+
 
     @classmethod
     def get_related_relationtype_field_names(cls):
@@ -422,13 +429,14 @@ class GenericEntity(TempEntityClass):
         ['event_relationtype_set', 'institution_relationtype_set', 'personB_relationtype_set', 'personA_relationtype_set', 'place_relationtype_set', 'work_relationtype_set']
 
         Note: this method depends on the 'generate_relation_fields' method which wires the ManyToMany Fields into the
-        entities and respective relationtypes. It is nevertheless defined here within GenericEntity for documentational purpose.
+        entities and respective relationtypes. It is nevertheless defined here within AbstractEntity for documentational purpose.
         """
 
         if cls._related_relationtype_field_names == None:
             raise Exception("_related_relationtype_field_names was not initialized yet.")
         else:
             return cls._related_relationtype_field_names
+
 
     @classmethod
     def add_related_relationtype_field_name(cls, relationtype_field_name):
@@ -437,13 +445,14 @@ class GenericEntity(TempEntityClass):
         :return: None
 
         Note: this method depends on the 'generate_relation_fields' method which wires the ManyToMany Fields into the
-        entities and respective relationtypes. It is nevertheless defined here within GenericEntity for documentational purpose.
+        entities and respective relationtypes. It is nevertheless defined here within AbstractEntity for documentational purpose.
         """
 
         if cls._related_relationtype_field_names == None:
             cls._related_relationtype_field_names = []
 
         cls._related_relationtype_field_names.append(relationtype_field_name)
+
 
     def get_related_relationtype_instances(self):
         """
@@ -471,9 +480,171 @@ class GenericEntity(TempEntityClass):
         return queryset_list
 
 
+
+    # meta logic which wires everything together programmatically
+    ####################################################################################################################
+
+    @classmethod
+    def generate_relation_fields(cls):
+        """
+        This function goes through every entity, relation, and relationtype model and automatically wires them together
+        by setting ManyToMany fields to each other through the relation model. This way the relations of a given entity
+        to any other entity or relationtype can be queried much more directly and without the overhead of going through
+        the relation model each time.
+
+        The wiring is done by going reflectively through the python code and finding in the respective model modules the relevant classes.
+
+        Django's ContentType interface could not be used since this relies on full class declaration before calling any models,
+        however since we want to define attributes of models during their declaration, this was not possible and thus python's
+        own code inspection had to be used.
+
+        E.g. for Person these fields are auto-generated: event_set, institution_set, personB_set, personA_set, place_set, work_set
+        And each of those fields are ManyToMany Managers where their django methods can be used upon, such as all() and filter()
+
+        This function is called just below.
+
+        :return: None
+        """
+
+        # TODO __sresch__ : check for best practice on local imports vs circularity problems.
+        # These imports are done locally to avoid circular import problems which arise if they are done globally in this module
+        from apis_core.apis_relations.models import AbstractRelation
+        from apis_core.apis_vocabularies.models import AbstractRelationType
+
+
+        # all the classes which are to be iterated over, also in the case of relation and relationtype they are sorted to ensure their proper alignment
+        entity_classes = cls.get_all_entity_classes()
+        relation_classes = AbstractRelation.get_all_relation_classes()
+        relation_classes.sort(key=lambda x : x.__name__)
+        relationtype_classes = AbstractRelationType.get_all_relationtype_classes()
+        relationtype_classes.sort(key=lambda x : x.__name__)
+
+
+        # Outer loop iterating over each of the entities, twice, in order to create their full power set
+        for entity_class_A in entity_classes:
+            for entity_class_B in entity_classes:
+
+                entity_name_A = entity_class_A.__name__.lower()
+                entity_name_B = entity_class_B.__name__.lower()
+
+                # inner loop iterating over each of the relation_class and relationtype at the same time, which were sorted before
+                # in order to align the relation_class and relationtype_class with each other.
+                for relation_class, relationtype_class in zip(relation_classes, relationtype_classes):
+
+                    relation_class_name = relation_class.__name__.lower()
+                    relationtype_class_name = relationtype_class.__name__.lower()
+
+                    # Ensure that relation_class and relationtype_class are indeed talking about the same relation
+                    # If this error is thrown then it would indicate misaligment in the models themselves
+                    # which would be a critical violation of the models.
+                    if relation_class_name not in relationtype_class_name:
+                        raise Exception("Mismatch between Relation and RelationType class found! Between:\n" +
+                                relation_class + " and " + relationtype_class)
+
+                    # Check if current relation related to both entities
+                    # Note that this way two entites are checked twice, such as person - place and place - person
+                    # but however in the relation model only one of these two exists. Thus the right one is picked.
+                    if entity_name_A + entity_name_B == relation_class_name:
+
+                        if entity_name_A != entity_name_B:
+
+                            # Define all the names for the ManyToMany fields generated below
+                            field_name_to_entity_A = entity_name_A + "_set"
+                            field_name_to_entity_B = entity_name_B + "_set"
+                            field_name_to_entity_B_relationtype = entity_name_B + "_relationtype_set"
+                            field_name_to_entity_A_relationtype = entity_name_A + "_relationtype_set"
+
+                            # Add those names already into the respective class's list of field names
+                            entity_class_A.add_related_entity_field_name(field_name_to_entity_B)
+                            entity_class_B.add_related_entity_field_name(field_name_to_entity_A)
+                            entity_class_A.add_related_relationtype_field_name(field_name_to_entity_B_relationtype)
+                            entity_class_B.add_related_relationtype_field_name(field_name_to_entity_A_relationtype)
+                            relationtype_class.add_related_entity_field_name(field_name_to_entity_B)
+                            relationtype_class.add_related_entity_field_name(field_name_to_entity_A)
+
+                            # entity A to entity B, and B back to A
+                            models.ManyToManyField(
+                                to=entity_class_B,
+                                through=relation_class,
+                                related_name=field_name_to_entity_A,
+                                blank=True,
+                            ).contribute_to_class(entity_class_A, field_name_to_entity_B)
+
+                            # entity A to RelationType via entity B, and RelationType back to A
+                            models.ManyToManyField(
+                                to=relationtype_class,
+                                through=relation_class,
+                                related_name=field_name_to_entity_A,
+                                blank=True,
+                            ).contribute_to_class(entity_class_A, field_name_to_entity_B_relationtype)
+
+                            # entity B to RelationType via entity A, and RelationType back to B
+                            models.ManyToManyField(
+                                to=relationtype_class,
+                                through=relation_class,
+                                related_name=field_name_to_entity_B,
+                                blank=True,
+                            ).contribute_to_class(entity_class_B, field_name_to_entity_A_relationtype)
+
+
+                        else:
+
+                            # Define all the names for the ManyToMany fields generated below
+                            field_name_to_entity_A = entity_name_A + "A_set"
+                            field_name_to_entity_B = entity_name_B + "B_set"
+                            field_name_to_entity_B_relationtype = entity_name_B + "B_relationtype_set"
+                            field_name_to_entity_A_relationtype = entity_name_A + "A_relationtype_set"
+
+                            # Add those names already into the respective class's list of field names
+                            entity_class_A.add_related_entity_field_name(field_name_to_entity_B)
+                            entity_class_B.add_related_entity_field_name(field_name_to_entity_A)
+                            entity_class_A.add_related_relationtype_field_name(field_name_to_entity_B_relationtype)
+                            entity_class_B.add_related_relationtype_field_name(field_name_to_entity_A_relationtype)
+                            relationtype_class.add_related_entity_field_name(field_name_to_entity_B)
+                            relationtype_class.add_related_entity_field_name(field_name_to_entity_A)
+
+                            # entity A to same entity B, and B back to A
+                            models.ManyToManyField(
+                                to=entity_class_B,
+                                through=relation_class,
+                                related_name=field_name_to_entity_A,
+                                blank=True,
+                                symmetrical=False,
+                                through_fields=("related_" + entity_name_A + "A", "related_" + entity_name_B + "B")
+                            ).contribute_to_class(entity_class_A, field_name_to_entity_B)
+
+                            # entity A to RelationType via entity B, and RelationType back to A
+                            models.ManyToManyField(
+                                to=relationtype_class,
+                                through=relation_class,
+                                related_name=field_name_to_entity_A,
+                                blank=True,
+                                symmetrical=False,
+                                through_fields=("related_" + entity_name_A + "A", "relation_type")
+                            ).contribute_to_class(entity_class_A, field_name_to_entity_B_relationtype)
+
+                            # entity B to RelationType via entity A, and RelationType back to B
+                            models.ManyToManyField(
+                                to=entity_class_B,
+                                through=relation_class,
+                                related_name=field_name_to_entity_A_relationtype,
+                                blank=True,
+                                symmetrical=False,
+                                through_fields=("relation_type", "related_" + entity_name_B + "B")
+                            ).contribute_to_class(relationtype_class, field_name_to_entity_B)
+
+                        # if entity_class_a_name + entity_class_b_name == relation_class_name
+                        # equals to True, then for entity_class_a and entity_class_b, their respective relation class
+                        # has been found, thus interrupt the loop going through these relation classes.
+                        break
+
+
+
+
+
+
 @reversion.register(follow=["tempentityclass_ptr"])
-class Person(GenericEntity):
-    """ A temporalized entity to model a human beeing."""
+class Person(AbstractEntity):
 
     GENDER_CHOICES = (("female", "female"), ("male", "male"))
     first_name = models.CharField(
@@ -485,26 +656,6 @@ class Person(GenericEntity):
     title = models.ManyToManyField(Title, blank=True)
     gender = models.CharField(max_length=15, choices=GENDER_CHOICES, blank=True)
 
-    def __str__(self):
-        if self.first_name != "" and self.name != "":
-            return "{}, {}".format(self.name, self.first_name)
-        elif self.first_name != "" and self.name == "":
-            return "{}, {}".format("no surename provided", self.first_name)
-        elif self.first_name == "" and self.name != "":
-            return self.name
-        elif self.first_name == "" and self.name == "":
-            return "no name provided"
-
-    def get_or_create_uri(uri):
-        try:
-            if re.match(r"^[0-9]*$", uri):
-                p = Person.objects.get(pk=uri)
-            else:
-                p = Person.objects.get(uri__uri=uri)
-            return p
-        except:
-            return False
-
     def save(self, *args, **kwargs):
         if self.first_name:
             # secure correct unicode encoding
@@ -515,136 +666,49 @@ class Person(GenericEntity):
 
 
 @reversion.register(follow=["tempentityclass_ptr"])
-class Place(GenericEntity):
-    """ A temporalized entity to model a place"""
+class Place(AbstractEntity):
 
     kind = models.ForeignKey(
         PlaceType, blank=True, null=True, on_delete=models.SET_NULL
     )
     lat = models.FloatField(blank=True, null=True, verbose_name="latitude")
     lng = models.FloatField(blank=True, null=True, verbose_name="longitude")
-    name_english = models.CharField(max_length=1024, blank=True, null=True)
 
-    def __str__(self):
-        if self.name != "":
-            return self.name
-        else:
-            return "no name provided"
-
-    def get_or_create_uri(uri):
-        try:
-            if re.match(r"^[0-9]*$", uri):
-                p = Place.objects.get(pk=uri)
-            else:
-                p = Place.objects.get(uri__uri=uri)
-            return p
-        except:
-            return False
 
 
 @reversion.register(follow=["tempentityclass_ptr"])
-class Institution(GenericEntity):
+class Institution(AbstractEntity):
+
     kind = models.ForeignKey(
         InstitutionType, blank=True, null=True, on_delete=models.SET_NULL
     )
-    name_english = models.CharField(max_length=1024, blank=True, null=True)
 
-    def __str__(self):
-        if self.name != "":
-            return self.name
-        else:
-            return "no name provided"
-
-    def get_or_create_uri(uri):
-        try:
-            if re.match(r"^[0-9]*$", uri):
-                p = Institution.objects.get(pk=uri)
-            else:
-                p = Institution.objects.get(uri__uri=uri)
-                print(p)
-            return p
-        except:
-            print("returned false")
-            return False
 
 
 @reversion.register(follow=["tempentityclass_ptr"])
-class Event(GenericEntity):
+class Event(AbstractEntity):
+
     kind = models.ForeignKey(
         EventType, blank=True, null=True, on_delete=models.SET_NULL
     )
-    name_english = models.CharField(max_length=1024, blank=True, null=True)
 
-    def __str__(self):
-        if self.name != "":
-            return self.name
-        else:
-            return "no name provided"
 
-    def get_or_create_uri(uri):
-        try:
-            if re.match(r"^[0-9]*$", uri):
-                p = Event.objects.get(pk=uri)
-            else:
-                p = Event.objects.get(uri__uri=uri)
-            return p
-        except:
-            return False
 
 
 @reversion.register(follow=["tempentityclass_ptr"])
-class Passage(GenericEntity):
+class Passage(AbstractEntity):
 
-    # TODO __sresch__ : consider renaming ManyToManyFields like topics to passagetopic_set to be consistent with reverse direction
-    topics = models.ManyToManyField(PassageTopics, blank=True, null=True)
-    migne_number = models.CharField(max_length=1024, blank=True, null=True)
     kind = models.ForeignKey(PassageType, blank=True, null=True, on_delete=models.SET_NULL)
 
-    def __str__(self):
-        if self.name != "":
-            return self.name
-        else:
-            return "no name provided"
-
-    def get_or_create_uri(uri):
-        try:
-            if re.match(r"^[0-9]*$", uri):
-                p = Passage.objects.get(pk=uri)
-            else:
-                p = Passage.objects.get(uri__uri=uri)
-            return p
-        except:
-            return False
 
 
 @reversion.register(follow=["tempentityclass_ptr"])
-class Publication(GenericEntity):
+class Publication(AbstractEntity):
     kind = models.ForeignKey(PassageType, blank=True, null=True, on_delete=models.SET_NULL)
     language = models.ForeignKey(PassageLanguage, blank=True, null=True, on_delete=models.SET_NULL)
     clavis_number = models.CharField(max_length=1024, blank=True, null=True)
     migne_number = models.CharField(max_length=1024, blank=True, null=True)
     publication_description = models.TextField(blank=True, null=True)
-
-    def __str__(self):
-        if self.name != "":
-            return self.name
-        else:
-            return "no name provided"
-
-    def get_or_create_uri(uri):
-        try:
-            if re.match(r"^[0-9]*$", uri):
-                p = Publication.objects.get(pk=uri)
-            else:
-                p = Publication.objects.get(uri__uri=uri)
-            return p
-        except:
-            return False
-
-
-
-
-
 
 
 @receiver(post_save, sender=Event, dispatch_uid="create_default_uri")
@@ -655,8 +719,12 @@ class Publication(GenericEntity):
 @receiver(post_save, sender=Publication, dispatch_uid="create_default_uri")
 def create_default_uri(sender, instance, **kwargs):
     if kwargs['created']:
-        uri_c = "http://{}{}".format(
-            BASE_URI,
+        if BASE_URI.endswith('/'):
+            base1 = BASE_URI[:-1]
+        else:
+            base1 = BASE_URI
+        uri_c = "{}{}".format(
+            base1,
             reverse("apis_core:apis_api2:GetEntityGeneric", kwargs={"pk": instance.pk}),
         )
         uri2 = Uri(uri=uri_c, domain="apis default", entity=instance)
@@ -748,156 +816,6 @@ if "registration" in getattr(settings, "INSTALLED_APPS", []):
 
 
 
-def generate_relation_fields():
-    """
-    This function goes through every entity, relation, and relationtype model and automatically wires them together
-    by setting ManyToMany fields to each other through the relation model. This way the relations of a given entity
-    to any other entity or relationtype can be queried much more directly and without the overhead of going through
-    the relation model each time.
+# Call the meta logic method here, after all relevant entity classes have been defined above
+AbstractEntity.generate_relation_fields()
 
-    The wiring is done by going reflectively through the python code and finding in the respective model modules the relevant classes.
-
-    Django's ContentType interface could not be used since this relies on full class declaration before calling any models,
-    however since we want to define attributes of models during their declaration, this was not possible and thus python's
-    own code inspection had to be used.
-
-    E.g. for Person these fields are auto-generated: event_set, institution_set, personB_set, personA_set, place_set, work_set
-    And each of those fields are ManyToMany Managers where their django methods can be used upon, such as all() and filter()
-
-    This function is called just below.
-
-    :return: None
-    """
-
-    # TODO __sresch__ : check for best practice on local imports vs circularity problems.
-    # These imports are done locally to avoid circular import problems which arise if they are done globally in this module
-    from apis_core.apis_relations.models import GenericRelation
-    from apis_core.apis_vocabularies.models import GenericRelationType
-
-
-    # all the classes which are to be iterated over, also in the case of relation and relationtype they are sorted to ensure their proper alignment
-    entity_classes = GenericEntity.get_all_entity_classes()
-    relation_classes = GenericRelation.get_all_relation_classes()
-    relation_classes.sort(key=lambda x : x.__name__)
-    relationtype_classes = GenericRelationType.get_all_relationtype_classes()
-    relationtype_classes.sort(key=lambda x : x.__name__)
-
-
-    # Outer loop iterating over each of the entities, twice, in order to create their full power set
-    for entity_class_A in entity_classes:
-        for entity_class_B in entity_classes:
-
-            entity_name_A = entity_class_A.__name__.lower()
-            entity_name_B = entity_class_B.__name__.lower()
-
-            # inner loop iterating over each of the relation_class and relationtype at the same time, which were sorted before
-            # in order to align the relation_class and relationtype_class with each other.
-            for relation_class, relationtype_class in zip(relation_classes, relationtype_classes):
-
-                relation_name = relation_class.__name__.lower()
-                relation_type_name = relationtype_class.__name__.lower()
-
-                # Ensure that relation_class and relationtype_class are indeed talking about the same relation
-                # If this error is thrown then it would indicate misaligment in the models themselves
-                # which would be a critical violation of the models.
-                if relation_name not in relation_type_name:
-                    raise Exception("Mismatch between Relation and RelationType class found! Between:\n",
-                            relation_class, "and", relationtype_class)
-
-                # Check if current relation related to both entities
-                # Note that this way two entites are checked twice, such as person - place and place - person
-                # but however in the relation model only one of these two exists. Thus the right one is picked.
-                if entity_name_A + entity_name_B == relation_name:
-
-                    if entity_name_A != entity_name_B:
-
-                        # Define all the names for the ManyToMany fields generated below
-                        field_name_to_entity_A = entity_name_A + "_set"
-                        field_name_to_entity_B = entity_name_B + "_set"
-                        field_name_to_entity_B_relationtype = entity_name_B + "_relationtype_set"
-                        field_name_to_entity_A_relationtype = entity_name_A + "_relationtype_set"
-
-                        # Add those names already into the respective class's list of field names
-                        entity_class_A.add_related_entity_field_name(field_name_to_entity_B)
-                        entity_class_B.add_related_entity_field_name(field_name_to_entity_A)
-                        entity_class_A.add_related_relationtype_field_name(field_name_to_entity_B_relationtype)
-                        entity_class_B.add_related_relationtype_field_name(field_name_to_entity_A_relationtype)
-                        relationtype_class.add_related_entity_field_name(field_name_to_entity_B)
-                        relationtype_class.add_related_entity_field_name(field_name_to_entity_A)
-
-                        # entity A to entity B, and B back to A
-                        models.ManyToManyField(
-                            to=entity_class_B,
-                            through=relation_class,
-                            related_name=field_name_to_entity_A,
-                            blank=True,
-                        ).contribute_to_class(entity_class_A, field_name_to_entity_B)
-
-                        # entity A to RelationType via entity B, and RelationType back to A
-                        models.ManyToManyField(
-                            to=relationtype_class,
-                            through=relation_class,
-                            related_name=field_name_to_entity_A,
-                            blank=True,
-                        ).contribute_to_class(entity_class_A, field_name_to_entity_B_relationtype)
-
-                        # entity B to RelationType via entity A, and RelationType back to B
-                        models.ManyToManyField(
-                            to=relationtype_class,
-                            through=relation_class,
-                            related_name=field_name_to_entity_B,
-                            blank=True,
-                        ).contribute_to_class(entity_class_B, field_name_to_entity_A_relationtype)
-
-
-                    else:
-                        # TODO __sresch__ : look further into if it's really not possible to combine the A and B manager into one
-
-                        # Define all the names for the ManyToMany fields generated below
-                        field_name_to_entity_A = entity_name_A + "A_set"
-                        field_name_to_entity_B = entity_name_B + "B_set"
-                        field_name_to_entity_B_relationtype = entity_name_B + "B_relationtype_set"
-                        field_name_to_entity_A_relationtype = entity_name_A + "A_relationtype_set"
-
-                        # Add those names already into the respective class's list of field names
-                        entity_class_A.add_related_entity_field_name(field_name_to_entity_B)
-                        entity_class_B.add_related_entity_field_name(field_name_to_entity_A)
-                        entity_class_A.add_related_relationtype_field_name(field_name_to_entity_B_relationtype)
-                        entity_class_B.add_related_relationtype_field_name(field_name_to_entity_A_relationtype)
-                        relationtype_class.add_related_entity_field_name(field_name_to_entity_B)
-                        relationtype_class.add_related_entity_field_name(field_name_to_entity_A)
-
-                        # entity A to same entity B, and B back to A
-                        models.ManyToManyField(
-                            to=entity_class_B,
-                            through=relation_class,
-                            related_name=field_name_to_entity_A,
-                            blank=True,
-                            symmetrical=False,
-                            through_fields=("related_" + entity_name_A + "A", "related_" + entity_name_B + "B")
-                        ).contribute_to_class(entity_class_A, field_name_to_entity_B)
-
-                        # entity A to RelationType via entity B, and RelationType back to A
-                        models.ManyToManyField(
-                            to=relationtype_class,
-                            through=relation_class,
-                            related_name=field_name_to_entity_A,
-                            blank=True,
-                            symmetrical=False,
-                            through_fields=("related_" + entity_name_A + "A", "relation_type")
-                        ).contribute_to_class(entity_class_A, field_name_to_entity_B_relationtype)
-
-                        # entity B to RelationType via entity A, and RelationType back to B
-                        models.ManyToManyField(
-                            to=entity_class_B,
-                            through=relation_class,
-                            related_name=field_name_to_entity_A_relationtype,
-                            blank=True,
-                            symmetrical=False,
-                            through_fields=("relation_type", "related_" + entity_name_B + "B")
-                        ).contribute_to_class(relationtype_class, field_name_to_entity_B)
-
-                    break
-
-
-generate_relation_fields()

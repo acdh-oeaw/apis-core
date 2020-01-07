@@ -16,7 +16,7 @@ from apis_core.apis_entities.fields import ListSelect2
 
 #from dal.autocomplete import ListSelect2
 from apis_core.apis_metainfo.models import TempEntityClass, Text
-from apis_core.helper_functions.RDFparsers import GenericRDFParser
+from apis_core.helper_functions.RDFParser import RDFParser
 from apis_core.apis_metainfo.forms import get_date_help_text_default, get_date_help_text_from_dates
 from .tables import *
 
@@ -60,7 +60,7 @@ class GenericRelationForm(forms.ModelForm):
         target = ContentType.objects.get(app_label='apis_entities', model=self.rel_accessor[0].lower()).model_class()
         t1 = target.get_or_create_uri(cd['target'])
         if not t1:
-            t1 = GenericRDFParser(cd['target'], self.rel_accessor[0]).get_or_create()
+            t1 = RDFParser(cd['target'], self.rel_accessor[0]).get_or_create()
         setattr(x, self.rel_accessor[2], t1)
         if commit:
             x.save()
@@ -130,7 +130,7 @@ class GenericRelationForm(forms.ModelForm):
         :type highlighter: bool
         """
         attrs = {'data-placeholder': 'Type to get suggestions',
-                 'data-minimum-input-length': 3,
+                 'data-minimum-input-length': getattr(settings, "APIS_MIN_CHAR", 3),
                  'data-html': True,
                  'style': 'width: 100%'}
         css_notes = 'LS'
@@ -272,4 +272,3 @@ class GenericRelationForm(forms.ModelForm):
             )
         else:
             self.fields['end_date_written'].help_text = get_date_help_text_default()
-

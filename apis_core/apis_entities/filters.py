@@ -24,7 +24,6 @@ from django.db.models import QuerySet
 
 # TODO __sresch__ : Turn the logic of returing a filter object into a singleton pattern to avoid redundant instantiations
 # TODO __sresch__ : use the order of list of filter fields in settings
-# TODO __sresch__ : make the various filters conjunctive with each other instead of disjunctive as they are now
 
 
 #######################################################################
@@ -201,8 +200,8 @@ class GenericListFilter(django_filters.FilterSet):
             # (e.g. for PersonWork: class Person, class Work, "related_person", "related_work")
             related_entity_classA = relation_class.get_related_entity_classA()
             related_entity_classB = relation_class.get_related_entity_classB()
-            related_entity_nameA = relation_class.get_related_entity_nameA()
-            related_entity_nameB = relation_class.get_related_entity_nameB()
+            related_entity_field_nameA = relation_class.get_related_entity_field_nameA()
+            related_entity_field_nameB = relation_class.get_related_entity_field_nameB()
 
             # Within a relation class, there is two fields which relate to entities, check now which of the two
             # is the same as the current one.
@@ -214,8 +213,8 @@ class GenericListFilter(django_filters.FilterSet):
                     # from before (e.g. if a tempentity's name contains "seu", then its primary key will be used here, to check
                     # if there is a related entity which has the same primary key.
                     relation_class.objects.filter(
-                        **{related_entity_nameB + "_id__in": tempentity_hit}
-                    ).values_list(related_entity_nameA + "_id", flat=True)
+                        **{related_entity_field_nameB + "_id__in": tempentity_hit}
+                    ).values_list(related_entity_field_nameA + "_id", flat=True)
                 )
 
             # also check the related entity field B (because it can be that both A and B are of the same entity class, e.g. PersonPerson,
@@ -225,8 +224,8 @@ class GenericListFilter(django_filters.FilterSet):
                 # same procedure as above, just with related class and related name being reversed.
                 related_relations_to_hit_list.append(
                     relation_class.objects.filter(
-                        **{related_entity_nameA + "_id__in": tempentity_hit}
-                    ).values_list(related_entity_nameB + "_id", flat=True)
+                        **{related_entity_field_nameA + "_id__in": tempentity_hit}
+                    ).values_list(related_entity_field_nameB + "_id", flat=True)
                 )
 
             # A safety check which should never arise. But if it does, we know there is something wrong with the automated wiring of
@@ -277,8 +276,8 @@ class GenericListFilter(django_filters.FilterSet):
 
             related_entity_classA = relation_class.get_related_entity_classA()
             related_entity_classB = relation_class.get_related_entity_classB()
-            related_entity_nameA = relation_class.get_related_entity_nameA()
-            related_entity_nameB = relation_class.get_related_entity_nameB()
+            related_entity_field_nameA = relation_class.get_related_entity_field_nameA()
+            related_entity_field_nameB = relation_class.get_related_entity_field_nameB()
 
             if queryset.model == related_entity_classA:
 
@@ -286,7 +285,7 @@ class GenericListFilter(django_filters.FilterSet):
                 related_relations_to_hit_list.append(
                     relation_class.objects.filter(
                         **{"relation_type_id__in": relationbaseclass_hit}
-                    ).values_list(related_entity_nameA + "_id", flat=True)
+                    ).values_list(related_entity_field_nameA + "_id", flat=True)
                 )
 
             if queryset.model == related_entity_classB:
@@ -295,7 +294,7 @@ class GenericListFilter(django_filters.FilterSet):
                 related_relations_to_hit_list.append(
                     relation_class.objects.filter(
                         **{"relation_type_id__in": relationbaseclass_hit}
-                    ).values_list(related_entity_nameB + "_id", flat=True)
+                    ).values_list(related_entity_field_nameB + "_id", flat=True)
                 )
 
             if queryset.model != related_entity_classA and queryset.model != related_entity_classB:
@@ -410,6 +409,9 @@ class PassageListFilter(GenericListFilter):
 
     class Meta:
         model = Passage
+        # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
+        # order to load all filters of all model fields by default so that they are available in the first place.
+        # Later those which are not referenced in the settings file will be removed again
         exclude = GenericListFilter.fields_to_exclude
 
 
@@ -418,6 +420,9 @@ class PublicationListFilter(GenericListFilter):
 
     class Meta:
         model = Publication
+        # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
+        # order to load all filters of all model fields by default so that they are available in the first place.
+        # Later those which are not referenced in the settings file will be removed again
         exclude = GenericListFilter.fields_to_exclude
 
 

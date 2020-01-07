@@ -640,12 +640,20 @@ class TempEntityClass(models.Model):
             if e_a != e_b:
                 continue
             lt, created = LabelType.objects.get_or_create(name="Legacy name (merge)")
-            l_uri, created = LabelType.objects.get_or_create(name="Legacy URI (merge)")
+            col_list = list(self.collection.all())
+            for col2 in ent.collection.all():
+                if col2 not in col_list:
+                    self.collection.add(col2)
+            for f in ent._meta.local_many_to_many:
+                if not f.name.endswith('_set'):
+                    sl = list(getattr(self, f.name).all())
+                    for s in getattr(ent, f.name).all():
+                        if s not in sl:
+                            getattr(self, f.name).add(s)
             Label.objects.create(label=str(ent), label_type=lt, temp_entity=self)
             for u in Uri.objects.filter(entity=ent):
-                Label.objects.create(
-                    label=str(u.uri), label_type=l_uri, temp_entity=self
-                )
+                u.entity = self
+                u.save()
             for l in Label.objects.filter(temp_entity=ent):
                 l.temp_entity = self
                 l.save()
@@ -825,7 +833,7 @@ class UriCandidate(models.Model):
                 return (label, desc)
 
 
-@receiver(post_save, sender=Uri, dispatch_uid="remove_default_uri")
-def remove_default_uri(sender, instance, **kwargs):
-    if Uri.objects.filter(entity=instance.entity).count() > 1:
-        Uri.objects.filter(entity=instance.entity, domain="apis default").delete()
+#@receiver(post_save, sender=Uri, dispatch_uid="remove_default_uri")
+#def remove_default_uri(sender, instance, **kwargs):
+#    if Uri.objects.filter(entity=instance.entity).count() > 1:
+#        Uri.objects.filter(entity=instance.entity, domain="apis default").delete()
