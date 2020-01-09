@@ -76,7 +76,7 @@ class AbstractEntity(TempEntityClass):
 
 
     @classmethod
-    def get_or_create_uri_new(cls, uri):
+    def get_or_create_uri(cls, uri):
         uri = str(uri)
         try:
             if re.match(r"^[0-9]*$", uri):
