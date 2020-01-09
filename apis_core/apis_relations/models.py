@@ -65,7 +65,7 @@ class AnnotationRelationLinkManager(models.Manager):
 # AbstractRelation
 #
 #######################################################################
-#
+
 
 class AbstractRelation(TempEntityClass):
     """
@@ -147,22 +147,16 @@ class AbstractRelation(TempEntityClass):
 
 
 
-
     # Various Methods enabling convenient shortcuts between entities, relations, fields, etc
     ####################################################################################################################
-
-    # private class variables used for saving both class dependent and class independent information
-    # for more convenient retrieval later on.
-    # Initially defined as empty lists, they will be properly instantiated on their first call
-
-    _all_relation_classes = None
-    _all_relation_names = None
-    _relation_classes_of_entity_class = {}
-    _relation_names_of_entity_class = {}
 
 
     # Methods dealing with all relations
     ####################################################################################################################
+
+
+    _all_relation_classes = None
+    _all_relation_names = None
 
 
     @classmethod
@@ -198,6 +192,7 @@ class AbstractRelation(TempEntityClass):
 
         return cls._all_relation_classes
 
+
     @classmethod
     def get_all_relation_names(cls):
         """
@@ -213,8 +208,13 @@ class AbstractRelation(TempEntityClass):
         return cls._all_relation_names
 
 
+
     # Methods dealing with related relations and entities
     ####################################################################################################################
+
+
+    _relation_classes_of_entity_class = {}
+    _relation_names_of_entity_class = {}
 
 
     @classmethod
@@ -419,7 +419,7 @@ class AbstractRelation(TempEntityClass):
                     # which would be a critical violation of the models.
                     if relation_class_name not in relationtype_class_name:
                         raise Exception("Mismatch between Relation and RelationType class found! Between:\n" +
-                                relation_class + " and " + relationtype_class)
+                                str(relation_class) + " and " + str(relationtype_class))
 
                     # Check if current relation related to both entities
                     # Note that this way two entites are checked twice, such as person - place and place - person
@@ -579,10 +579,6 @@ class AbstractRelation(TempEntityClass):
 
 
 
-
-
-
-
 #######################################################################
 #
 # Person - ... - Relation
@@ -596,14 +592,11 @@ class PersonPerson(AbstractRelation):
     annotation_links = AnnotationRelationLinkManager()
 
 
-
 @reversion.register(follow=['tempentityclass_ptr'])
 class PersonPlace(AbstractRelation):
 
     annotation_links = AnnotationRelationLinkManager()
 
-
-# PlacePerson = PersonPlace TODO __sresch__
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class PersonInstitution(AbstractRelation):
@@ -621,7 +614,6 @@ class PersonEvent(AbstractRelation):
 class PersonWork(AbstractRelation):
 
     annotation_links = AnnotationRelationLinkManager()
-
 
 
 #######################################################################
@@ -655,7 +647,6 @@ class InstitutionWork(AbstractRelation):
     annotation_links = AnnotationRelationLinkManager()
 
 
-
 #######################################################################
 #
 #   Place - ... - Relation
@@ -681,7 +672,6 @@ class PlaceWork(AbstractRelation):
     annotation_links = AnnotationRelationLinkManager()
 
 
-
 #######################################################################
 #
 #   Event - ... - Relation
@@ -693,7 +683,6 @@ class PlaceWork(AbstractRelation):
 class EventEvent(AbstractRelation):
 
     annotation_links = AnnotationRelationLinkManager()
-
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
@@ -713,7 +702,6 @@ class EventWork(AbstractRelation):
 class WorkWork(AbstractRelation):
 
     annotation_links = AnnotationRelationLinkManager()
-
 
 
 

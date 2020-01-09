@@ -207,7 +207,7 @@ def get_entities_form(entity):
                 Accordion(
                     acc_grp1,
                     acc_grp2
-                    )
+                )
             )
             self.fields['status'].required = False
             self.fields['collection'].required = False
