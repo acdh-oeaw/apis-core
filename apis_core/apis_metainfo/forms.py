@@ -70,6 +70,9 @@ def get_date_help_text_from_dates(single_date, single_start_date, single_end_dat
     :param single_date_written: str :
         the textual user entry of a date field (needed to check if empty or not)
 
+    :param single_date_is_exact: bool :
+        if the given date is defined as to be exact or not
+
     :return help_text: str :
         The text to be displayed underneath a date field, informing the user about the parsing result
     """

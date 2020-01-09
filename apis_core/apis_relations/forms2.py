@@ -255,20 +255,22 @@ class GenericRelationForm(forms.ModelForm):
 
         if instance.start_date_written:
             self.fields['start_date_written'].help_text = get_date_help_text_from_dates(
-                instance.start_date,
-                instance.start_start_date,
-                instance.start_end_date,
-                instance.start_date_written
+                single_date=instance.start_date,
+                single_start_date=instance.start_start_date,
+                single_end_date=instance.start_end_date,
+                single_date_written=instance.start_date_written,
+                single_date_is_exact=instance.start_date_is_exact
             )
         else:
             self.fields['start_date_written'].help_text = get_date_help_text_default()
 
         if instance.end_date_written:
             self.fields['end_date_written'].help_text = get_date_help_text_from_dates(
-                instance.end_date,
-                instance.end_start_date,
-                instance.end_end_date,
-                instance.end_date_written
+                single_date=instance.end_date,
+                single_start_date=instance.end_start_date,
+                single_end_date=instance.end_end_date,
+                single_date_written=instance.end_date_written,
+                single_date_is_exact=instance.end_date_is_exact
             )
         else:
             self.fields['end_date_written'].help_text = get_date_help_text_default()

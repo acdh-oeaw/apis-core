@@ -384,13 +384,8 @@ class TempEntityClass(models.Model):
                     found_bis = False
                     found_single = False
 
-                    if "genau" in date_string and "ungenau" not in date_string :
-                        date_is_exact = True
-                    elif "ungenau" in date_string :
+                    if "ungenau" in date_string :
                         date_is_exact = False
-                    # TODO __sresch__ : inspect this again to confirm functionality
-                    # elif "genau" in date_string and "ungenau" in date_string :
-                    #     raise ValueError("Both keywords 'genau' and 'ungenau were provided'")
                     else:
                         date_is_exact = True
 
