@@ -286,7 +286,7 @@ class AbstractRelation(TempEntityClass):
 
         Note that if your IDE complains about expecting a 'str' instead of 'None' this happens because
         the method 'get_related_entity_field_nameA()' is only implemented and overridden at runtime in the
-        function 'generated_relation_fields'.
+        function 'generate_relation_fields'.
 
         :return: An entity instance related to the current relation instance
         """
@@ -300,7 +300,7 @@ class AbstractRelation(TempEntityClass):
 
         Note that if your IDE complains about expecting a 'str' instead of 'None' this happens because
         the method 'get_related_entity_field_nameB()' is only implemented and overridden at runtime in the
-        function 'generated_relation_fields'.
+        function 'generate_relation_fields'.
 
         :return: An entity instance related to the current relation instance
         """
