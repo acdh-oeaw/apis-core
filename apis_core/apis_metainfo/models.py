@@ -63,13 +63,13 @@ class TempEntityClass(models.Model):
         max_length=255,
         blank=True,
         null=True,
-        verbose_name="Start"
+        verbose_name="Start",
     )
     end_date_written = models.CharField(
         max_length=255,
         blank=True,
         null=True,
-        verbose_name="End"
+        verbose_name="End",
     )
     text = models.ManyToManyField("Text", blank=True)
     collection = models.ManyToManyField("Collection")
@@ -379,7 +379,7 @@ class TempEntityClass(models.Model):
                     date_string = date_string.lower()
                     date_string = date_string.replace(" ","")
 
-                    ## helper variables for the following loop
+                    # helper variables for the following loop
                     found_ab = False
                     found_bis = False
                     found_single = False
@@ -389,8 +389,7 @@ class TempEntityClass(models.Model):
                     else:
                         date_is_exact = True
 
-                    date_string = date_string.replace("ungenau", "")
-                    date_string = date_string.replace("genau", "")
+                    date_string = date_string.replace("ungenau", "").replace("genau", "")
 
 
                     # split by allowed keywords 'ab' and 'bis' and iterate over them
@@ -551,6 +550,13 @@ class TempEntityClass(models.Model):
         else:
             return None
 
+    def get_child_class(self):
+        child = self.get_child_entity()
+        if child:
+            return "{}".format(child.__class__.__name__)
+        else:
+            return "{}".format(child.__class__.__name__)
+
     def get_absolute_url(self):
         entity = self.__class__.__name__.lower()
         if entity == "institution" or entity == 'publication' or len(entity) < 10:
@@ -558,6 +564,8 @@ class TempEntityClass(models.Model):
                 "apis_core:apis_entities:generic_entities_detail_view",
                 kwargs={"entity": entity, "pk": self.id},
             )
+        elif entity == "tempentityclass":
+            return self.get_child_entity().get_absolute_url()
         else:
             return reverse(
                 "apis_core:apis_relations:generic_relations_detail_view",

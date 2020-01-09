@@ -3,10 +3,14 @@ from .models import (InstitutionInstitution, PersonInstitution, PersonPlace, Per
                      PersonEvent, PersonPassage, InstitutionPlace, InstitutionEvent, InstitutionPassage,
                      PlaceEvent, PlacePassage, PlacePlace, EventPassage, EventEvent, PassagePassage)
 
+from apis_core.apis_entities.serializers import (
+    PersonSerializer,
+    PlaceSerializer
+)
+
 from apis_core.apis_vocabularies.serializers import (
     PersonPlaceRelationSerializer,
 )
-from apis_core.apis_entities.serializers import PersonSerializer, PlaceSerializer
 
 
 class InstitutionInstitutionSerializer(serializers.HyperlinkedModelSerializer):

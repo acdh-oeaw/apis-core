@@ -163,7 +163,10 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
         instance_id = ''
     else:
         instance_id = ObjectID
-    print(entity_type, kind_form, SiteID)
+
+    # TODO __sresch__ : delete
+    # print(entity_type, kind_form, SiteID)
+
     entity_type_str = entity_type
     entity_type = ContentType.objects.get(
         app_label__startswith="apis_", model=entity_type.lower()).model_class()
