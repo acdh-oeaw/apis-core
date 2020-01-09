@@ -54,7 +54,7 @@ class AbstractEntity(TempEntityClass):
     ####################################################################################################################
 
 
-    def to_str_new(self):
+    def __str__(self):
 
         if self.__class__ == Person:
 
@@ -75,7 +75,7 @@ class AbstractEntity(TempEntityClass):
                 return "no name provided"
 
     @classmethod
-    def get_or_create_uri_new(cls, uri):
+    def get_or_create_uri(cls, uri):
         uri = str(uri)
         try:
             if re.match(r"^[0-9]*$", uri):
