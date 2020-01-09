@@ -71,10 +71,10 @@ def get_entities_form(entity):
             self.helper.help_text_inline = True
             acc_grp1 = Fieldset('Metadata {}'.format(entity.title()))
             acc_grp2 = AccordionGroup(
-                        'MetaInfo',
-                        'references',
-                        'notes',
-                        'review')
+                'MetaInfo',
+                'references',
+                'notes',
+                'review')
             attrs = {'data-placeholder': 'Type to get suggestions',
                      'data-minimum-input-length': getattr(settings, "APIS_MIN_CHAR", 3),
                      'data-html': True}

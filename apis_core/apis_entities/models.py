@@ -538,8 +538,11 @@ class AbstractEntity(TempEntityClass):
                     # If this error is thrown then it would indicate misaligment in the models themselves
                     # which would be a critical violation of the models.
                     if relation_class_name not in relationtype_class_name:
-                        raise Exception("Mismatch between Relation and RelationType class found! Between:\n" +
-                                str(relation_class) + " and " + str(relationtype_class))
+                        raise Exception(
+                            "Mismatch found between Relation and RelationType class:\n" +
+                            str(relation_class) + " and " + str(relationtype_class) + "!"
+                            "\nMaybe for the given Relation class there does not exist a corresponding RelationType class (or vice versa)?"
+                        )
 
                     # Check if current relation related to both entities
                     # Note that this way two entites are checked twice, such as person - place and place - person

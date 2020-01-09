@@ -1,6 +1,6 @@
-import math
 import re
 import unicodedata
+import math
 from datetime import datetime, timedelta
 from difflib import SequenceMatcher
 from dateutil.parser import parse
@@ -26,8 +26,6 @@ from django.dispatch import receiver
 from django.urls import NoReverseMatch, reverse
 from django.utils.functional import cached_property
 from model_utils.managers import InheritanceManager
-
-from .validators import date_validator
 
 NEXT_PREV = getattr(settings, "APIS_NEXT_PREV", True)
 
@@ -81,6 +79,7 @@ class TempEntityClass(models.Model):
     objects = models.Manager()
     objects_inheritance = InheritanceManager()
 
+
     def __str__(self):
         if self.name != "" and hasattr(
             self, "first_name"
@@ -94,6 +93,7 @@ class TempEntityClass(models.Model):
     def save(self, parse_dates=True, *args, **kwargs):
         """Adaption of the save() method of the class to automatically parse string-dates into date objects
         """
+
 
         def parse_dates_func(temp_entity_class):
             """

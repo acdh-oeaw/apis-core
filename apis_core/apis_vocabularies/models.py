@@ -21,7 +21,7 @@ class VocabNames(models.Model):
 @reversion.register()
 class VocabsBaseClass(models.Model):
     """ An abstract base class for other classes which contain so called
-    'controlled vocablury' to describe subtypes of main temporalized
+    'controlled vocabulary' to describe subtypes of main temporalized
     entites"""
     choices_status = (
         ('rej', 'rejected'),
@@ -71,8 +71,8 @@ class VocabsBaseClass(models.Model):
 @reversion.register(follow=['vocabsbaseclass_ptr'])
 class RelationBaseClass(VocabsBaseClass):
     """ An abstract base class for other classes which contain so called
-    'controlled vocablury' to describe the relations between main temporalized
-    entites ('db_')"""
+    'controlled vocabulary' to describe the relations between main temporalized
+    entities ('db_')"""
 
     name_reverse = models.CharField(
         max_length=255,
