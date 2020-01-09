@@ -65,7 +65,7 @@ class AnnotationRelationLinkManager(models.Manager):
 # AbstractRelation
 #
 #######################################################################
-#
+
 
 class AbstractRelation(TempEntityClass):
     """
@@ -147,22 +147,16 @@ class AbstractRelation(TempEntityClass):
 
 
 
-
     # Various Methods enabling convenient shortcuts between entities, relations, fields, etc
     ####################################################################################################################
-
-    # private class variables used for saving both class dependent and class independent information
-    # for more convenient retrieval later on.
-    # Initially defined as empty lists, they will be properly instantiated on their first call
-
-    _all_relation_classes = None
-    _all_relation_names = None
-    _relation_classes_of_entity_class = {}
-    _relation_names_of_entity_class = {}
 
 
     # Methods dealing with all relations
     ####################################################################################################################
+
+
+    _all_relation_classes = None
+    _all_relation_names = None
 
 
     @classmethod
@@ -198,6 +192,7 @@ class AbstractRelation(TempEntityClass):
 
         return cls._all_relation_classes
 
+
     @classmethod
     def get_all_relation_names(cls):
         """
@@ -213,8 +208,13 @@ class AbstractRelation(TempEntityClass):
         return cls._all_relation_names
 
 
+
     # Methods dealing with related relations and entities
     ####################################################################################################################
+
+
+    _relation_classes_of_entity_class = {}
+    _relation_names_of_entity_class = {}
 
 
     @classmethod
@@ -285,8 +285,8 @@ class AbstractRelation(TempEntityClass):
         There it returns the instance of an entity on the 'A' side of the given relation instance.
 
         Note that if your IDE complains about expecting a 'str' instead of 'None' this happens because
-        the method 'get_related_entity_field_nameA()' is not implemented before runtime and will be overridden at runtime
-        within the function 'generate_relation_fields'.
+        the method 'get_related_entity_field_nameA()' is only implemented and overridden at runtime in the
+        function 'generated_relation_fields'.
 
         :return: An entity instance related to the current relation instance
         """
@@ -299,8 +299,8 @@ class AbstractRelation(TempEntityClass):
         There it returns the instance of an entity on the 'B' side of the given relation instance.
 
         Note that if your IDE complains about expecting a 'str' instead of 'None' this happens because
-        the method 'get_related_entity_field_nameB()' is not implemented before runtime and will be overridden at runtime
-        within the function 'generate_relation_fields'.
+        the method 'get_related_entity_field_nameB()' is only implemented and overridden at runtime in the
+        function 'generated_relation_fields'.
 
         :return: An entity instance related to the current relation instance
         """
@@ -582,10 +582,6 @@ class AbstractRelation(TempEntityClass):
 
 
 
-
-
-
-
 #######################################################################
 #
 # Person - ... - Relation
@@ -604,8 +600,6 @@ class PersonPlace(AbstractRelation):
 
     annotation_links = AnnotationRelationLinkManager()
 
-
-# PlacePerson = PersonPlace TODO __sresch__
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class PersonInstitution(AbstractRelation):
