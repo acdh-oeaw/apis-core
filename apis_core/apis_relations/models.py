@@ -73,8 +73,7 @@ class AbstractRelation(TempEntityClass):
     relating to either all or specific relations.
     """
 
-    # TODO __sresch__ : Consider moving the annotation manager into this class and remove it from all subclasses
-    # annotation_links = AnnotationRelationLinkManager()
+    annotation_links = AnnotationRelationLinkManager()
 
     class Meta:
         abstract = True
@@ -592,31 +591,31 @@ class AbstractRelation(TempEntityClass):
 @reversion.register(follow=['tempentityclass_ptr'])
 class PersonPerson(AbstractRelation):
 
-    annotation_links = AnnotationRelationLinkManager()
+    pass
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class PersonPlace(AbstractRelation):
 
-    annotation_links = AnnotationRelationLinkManager()
+    pass
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class PersonInstitution(AbstractRelation):
 
-    annotation_links = AnnotationRelationLinkManager()
+    pass
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class PersonEvent(AbstractRelation):
 
-    annotation_links = AnnotationRelationLinkManager()
+    pass
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class PersonWork(AbstractRelation):
 
-    annotation_links = AnnotationRelationLinkManager()
+    pass
 
 
 #######################################################################
@@ -629,25 +628,25 @@ class PersonWork(AbstractRelation):
 @reversion.register(follow=['tempentityclass_ptr'])
 class InstitutionInstitution(AbstractRelation):
 
-    annotation_links = AnnotationRelationLinkManager()
+    pass
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class InstitutionPlace(AbstractRelation):
 
-    annotation_links = AnnotationRelationLinkManager()
+    pass
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class InstitutionEvent(AbstractRelation):
 
-    annotation_links = AnnotationRelationLinkManager()
+    pass
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class InstitutionWork(AbstractRelation):
 
-    annotation_links = AnnotationRelationLinkManager()
+    pass
 
 
 #######################################################################
@@ -660,19 +659,19 @@ class InstitutionWork(AbstractRelation):
 @reversion.register(follow=['tempentityclass_ptr'])
 class PlacePlace(AbstractRelation):
 
-    annotation_links = AnnotationRelationLinkManager()
+    pass
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class PlaceEvent(AbstractRelation):
 
-    annotation_links = AnnotationRelationLinkManager()
+    pass
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class PlaceWork(AbstractRelation):
 
-    annotation_links = AnnotationRelationLinkManager()
+    pass
 
 
 #######################################################################
@@ -685,13 +684,13 @@ class PlaceWork(AbstractRelation):
 @reversion.register(follow=['tempentityclass_ptr'])
 class EventEvent(AbstractRelation):
 
-    annotation_links = AnnotationRelationLinkManager()
+    pass
 
 
 @reversion.register(follow=['tempentityclass_ptr'])
 class EventWork(AbstractRelation):
 
-    annotation_links = AnnotationRelationLinkManager()
+    pass
 
 
 #######################################################################
@@ -704,7 +703,7 @@ class EventWork(AbstractRelation):
 @reversion.register(follow=['tempentityclass_ptr'])
 class WorkWork(AbstractRelation):
 
-    annotation_links = AnnotationRelationLinkManager()
+    pass
 
 
 
