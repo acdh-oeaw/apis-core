@@ -25,6 +25,7 @@ from django.dispatch import receiver
 from django.urls import reverse
 from guardian.shortcuts import assign_perm, remove_perm
 from django.contrib.contenttypes.models import ContentType
+from apis_core.helper_functions import EntityRelationFieldGenerator
 
 
 BASE_URI = getattr(settings, "APIS_BASE_URI", "http://apis.info/")
@@ -266,8 +267,9 @@ class AbstractEntity(TempEntityClass):
         E.g. for Person.get_related_entity_field_names() or person_instance.get_related_entity_field_names() ->
         ['event_set', 'institution_set', 'personB_set', 'personA_set', 'place_set', 'work_set']
 
-        Note: this method depends on the 'generate_relation_fields' method which wires the ManyToMany Fields into the
-        entities and respective relationtypes. It is nevertheless defined here within AbstractEntity for documentational purpose.
+        Note: this method depends on the 'generate_all_fields' function of the EntityRelationFieldGenerator class 
+        which wires the ManyToMany Fields into the entities and respective relationtypes. 
+        This method is nevertheless defined here within AbstractEntity for documentational purpose.
         """
 
         if cls._related_entity_field_names == None:
@@ -282,8 +284,9 @@ class AbstractEntity(TempEntityClass):
         :param entity_field_name: the name of one of several ManyToMany fields created automatically
         :return: None
 
-        Note: this method depends on the 'generate_relation_fields' method which wires the ManyToMany Fields into the
-        entities and respective relationtypes. It is nevertheless defined here within AbstractEntity for documentational purpose.
+        Note: this method depends on the 'generate_all_fields' function of the EntityRelationFieldGenerator class 
+        which wires the ManyToMany Fields into the entities and respective relationtypes. 
+        This method is nevertheless defined here within AbstractEntity for documentational purpose.
         """
 
         if cls._related_entity_field_names == None:
@@ -430,8 +433,9 @@ class AbstractEntity(TempEntityClass):
         E.g. for PersonPerson.get_related_relationtype_field_names() or person_instance.get_related_relationtype_field_names() ->
         ['event_relationtype_set', 'institution_relationtype_set', 'personB_relationtype_set', 'personA_relationtype_set', 'place_relationtype_set', 'work_relationtype_set']
 
-        Note: this method depends on the 'generate_relation_fields' method which wires the ManyToMany Fields into the
-        entities and respective relationtypes. It is nevertheless defined here within AbstractEntity for documentational purpose.
+        Note: this method depends on the 'generate_all_fields' function of the EntityRelationFieldGenerator class 
+        which wires the ManyToMany Fields into the entities and respective relationtypes. 
+        This method is nevertheless defined here within AbstractEntity for documentational purpose.
         """
 
         if cls._related_relationtype_field_names == None:
@@ -446,8 +450,9 @@ class AbstractEntity(TempEntityClass):
         :param entity_field_name: the name of one of several ManyToMany fields created automatically
         :return: None
 
-        Note: this method depends on the 'generate_relation_fields' method which wires the ManyToMany Fields into the
-        entities and respective relationtypes. It is nevertheless defined here within AbstractEntity for documentational purpose.
+        Note: this method depends on the 'generate_all_fields' function of the EntityRelationFieldGenerator class 
+        which wires the ManyToMany Fields into the entities and respective relationtypes. 
+        This method is nevertheless defined here within AbstractEntity for documentational purpose.
         """
 
         if cls._related_relationtype_field_names == None:
@@ -480,167 +485,6 @@ class AbstractEntity(TempEntityClass):
                 queryset_list.append(queryset)
 
         return queryset_list
-
-
-    # meta logic which wires everything together programmatically
-    ####################################################################################################################
-
-
-    @classmethod
-    def generate_relation_fields(cls):
-        """
-        This function goes through every entity, relation, and relationtype model and automatically wires them together
-        by setting ManyToMany fields to each other through the relation model. This way the relations of a given entity
-        to any other entity or relationtype can be queried much more directly and without the overhead of going through
-        the relation model each time.
-
-        The wiring is done by going reflectively through the python code and finding in the respective model modules the relevant classes.
-
-        Django's ContentType interface could not be used since this relies on full class declaration before calling any models,
-        however since we want to define attributes of models during their declaration, this was not possible and thus python's
-        own code inspection had to be used.
-
-        E.g. for Person these fields are auto-generated: event_set, institution_set, personB_set, personA_set, place_set, work_set
-        And each of those fields are ManyToMany Managers where their django methods can be used upon, such as all() and filter()
-
-        This function is called just below.
-
-        :return: None
-        """
-
-        # TODO __sresch__ : check for best practice on local imports vs circularity problems.
-        from apis_core.apis_relations.models import AbstractRelation
-        from apis_core.apis_vocabularies.models import AbstractRelationType
-
-
-        # all the classes which are to be iterated over, also in the case of relation and relationtype they are sorted to ensure their proper alignment
-        entity_classes = cls.get_all_entity_classes()
-        relation_classes = AbstractRelation.get_all_relation_classes()
-        relation_classes.sort(key=lambda x : x.__name__)
-        relationtype_classes = AbstractRelationType.get_all_relationtype_classes()
-        relationtype_classes.sort(key=lambda x : x.__name__)
-
-
-        # Outer loop iterating over each of the entities, twice, in order to create their full power set
-        for entity_class_a in entity_classes:
-            for entity_class_b in entity_classes:
-
-                entity_name_a = entity_class_a.__name__.lower()
-                entity_name_b = entity_class_b.__name__.lower()
-
-                # inner loop iterating over each of the relation_class and relationtype at the same time, which were sorted before
-                # in order to align the relation_class and relationtype_class with each other.
-                for relation_class, relationtype_class in zip(relation_classes, relationtype_classes):
-
-                    relation_class_name = relation_class.__name__.lower()
-                    relationtype_class_name = relationtype_class.__name__.lower()
-
-                    # Ensure that relation_class and relationtype_class are indeed talking about the same relation
-                    # If this error is thrown then it would indicate misaligment in the models themselves
-                    # which would be a critical violation of the models.
-                    if relation_class_name not in relationtype_class_name:
-                        raise Exception(
-                            "Mismatch found between Relation and RelationType class:\n" +
-                            str(relation_class) + " and " + str(relationtype_class) + "!"
-                            "\nMaybe for the given Relation class there does not exist a corresponding RelationType class (or vice versa)?"
-                        )
-
-                    # Check if current relation related to both entities
-                    # Note that this way two entites are checked twice, such as person - place and place - person
-                    # but however in the relation model only one of these two exists. Thus the right one is picked.
-                    if entity_name_a + entity_name_b == relation_class_name:
-
-                        if entity_name_a != entity_name_b:
-
-                            # Define all the names for the ManyToMany fields generated below
-                            field_name_to_entity_a = entity_name_a + "_set"
-                            field_name_to_entity_b = entity_name_b + "_set"
-                            field_name_to_entity_b_relationtype = entity_name_b + "_relationtype_set"
-                            field_name_to_entity_a_relationtype = entity_name_a + "_relationtype_set"
-
-                            # Add those names already into the respective class's list of field names
-                            entity_class_a.add_related_entity_field_name(field_name_to_entity_b)
-                            entity_class_b.add_related_entity_field_name(field_name_to_entity_a)
-                            entity_class_a.add_related_relationtype_field_name(field_name_to_entity_b_relationtype)
-                            entity_class_b.add_related_relationtype_field_name(field_name_to_entity_a_relationtype)
-                            relationtype_class.add_related_entity_field_name(field_name_to_entity_b)
-                            relationtype_class.add_related_entity_field_name(field_name_to_entity_a)
-
-                            # entity A to entity B, and B back to A
-                            models.ManyToManyField(
-                                to=entity_class_b,
-                                through=relation_class,
-                                related_name=field_name_to_entity_a,
-                                blank=True,
-                            ).contribute_to_class(entity_class_a, field_name_to_entity_b)
-
-                            # entity A to RelationType via entity B, and RelationType back to A
-                            models.ManyToManyField(
-                                to=relationtype_class,
-                                through=relation_class,
-                                related_name=field_name_to_entity_a,
-                                blank=True,
-                            ).contribute_to_class(entity_class_a, field_name_to_entity_b_relationtype)
-
-                            # entity B to RelationType via entity A, and RelationType back to B
-                            models.ManyToManyField(
-                                to=relationtype_class,
-                                through=relation_class,
-                                related_name=field_name_to_entity_b,
-                                blank=True,
-                            ).contribute_to_class(entity_class_b, field_name_to_entity_a_relationtype)
-
-
-                        else:
-
-                            # Define all the names for the ManyToMany fields generated below
-                            field_name_to_entity_a = entity_name_a + "A_set"
-                            field_name_to_entity_b = entity_name_b + "B_set"
-                            field_name_to_entity_b_relationtype = entity_name_b + "B_relationtype_set"
-                            field_name_to_entity_a_relationtype = entity_name_a + "A_relationtype_set"
-
-                            # Add those names already into the respective class's list of field names
-                            entity_class_a.add_related_entity_field_name(field_name_to_entity_b)
-                            entity_class_b.add_related_entity_field_name(field_name_to_entity_a)
-                            entity_class_a.add_related_relationtype_field_name(field_name_to_entity_b_relationtype)
-                            entity_class_b.add_related_relationtype_field_name(field_name_to_entity_a_relationtype)
-                            relationtype_class.add_related_entity_field_name(field_name_to_entity_b)
-                            relationtype_class.add_related_entity_field_name(field_name_to_entity_a)
-
-                            # entity A to same entity B, and B back to A
-                            models.ManyToManyField(
-                                to=entity_class_b,
-                                through=relation_class,
-                                related_name=field_name_to_entity_a,
-                                blank=True,
-                                symmetrical=False,
-                                through_fields=("related_" + entity_name_a + "A", "related_" + entity_name_b + "B")
-                            ).contribute_to_class(entity_class_a, field_name_to_entity_b)
-
-                            # entity A to RelationType via entity B, and RelationType back to A
-                            models.ManyToManyField(
-                                to=relationtype_class,
-                                through=relation_class,
-                                related_name=field_name_to_entity_a,
-                                blank=True,
-                                symmetrical=False,
-                                through_fields=("related_" + entity_name_a + "A", "relation_type")
-                            ).contribute_to_class(entity_class_a, field_name_to_entity_b_relationtype)
-
-                            # entity B to RelationType via entity A, and RelationType back to B
-                            models.ManyToManyField(
-                                to=entity_class_b,
-                                through=relation_class,
-                                related_name=field_name_to_entity_a_relationtype,
-                                blank=True,
-                                symmetrical=False,
-                                through_fields=("relation_type", "related_" + entity_name_b + "B")
-                            ).contribute_to_class(relationtype_class, field_name_to_entity_b)
-
-                        # if entity_class_a_name + entity_class_b_name == relation_class_name
-                        # equals to True, then for entity_class_a and entity_class_b, their respective relation class
-                        # has been found, thus interrupt the loop going through these relation classes.
-                        break
 
 
 
@@ -813,6 +657,5 @@ if "registration" in getattr(settings, "INSTALLED_APPS", []):
 
 
 
-# Call the meta logic method here, after all relevant entity classes have been defined above
-AbstractEntity.generate_relation_fields()
-
+# Call the field generation function here, after all relevant entity classes have been defined above
+EntityRelationFieldGenerator.generate_all_fields()
