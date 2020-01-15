@@ -142,6 +142,9 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
             elif re.match('^[^*]+$', q.strip()):
                 search_type = ''
                 q = q.strip()
+            else:
+                search_type = ''
+                q = q.strip()
 
             arg_list = [Q(**{x+search_type: q}) for x in settings.APIS_ENTITIES[ac_type.title()]['search']]
             res = ent_model.objects.filter(reduce(operator.or_, arg_list)).distinct()
