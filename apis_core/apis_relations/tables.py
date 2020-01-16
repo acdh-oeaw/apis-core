@@ -132,7 +132,7 @@ class EntityUriTable(tables.Table):
 
 
 class EntityDetailViewLabelTable(tables.Table):
-    label2 = tables.Column(accessor='label')
+    label2 = tables.TemplateColumn(template_name="apis_relations/labels_label.html")
 
     class Meta:
         empty_text = empty_text_default
@@ -147,7 +147,7 @@ class EntityDetailViewLabelTable(tables.Table):
 
 class EntityLabelTable(tables.Table):
     edit = tables.TemplateColumn(template_name='apis_relations/edit_button_persLabel_ajax_form.html')
-    label2 = tables.Column(accessor='label')
+    label2 = tables.TemplateColumn(template_name="apis_relations/labels_label.html")
 
     class Meta:
         empty_text = empty_text_default
