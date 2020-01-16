@@ -107,39 +107,11 @@ class GenericListFilter(django_filters.FilterSet):
 
     def construct_lookup_from_wildcard(self, value):
         """
-        Parses user input for wildcards and returns a tuple containing the interpreted django lookup string and the trimmed value
-        E.g.
-            "*example" -> ("__iendswith", "example")
-            "example*" -> ("__istartswith", "example")
-            "*example*" -> ("__icontains", "example")
-            ""example"" -> ("__exact", "example")
-
-        :param value : str : text to be parsed for *
-        :return: (lookup : str, value : str)
+        For the SOLA project I decided to switch to __icontains as default, but to be consistent with
+        other versions of APIS and usages, I left this method here for now so that other methods can always point
+        to here
         """
-
-        search_startswith = False
-        search_endswith = False
-
-        if value.startswith("*"):
-            value = value[1:]
-            search_startswith = True
-
-        if value.endswith("*"):
-            value = value[:-1]
-            search_endswith = True
-
-        if search_startswith and not search_endswith:
-            return "__iendswith", value
-
-        elif not search_startswith and search_endswith:
-            return "__istartswith", value
-
-        elif search_startswith and search_endswith:
-            return "__icontains", value
-
-        else:
-            return "__exact", value
+        return "__icontains", value
 
 
     def string_wildcard_filter(self, queryset, name, value):
@@ -339,7 +311,6 @@ class GenericListFilter(django_filters.FilterSet):
 class PersonListFilter(GenericListFilter):
 
     gender = django_filters.ChoiceFilter(choices=(('', 'any'), ('male', 'male'), ('female', 'female')))
-    profession = django_filters.CharFilter(method="related_arbitrary_model_name")
     title = django_filters.CharFilter(method="related_arbitrary_model_name")
     name = django_filters.CharFilter(method="person_name_filter", label="Name or Label of person")
 
