@@ -71,10 +71,6 @@ def create_generic_api_viewset(**kwargs):
         pagination_class = CustomPagination
         entity_str = kwargs.get("entity")
         app_label = kwargs.get("app_label")
-
-        # TODO __sresch__ : delete
-        print(app_label, entity_str)
-
         entity = ContentType.objects.get(
             app_label=app_label, model=entity_str.lower()
         ).model_class()

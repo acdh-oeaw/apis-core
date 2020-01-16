@@ -42,9 +42,11 @@ from .serializers import (
     PersonSerializer,
     PlaceSerializer,
 
+
     # TODO __sresch__ : serializer stuff
     # PassageSerializer,
     # PublicationSerializer,
+
 
     GeoJsonSerializerTheme
 )
@@ -180,8 +182,11 @@ class PassageViewSet(viewsets.ModelViewSet):
     permission_classes = (DjangoObjectPermissions,)
     queryset = Passage.objects.all()
 
+
     # TODO __sresch__ : serializer stuff
     # serializer_class = PassageSerializer
+
+
     pagination_class = StandardResultsSetPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     depth = 2

@@ -430,7 +430,7 @@ class AbstractEntity(TempEntityClass):
         """
         :return: a list of names of all ManyToMany field names relating to relationtypes from the respective entity class
 
-        E.g. for PersonPerson.get_related_relationtype_field_names() or person_instance.get_related_relationtype_field_names() ->
+        E.g. for Person.get_related_relationtype_field_names() or person_instance.get_related_relationtype_field_names() ->
         ['event_relationtype_set', 'institution_relationtype_set', 'personB_relationtype_set', 'personA_relationtype_set', 'place_relationtype_set', 'work_relationtype_set']
 
         Note: this method depends on the 'generate_all_fields' function of the EntityRelationFieldGenerator class 
@@ -518,6 +518,7 @@ class Place(AbstractEntity):
     )
     lat = models.FloatField(blank=True, null=True, verbose_name="latitude")
     lng = models.FloatField(blank=True, null=True, verbose_name="longitude")
+    name_english = models.CharField(max_length=1024, blank=True, null=True)
 
 
 @reversion.register(follow=["tempentityclass_ptr"])
@@ -526,6 +527,7 @@ class Institution(AbstractEntity):
     kind = models.ForeignKey(
         InstitutionType, blank=True, null=True, on_delete=models.SET_NULL
     )
+    name_english = models.CharField(max_length=1024, blank=True, null=True)
 
 
 @reversion.register(follow=["tempentityclass_ptr"])
@@ -534,11 +536,14 @@ class Event(AbstractEntity):
     kind = models.ForeignKey(
         EventType, blank=True, null=True, on_delete=models.SET_NULL
     )
+    name_english = models.CharField(max_length=1024, blank=True, null=True)
 
 
 @reversion.register(follow=["tempentityclass_ptr"])
 class Passage(AbstractEntity):
 
+    topics = models.ManyToManyField(PassageTopics, blank=True)
+    migne_number = models.CharField(max_length=1024, blank=True, null=True)
     kind = models.ForeignKey(PassageType, blank=True, null=True, on_delete=models.SET_NULL)
 
 

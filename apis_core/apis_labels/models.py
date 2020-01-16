@@ -18,8 +18,10 @@ class Label(models.Model):
     label_type = models.ForeignKey(LabelType, blank=True, null=True,
                                    on_delete=models.SET_NULL)
 
-    # TODO __sresch__ add related_name="label_set" here to be consistent with other usages throughout django
+
+    # TODO __sresch__ : add related_name="label_set" here to be consistent with other usages throughout django
     temp_entity = models.ForeignKey("apis_metainfo.TempEntityClass", on_delete=models.CASCADE)
+
 
     def get_web_object(self):
         result = {
