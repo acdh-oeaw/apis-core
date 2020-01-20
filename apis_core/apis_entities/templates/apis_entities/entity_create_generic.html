@@ -6,6 +6,9 @@
       <link rel="stylesheet" href="{% static 'apis_highlighter/apis_highlighter.css' %}" />
 	<script type="text/javascript" src="{% static 'apis_highlighter/apis_highlighter.js' %}"></script>
 	{% endif %}
+    {% if apis_bibsonomy %}
+{% include 'apis_bibsonomy/apis_bibsonomy_include.html' %}
+    {% endif %}
 {% endblock %}
 {% block Titel %}Create a {{entity_type|title}}{% endblock %}
 {% load guardian_tags %}
@@ -44,6 +47,9 @@
                         </div>
                         <div class="card-body">
                             <form action="" method="post">
+                            {% if apis_bibsonomy %}
+                                <button hidden=True class="bibsonomy-anker-hidden" data-bibs-contenttype={{ entity_type }} data-bibs-object_pk={{instance.pk}} data-bibs-form-elements="{{ apis_bibsonomy }}">Ref</button>
+                            {% endif %}
                                 <div class="card card-default">
 
                             	{% crispy form %}
