@@ -6,6 +6,8 @@ from datetime import datetime
 from io import TextIOWrapper
 
 import requests
+from rest_framework.generics import GenericAPIView
+
 from apis_core.apis_metainfo.api_renderers import PaginatedCSVRenderer
 from apis_core.apis_metainfo.models import TempEntityClass, Uri
 from apis_core.apis_relations.models import PersonPlace, InstitutionPlace
@@ -56,8 +58,9 @@ class StandardResultsSetPagination(PageNumberPagination):
     max_page_size = 1000
 
 
-class GetEntityGeneric(APIView):
+class GetEntityGeneric(GenericAPIView):
     serializer_class = EntitySerializer
+    queryset = TempEntityClass.objects.all()
     renderer_classes = tuple(
         api_settings.DEFAULT_RENDERER_CLASSES) + (EntityToTEI, EntityToCIDOCXML, EntityToProsopogrAPhI, EntityToCIDOCN3, EntityToCIDOCNQUADS, EntityToCIDOCTURTLE)
     if getattr(settings, 'APIS_RENDERERS', None) is not None:
