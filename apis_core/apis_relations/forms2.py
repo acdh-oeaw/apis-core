@@ -1,6 +1,5 @@
 import re
 
-from django.contrib.contenttypes.models import ContentType
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout
@@ -76,6 +75,7 @@ class GenericRelationForm(forms.ModelForm):
                 annotation_project_id=int(self.request.session.get('annotation_project', 1)))
             a.save()
             a.entity_link.add(x)
+
         print('saved: {}'.format(x))
         return x
 
@@ -274,3 +274,34 @@ class GenericRelationForm(forms.ModelForm):
             )
         else:
             self.fields['end_date_written'].help_text = get_date_help_text_default()
+
+
+
+        # check if the current form regards a relation, and if so, check if it's relevant to bible references
+        # in order to display a relevant help_text underneath the references field
+
+        if \
+                "instance" in kwargs and hasattr(kwargs["instance"], "bible_book_ref") and \
+                ( kwargs["instance"].relation_type_id == 204 or kwargs["instance"].relation_type_id == 205 ):
+            # check if relevant, and if the relation type is either 204 or 205 (both indicate passage<->bible relations)
+
+            if kwargs["instance"].bible_book_ref:
+                # if successfully parsed, fetch, the relevant bible data, and construct a help text with a link to the
+                # bible passage on stepbible.org
+
+                book = kwargs["instance"].bible_book_ref
+                chapter = kwargs["instance"].bible_chapter_ref
+                verse = kwargs["instance"].bible_verse_ref
+
+                label = "Book: " + book + ", Chapter: " + chapter + ", Verse: " + verse
+                url = "https://www.stepbible.org/?q=reference=" + book + "." + chapter + ":" + verse
+
+                self.fields['references'].help_text =  "<a href="+url+">"+label+"</a>"
+
+            else:
+                # if not succesfully parsed but the relation is a passage<->bible relation, display the failure of parsing
+                self.fields['references'].help_text = "Could not parse bible reference"
+
+        else:
+            # in any other case, don't show anything
+            self.fields['references'].help_text = None

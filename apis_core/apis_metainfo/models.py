@@ -6,7 +6,7 @@ from convertdate import julian
 from difflib import SequenceMatcher
 from dateutil.parser import parse
 import requests
-
+import json
 # from reversion import revisions as reversion
 import reversion
 from apis_core.apis_entities.serializers_generic import EntitySerializer
@@ -27,6 +27,7 @@ from django.dispatch import receiver
 from django.urls import NoReverseMatch, reverse
 from django.utils.functional import cached_property
 from model_utils.managers import InheritanceManager
+
 
 NEXT_PREV = getattr(settings, "APIS_NEXT_PREV", True)
 
@@ -97,6 +98,8 @@ class TempEntityClass(models.Model):
         """Adaption of the save() method of the class to automatically parse string-dates into date objects
         """
 
+
+        # Parse dates
 
         def parse_dates_func(temp_entity_class):
             """
@@ -494,11 +497,81 @@ class TempEntityClass(models.Model):
             temp_entity_class.end_end_date = end_end_date
             temp_entity_class.end_date_is_exact = end_date_is_exact
 
+
         if parse_dates:
             parse_dates_func(self)
 
+
+
+        # normalize the name
+
         if self.name:
             self.name = unicodedata.normalize("NFC", self.name)
+
+
+
+        # Check if the tempentity to be saved is a passage<->bible relation (special form of passage<->publication),
+        # if so parse the references field and save it into the relation
+
+        def parse_bible_reference(unparsed_string):
+            """
+            function to parse the references field of a Passage<-> Publication relation to check if it contains
+            bible references.
+
+            :param unparsed_string: the raw string to be parsed
+            :return: either a dictionary if parsed succesfully or None if not
+            """
+
+            if unparsed_string:
+
+                # load the json file which contains all valid bible references, compare the user input against it
+                with open("./data/bible_refs.json") as json_file:
+                    valid_bible_books = json.load(json_file)
+
+                    # User input of bible references must be separated either by whitespace or by double colon
+                    ref = re.split(" +|:", unparsed_string)
+
+                    if len(ref) == 3:
+
+                        book = ref[0].lower()
+                        chapter = ref[1]
+                        verse = ref[2]
+
+                        # compare the split values against the json bible dictionary
+                        if \
+                                book in valid_bible_books and \
+                                chapter in valid_bible_books[book] and \
+                                verse in valid_bible_books[book][chapter]:
+
+                            # if it exists, then it's valid. Return a dictionary of these values
+                            return {
+                                "book": book,
+                                "chapter": chapter,
+                                "verse": verse
+                            }
+
+            # if nothing was returend before, return None
+            return None
+
+        # TODO __sresch__ : check for best practice on local imports vs circularity problems.
+        from apis_core.apis_relations.models import PassagePublication
+
+        if self.__class__ == PassagePublication and (self.relation_type.pk == 204 or self.relation_type.pk == 205):
+            # If class is passage<->publication and the relationtype is one of the two bible relations (204 or 205), then parse it.
+            # TODO __sresch__ : consider also checking for if the publication is the bible
+
+            parsed_bible_dict = parse_bible_reference(self.references)
+
+            if parsed_bible_dict:
+                self.bible_book_ref = parsed_bible_dict["book"]
+                self.bible_chapter_ref = parsed_bible_dict["chapter"]
+                self.bible_verse_ref = parsed_bible_dict["verse"]
+            else:
+                self.bible_book_ref = None
+                self.bible_chapter_ref = None
+                self.bible_verse_ref = None
+
+
 
         super(TempEntityClass, self).save(*args, **kwargs)
 
