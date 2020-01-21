@@ -1,6 +1,7 @@
 import django_tables2 as tables
 from django.contrib.contenttypes.models import ContentType
 from django_tables2.utils import A
+from django.conf import settings
 
 from .models import (
     PersonInstitution, PersonPlace, PersonPerson, PersonEvent, InstitutionEvent, PlaceEvent,
@@ -64,9 +65,10 @@ def get_generic_relations_table(relation, entity, detail=None):
             self.base_columns['delete'] = tables.TemplateColumn(
                 template_name='apis_relations/delete_button_generic_ajax_form.html'
             )
-            self.base_columns['ref'] = tables.TemplateColumn(
-                template_name='apis_relations/references_button_generic_ajax_form.html'
-            )
+            if 'apis_bibsonomy' in settings.INSTALLED_APPS:
+                self.base_columns['ref'] = tables.TemplateColumn(
+                    template_name='apis_relations/references_button_generic_ajax_form.html'
+                )
             self.base_columns['related_'+rel_ent.lower()] = tables.LinkColumn(
                 'apis:apis_entities:generic_entities_edit_view',
                 args=[
@@ -81,10 +83,13 @@ def get_generic_relations_table(relation, entity, detail=None):
                 template_name='apis_relations/edit_button_generic_ajax_form.html'
             )
             super(GenericRelationsTable, self).__init__(*args, **kwargs)
-            self.sequence = (
-                'delete', 'ref', 'start_date_written', 'end_date_written', 'relation_type',
+            self.sequence = [
+                'delete', 'start_date_written', 'end_date_written', 'relation_type',
                 'related_' + rel_ent.lower(), 'edit'
-            )
+            ]
+            if 'apis_bibsonomy' in settings.INSTALLED_APPS:
+                self.sequence.pop()
+                self.sequence.insert(1, 'ref')
 
     if detail:
 
