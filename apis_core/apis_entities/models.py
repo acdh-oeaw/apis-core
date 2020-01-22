@@ -490,7 +490,7 @@ class AbstractEntity(TempEntityClass):
 @reversion.register(follow=["tempentityclass_ptr"])
 class Person(AbstractEntity):
 
-    GENDER_CHOICES = (("female", "female"), ("male", "male"))
+    GENDER_CHOICES = (("female", "female"), ("male", "male"), ("third gender", "third gender"))
     first_name = models.CharField(
         max_length=255,
         help_text="The persons´s forename. In case of more then one name...",
