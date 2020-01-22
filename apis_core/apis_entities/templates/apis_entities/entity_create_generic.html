@@ -302,8 +302,11 @@
     }
 </script>
 <script type='text/javascript'>
-    function DeleteTempEntity(pk, kind) {
-        var url = '/apis/api/'+kind+'/'+pk.toString()
+    function DeleteTempEntity(pk, kind, app_name=false) {
+        if (app_name){
+            var url = '/apis/api/'+app_name+'/'+kind+'/'+pk.toString()
+        } else {
+        var url = '/apis/api/'+kind+'/'+pk.toString()}
         $.ajax({
             type: 'DELETE',
             url: url,
@@ -324,9 +327,9 @@
     }
 </script>
 <script type='text/javascript'>
-    function DeleteAnnTempEntity(an_pk, rel_class, rel_pk) {
+    function DeleteAnnTempEntity(an_pk, rel_class, rel_pk, app_name) {
         DeleteTempEntity(an_pk,"HLAnnotation");
-        DeleteTempEntity(rel_pk, rel_class);
+        DeleteTempEntity(rel_pk, rel_class, app_name);
     };
 </script>
 
