@@ -34,8 +34,10 @@ def validate_target_autocomplete(value):
         if value.startswith('http'):
             test = False
             sett = yaml.load(open(APIS_RDF_URI_SETTINGS, 'r'))
-            for r in sett['mappings']:
-                if re.match(r['regex'], value):
+            regx = [x['regex'] for x in sett['mappings']]
+            regx.append('http.*oeaw\.ac\.at')
+            for r in regx:
+                if re.match(r, value):
                     test = True
             if not test:
                 raise ValidationError(
