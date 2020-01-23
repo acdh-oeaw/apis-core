@@ -519,6 +519,12 @@ class Place(AbstractEntity):
     lat = models.FloatField(blank=True, null=True, verbose_name="latitude")
     lng = models.FloatField(blank=True, null=True, verbose_name="longitude")
 
+    def save(self, *args, **kwargs):
+        if isinstance(self.lat, float) and isinstance(self.lng, float):
+            self.status = 'distinct'
+        super(Place, self).save(*args, **kwargs)
+        return self
+
 
 @reversion.register(follow=["tempentityclass_ptr"])
 class Institution(AbstractEntity):
