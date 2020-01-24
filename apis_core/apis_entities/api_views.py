@@ -233,7 +233,16 @@ class PlaceGeoJsonViewSet(viewsets.ViewSet):
         return Response(serializer.data)
 
 
-class NetJsonViewSet(viewsets.ViewSet):
+class NetJsonViewSet(viewsets.GenericViewSet):
+
+    def get_queryset(self):
+        rel = self.request.data["select_relation"]
+        q = ContentType.objects.get(
+            app_label="apis_relations", model="".join(rel.split("-"))
+        ).model_class()
+        return q.objects.all()
+
+
     def create(self, request):
         rel = request.data["select_relation"]
         if "select_kind" in request.data.keys():
