@@ -55,11 +55,11 @@ class TempEntityClass(models.Model):
     start_date = models.DateField(blank=True, null=True)
     start_start_date = models.DateField(blank=True, null=True)
     start_end_date = models.DateField(blank=True, null=True)
-    start_date_is_exact = models.BooleanField(blank=True, null=True)
+    start_date_is_exact = models.NullBooleanField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     end_start_date = models.DateField(blank=True, null=True)
     end_end_date = models.DateField(blank=True, null=True)
-    end_date_is_exact = models.BooleanField(blank=True, null=True)
+    end_date_is_exact = models.NullBooleanField(blank=True, null=True)
     start_date_written = models.CharField(
         max_length=255,
         blank=True,
@@ -522,6 +522,26 @@ class TempEntityClass(models.Model):
             :return: either a dictionary if parsed succesfully or None if not
             """
 
+            def make_string_of_int(potential_int):
+                """
+                Since it's possible that the number of the chapter or verse reference has a leading zero, remove
+                it by temporarily turning the value into an integer and then back into a string (e.g "01" -> 1 -> "1").
+                Also checks if it's valid at all, since only numbers are accepted for chapters and verses.
+
+                :param potential_int : str : the chapter or verse the user has put in.
+                :return:
+                    if valid : str : the properly stringified chapter or verse without any potential leading zero
+                    if not valid : None
+                """
+
+                try:
+                    temp_int = int(potential_int)
+                    return str( temp_int )
+                except:
+                    return None
+
+
+
             if unparsed_string:
 
                 # load the json file which contains all valid bible references, compare the user input against it
@@ -534,11 +554,12 @@ class TempEntityClass(models.Model):
                     if len(ref) == 3:
 
                         book = ref[0].lower()
-                        chapter = ref[1]
-                        verse = ref[2]
+                        chapter = make_string_of_int( ref[1] )
+                        verse = make_string_of_int( ref[2] )
 
                         # compare the split values against the json bible dictionary
                         if \
+                                chapter and verse and \
                                 book in valid_bible_books and \
                                 chapter in valid_bible_books[book] and \
                                 verse in valid_bible_books[book][chapter]:
@@ -550,7 +571,7 @@ class TempEntityClass(models.Model):
                                 "verse": verse
                             }
 
-            # if nothing was returend before, return None
+            # if nothing was returned above, return None
             return None
 
         # TODO __sresch__ : check for best practice on local imports vs circularity problems.
