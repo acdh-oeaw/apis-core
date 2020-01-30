@@ -491,7 +491,7 @@ class AbstractEntity(TempEntityClass):
 @reversion.register(follow=["tempentityclass_ptr"])
 class Person(AbstractEntity):
 
-    GENDER_CHOICES = (("female", "female"), ("male", "male"))
+    GENDER_CHOICES = (("female", "female"), ("male", "male"), ("third gender", "third gender"))
     first_name = models.CharField(
         max_length=255,
         help_text="The persons´s forename. In case of more then one name...",
@@ -519,6 +519,12 @@ class Place(AbstractEntity):
     lat = models.FloatField(blank=True, null=True, verbose_name="latitude")
     lng = models.FloatField(blank=True, null=True, verbose_name="longitude")
     name_english = models.CharField(max_length=1024, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if isinstance(self.lat, float) and isinstance(self.lng, float):
+            self.status = 'distinct'
+        super(Place, self).save(*args, **kwargs)
+        return self
 
 
 @reversion.register(follow=["tempentityclass_ptr"])

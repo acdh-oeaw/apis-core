@@ -1,13 +1,14 @@
 {% extends "webpage/base.html" %}
 {% load static %}
-{% load bibsonomy_templatetags %}
 {% block scriptHeader %}
 {{block.super}}
-{% include 'apis_bibsonomy/apis_bibsonomy_include.html' %}
 {% if highlighter_active %}
       <link rel="stylesheet" href="{% static 'apis_highlighter/apis_highlighter.css' %}" />
 	<script type="text/javascript" src="{% static 'apis_highlighter/apis_highlighter.js' %}"></script>
 	{% endif %}
+    {% if apis_bibsonomy %}
+{% include 'apis_bibsonomy/apis_bibsonomy_include.html' %}
+    {% endif %}
 {% endblock %}
 {% block Titel %}Create a {{entity_type|title}}{% endblock %}
 {% load guardian_tags %}
@@ -19,16 +20,12 @@
 <div class="container-fluid">
     <div class="card">
         <div class="card-header" style="text-align: center;">
-            <h1>
-      		      {% bibsonomy_form content_type=entity_type hidden=True %}
-      		      <a class="bibsonomy-anker" data-bibs-contenttype={{entity_type}} data-bibs-object_pk={{instance.pk}}><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-book-open"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg></a>
-              <a href="{{ instance.get_listview_url }}">
+            <h1><a href="{{ instance.get_listview_url }}">
                 <small>{{ entity_type }}s</small>
-              </a>
-              <strong>{{ instance }} </strong>
-              <a href="{{ instance.get_absolute_url }}">
-                <i data-feather="eye" title="eye"></i>
-              </a>
+            </a>
+                <strong>{{ instance }} </strong> <a href="{{ instance.get_absolute_url }}">
+                    <i data-feather="eye" title="eye"></i>
+                </a>
             </h1>
         </div>
         <div class="card-body">
@@ -50,16 +47,9 @@
                         </div>
                         <div class="card-body">
                             <form action="" method="post">
-
-                                <button
-                                        hidden=True
-                                        class="bibsonomy-anker-hidden"
-                                        data-bibs-contenttype={{ entity_type }}
-                                        data-bibs-object_pk={{instance.pk}}
-                                        data-bibs-form-elements="first_name|name|start_date_written|end_date_written|lat">
-                                    Ref
-                                </button>
-
+                            {% if apis_bibsonomy %}
+                                <button hidden=True class="bibsonomy-anker-hidden" data-bibs-contenttype={{ entity_type }} data-bibs-object_pk={{instance.pk}} data-bibs-form-elements="{{ apis_bibsonomy }}">Ref</button>
+                            {% endif %}
                                 <div class="card card-default">
 
                             	{% crispy form %}
@@ -312,8 +302,11 @@
     }
 </script>
 <script type='text/javascript'>
-    function DeleteTempEntity(pk, kind) {
-        var url = '/apis/api/'+kind+'/'+pk.toString()
+    function DeleteTempEntity(pk, kind, app_name=false) {
+        if (app_name){
+            var url = '/apis/api/'+app_name+'/'+kind+'/'+pk.toString()
+        } else {
+        var url = '/apis/api/'+kind+'/'+pk.toString()}
         $.ajax({
             type: 'DELETE',
             url: url,
@@ -334,9 +327,9 @@
     }
 </script>
 <script type='text/javascript'>
-    function DeleteAnnTempEntity(an_pk, rel_class, rel_pk) {
+    function DeleteAnnTempEntity(an_pk, rel_class, rel_pk, app_name) {
         DeleteTempEntity(an_pk,"HLAnnotation");
-        DeleteTempEntity(rel_pk, rel_class);
+        DeleteTempEntity(rel_pk, rel_class, app_name);
     };
 </script>
 
