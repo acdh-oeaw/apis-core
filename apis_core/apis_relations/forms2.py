@@ -1,5 +1,8 @@
+import copy
 import re
 
+import yaml
+from django.contrib.contenttypes.models import ContentType
 from django import forms
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout
@@ -9,18 +12,45 @@ from django.utils.translation import ugettext_lazy as _
 from django.db.models import Q
 from django.conf import settings
 from dal import autocomplete
-from django.core.validators import URLValidator
 from django.urls import reverse
 from apis_core.apis_entities.fields import ListSelect2
+from django.core.exceptions import ValidationError
+#from dal.autocomplete import ListSelect2
 
 #from dal.autocomplete import ListSelect2
 from apis_core.apis_metainfo.models import TempEntityClass, Text
-from apis_core.helper_functions.RDFParser import RDFParser
+from apis_core.helper_functions.RDFParser import RDFParser, APIS_RDF_URI_SETTINGS
 from apis_core.apis_metainfo.forms import get_date_help_text_default, get_date_help_text_from_dates
 from .tables import *
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.models import Annotation
+
+
+def validate_target_autocomplete(value):
+    try:
+        value = int(value)
+    except ValueError:
+        if value.startswith('http'):
+            test = False
+            sett = yaml.load(open(APIS_RDF_URI_SETTINGS, 'r'))
+            regx = [x['regex'] for x in sett['mappings']]
+            regx.append('http.*oeaw\.ac\.at')
+            for r in regx:
+                if re.match(r, value):
+                    test = True
+            if not test:
+                raise ValidationError(
+                    _('Invalid value: %(value)s, the url you are using is not configured'),
+                    code='invalid',
+                    params={'value': value},
+                )
+        else:
+            raise ValidationError(
+                _('Invalid value: %(value)s, use either URLs or select a value'),
+                code='invalid',
+                params={'value': value},
+            )
 
 
 class GenericRelationForm(forms.ModelForm):
@@ -75,7 +105,6 @@ class GenericRelationForm(forms.ModelForm):
                 annotation_project_id=int(self.request.session.get('annotation_project', 1)))
             a.save()
             a.entity_link.add(x)
-
         print('saved: {}'.format(x))
         return x
 
@@ -133,6 +162,9 @@ class GenericRelationForm(forms.ModelForm):
                  'data-minimum-input-length': getattr(settings, "APIS_MIN_CHAR", 3),
                  'data-html': True,
                  'style': 'width: 100%'}
+        help_text_target = "Search and select or use an URL from a reference resource"
+        attrs_target = copy.deepcopy(attrs)
+        attrs_target['data-tags'] = '1'
         css_notes = 'LS'
         self.highlighter = highlighter
         entity_type = kwargs.pop('entity_type')
@@ -175,8 +207,9 @@ class GenericRelationForm(forms.ModelForm):
                 widget=ListSelect2(
                     #url='/entities/autocomplete/{}'.format(lst_src_target[1].lower()),
                     url = reverse('apis:apis_entities:generic_entities_autocomplete', args=[lst_src_target[1].lower()]),
-                    attrs=attrs),
-                validators=[URLValidator])
+                    attrs=attrs_target),
+                validators=[validate_target_autocomplete],
+                help_text=help_text_target)
         elif entity_type.lower() == lst_src_target[0].lower():
             self.rel_accessor = (lst_src_target[1], True,
                                  'related_{}'.format(lst_src_target[1].lower()),
@@ -192,8 +225,9 @@ class GenericRelationForm(forms.ModelForm):
                 widget=ListSelect2(
                     #url='/entities/autocomplete/{}'.format(lst_src_target[1].lower()),
                     url = reverse('apis:apis_entities:generic_entities_autocomplete', args=[lst_src_target[1].lower()]),
-                    attrs=attrs),
-                validators=[URLValidator])
+                    attrs=attrs_target),
+                validators=[validate_target_autocomplete],
+                help_text=help_text_target)
         elif entity_type.lower() == lst_src_target[1].lower():
             self.rel_accessor = (lst_src_target[0], False,
                                  'related_{}'.format(lst_src_target[0].lower()),
@@ -209,8 +243,9 @@ class GenericRelationForm(forms.ModelForm):
                 widget=ListSelect2(
                     #url='/entities/autocomplete/{}'.format(lst_src_target[0].lower()),
                     url = reverse('apis:apis_entities:generic_entities_autocomplete', args=[lst_src_target[0].lower()]),
-                    attrs=attrs),
-                validators=[URLValidator])
+                    attrs=attrs_target),
+                validators=[validate_target_autocomplete],
+                help_text=help_text_target)
         else:
             print('no hit rel_accessor')
         if instance and instance.id:

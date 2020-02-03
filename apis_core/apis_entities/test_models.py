@@ -176,12 +176,14 @@ class PermissionsModelTestCase(TestCase):
             },
             #format='json'
             )
+        print(f"no permissions, patch: {res.status_code}")
         self.assertEqual(res.status_code, 403)
 
     def test_no_perm_view(self):
         res = self.c.get(
             reverse('apis:apis_core:person-detail', kwargs={'pk': self.pers.pk}),
         )
+        print(f"no permissions, get: {res.status_code}")
         self.assertEqual(res.status_code, 200)
 
     def test_perm(self):
@@ -193,6 +195,7 @@ class PermissionsModelTestCase(TestCase):
             },
             #format='json'
             )
+        print(f"permissions granted, patch: {res.status_code}")
         self.assertEqual(res.status_code, 200)
 
     def test_perm_removed(self):
@@ -204,6 +207,7 @@ class PermissionsModelTestCase(TestCase):
             },
             #format='json'
             )
+        print(f"permissions revoked, patch: {res.status_code}")
         self.assertEqual(res.status_code, 403)
 
 

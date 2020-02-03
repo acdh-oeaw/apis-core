@@ -21,6 +21,7 @@ from apis_core.apis_metainfo.models import Uri
 from apis_core.apis_relations.tables import get_generic_relations_table, EntityLabelTable
 from .forms import get_entities_form, FullTextForm, GenericEntitiesStanbolForm
 from .views import set_session_variables
+from ..apis_vocabularies.models import TextType
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.forms import SelectAnnotatorAgreement
@@ -79,6 +80,15 @@ class GenericEntitiesEditView(View):
             form_ann_agreement = SelectAnnotatorAgreement()
         else:
             form_ann_agreement = False
+        if 'apis_bibsonomy' in settings.INSTALLED_APPS:
+            apis_bibsonomy = getattr(settings, 'APIS_BIBSONOMY_FIELDS', ['self'])
+            apis_bibsonomy_texts = getattr(settings, "APIS_BIBSONOMY_TEXTS", False)
+            if apis_bibsonomy_texts:
+                apis_bibsonomy.extend([f"text_{pk}" for pk in TextType.objects.filter(name__in=apis_bibsonomy_texts).values_list('pk', flat=True) if f"text_{pk}" not in apis_bibsonomy])
+            if isinstance(apis_bibsonomy, list):
+                apis_bibsonomy = '|'.join([x.strip() for x in apis_bibsonomy])
+        else:
+            apis_bibsonomy = False
         object_revisions = Version.objects.get_for_object(instance)
         object_lod = Uri.objects.filter(entity=instance)
         object_texts, ann_proj_form = get_highlighted_texts(request, instance)
@@ -104,6 +114,7 @@ class GenericEntitiesEditView(View):
             'object_lod': object_lod,
             'ann_proj_form': ann_proj_form,
             'form_ann_agreement': form_ann_agreement,
+            'apis_bibsonomy': apis_bibsonomy,
             'permissions': permissions}
         if entity.lower() != 'place':
             form_merge_with = GenericEntitiesStanbolForm(entity, ent_merge_pk=pk)

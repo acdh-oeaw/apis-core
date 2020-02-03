@@ -443,10 +443,6 @@ class RDFParser(object):
 
         self._clean_uri_store()
         self._rdf_settings_file = rdf_settings
-        sett_file =  getattr(settings, 'APIS_GENERICRDF_SETTINGS', False)
-        if sett_file:
-            base_dir = getattr(settings, 'BASE_DIR')
-            self._rdf_settings_file = os.path.join(base_dir, sett_file)
         self._uri_settings_file = uri_settings
         self._preserve_uri_minutes = preserve_uri_minutes
         self._uri_check = uri_check
