@@ -55,11 +55,11 @@ class TempEntityClass(models.Model):
     start_date = models.DateField(blank=True, null=True)
     start_start_date = models.DateField(blank=True, null=True)
     start_end_date = models.DateField(blank=True, null=True)
-    start_date_is_exact = models.BooleanField(blank=True, null=True)
+    start_date_is_exact = models.NullBooleanField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     end_start_date = models.DateField(blank=True, null=True)
     end_end_date = models.DateField(blank=True, null=True)
-    end_date_is_exact = models.BooleanField(blank=True, null=True)
+    end_date_is_exact = models.NullBooleanField(blank=True, null=True)
     start_date_written = models.CharField(
         max_length=255,
         blank=True,
