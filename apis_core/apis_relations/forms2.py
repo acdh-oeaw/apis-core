@@ -333,9 +333,12 @@ class GenericRelationForm(forms.ModelForm):
 
                 self.fields['references'].help_text =  "<a href="+url+">"+label+"</a>"
 
-            else:
+            elif kwargs["instance"].references != "":
                 # if not succesfully parsed but the relation is a passage<->bible relation, display the failure of parsing
                 self.fields['references'].help_text = "Could not parse bible reference"
+
+            else:
+                self.fields['references'].help_text = None
 
         else:
             # in any other case, don't show anything
