@@ -40,7 +40,6 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
         relations = ContentType.objects.filter(app_label='apis_relations', model__icontains=entity)
         side_bar = []
         for rel in relations:
-            print(str(rel))
             match = str(rel).split()
             prefix = "{}{}-".format(match[0].title()[:2], match[1].title()[:2])
             table = get_generic_relations_table(''.join(match), entity, detail=True)
