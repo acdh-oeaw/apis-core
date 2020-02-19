@@ -40,11 +40,12 @@ def validate_target_autocomplete(value):
                 if re.match(r, value):
                     test = True
             if not test:
-                raise ValidationError(
-                    _('Invalid value: %(value)s, the url you are using is not configured'),
-                    code='invalid',
-                    params={'value': value},
-                )
+                if Uri.objects.filter(uri=value).count() != 1:
+                    raise ValidationError(
+                        _('Invalid value: %(value)s, the url you are using is not configured'),
+                        code='invalid',
+                        params={'value': value},
+                    )
         else:
             raise ValidationError(
                 _('Invalid value: %(value)s, use either URLs or select a value'),
