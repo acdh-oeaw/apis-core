@@ -32,7 +32,8 @@ class EntityLabelForm(forms.ModelForm):
 
     class Meta:
         model = Label
-        fields = ['label', 'isoCode_639_3', 'label_type']
+        # fields = ['label', 'isoCode_639_3', 'label_type']
+        fields = ['label', 'isoCode_639_3', 'label_type', 'start_date_written']
 
     def save(self, site_instance, instance=None, commit=True):
         cd = self.cleaned_data
@@ -41,6 +42,7 @@ class EntityLabelForm(forms.ModelForm):
             x.label = cd['label']
             x.isoCode_639_3 = cd['isoCode_639_3']
             x.label_type = cd['label_type']
+            x.start_date_written = cd['start_date_written']
         else:
             x = super(EntityLabelForm, self).save(commit=False)
             x.temp_entity = site_instance

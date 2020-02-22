@@ -11,11 +11,13 @@ class LabelForm(forms.ModelForm):
         required=True,
         label="ISO 639-3"
     )
-    label = forms.CharField(required=True, help_text="The entities label or name.")
+    # label = forms.CharField(required=True, help_text="The entities label or name.")
+    bla = forms.CharField(required=True, help_text="XXXX")
 
     class Meta:
         model = Label
-        fields = ['temp_entity', 'label', 'isoCode']
+        # fields = ['temp_entity', 'label', 'isoCode']
+        fields = ['label', 'isoCode_639_3', 'label_type', 'start_date_written']
 
     def __init__(self, *args, **kwargs):
         super(LabelForm, self).__init__(*args, **kwargs)
