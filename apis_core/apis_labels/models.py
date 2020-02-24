@@ -52,8 +52,6 @@ class Label(models.Model):
     def save(self, *args, **kwargs):
         if self.label != unicodedata.normalize('NFC', self.label):    #secure correct unicode encoding
             self.label = unicodedata.normalize('NFC', self.label)
-        super(Label, self).save(*args, **kwargs)
-
 
         def parse_dates():
 
@@ -92,7 +90,7 @@ class Label(models.Model):
 
         parse_dates()
 
-
+        super(Label, self).save(*args, **kwargs)
         return self
 
     def __str__(self):

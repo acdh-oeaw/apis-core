@@ -157,8 +157,8 @@ class EntityLabelTable(tables.Table):
     class Meta:
         empty_text = empty_text_default
         model = Label
-        fields = ['isoCode_639_3', 'label_type']
-        sequence = ('label2', 'label_type', 'isoCode_639_3')
+        fields = ['isoCode_639_3', 'start_date_written', 'end_date_written', 'label_type']
+        sequence = ('label2', 'start_date_written', 'end_date_written', 'label_type', 'isoCode_639_3')
         # add class="paleblue" to <table> tag
         attrs = {"class": "table table-hover table-striped table-condensed",
                 "id": "PL_conn"}
