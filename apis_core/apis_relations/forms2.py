@@ -20,7 +20,7 @@ from django.core.exceptions import ValidationError
 #from dal.autocomplete import ListSelect2
 from apis_core.apis_metainfo.models import TempEntityClass, Text
 from apis_core.helper_functions.RDFParser import RDFParser, APIS_RDF_URI_SETTINGS
-from apis_core.apis_metainfo.forms import get_date_help_text_default, get_date_help_text_from_dates
+from apis_core.helper_functions import DateParser
 from .tables import *
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
@@ -40,11 +40,12 @@ def validate_target_autocomplete(value):
                 if re.match(r, value):
                     test = True
             if not test:
-                raise ValidationError(
-                    _('Invalid value: %(value)s, the url you are using is not configured'),
-                    code='invalid',
-                    params={'value': value},
-                )
+                if Uri.objects.filter(uri=value).count() != 1:
+                    raise ValidationError(
+                        _('Invalid value: %(value)s, the url you are using is not configured'),
+                        code='invalid',
+                        params={'value': value},
+                    )
         else:
             raise ValidationError(
                 _('Invalid value: %(value)s, use either URLs or select a value'),
@@ -288,27 +289,31 @@ class GenericRelationForm(forms.ModelForm):
                 'HL_end',
                 'HL_text_id'])
 
-        if instance.start_date_written:
-            self.fields['start_date_written'].help_text = get_date_help_text_from_dates(
-                single_date=instance.start_date,
-                single_start_date=instance.start_start_date,
-                single_end_date=instance.start_end_date,
-                single_date_written=instance.start_date_written,
-                single_date_is_exact=instance.start_date_is_exact
-            )
-        else:
-            self.fields['start_date_written'].help_text = get_date_help_text_default()
 
-        if instance.end_date_written:
-            self.fields['end_date_written'].help_text = get_date_help_text_from_dates(
-                single_date=instance.end_date,
-                single_start_date=instance.end_start_date,
-                single_end_date=instance.end_end_date,
-                single_date_written=instance.end_date_written,
-                single_date_is_exact=instance.end_date_is_exact
-            )
-        else:
-            self.fields['end_date_written'].help_text = get_date_help_text_default()
+        if instance != None:
+
+            if instance.start_date_written:
+                self.fields['start_date_written'].help_text = DateParser.get_date_help_text_from_dates(
+                    single_date=instance.start_date,
+                    single_start_date=instance.start_start_date,
+                    single_end_date=instance.start_end_date,
+                    single_date_written=instance.start_date_written,
+                    single_date_is_exact=instance.start_date_is_exact
+                )
+            else:
+                self.fields['start_date_written'].help_text = DateParser.get_date_help_text_default()
+
+            if instance.end_date_written:
+                self.fields['end_date_written'].help_text = DateParser.get_date_help_text_from_dates(
+                    single_date=instance.end_date,
+                    single_start_date=instance.end_start_date,
+                    single_end_date=instance.end_end_date,
+                    single_date_written=instance.end_date_written,
+                    single_date_is_exact=instance.end_date_is_exact
+                )
+            else:
+                self.fields['end_date_written'].help_text = DateParser.get_date_help_text_default()
+
 
 
 

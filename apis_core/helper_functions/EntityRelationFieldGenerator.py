@@ -49,9 +49,7 @@ def generate_all_fields():
     def pair_up_relations_relationtypes(relation_classes, relationtype_classes):
         """
         helper function to pair up the relation and relationtype classes so that potential mismatches between them are
-        detected early on and respective measures can be: raise an exception or print a statement.
-        Which of those two in an error case would be followed is up to the conrecte APIS instance and its requirements.
-        Hence the boolean value 'no_pairing_found_is_severe' below should be set accordingly.
+        detected early on.
 
         :param relation_classes: classes of all relations from the module apis_relations/models.py
         :param relationtype_classes: classes of all relationtypes from the module apis_vocabularies/models.py
@@ -84,13 +82,7 @@ def generate_all_fields():
             for cls in no_pairing_found:
                 message += "Found no corresponding Relation or RelationType class to: \n" + str(cls) + "!"
 
-            # Change this, if you want this pairing check to abort or just provide feedback
-            no_pairing_found_is_severe = False
-
-            if no_pairing_found_is_severe:
-                raise Exception(message)
-            else:
-                print(message)
+            raise Exception(message)
 
         return rc_rtc_pairs
 
