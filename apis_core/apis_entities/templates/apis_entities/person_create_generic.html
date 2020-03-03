@@ -1,0 +1,23 @@
+{% extends "apis_entities/entity_create_generic.html" %}
+{% block additional_accordion %}
+<div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingOne">
+                            <h4 class="card-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Merge with
+                                </a>
+                            </h4>
+                        </div>
+
+                <div id="collapseOne" class="card-collapse collapse in" role="tabcard" aria-labelledby="headingOne">
+                            <div id="tab_merge_with" class="card-body">
+				    {% load crispy_forms_tags %}
+                			{% crispy form_merge_with  form_merge_with.helper %}
+				</div>
+                        </div>
+                    </div>
+                <hr/>
+{% endblock %}
+
+
+

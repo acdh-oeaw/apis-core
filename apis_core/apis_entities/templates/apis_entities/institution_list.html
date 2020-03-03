@@ -1,0 +1,33 @@
+{% extends "webpage/base.html" %}
+{% block Titel %} See all Institutions {% endblock %}
+{% block content %}
+
+<div class="card card-default">
+	<div class="card-heading">
+		<h1>All {{ number_of_objects }} Institutions</h1>
+		<div>
+			<a class="btn btn-primary btn-lg" href="{% url 'apis:apis_entities:institution_create' %}">create new Institution</a>
+		</div>
+	</div>
+	<div class="card-body">
+		{% if object_list %}
+		<table class="table table-striped">
+			<thead>
+				<th>Name</th>
+				<th>founded/closed</th>
+				<th>places</th>
+			</thead>
+			<tbody>
+			{% for object in object_list %}
+				<tr>
+					<td><a href="{% url 'apis:apis_entities:institution_edit' pk=object.id %}">{{ object }}</a></td>
+					<td>{{ object.start_date_written }} - {{ object.end_date_written }}</td>
+					<td>{{ object.isoCode }}</a></td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+		{% endif %}
+	</div>
+</div>
+{% endblock %}

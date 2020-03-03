@@ -1,0 +1,33 @@
+{% extends "webpage/base.html" %}
+{% block Titel %} See all Persons {% endblock %}
+{% block content %}
+
+<div class="card card-default">
+	<div class="card-heading">
+		<h1>All Persons</h1>
+		<div>
+			<a class="btn btn-primary btn-lg" href="{% url 'apis:apis_entities:person_create' %}">create new Person</a>
+		</div>
+	</div>
+	<div class="card-body">
+		{% if object_list %}
+		<table class="table table-striped">
+			<thead>
+				<th>Name</th>
+				<th>lives/lived</th>
+				<th>places</th>
+			</thead>
+			<tbody>
+			{% for object in object_list %}
+				<tr>
+					<td><a href="{% url 'apis:apis_entities:person_edit' pk=object.id %}">{{ object }}</a></td>
+					<td>{{ object.start_date_written }} {% if object.end_date_written %} - {{ object.end_date_written }} {% endif %}</td>
+					<td>{{ object.isoCode }}</a></td>
+				</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+		{% endif %}
+	</div>
+</div>
+{% endblock %}

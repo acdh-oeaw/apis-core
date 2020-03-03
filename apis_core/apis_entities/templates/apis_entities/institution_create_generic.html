@@ -1,0 +1,85 @@
+{% extends "apis_entities/entity_create_generic.html" %}
+{% load guardian_tags %}
+{% block Titel %}Create an Institution{% endblock %}
+
+{% block additional_accordion %}
+<div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingOne">
+                            <h4 class="card-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Merge with
+                                </a>
+                            </h4>
+                        </div>
+
+                <div id="collapseOne" class="card-collapse collapse in" role="tabcard" aria-labelledby="headingOne">
+                            <div id="tab_merge_with" class="card-body">
+				    {% load crispy_forms_tags %}
+                			{% crispy form_merge_with  form_merge_with.helper %}
+				</div>
+                        </div>
+                    </div>
+                <hr/>
+{% endblock %}
+{% block scripts %}
+{{ block.super }}
+<script type="text/javascript">
+function check_perms_relation(){
+    {% if instance %}
+        {% get_obj_perms request.user for instance as "instance_perms" %}
+    {% if "change_institution" in instance_perms %}
+    return true
+    {% else %}
+    return false
+    {% endif %}
+    {% endif %}
+}
+</script>
+{% if instance %}
+    {% get_obj_perms request.user for instance as "instance_perms" %}
+{% if "change_institution" in instance_perms %}
+<script type="text/javascript">
+
+    $(function(){
+        {% for obj in right_card %}
+        GetFormAjax("{{obj.2|add:'Form'}}");
+        //unbind_ajax_forms();
+        {% endfor %}
+    })
+</script>
+<script type="text/javascript">
+    {% if highlighter_active %}
+        init_apis_highlighter(1, {{instance.pk}})
+        $('span.highlight').on("click", highlight_detail)
+    {% endif %}
+</script>
+{% else %}
+<script type="text/javascript">
+$(function(){
+    $('.reldelete').addClass("disabled");
+    $('.reldelete').prop("disabled", true);
+    $('.reledit').addClass("disabled");
+    $('.reledit').prop("disabled", true);
+})
+</script>
+{% endif %}
+{% endif %}
+{% endblock %}
+{% block editbuttons %}
+    {% if instance %}
+        {% get_obj_perms request.user for instance as "instance_perms" %}
+    {% if "delete_institution" in instance_perms %}
+        <a class ="btn btn-danger btn-primary" href="delete">Delete</a>
+    {% endif %}
+    {% if "change_institution" in instance_perms %}
+    <input class="btn btn-primary" type="submit" value="modify" />
+    {% endif %}
+        {% else %}
+        {% if perms.apis_entities.add_institution %}
+        <input class="btn btn-primary" type="submit" value="create" />
+            {% endif %}
+    {% endif %}
+    {% if instance %}
+    <button class="compare_tooltip btn btn-default" data-tooltip='{"app":"entities","kind":"institution","pk":"{{ instance.pk }}"}'>Revisions</button>
+    {% endif %}
+{% endblock editbuttons %}

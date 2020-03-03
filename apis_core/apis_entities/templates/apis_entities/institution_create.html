@@ -1,0 +1,397 @@
+{% extends "webpage/base.html" %}
+
+{% block Titel %}Create a Institution{% endblock %}
+{% block scriptHeader %}
+{% include 'autocomplete_light/static.html' %}
+{% endblock %}
+{% block content %}
+{% load crispy_forms_tags %}
+<div class="row">
+
+    <div class="col-md-6">
+        <div class="card card-default">
+            <div class="card-heading">
+            	<h3><strong>{{ instance }}</strong></h3>
+            </div>
+            <div class="card-body">
+            <form action="" method="post">
+                <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingFour">
+                          <h4 class="card-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                Texts
+                            </a>
+                          </h4>
+                        </div>
+                        <div id="collapseFour" class="card-collapse collapse" role="tabcard" aria-labelledby="headingFour">
+                          <div class="card-body">
+                        
+                            {% if form_text %}
+                        
+                            {% crispy form_text %}
+
+                          {% endif %}
+                                
+                          </div>
+                        </div>
+                      </div>
+                
+                	
+                	{% csrf_token %}
+                	{% crispy form %}
+                    <!--{% if instance %}
+                        <a class ="btn btn-danger btn-sm" href="{% url 'apis:apis_entities:person_delete' pk=instance.id %}">delete</a>
+                    {% endif %}-->
+                     {% for form1 in formset %}
+                        <div class="Formset">
+                            {% crispy form1 %}
+                        </div>
+                        {% endfor %}
+                        {{ formset.management_form }}
+                    <input class="btn btn-primary" type="submit" value="create/modify" />
+                </form>
+                {% if object_revisions %}
+                <p></p>
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingEight">
+                            <h4 class="card-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree2" aria-expanded="false" aria-controls="collapseThree2">
+                                    Revisions
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseThree2" class="card-collapse collapse in" role="tabcard" aria-labelledby="headingEight">
+                            <div id="tab_Revisions" class="card-body">
+                                <table class="table table-bordered">
+                                    {% for rev in object_revisions %}
+                                    <tr><td>{{ rev.revision.date_created }}</td><td>{{ rev.revision.user }}</td></tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            
+            
+        </div>
+
+        
+    </div>
+    
+    
+    <div class="col-md-6">
+        <div class="card card-default">
+            <div class="card-heading">
+                <h3>related to</h3>
+            </div>
+            <div class="card-body"> 
+                <div class="card-group" id="accordion" role="tablist" aria-multiselectable="true">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingOne">
+                            <h4 class="card-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Places
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseOne" class="card-collapse collapse in" role="tabcard" aria-labelledby="headingOne">
+                            <div id="tab_InstitutionPlace" class="card-body">
+                            
+                                <table class="table table-bordered">
+                                    {% for x in object_place %}
+                                            <tr id="pp_{{x.pk}}">
+                                                <td>{{ x.start_date_written }} - {{ x.end_date_written }}
+                                                
+                                            </td>
+                                            <td>{{ x.relation_type }}</td>
+                                            <td>
+                                                {{ x.related_place }}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-primary btn-sm" onclick="GetFormAjax('InstitutionPlaceForm',{{ x.pk }})">Edit</button>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingTwo">
+                            <h4 class="card-title">
+                                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Persons
+                                </a>
+                            </h4>
+                        </div>
+                    <div id="collapseTwo" class="card-collapse collapse" role="tabcard" aria-labelledby="headingTwo">
+                        <div id="tab_InstitutionPerson" class="card-body">
+                        
+                            <table class="table table-bordered">
+                                {% for x in object_person %}
+                                <tr id="instper_{{x.pk}}">
+                                    <td>
+                                        {{ x.start_date_written }} - {{ x.end_date_written }}                   
+                                    </td>
+                                    <td>{{ x.relation_type }}</td>
+                                    <td>{{ x.related_person }}</td>
+                                    <td><button type='button' class='btn btn-primary btn-sm' onclick=GetFormAjax('InstitutionPersonForm','{{x.pk}}')>Edit</button></td>
+                                </tr>
+                                {% endfor %}
+                                {% for x in object_personB %}
+                                <tr>
+                                    <td>{{ x.start_date }}</td>
+                                    <td>{{ x.relation_type.name_reverse }}</td>
+                                    <td><a onclick='popupCreateObject("{% url 'admin:relations_personperson_change' x.id %}")'>{{ x.related_personA }}</a></td>
+                                    <td><a href="{% url 'apis:apis_entities:person_edit' pk=x.related_personA.id %}"> reverse</a></td>
+                                </tr>
+                                {% endfor %}
+                            </table>
+                       
+                            <div style="text-align:right">
+                                <a onclick='popupCreateObject("{% url 'admin:relations_personperson_add' %}")'>add relation</a>
+                            </div>
+                        </div>
+                        </div>
+                      </div>
+                      <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingThree">
+                          <h4 class="card-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                Institutions
+                            </a>
+                          </h4>
+                        </div>
+                        <div id="collapseThree" class="card-collapse collapse" role="tabcard" aria-labelledby="headingThree">
+                          <div id="tab_InstitutionInstitution" class="card-body">
+                            
+                                <table class="table table-bordered">
+                                    {% for x in object_institutionA %}
+                                    <tr id="instinst_{{x.pk}}">
+                                        <td>
+                                            {{ x.start_date_written }} - {{ x.end_date_written }}                   
+                                        </td>
+                                        <td>{{ x.relation_type }}</td>
+                                        <td>{{ x.related_institutionB }}</td>
+                                        <td><button type='button' class='btn btn-primary btn-sm' onclick=GetFormAjax('InstitutionInstitutionForm','{{x.pk}}')>Edit</button></td>
+                                    </tr>
+                                    {% endfor %}
+                                    {% for x in object_institutionB %}
+                                    <tr id="instinst_{{x.pk}}">
+                                        <td>{{ x.start_date_written }}
+                                            {% if x.end_date_written %} - {{ x.end_date_written }}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ x.relation_type.name_reverse }}</td>
+                                        <td>{{ x.related_institutionA }}</td>
+                                        <td><button type='button' class='btn btn-primary btn-sm' onclick=GetFormAjax('InstitutionInstitutionForm','{{x.pk}}')>Edit</button></td>
+                                    </tr>
+                                    {% endfor %}
+                                </table>
+                            
+                            <div style="text-align:right">
+                                <a onclick='popupCreateObject("{% url 'admin:relations_personinstitution_add' %}")'>add relation</a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="card card-default">
+                          <div class="card-heading" role="tab" id="headingSix">
+                              <h4 class="card-title">
+                                  <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseSix" aria-expanded="true" aria-controls="collapseSix">
+                                      Labels
+                                  </a>
+                              </h4>
+                          </div>
+                          <div id="collapseSix" class="card-collapse collapse in" role="tabcard" aria-labelledby="headingSix">
+                          <div id="tab_InstitutionLabel" class="card-body">
+                              <table class="table table-bordered">
+                                    {% for x in object_labels %}
+                                    <tr id="label_{{x.pk}}">
+                                        <td>{{ x.label }}</td>
+                                        <td>
+                                            {{ x.isoCode_639_3 }}                   
+                                        </td>
+                                        <td>{{ x.label_type }}</td>
+                                        <td><button type='button' class='btn btn-primary btn-sm' onclick=GetFormAjax('InstitutionLabelForm','{{x.pk}}')>Edit</button></td>
+                                    </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                          </div>
+                      </div>
+                      <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingFive">
+                          <h4 class="card-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                Events
+                            </a>
+                          </h4>
+                        </div>
+                        <div id="collapseFive" class="card-collapse collapse" role="tabcard" aria-labelledby="headingFive">
+                          <div class="card-body">
+                            {% if object_event %}
+                                <table class="table table-bordered">
+                                    <tbody>
+                                        {% for x in object_event %}
+                                            <tr>
+                                                <td>{{ x.relation_type }}</td>
+                                                <td><a onclick='popupCreateObject("{% url 'admin:relations_personevent_change' x.id %}")'>{{ x.related_event }}</a></td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                                {% endif %} 
+                                <div style="text-align:right">
+                                    <a onclick='popupCreateObject("{% url 'admin:relations_personevent_add' %}")'>add relation</a>
+                                </div>
+                          </div>
+                        </div>
+                      </div>
+                </div>            
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{{block.super}}
+<script type="text/javascript">
+    function popupCreateObject(url) { //not needed any<more if the Ajay forms work
+        var MyWindow = window.open(url,"","width=500, height=500");
+    };
+</script>
+<script type="text/javascript">
+    function GetFormAjax(FormName , ObjectID , ButtonText) {
+        if (ObjectID === undefined) {
+        ObjectID = false;
+        };
+        if (ButtonText === undefined) {
+        ButtonText = 'create/modify';
+        };
+        $.ajax({
+                type: 'POST',
+                url: '{% url 'apis:apis_relations:get_form_ajax' %}',
+                data: {'FormName':FormName,'SiteID':{{instance.pk}},'ObjectID':ObjectID,'ButtonText':ButtonText},
+                success: function(data) {
+                    // update our tooltip content with our returned data and cache it
+                    $('#tab_'+data.tab).find('div').remove();
+                    $('#tab_'+data.tab).append(data.form);
+                    $(".form.ajax_form").unbind()
+                    unbind_ajax_forms();
+                    captureAutocompleteEvent('autocomplete-ort-uri');
+
+                }
+            });
+    }
+</script>
+<script type="text/javascript">
+    function InstitutionPlaceForm_response(response){
+        if (response.test == false) {
+            console.log(response);
+            $('#'+response.DivID).replaceWith(response.form);
+            $(".form.ajax_form").unbind()
+            unbind_ajax_forms();
+            captureAutocompleteEvent('autocomplete-ort-uri');
+        } else {
+             var tab_html = "<tr id='pp_"+response.instance.relation_pk+"'><td>"+response.instance.start_date+" - "+response.instance.end_date+"</td><td>"+ response.instance.relation_type +"</td><td>"+ response.instance.related_place +"</td><td><button type='button' class='btn btn-primary btn-sm' onclick=GetFormAjax('InstitutionPlaceForm',"+response.instance.relation_pk+")>Edit</button></td></tr>"
+            if ($('#tab_'+response.tab+' table').find('#pp_'+response.instance.relation_pk).length) {
+                $('#tab_'+response.tab+' table').find('#pp_'+response.instance.relation_pk).replaceWith(tab_html);
+            } else {
+            $('#tab_'+response.tab+' table').append(tab_html);}
+             $('#tab_'+response.tab).find('div').remove();
+             GetFormAjax('InstitutionPlaceForm');
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function InstitutionPersonForm_response(response){
+        if (response.test == false) {
+            console.log(response);
+            $('#'+response.DivID).replaceWith(response.form);
+            $(".form.ajax_form").unbind()
+            unbind_ajax_forms();
+            captureAutocompleteEvent('autocomplete-ort-uri');
+        } else {
+             var tab_html = "<tr id='instper_"+response.instance.relation_pk+"'><td>"+response.instance.start_date+" - "+response.instance.end_date+"</td><td>"+ response.instance.relation_type +"</td><td>"+ response.instance.related_person +"</td><td><button type='button' class='btn btn-primary btn-sm' onclick=GetFormAjax('InstitutionPersonForm',"+response.instance.relation_pk+")>Edit</button></td></tr>"
+            if ($('#tab_'+response.tab+' table').find('#instper_'+response.instance.relation_pk).length) {
+                $('#tab_'+response.tab+' table').find('#instper_'+response.instance.relation_pk).replaceWith(tab_html);
+            } else {
+            $('#tab_'+response.tab+' table').append(tab_html);}
+             $('#tab_'+response.tab).find('div').remove();
+             GetFormAjax('InstitutionPersonForm');
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function InstitutionInstitutionForm_response(response){
+        if (response.test == false) {
+            console.log(response);
+            $('#'+response.DivID).replaceWith(response.form);
+            $(".form.ajax_form").unbind()
+            unbind_ajax_forms();
+            captureAutocompleteEvent('autocomplete-ort-uri');
+        } else {
+             var tab_html = "<tr id='instinst_"+response.instance.relation_pk+"'><td>"+response.instance.start_date+" - "+response.instance.end_date+"</td><td>"+ response.instance.relation_type +"</td><td>"+ response.instance.related_institutionB +"</td><td><button type='button' class='btn btn-primary btn-sm' onclick=GetFormAjax('InstitutionInstitutionForm',"+response.instance.relation_pk+")>Edit</button></td></tr>"
+            if ($('#tab_'+response.tab+' table').find('#instinst_'+response.instance.relation_pk).length) {
+                $('#tab_'+response.tab+' table').find('#instinst_'+response.instance.relation_pk).replaceWith(tab_html);
+            } else {
+            $('#tab_'+response.tab+' table').append(tab_html);}
+             $('#tab_'+response.tab).find('div').remove();
+             GetFormAjax('InstitutionInstitutionForm');
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function InstitutionLabelForm_response(response){
+        if (response.test == false) {
+            console.log(response);
+            $('#'+response.DivID).replaceWith(response.form);
+            $(".form.ajax_form").unbind()
+            unbind_ajax_forms();
+            captureAutocompleteEvent('autocomplete-ort-uri');
+        } else {
+             var tab_html = "<tr id='label_"+response.instance.relation_pk+"'><td>"+response.instance.label+"</td><td>"+ response.instance.isoCode_639_3 +"</td><td>"+ response.instance.label_type +"</td><td><button type='button' class='btn btn-primary btn-sm' onclick=GetFormAjax('InstitutionLabelForm',"+response.instance.relation_pk+")>Edit</button></td></tr>"
+            if ($('#tab_'+response.tab+' table').find('#label_'+response.instance.relation_pk).length) {
+                $('#tab_'+response.tab+' table').find('#label_'+response.instance.relation_pk).replaceWith(tab_html);
+            } else {
+            $('#tab_'+response.tab+' table').append(tab_html);}
+             $('#tab_'+response.tab).find('div').remove();
+             GetFormAjax('InstitutionLabelForm');
+        }
+    }
+</script>
+
+<script type='text/javascript'>
+function captureAutocompleteEvent(inputClass) {
+
+$('input.'+inputClass).bind('selectChoice', function(e, choice, autocomplete) {
+    //console.log($(this).parents('.updHighl').attr("id"));
+
+    var id_1 = $(this).attr('id');
+    //var re_1 = /(.+)-name/g;
+    var id_2 = id_1+'_uri';
+    $(this).parents('.form-group').parent().find('#'+id_2).val(choice.attr('data-value'));
+    $(this).val(choice.attr('replace-text'))
+
+});}
+</script>
+
+{% if instance %}
+<script type="text/javascript">
+    $(function(){
+        GetFormAjax('InstitutionPlaceForm');
+        GetFormAjax('InstitutionPersonForm');
+        GetFormAjax('InstitutionInstitutionForm');
+        GetFormAjax('InstitutionLabelForm');
+        //unbind_ajax_forms();
+    })
+</script>
+{% endif %}
+{% endblock %}
+        

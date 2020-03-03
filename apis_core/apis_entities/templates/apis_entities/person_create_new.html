@@ -1,0 +1,247 @@
+{% extends "webpage/base.html" %}
+
+{% block Titel %}Create a Person{% endblock %}
+{% block scriptHeader %}
+{% include 'autocomplete_light/static.html' %}
+{% endblock %}
+{% block content %}
+{% load crispy_forms_tags %}
+{% load django_tables2 %}
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card card-default">
+            <div class="card-heading">
+            	<h3><strong>{{ instance }}</strong></h3>
+            </div>
+            <div class="card-body">
+                <form action="" method="post">
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingFour">
+                          <h4 class="card-title">
+                            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                Texts
+                            </a>
+                          </h4>
+                        </div>
+                        <div id="collapseFour" class="card-collapse collapse" role="tabcard" aria-labelledby="headingFour">
+                          <div class="card-body">
+                        
+                            {% crispy form_text %}
+                                
+                          </div>
+                        </div>
+                      </div>
+                	{% crispy form %}
+                    {% if instance %}
+                        <a class ="btn btn-danger btn-sm" href="{% url 'apis:apis_entities:person_delete' pk=instance.id %}">delete</a>
+                    {% endif %}
+                     {% for form1 in formset %}
+                        <div class="Formset">
+                            {% crispy form1 %}
+                        </div>
+                        {% endfor %}
+                        {{ formset.management_form }}
+                    <input class="btn btn-primary" type="submit" value="create/modify" />
+                </form>
+                {% if object_revisions %}
+                <p></p>
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="headingOne">
+                            <h4 class="card-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseOne2" aria-expanded="false" aria-controls="collapseOne2">
+                                    Revisions
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseOne2" class="card-collapse collapse in" role="tabcard" aria-labelledby="headingOne">
+                            <div id="tab_Revisions" class="card-body">
+                                <table class="table table-bordered">
+                                    {% for rev in object_revisions %}
+                                    <tr><td>{{ rev.revision.date_created }}</td><td>{{ rev.revision.user }}</td></tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card card-default">
+            <div class="card-heading">
+                <h3>related to</h3>
+            </div>
+            <div class="card-body"> 
+                <div class="card-group" id="accordion" role="tablist" aria-multiselectable="true">
+                {% for obj in right_card %}
+                    <div class="card card-default">
+                        <div class="card-heading" role="tab" id="heading{{forloop.counter}}">
+                            <h4 class="card-title">
+                                <a role="button" data-toggle="collapse" data-parent="#accordion" href="#collapse{{forloop.counter}}" aria-expanded="true" aria-controls="collapse{{forloop.counter}}">
+                                    {{ obj.0 }}
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapse{{forloop.counter}}" class="card-collapse collapse in" role="tabcard" aria-labelledby="heading{{forloop.counter}}">
+                            <div id="tab_{{ obj.2 }}" class="card-body">
+                            
+                                {% render_table obj.1 %}
+
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                    
+                    
+                </div>            
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+{{block.super}}
+<script type="text/javascript">
+    function popupCreateObject(url) { //not needed any<more if the Ajay forms work
+        var MyWindow = window.open(url,"","width=500, height=500");
+    };
+</script>
+<script type="text/javascript">
+    function GetFormAjax(FormName , ObjectID , ButtonText) {
+        if (ObjectID === undefined) {
+        ObjectID = false;
+        };
+        if (ButtonText === undefined) {
+        ButtonText = 'create/modify';
+        };
+        $.ajax({
+                type: 'POST',
+                url: '{% url 'apis:apis_relations:get_form_ajax' %}',
+                data: {'FormName':FormName,'SiteID':{{instance.pk}},'ObjectID':ObjectID,'ButtonText':ButtonText},
+                success: function(data) {
+                    console.log('yes')
+                    // update our tooltip content with our returned data and cache it
+                    //$('#tab_'+data.tab).find('div').remove();
+                    $('#tab_'+data.tab).append(data.form);
+                    $(".form.ajax_form").unbind()
+                    unbind_ajax_forms();
+                    captureAutocompleteEvent('autocomplete-ort-uri');
+
+                }
+            });
+    }
+</script>
+<script type="text/javascript">
+    function PersonPlaceForm_response(response){
+        if (response.test == false) {
+            console.log(response);
+            $('#'+response.DivID).replaceWith(response.form);
+            $(".form.ajax_form").unbind()
+            unbind_ajax_forms();
+            captureAutocompleteEvent('autocomplete-ort-uri');
+        } else {
+             console.log(response);
+             var tab_html = "<tr id='pp_"+response.instance.relation_pk+"'><td>"+response.instance.start_date+"</td><td>"+ response.instance.relation_type +"</td><td>"+ response.instance.related_place +"</td><td><button type='button' class='btn btn-primary btn-sm' onclick=GetFormAjax('PersonPlaceForm',"+response.instance.relation_pk+")>Edit</button></td></tr>"
+            if ($('#tab_'+response.tab+' table').find('#pp_'+response.instance.relation_pk).length) {
+                $('#tab_'+response.tab+' table').find('#pp_'+response.instance.relation_pk).replaceWith(tab_html);
+            } else {
+            $('#tab_'+response.tab+' table').append(tab_html);}
+             $('#tab_'+response.tab).find('div').remove();
+             GetFormAjax('PersonPlaceForm');
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function PersonPersonForm_response(response){
+        if (response.test == false) {
+            
+            $('#'+response.DivID).replaceWith(response.form);
+            $(".form.ajax_form").unbind()
+            unbind_ajax_forms();
+            captureAutocompleteEvent('autocomplete-ort-uri');
+        } else {
+             
+             var tab_html = "<tr id='perper_"+response.instance.relation_pk+"'><td>"+response.instance.start_date+"</td><td>"+ response.instance.relation_type +"</td><td>"+ response.instance.related_personB +"</td><td><button type='button' class='btn btn-primary btn-sm' onclick=GetFormAjax('PersonPersonForm',"+response.instance.relation_pk+")>Edit</button></td></tr>"
+            if ($('#tab_'+response.tab+' table').find('#perper_'+response.instance.relation_pk).length) {
+                $('#tab_'+response.tab+' table').find('#perper_'+response.instance.relation_pk).replaceWith(tab_html);
+            } else {
+            $('#tab_'+response.tab+' table').append(tab_html);}
+             $('#tab_'+response.tab).find('div').remove();
+             GetFormAjax('PersonPersonForm');
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function PersonInstitutionForm_response(response){
+        if (response.test == false) {
+            console.log(response);
+            $('#'+response.DivID).replaceWith(response.form);
+            $(".form.ajax_form").unbind()
+            unbind_ajax_forms();
+            captureAutocompleteEvent('autocomplete-ort-uri');
+        } else {
+             console.log(response);
+             var tab_html = "<tr id='perinst_"+response.instance.relation_pk+"'><td>"+response.instance.start_date+"</td><td>"+ response.instance.relation_type +"</td><td>"+ response.instance.related_institution +"</td><td><button type='button' class='btn btn-primary btn-sm' onclick=GetFormAjax('PersonInstitutionForm',"+response.instance.relation_pk+")>Edit</button></td></tr>"
+            if ($('#tab_'+response.tab+' table').find('#perinst_'+response.instance.relation_pk).length) {
+                $('#tab_'+response.tab+' table').find('#perinst_'+response.instance.relation_pk).replaceWith(tab_html);
+            } else {
+            $('#tab_'+response.tab+' table').append(tab_html);}
+             $('#tab_'+response.tab).find('div').remove();
+             GetFormAjax('PersonInstitutionForm');
+        }
+    }
+</script>
+
+<script type="text/javascript">
+    function PersonLabelForm_response(response){
+        if (response.test == false) {
+            console.log(response);
+            $('#'+response.DivID).replaceWith(response.form);
+            $(".form.ajax_form").unbind()
+            unbind_ajax_forms();
+            captureAutocompleteEvent('autocomplete-ort-uri');
+        } else {
+             var tab_html = "<tr id='label_"+response.instance.relation_pk+"'><td>"+response.instance.label+"</td><td>"+ response.instance.isoCode_639_3 +"</td><td>"+ response.instance.label_type +"</td><td><button type='button' class='btn btn-primary btn-sm' onclick=GetFormAjax('PersonLabelForm',"+response.instance.relation_pk+")>Edit</button></td></tr>"
+            if ($('#tab_'+response.tab+' table').find('#label_'+response.instance.relation_pk).length) {
+                $('#tab_'+response.tab+' table').find('#label_'+response.instance.relation_pk).replaceWith(tab_html);
+            } else {
+            $('#tab_'+response.tab+' table').append(tab_html);}
+             $('#tab_'+response.tab).find('div').remove();
+             GetFormAjax('PersonLabelForm');
+        }
+    }
+</script>
+
+<script type='text/javascript'>
+function captureAutocompleteEvent(inputClass) {
+
+$('input.'+inputClass).bind('selectChoice', function(e, choice, autocomplete) {
+    //console.log($(this).parents('.updHighl').attr("id"));
+
+    var id_1 = $(this).attr('id');
+    //var re_1 = /(.+)-name/g;
+    var id_2 = id_1+'_uri';
+    console.log('id_1');
+    $(this).parents('.form-group').parent().find('#'+id_2).val(choice.attr('data-value'));
+    $(this).val(choice.attr('replace-text'))
+
+});}
+</script>
+
+{% if instance %}
+<script type="text/javascript">
+    $(function(){
+        GetFormAjax('PersonPlaceForm');
+        GetFormAjax('PersonPersonForm');
+        GetFormAjax('PersonInstitutionForm');
+        GetFormAjax('PersonLabelForm');
+        //unbind_ajax_forms();
+    })
+</script>
+{% endif %}
+{% endblock %}
