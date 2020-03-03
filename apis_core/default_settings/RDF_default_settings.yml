@@ -125,15 +125,6 @@ Person:
                 BIND(?name2 as ?name)
             }
             }
-        - name: profession
-          sparql: |
-            PREFIX gndo: <https://d-nb.info/standards/elementset/gnd#>
-
-            SELECT ?profession
-
-            WHERE {
-              ?subject gndo:professionOrOccupation ?profession
-            }
         - name: start_date_written
           sparql: |
             PREFIX gndo: <https://d-nb.info/standards/elementset/gnd#>
@@ -174,10 +165,6 @@ Person:
         string: '{start_date_written}'
       end_date_written:
         string: '{end_date_written}'
-      profession:
-        string: '{profession}'
-        accessor: name
-        linked: true
     linked objects:
       - type: Place
         kind: Place of Birth
