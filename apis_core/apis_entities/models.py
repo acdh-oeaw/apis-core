@@ -550,15 +550,13 @@ class Passage(AbstractEntity):
 
     topics = models.ManyToManyField(PassageTopics, blank=True)
     migne_number = models.CharField(max_length=1024, blank=True, null=True)
-    kind = models.ForeignKey(PassageType, blank=True, null=True, on_delete=models.SET_NULL)
-    kind_new = models.ManyToManyField(PassageType, blank=True, related_name="passage_set_new")
+    kind = models.ManyToManyField(PassageType, blank=True)
 
 
 
 @reversion.register(follow=["tempentityclass_ptr"])
 class Publication(AbstractEntity):
-    kind = models.ForeignKey(PassageType, blank=True, null=True, on_delete=models.SET_NULL)
-    kind_new = models.ManyToManyField(PassageType, blank=True, related_name="publication_set_new")
+    kind = models.ManyToManyField(PassageType, blank=True)
     language = models.ForeignKey(PassageLanguage, blank=True, null=True, on_delete=models.SET_NULL)
     clavis_number = models.CharField(max_length=1024, blank=True, null=True)
     migne_number = models.CharField(max_length=1024, blank=True, null=True)
