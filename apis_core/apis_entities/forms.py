@@ -18,7 +18,7 @@ from django.conf import settings
 from .models import Person, Place, Institution, Event, Work
 from apis_core.apis_vocabularies.models import TextType
 from apis_core.apis_metainfo.models import Text, Uri, Collection
-from apis_core.apis_metainfo.forms import get_date_help_text_from_dates, get_date_help_text_default
+from apis_core.helper_functions import DateParser
 
 from apis_core.helper_functions.RDFParser import RDFParser
 
@@ -215,30 +215,28 @@ def get_entities_form(entity):
             self.fields['end_date_written'].required = False
 
 
-            # check if form loads an existing instance
-            if 'instance' in kwargs:
-                # instance exists, thus run the date parse check to inform the user about its results
+            instance = getattr(self, 'instance', None)
+            if instance != None:
 
-                instance = kwargs['instance']
+                if instance.start_date_written:
+                    self.fields['start_date_written'].help_text = DateParser.get_date_help_text_from_dates(
+                        single_date=instance.start_date,
+                        single_start_date=instance.start_start_date,
+                        single_end_date=instance.start_end_date,
+                        single_date_written=instance.start_date_written,
+                    )
+                else:
+                    self.fields['start_date_written'].help_text = DateParser.get_date_help_text_default()
 
-                self.fields['start_date_written'].help_text = get_date_help_text_from_dates(
-                    instance.start_date,
-                    instance.start_start_date,
-                    instance.start_end_date,
-                    instance.start_date_written
-                )
-                self.fields['end_date_written'].help_text = get_date_help_text_from_dates(
-                    instance.end_date,
-                    instance.end_start_date,
-                    instance.end_end_date,
-                    instance.end_date_written
-                )
-
-            else:
-                # instance does not exist, load default help text into fields
-
-                self.fields['start_date_written'].help_text = get_date_help_text_default()
-                self.fields['end_date_written'].help_text = get_date_help_text_default()
+                if instance.end_date_written:
+                    self.fields['end_date_written'].help_text = DateParser.get_date_help_text_from_dates(
+                        single_date=instance.end_date,
+                        single_start_date=instance.end_start_date,
+                        single_end_date=instance.end_end_date,
+                        single_date_written=instance.end_date_written,
+                    )
+                else:
+                    self.fields['end_date_written'].help_text = DateParser.get_date_help_text_default()
 
 
 

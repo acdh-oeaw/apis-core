@@ -21,6 +21,7 @@ from apis_core.apis_vocabularies.models import (
 )
 from apis_core.apis_labels.models import Label
 from apis_core.helper_functions.RDFParser import RDFParser
+from apis_core.helper_functions import DateParser
 from dal import autocomplete
 
 
@@ -32,7 +33,7 @@ class EntityLabelForm(forms.ModelForm):
 
     class Meta:
         model = Label
-        fields = ['label', 'isoCode_639_3', 'label_type']
+        fields = ['label', 'isoCode_639_3', 'label_type', 'start_date_written', 'end_date_written']
 
     def save(self, site_instance, instance=None, commit=True):
         cd = self.cleaned_data
@@ -41,6 +42,8 @@ class EntityLabelForm(forms.ModelForm):
             x.label = cd['label']
             x.isoCode_639_3 = cd['isoCode_639_3']
             x.label_type = cd['label_type']
+            x.start_date_written = cd['start_date_written']
+            x.end_date_written = cd['end_date_written']
         else:
             x = super(EntityLabelForm, self).save(commit=False)
             x.temp_entity = site_instance
@@ -56,6 +59,29 @@ class EntityLabelForm(forms.ModelForm):
         self.helper = FormHelper()
         self.helper.form_class = 'EntityLabelForm'
         self.helper.form_tag = False
+
+        instance = getattr(self, 'instance', None)
+        if instance != None:
+
+            if instance.start_date_written:
+                self.fields['start_date_written'].help_text = DateParser.get_date_help_text_from_dates(
+                    single_date=instance.start_date,
+                    single_start_date=instance.start_start_date,
+                    single_end_date=instance.start_end_date,
+                    single_date_written=instance.start_date_written,
+                )
+            else:
+                self.fields['start_date_written'].help_text = DateParser.get_date_help_text_default()
+
+            if instance.end_date_written:
+                self.fields['end_date_written'].help_text = DateParser.get_date_help_text_from_dates(
+                    single_date=instance.end_date,
+                    single_start_date=instance.end_start_date,
+                    single_end_date=instance.end_end_date,
+                    single_date_written=instance.end_date_written,
+                )
+            else:
+                self.fields['end_date_written'].help_text = DateParser.get_date_help_text_default()
 
 ##############################################
 # Person
