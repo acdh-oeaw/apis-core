@@ -1,22 +1,11 @@
 import json
 import re
-from copy import deepcopy
-
 from django.http import HttpResponse, Http404
 from django.template.loader import render_to_string
-from django.template import RequestContext
-from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
-from django.core import serializers
-from django_tables2 import RequestConfig
-from django.db.models import Q
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
-
 from .forms2 import GenericRelationForm
-# from entities.forms import (PlaceHighlighterForm, PersonHighlighterForm)
-from .forms import PersonLabelForm
 from .models import (
     PersonPlace, PersonPerson, PersonInstitution, InstitutionPlace,
     InstitutionInstitution, PlacePlace, PersonEvent, InstitutionEvent, PlaceEvent, PersonWork,
@@ -24,10 +13,8 @@ from .models import (
 )
 from apis_core.apis_metainfo.models import Uri
 from apis_core.apis_entities.models import Person, Institution, Place, Event, Work
-from apis_core.apis_entities.forms import PersonResolveUriForm, GenericEntitiesStanbolForm
 from apis_core.apis_labels.models import Label
-from django.views.decorators.csrf import csrf_exempt
-from .tables import EntityLabelTable
+from .tables import LabelTableEdit
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_core.helper_functions.highlighter import highlight_text
@@ -197,12 +184,12 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
                                        types=entity_types_highlighter).strip(),
                 'id': form.get_text_id()}
         if tab == 'PersonLabel':
-            table_html = EntityLabelTable(
-                    site_instance.label_set.all(),
+            table_html = LabelTableEdit(
+                    data=site_instance.label_set.all(),
                     prefix='PL-')
         elif tab == 'InstitutionLabel':
-            table_html = EntityLabelTable(
-                    site_instance.label_set.all(),
+            table_html = LabelTableEdit(
+                    data=site_instance.label_set.all(),
                     prefix='IL-')
         elif tab == 'PersonResolveUri':
             table_html = EntityUriTable(

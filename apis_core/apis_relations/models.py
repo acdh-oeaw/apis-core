@@ -193,6 +193,20 @@ class AbstractRelation(TempEntityClass):
 
 
     @classmethod
+    def get_relation_class_of_name(cls, relation_name):
+        """
+        :param entity_name: str : The name of an relation
+        :return: The model class of the relation respective to the given name
+        """
+
+        for relation_class in cls.get_all_relation_classes():
+            if relation_class.__name__.lower() == relation_name.lower():
+                return relation_class
+
+        raise Exception("Could not find relation class of name:", relation_name)
+
+
+    @classmethod
     def get_all_relation_names(cls):
         """
         :return: list of all class names in lower case of the relations defined within this models' module
@@ -213,7 +227,8 @@ class AbstractRelation(TempEntityClass):
 
 
     _relation_classes_of_entity_class = {}
-    _relation_names_of_entity_class = {}
+    _relation_classes_of_entity_name = {}
+    _relation_field_names_of_entity_class = {}
 
 
     @classmethod
@@ -230,10 +245,23 @@ class AbstractRelation(TempEntityClass):
 
 
     @classmethod
+    def get_relation_classes_of_entity_name(cls, entity_name):
+        """
+        :param entity_name : class name of an entity for which the related relations should be returned
+        :return: a list of relation classes that are related to the entity class
+
+        E.g. AbstractRelation.get_relation_classes_of_entity_class( 'person' )
+        -> [ PersonEvent, PersonInstitution, PersonPerson, PersonPlace, PersonWork ]
+        """
+
+        return cls._relation_classes_of_entity_name[entity_name.lower()]
+
+
+    @classmethod
     def add_relation_class_of_entity_class(cls, entity_class):
         """
-        Adds the given entity class to a list which is later retrieved via a dictionary, where the entity class
-        defines the key and the list of related relation classes as its values.
+        Adds the given entity class to a list which is later retrieved via a dictionary, where the entity class and entity class name
+        define the key and the list of related relation classes as their values.
 
         :param entity_class: the class for which the related relation (the current cls) will be saved into a respective list.
         :return: None
@@ -241,10 +269,13 @@ class AbstractRelation(TempEntityClass):
 
         # get the list of the class dictionary, create if not yet exists.
         relation_class_list = cls._relation_classes_of_entity_class.get(entity_class, [])
+
         # append the current relation class to the list.
         relation_class_list.append(cls)
+
         # save into the dictionary, which uses the entity class as key and the extended list above as value.
         cls._relation_classes_of_entity_class[entity_class] = relation_class_list
+        cls._relation_classes_of_entity_name[entity_class.__name__.lower()] = relation_class_list
 
 
     @classmethod
@@ -257,11 +288,11 @@ class AbstractRelation(TempEntityClass):
         -> [ personevent_set, personinstitution_set, related_personA, related_personB, personplace_set, personwork_set ]
         """
 
-        return cls._relation_names_of_entity_class[entity_class]
+        return cls._relation_field_names_of_entity_class[entity_class]
 
 
     @classmethod
-    def add_relation_name_of_entity_class(cls, relation_name, entity_class):
+    def add_relation_field_name_of_entity_class(cls, relation_name, entity_class):
         """
         Adds the given entity class to a list which is later retrieved via a dictionary, where the entity class
         defines the key and the list of related relation classes as its values.
@@ -271,11 +302,11 @@ class AbstractRelation(TempEntityClass):
         """
 
         # get the list of the class dictionary, create if not yet exists.
-        relation_names_list = cls._relation_names_of_entity_class.get(entity_class, [])
+        relation_names_list = cls._relation_field_names_of_entity_class.get(entity_class, [])
         # append the current relation field name to the list.
         relation_names_list.append(relation_name)
         # save into the dictionary, which uses the entity class as key and the extended list above as value.
-        cls._relation_names_of_entity_class[entity_class] = relation_names_list
+        cls._relation_field_names_of_entity_class[entity_class] = relation_names_list
 
 
     def get_related_entity_instanceA(self):
