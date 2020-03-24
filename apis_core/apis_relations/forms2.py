@@ -18,10 +18,10 @@ from django.core.exceptions import ValidationError
 #from dal.autocomplete import ListSelect2
 
 #from dal.autocomplete import ListSelect2
-from apis_core.apis_metainfo.models import TempEntityClass, Text
+from apis_core.apis_metainfo.models import TempEntityClass, Text, Uri
 from apis_core.helper_functions.RDFParser import RDFParser, APIS_RDF_URI_SETTINGS
 from apis_core.helper_functions import DateParser
-from .tables import *
+from .tables import get_generic_relations_table
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.models import Annotation
@@ -117,22 +117,23 @@ class GenericRelationForm(forms.ModelForm):
         return self.cleaned_data['HL_text_id'][5:]
 
     def get_html_table(self, entity_type, request, site_instance, form_match):
-        table = get_generic_relations_table(self.relation_form.__name__, entity_type)
+
+        table = get_generic_relations_table(relation_class=self.relation_form, entity_instance=site_instance, detail=False)
         prefix = re.match(r'([A-Z][a-z])[^A-Z]*([A-Z][a-z])', self.relation_form.__name__)
         prefix = prefix.group(1)+prefix.group(2)+'-'
         if form_match.group(1) == form_match.group(2):
-            list_rel = []
             dic_a = {'related_'+entity_type.lower()+'A': site_instance}
             dic_b = {'related_' + entity_type.lower() + 'B': site_instance}
             if 'apis_highlighter' in settings.INSTALLED_APPS:
-                for x in self.relation_form.annotation_links.filter_ann_proj(request=request).filter(
-                                Q(**dic_a) | Q(**dic_b)):
-                    list_rel.append(x.get_table_dict(site_instance))
+                objects = self.relation_form.annotation_links.filter_ann_proj(request=request).filter(
+                    Q(**dic_a) | Q(**dic_b)
+                )
             else:
-                for x in self.relation_form.objects.filter(
-                        Q(**dic_a) | Q(**dic_b)):
-                    list_rel.append(x.get_table_dict(site_instance))
-            table_html = table(list_rel, prefix=prefix)
+                objects = self.relation_form.objects.filter(
+                    Q(**dic_a) | Q(**dic_b)
+                )
+
+            table_html = table(data=objects, prefix=prefix)
         else:
             tab_query = {'related_'+entity_type.lower(): site_instance}
             if 'apis_highlighter' in settings.INSTALLED_APPS:
@@ -140,9 +141,7 @@ class GenericRelationForm(forms.ModelForm):
                     request=request).filter(**tab_query)
             else:
                 ttab = self.relation_form.objects.filter(**tab_query)
-            table_html = table(ttab,
-                               entity=entity_type,
-                               prefix=prefix)
+            table_html = table(data=ttab, prefix=prefix)
         return table_html
 
     def __init__(self, siteID=None, highlighter=False, *args, **kwargs):

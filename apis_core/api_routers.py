@@ -131,6 +131,10 @@ def create_generic_api_viewset(**kwargs):
                 def __init__(self, *args, **kwargs):
                     super().__init__(*args, **kwargs)
                     for f in entity._meta.get_fields():
+                        if getattr(settings, "APIS_API_EXCLUDE_SETS", False) and str(f.name).endswith('_set'):
+                            if f.name in self.fields.keys():
+                                self.fields.pop(f.name)
+                            continue
                         if f.name in exclude_lst:
                             continue
                         elif (

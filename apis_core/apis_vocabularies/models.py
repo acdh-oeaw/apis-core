@@ -112,6 +112,10 @@ class RelationBaseClass(VocabsBaseClass):
     def save(self, *args, **kwargs):
         if self.name_reverse != unicodedata.normalize('NFC', self.name_reverse):
             self.name_reverse = unicodedata.normalize('NFC', self.name_reverse)
+
+        if self.name_reverse == "" or self.name_reverse == None:
+            self.name_reverse = self.name + " [REVERSE]"
+
         super(RelationBaseClass, self).save(*args, **kwargs)
         return self
 
@@ -256,6 +260,20 @@ class AbstractRelationType(RelationBaseClass):
             cls._all_relationtype_names = relationtype_names
 
         return cls._all_relationtype_classes
+
+
+    @classmethod
+    def get_relationtype_class_of_name(cls, relationtype_name):
+        """
+        :param entity_name: str : The name of an relationtype
+        :return: The model class of the relationtype respective to the given name
+        """
+
+        for relationtype_class in cls.get_all_relationtype_classes():
+            if relationtype_class.__name__.lower() == relationtype_name.lower():
+                return relationtype_class
+
+        raise Exception("Could not find relationtype class of name:", relationtype_name)
 
 
     @classmethod

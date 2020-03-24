@@ -36,9 +36,7 @@ from .forms import (
     NetworkVizFilterForm, PersonResolveUriForm,
     get_entities_form, GenericEntitiesStanbolForm
 )
-from .tables import (
-    PersonTable, PlaceTable, InstitutionTable, EventTable, PassageTable, get_entities_table
-)
+from .tables import get_entities_table
 
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:

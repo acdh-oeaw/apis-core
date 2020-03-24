@@ -173,9 +173,9 @@ def generate_all_fields():
 
                         relation_class.add_relation_class_of_entity_class(entity_class_a)
                         relation_class.add_relation_class_of_entity_class(entity_class_b)
-                        relation_class.add_relation_name_of_entity_class(
+                        relation_class.add_relation_field_name_of_entity_class(
                             relation_name=relation_field_name_in_other_class, entity_class=entity_class_a)
-                        relation_class.add_relation_name_of_entity_class(
+                        relation_class.add_relation_field_name_of_entity_class(
                             relation_name=relation_field_name_in_other_class, entity_class=entity_class_b)
 
 
@@ -307,9 +307,9 @@ def generate_all_fields():
                             create_function_get_related_entity_field_name(relation_field_name_b)
 
                         relation_class.add_relation_class_of_entity_class(entity_class)
-                        relation_class.add_relation_name_of_entity_class(
+                        relation_class.add_relation_field_name_of_entity_class(
                             relation_name=relation_field_name_in_other_class_a, entity_class=entity_class)
-                        relation_class.add_relation_name_of_entity_class(
+                        relation_class.add_relation_field_name_of_entity_class(
                             relation_name=relation_field_name_in_other_class_b, entity_class=entity_class)
 
 
