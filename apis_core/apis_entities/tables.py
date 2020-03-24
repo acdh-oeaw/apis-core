@@ -14,6 +14,7 @@ from apis_core.apis_metainfo.tables import (
     generic_render_start_date_written,
     generic_render_end_date_written
 )
+from .models import Person, Place, Institution, Event, Passage
 
 input_form = """
   <input type="checkbox" name="keep" value="{}" title="keep this"/> |
@@ -193,6 +194,9 @@ def get_entities_table(entity, edit_v, default_cols):
         order_end_date_written = generic_order_end_date_written
         render_start_date_written = generic_render_start_date_written
         render_end_date_written = generic_render_end_date_written
+
+        if entity == "Passage" or entity == "Publication":
+            urheber_col = UrheberColumn(empty_values=(), verbose_name="Urheber")
 
         if edit_v:
             name = tables.LinkColumn(
