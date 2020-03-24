@@ -5,8 +5,12 @@ from django.conf import settings
 from apis_core.apis_labels.models import Label
 from apis_core.apis_metainfo.models import Uri
 from apis_core.apis_relations.models import AbstractRelation
-from apis_core.apis_metainfo.tables import generic_order_start_date_written, generic_order_end_date_written
-
+from apis_core.apis_metainfo.tables import (
+    generic_order_start_date_written,
+    generic_order_end_date_written,
+    generic_render_start_date_written,
+    generic_render_end_date_written
+)
 
 empty_text_default = 'There are currently no relations'
 
@@ -31,10 +35,14 @@ def get_generic_relation_listview_table(relation_name):
 
     class GenericRelationListViewTable(tables.Table):
 
-        # reuse the logic for ordering *_date_written by their parsed dates.
-        # Important: The names of these class variables must correspond to the column field name
+        # reuse the logic for ordering and rendering *_date_written
+        # Important: The names of these class variables must correspond to the column field name,
+        # e.g. for start_date_written, the methods must be named order_start_date_written and render_start_date_written
         order_start_date_written = generic_order_start_date_written
         order_end_date_written = generic_order_end_date_written
+        render_start_date_written = generic_render_start_date_written
+        render_end_date_written = generic_render_end_date_written
+
 
         class Meta:
             model = relation_class
@@ -123,10 +131,13 @@ def get_generic_relations_table(relation_class, entity_instance, detail=None):
         The base table from which detail or edit tables will inherit from in order to avoid redundant definitions
         """
 
-        # reuse the logic for ordering *_date_written by their parsed dates.
-        # Important: The names of these class variables must correspond to the column field name
+        # reuse the logic for ordering and rendering *_date_written
+        # Important: The names of these class variables must correspond to the column field name,
+        # e.g. for start_date_written, the methods must be named order_start_date_written and render_start_date_written
         order_start_date_written = generic_order_start_date_written
         order_end_date_written = generic_order_end_date_written
+        render_start_date_written = generic_render_start_date_written
+        render_end_date_written = generic_render_end_date_written
 
         class Meta:
             """
@@ -318,10 +329,13 @@ class LabelTableBase(tables.Table):
 
     label2 = tables.TemplateColumn(template_name="apis_relations/labels_label.html")
 
-    # reuse the logic for ordering *_date_written by their parsed dates.
-    # Important: The names of these class variables must correspond to the column field name
+    # reuse the logic for ordering and rendering *_date_written
+    # Important: The names of these class variables must correspond to the column field name,
+    # e.g. for start_date_written, the methods must be named order_start_date_written and render_start_date_written
     order_start_date_written = generic_order_start_date_written
     order_end_date_written = generic_order_end_date_written
+    render_start_date_written = generic_render_start_date_written
+    render_end_date_written = generic_render_end_date_written
 
     class Meta:
 

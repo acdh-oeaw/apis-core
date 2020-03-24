@@ -3,7 +3,12 @@ from django_tables2.utils import A
 from django.conf import settings
 from django.utils.safestring import mark_safe
 from apis_core.apis_entities.models import AbstractEntity
-from apis_core.apis_metainfo.tables import generic_order_start_date_written, generic_order_end_date_written
+from apis_core.apis_metainfo.tables import (
+    generic_order_start_date_written,
+    generic_order_end_date_written,
+    generic_render_start_date_written,
+    generic_render_end_date_written
+)
 
 input_form = """
   <input type="checkbox" name="keep" value="{}" title="keep this"/> |
@@ -29,6 +34,15 @@ def get_entities_table(entity, edit_v, default_cols):
         default_cols = ['name', ]
 
     class GenericEntitiesTable(tables.Table):
+
+        # reuse the logic for ordering and rendering *_date_written
+        # Important: The names of these class variables must correspond to the column field name,
+        # e.g. for start_date_written, the methods must be named order_start_date_written and render_start_date_written
+        order_start_date_written = generic_order_start_date_written
+        order_end_date_written = generic_order_end_date_written
+        render_start_date_written = generic_render_start_date_written
+        render_end_date_written = generic_render_end_date_written
+
         if edit_v:
             name = tables.LinkColumn(
                 'apis:apis_entities:generic_entities_edit_view',
@@ -50,10 +64,6 @@ def get_entities_table(entity, edit_v, default_cols):
         if 'id' in default_cols:
             id = tables.LinkColumn()
 
-        # reuse the logic for ordering *_date_written by their parsed dates.
-        # Important: The names of these class variables must correspond to the column field name
-        order_start_date_written = generic_order_start_date_written
-        order_end_date_written = generic_order_end_date_written
 
         class Meta:
             model = AbstractEntity.get_entity_class_of_name(entity_name=entity)
