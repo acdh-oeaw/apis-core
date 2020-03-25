@@ -116,9 +116,8 @@ class GenericEntitiesEditView(View):
             'form_ann_agreement': form_ann_agreement,
             'apis_bibsonomy': apis_bibsonomy,
             'permissions': permissions}
-        if entity.lower() != 'place':
-            form_merge_with = GenericEntitiesStanbolForm(entity, ent_merge_pk=pk)
-            context['form_merge_with'] = form_merge_with
+        form_merge_with = GenericEntitiesStanbolForm(entity, ent_merge_pk=pk)
+        context['form_merge_with'] = form_merge_with
         return HttpResponse(template.render(request=request, context=context))
 
     def post(self, request, *args, **kwargs):
