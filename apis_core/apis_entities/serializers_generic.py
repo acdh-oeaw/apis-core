@@ -80,11 +80,11 @@ class EntitySerializer(serializers.Serializer):
                         obj, "related_{}{}".format(mk.lower(), t)
                     ).all():
                         if t == "A":
-                            ok = "{}A".format(mk.lower())
-                            reverse = False
-                        else:
                             ok = "{}B".format(mk.lower())
                             reverse = True
+                        else:
+                            ok = "{}A".format(mk.lower())
+                            reverse = False
                         res["{}s".format(mk2.group(1))].append(
                             RelationEntitySerializer(
                                 rel2, own_class=ok, read_only=True, context=self.context, reverse=reverse
