@@ -32,8 +32,8 @@ class GenericRelationView(GenericListViewNew):
         return self.filter.qs.distinct()
 
     def get_table(self, **kwargs):
-        relation = self.kwargs['entity'].lower()
-        self.table_class = get_generic_relation_listview_table(relation)
+        relation_name = self.kwargs['entity'].lower()
+        self.table_class = get_generic_relation_listview_table(relation_name=relation_name)
         table = super(GenericListViewNew, self).get_table()
         RequestConfig(self.request, paginate={
             'page': 1, 'per_page': self.paginate_by}).configure(table)

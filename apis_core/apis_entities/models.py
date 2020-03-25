@@ -238,6 +238,20 @@ class AbstractEntity(TempEntityClass):
 
 
     @classmethod
+    def get_entity_class_of_name(cls, entity_name):
+        """
+        :param entity_name: str : The name of an entity
+        :return: The model class of the entity respective to the given name
+        """
+
+        for entity_class in cls.get_all_entity_classes():
+            if entity_class.__name__.lower() == entity_name.lower():
+                return entity_class
+
+        raise Exception("Could not find entity class of name:", entity_name)
+
+
+    @classmethod
     def get_all_entity_names(cls):
         """
         :return: list of all class names in lower case of the entities defined within this models' module

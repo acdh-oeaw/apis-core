@@ -27,7 +27,7 @@ from apis_core.apis_entities.models import Person, Institution, Place, Event, Wo
 from apis_core.apis_entities.forms import PersonResolveUriForm, GenericEntitiesStanbolForm
 from apis_core.apis_labels.models import Label
 from django.views.decorators.csrf import csrf_exempt
-from .tables import EntityLabelTable
+from .tables import LabelTableEdit
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_core.helper_functions.highlighter import highlight_text
@@ -197,12 +197,12 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
                                        types=entity_types_highlighter).strip(),
                 'id': form.get_text_id()}
         if tab == 'PersonLabel':
-            table_html = EntityLabelTable(
-                    site_instance.label_set.all(),
+            table_html = LabelTableEdit(
+                    data=site_instance.label_set.all(),
                     prefix='PL-')
         elif tab == 'InstitutionLabel':
-            table_html = EntityLabelTable(
-                    site_instance.label_set.all(),
+            table_html = LabelTableEdit(
+                    data=site_instance.label_set.all(),
                     prefix='IL-')
         elif tab == 'PersonResolveUri':
             table_html = EntityUriTable(

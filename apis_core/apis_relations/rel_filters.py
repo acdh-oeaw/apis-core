@@ -145,7 +145,6 @@ def get_generic_relation_filter(entity):
                      'data-html': True}
             super(GenericListFilter, self).__init__(*args, **kwargs)
             for x in self.filters.keys():
-                print(type(self.filters[x].field).__name__)
                 if type(self.filters[x].field).__name__ == "ModelChoiceField":
                     current_model_name = str(self.filters[x].queryset.model.__name__).lower()
                     current_qs = self.filters[x].queryset

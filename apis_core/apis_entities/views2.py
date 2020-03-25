@@ -15,10 +15,11 @@ from django_tables2 import RequestConfig
 from guardian.core import ObjectPermissionChecker
 from reversion.models import Version
 
+from apis_core.apis_relations.models import AbstractRelation
 from .views import get_highlighted_texts
 from apis_core.apis_labels.models import Label
 from apis_core.apis_metainfo.models import Uri
-from apis_core.apis_relations.tables import get_generic_relations_table, EntityLabelTable
+from apis_core.apis_relations.tables import get_generic_relations_table, LabelTableEdit
 from .forms import get_entities_form, FullTextForm, GenericEntitiesStanbolForm
 from .views import set_session_variables
 from ..apis_vocabularies.models import TextType
@@ -37,26 +38,26 @@ class GenericEntitiesEditView(View):
             app_label='apis_entities', model=entity).model_class()
         instance = get_object_or_404(entity_model, pk=pk)
         request = set_session_variables(request)
-        relations = ContentType.objects.filter(app_label='apis_relations', model__icontains=entity)
+        relations = AbstractRelation.get_relation_classes_of_entity_name(entity_name=entity)
         side_bar = []
         for rel in relations:
-            match = str(rel).split()
+            match = [
+                rel.get_related_entity_classA().__name__.lower(),
+                rel.get_related_entity_classB().__name__.lower()
+            ]
             prefix = "{}{}-".format(match[0].title()[:2], match[1].title()[:2])
-            table = get_generic_relations_table(''.join(match), entity)
+            table = get_generic_relations_table(relation_class=rel, entity_instance=instance, detail=False)
             title_card = ''
             if match[0] == match[1]:
                 title_card = entity.title()
                 dict_1 = {'related_' + entity.lower() + 'A': instance}
                 dict_2 = {'related_' + entity.lower() + 'B': instance}
                 if 'apis_highlighter' in settings.INSTALLED_APPS:
-                    object_pre = rel.model_class().annotation_links.filter_ann_proj(request=request).filter(
+                    objects = rel.annotation_links.filter_ann_proj(request=request).filter(
                         Q(**dict_1) | Q(**dict_2))
                 else:
-                    object_pre = rel.model_class().objects.filter(
+                    objects = rel.objects.filter(
                         Q(**dict_1) | Q(**dict_2))
-                objects = []
-                for x in object_pre:
-                    objects.append(x.get_table_dict(instance))
             else:
                 if match[0].lower() == entity.lower():
                     title_card = match[1].title()
@@ -64,12 +65,10 @@ class GenericEntitiesEditView(View):
                     title_card = match[0].title()
                 dict_1 = {'related_' + entity.lower(): instance}
                 if 'apis_highlighter' in settings.INSTALLED_APPS:
-                    objects = list(rel.model_class()
-                                   .annotation_links.filter_ann_proj(request=request)
-                                   .filter(**dict_1))
+                    objects = rel.annotation_links.filter_ann_proj(request=request).filter(**dict_1)
                 else:
-                    objects = list(rel.model_class().objects.filter(**dict_1))
-            tb_object = table(objects, prefix=prefix)
+                    objects = rel.objects.filter(**dict_1)
+            tb_object = table(data=objects, prefix=prefix)
             tb_object_open = request.GET.get(prefix + 'page', None)
             RequestConfig(request, paginate={"per_page": 10}).configure(tb_object)
             side_bar.append((title_card, tb_object, ''.join([x.title() for x in match]), tb_object_open))
@@ -93,7 +92,7 @@ class GenericEntitiesEditView(View):
         object_lod = Uri.objects.filter(entity=instance)
         object_texts, ann_proj_form = get_highlighted_texts(request, instance)
         object_labels = Label.objects.filter(temp_entity=instance)
-        tb_label = EntityLabelTable(object_labels, prefix=entity.title()[:2]+'L-')
+        tb_label = LabelTableEdit(data=object_labels, prefix=entity.title()[:2] + 'L-')
         tb_label_open = request.GET.get('PL-page', None)
         side_bar.append(('Label', tb_label, 'PersonLabel', tb_label_open))
         RequestConfig(request, paginate={"per_page": 10}).configure(tb_label)

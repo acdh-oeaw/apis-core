@@ -36,8 +36,11 @@ urlpatterns = [
     url(r'^autocomplete-network/(?P<entity>[a-zA-Z0-9-]+)/$',
         GenericNetworkEntitiesAutocomplete.as_view(),
         name='generic_network_entities_autocomplete'),
-    url(r'^detail/work/(?P<pk>[0-9]+)$',
-        detail_views.WorkDetailView.as_view(), name='work_detail'),
+
+    # TODO __sresch__ : This seems unused. Remove it once sure
+    # url(r'^detail/work/(?P<pk>[0-9]+)$',
+    #     detail_views.WorkDetailView.as_view(), name='work_detail'),
+
     url(r'^place/geojson/$', views.getGeoJson, name='getGeoJson'),
     url(r'^place/geojson/list/$', views.getGeoJsonList, name='getGeoJsonList'),
     url(r'^place/network/list/$', views.getNetJsonList, name='getNetJsonList'),

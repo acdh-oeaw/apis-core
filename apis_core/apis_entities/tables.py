@@ -1,10 +1,14 @@
 import django_tables2 as tables
 from django_tables2.utils import A
-from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from django.utils.safestring import mark_safe
-
-from .models import Person, Place, Institution, Event, Work
+from apis_core.apis_entities.models import AbstractEntity
+from apis_core.apis_metainfo.tables import (
+    generic_order_start_date_written,
+    generic_order_end_date_written,
+    generic_render_start_date_written,
+    generic_render_end_date_written
+)
 
 input_form = """
   <input type="checkbox" name="keep" value="{}" title="keep this"/> |
@@ -24,9 +28,21 @@ class MergeColumn(tables.Column):
         )
 
 
-def get_entities_table(entity, edit_v, default_cols=['name', ]):
+def get_entities_table(entity, edit_v, default_cols):
+
+    if default_cols is None:
+        default_cols = ['name', ]
 
     class GenericEntitiesTable(tables.Table):
+
+        # reuse the logic for ordering and rendering *_date_written
+        # Important: The names of these class variables must correspond to the column field name,
+        # e.g. for start_date_written, the methods must be named order_start_date_written and render_start_date_written
+        order_start_date_written = generic_order_start_date_written
+        order_end_date_written = generic_order_end_date_written
+        render_start_date_written = generic_render_start_date_written
+        render_end_date_written = generic_render_end_date_written
+
         if edit_v:
             name = tables.LinkColumn(
                 'apis:apis_entities:generic_entities_edit_view',
@@ -48,59 +64,18 @@ def get_entities_table(entity, edit_v, default_cols=['name', ]):
         if 'id' in default_cols:
             id = tables.LinkColumn()
 
+
         class Meta:
-            model = ContentType.objects.get(
-                app_label__startswith='apis_', model=entity.lower()).model_class()
+            model = AbstractEntity.get_entity_class_of_name(entity_name=entity)
+
             fields = default_cols
             attrs = {"class": "table table-hover table-striped table-condensed"}
+
+
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+
+
     return GenericEntitiesTable
 
 
-class PersonTable(tables.Table):
-    name = tables.LinkColumn('apis:apis_entities:person_edit', args=[A('pk')])
-
-    class Meta:
-        model = Person
-        fields = ['name', 'first_name', 'start_date', 'end_date']
-        # add class="paleblue" to <table> tag
-        attrs = {"class": "table table-hover table-striped table-condensed"}
-
-
-class PlaceTable(tables.Table):
-    name = tables.LinkColumn('apis:apis_entities:place_edit', args=[A('pk')])
-
-    class Meta:
-        model = Place
-        fields = ['name', 'status', 'lng', 'lat']
-        # add class="paleblue" to <table> tag
-        attrs = {"class": "table table-hover table-striped table-condensed"}
-
-
-class InstitutionTable(tables.Table):
-    name = tables.LinkColumn('apis:apis_entities:institution_edit', args=[A('pk')])
-
-    class Meta:
-        model = Institution
-        fields = ['name', 'start_date', 'end_date', 'kind']
-        # add class="paleblue" to <table> tag
-        attrs = {"class": "table table-hover table-striped table-condensed"}
-
-
-class EventTable(tables.Table):
-    name = tables.LinkColumn('apis:apis_entities:event_edit', args=[A('pk')])
-
-    class Meta:
-        model = Event
-        fields = ['name', 'start_date', 'end_date', 'kind']
-        # add class="paleblue" to <table> tag
-        attrs = {"class": "table table-hover table-striped table-condensed"}
-
-
-class WorkTable(tables.Table):
-    name = tables.LinkColumn('apis:apis_entities:work_edit', args=[A('pk')])
-
-    class Meta:
-        model = Work
-        fields = ['name', 'start_date', 'end_date', 'kind']
-        # add class="paleblue" to <table> tag
-        attrs = {"class": "table table-hover table-striped table-condensed"}
