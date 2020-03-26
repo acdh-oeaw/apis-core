@@ -96,7 +96,7 @@ class EntitySerializer(serializers.Serializer):
         return str(obj.__class__.__name__)
 
     def add_url(self, obj):
-        url = f"{base_uri}{reverse('apis_core:apis_api2:GetEntityGeneric', kwargs={'pk': obj.pk})}"
+        url = f"{base_uri}{reverse('GetEntityGenericRoot', kwargs={'pk': obj.pk})}"
         return url
 
     def __init__(self, *args, depth_ent=1, **kwargs):
