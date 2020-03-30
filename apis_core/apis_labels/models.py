@@ -66,20 +66,14 @@ class Label(models.Model):
             if self.start_date_written:
                 # If some textual user input of a start date is there, then parse it
 
-                try:
-                    start_date, start_start_date, start_end_date = \
-                        DateParser.parse_date(self.start_date_written)
-                except Exception as e:
-                    print("Could not parse date: ", self.start_date_written, "ERROR:", e)
+                start_date, start_start_date, start_end_date = \
+                    DateParser.parse_date(self.start_date_written)
 
             if self.end_date_written:
                 # If some textual user input of an end date is there, then parse it
 
-                try:
-                    end_date, end_start_date, end_end_date = \
-                        DateParser.parse_date(self.end_date_written)
-                except Exception as e:
-                    print("Could not parse date: ", self.end_date_written, "ERROR:", e)
+                end_date, end_start_date, end_end_date = \
+                    DateParser.parse_date(self.end_date_written)
 
             self.start_date = start_date
             self.start_start_date = start_start_date
