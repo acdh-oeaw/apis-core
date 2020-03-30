@@ -14,6 +14,8 @@ from django.conf import settings
 from dal import autocomplete
 from django.urls import reverse
 from apis_core.apis_entities.fields import ListSelect2
+from apis_core.apis_entities.models import AbstractEntity
+from apis_core.apis_relations.models import AbstractRelation
 from django.core.exceptions import ValidationError
 #from dal.autocomplete import ListSelect2
 
@@ -87,7 +89,7 @@ class GenericRelationForm(forms.ModelForm):
         x.notes = cd['notes']
         x.references = cd['references']
         setattr(x, self.rel_accessor[3], site_instance)
-        target = ContentType.objects.get(app_label='apis_entities', model=self.rel_accessor[0].lower()).model_class()
+        target = AbstractEntity.get_entity_class_of_name(self.rel_accessor[0])
         t1 = target.get_or_create_uri(cd['target'])
         if not t1:
             t1 = RDFParser(cd['target'], self.rel_accessor[0]).get_or_create()
@@ -172,8 +174,7 @@ class GenericRelationForm(forms.ModelForm):
             entity_type = entity_type.__name__
         self.relation_form = kwargs.pop('relation_form')
         if type(self.relation_form) == str:
-            self.relation_form = ContentType.objects.get(
-                app_label='apis_relations', model=self.relation_form.lower()).model_class()
+            self.relation_form = AbstractRelation.get_relation_class_of_name(self.relation_form)
         self.request = kwargs.pop('request', False)
         super(GenericRelationForm, self).__init__(*args, **kwargs)
         instance = getattr(self, 'instance', None)

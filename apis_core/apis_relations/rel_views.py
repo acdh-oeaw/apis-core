@@ -5,6 +5,7 @@ from django.contrib.contenttypes.models import ContentType
 from django_tables2 import RequestConfig
 
 from apis_core.apis_entities.views import GenericListViewNew
+from apis_core.apis_relations.models import AbstractRelation
 from . forms2 import GenericRelationForm
 from . tables import get_generic_relation_listview_table
 from . rel_filters import get_generic_relation_filter
@@ -23,9 +24,7 @@ class GenericRelationView(GenericListViewNew):
 
     def get_queryset(self, **kwargs):
         self.entity = self.kwargs.get('entity')
-        qs = ContentType.objects.get(
-            app_label__startswith='apis_', model=self.entity.lower()
-        ).model_class().objects.all()
+        qs = AbstractRelation.get_relation_class_of_name(self.entity).objects.all()
         self.filter = get_generic_relation_filter(
             self.entity.title())(self.request.GET, queryset=qs)
         self.filter.form.helper = self.formhelper_class()
@@ -51,8 +50,7 @@ class GenericRelationDetailView(DetailView):
     def get_object(self):
         entity = self.kwargs['entity'].lower()
         instance = self.kwargs['pk'].lower()
-        entity_model = ContentType.objects.get(
-            app_label='apis_relations', model=entity).model_class()
+        entity_model = AbstractRelation.get_relation_class_of_name(entity)
         instance = entity_model.objects.get(pk=instance)
         return instance
 

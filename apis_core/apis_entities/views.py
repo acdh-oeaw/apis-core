@@ -20,6 +20,8 @@ from django.db.models import Q
 from django_tables2 import SingleTableView
 from django_tables2 import RequestConfig
 from django_tables2.export.views import ExportMixin
+
+from apis_core.apis_relations.models import AbstractRelation
 from .filters import get_list_filter_of_entity
 from apis_core.helper_functions.utils import access_for_all
 from .models import Person, Place, Institution, Event, Work
@@ -336,7 +338,7 @@ def getGeoJson(request):
 def getGeoJsonList(request):
     '''Used to retrieve a list of GeoJsons. To generate the list the kind of connection
     and the connected entity is needed'''
-    relation = ContentType.objects.get(app_label='apis_relations', model=request.GET.get("relation")).model_class()
+    relation = AbstractRelation.get_relation_class_of_name(request.GET.get("relation"))
     #relation_type = request.GET.get("relation_type")
     objects = relation.objects.filter(
             related_place__status='distinct').select_related('related_person', 'related_place', 'relation_type')
@@ -362,7 +364,7 @@ def getGeoJsonList(request):
 @login_required
 def getNetJsonList(request):
     '''Used to retrieve a Json to draw a network'''
-    relation = ContentType.objects.get(app_label='apis_relations', model='PersonPlace').model_class()
+    relation = AbstractRelation.get_relation_class_of_name('PersonPlace')
     objects = relation.objects.filter(
             related_place__status='distinct')
     nodes = dict()
@@ -400,7 +402,7 @@ def getNetJsonList(request):
 @login_required
 def getNetJsonListInstitution(request):
     '''Used to retrieve a Json to draw a network'''
-    relation = ContentType.objects.get(app_label='apis_relations', model='PersonInstitution').model_class()
+    relation = AbstractRelation.get_relation_class_of_name('PersonInstitution')
     objects = relation.objects.all()
     nodes = dict()
     edges = []

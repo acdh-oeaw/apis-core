@@ -1,7 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from rest_framework.generics import ListAPIView
 from .serializers import *
-from apis_core.apis_relations.models import PersonInstitution
+from apis_core.apis_relations.models import PersonInstitution, AbstractRelation
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 
@@ -23,8 +23,7 @@ class GetVisJson(ListAPIView):
 
     def get_queryset(self, **kwargs):
         relation = self.kwargs['relation'].lower()
-        relation_model = ContentType.objects.get(
-            app_label='apis_relations', model=relation).model_class()
+        relation_model = AbstractRelation.get_relation_class_of_name(relation)
         print("from get_queryset {}".format(relation))
         queryset = relation_model.objects.all()
         return queryset

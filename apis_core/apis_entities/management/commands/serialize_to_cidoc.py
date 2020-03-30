@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from apis_core.apis_entities.models import Person
+from apis_core.apis_entities.models import Person, AbstractEntity
 from django.contrib.contenttypes.models import ContentType
 from apis_core.apis_entities.serializers_generic import EntitySerializer
 from apis_core.apis_entities.api_renderers import EntityToCIDOC
@@ -127,7 +127,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        ent = ContentType.objects.get(app_label="apis_entities", model=options['entity']).model_class()
+        ent = AbstractEntity.get_entity_class_of_name(options['entity'])
         res = []
         objcts = ent.objects.filter(**json.loads(options['filter']))
         if objcts.filter(uri__uri__icontains=' ').count() > 0:

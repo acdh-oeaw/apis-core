@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from .models import Place, Person, Institution, Event, Work
+from .models import Place, Person, Institution, Event, Work, AbstractEntity
 from apis_core.apis_metainfo.models import Uri, Collection
 from apis_core.default_settings.NER_settings import autocomp_settings as ac_settings
 from django.conf import settings
@@ -116,9 +116,7 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
         db_include = self.kwargs.get('db_include', False)
         choices = []
         headers = {'Content-Type': 'application/json'}
-        ent_model = ContentType.objects.get(
-            app_label='apis_entities', model=ac_type.lower()
-        ).model_class()
+        ent_model = AbstractEntity.get_entity_class_of_name(ac_type)
         if self.q.startswith('http'):
             res = ent_model.objects.filter(uri__uri=self.q.strip())
         else:
