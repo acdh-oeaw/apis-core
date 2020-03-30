@@ -1,4 +1,5 @@
 import django_tables2 as tables
+from convertdate import julian
 from django.db.models import F
 from django.utils.html import format_html
 from . models import Uri
@@ -43,7 +44,6 @@ def generic_order_end_date_written(self, queryset, is_descending):
     return (queryset, True)
 
 
-# TODO __sresch__ : The dates must be converted from db-internal gregorian format to julian format for the user
 def helper_render_date(value, var_date, var_start_date, var_end_date):
     """
     helper function to avoid duplicated code. It checks the various sub-dates of a model's date field for them being None
@@ -51,6 +51,8 @@ def helper_render_date(value, var_date, var_start_date, var_end_date):
 
     If there are values, use them as mouse overlay helptext to inform the user about the parsing result behind a written
     date field.
+
+    Also converts from the db-internal gregorian date object to a julian date for the textual output
 
     :param value: str : the *_date_written (either start_date_written or end_date_written) field of an entity or relation
     :param var_date: datetime : either the precisely parsed date or the average in between two dates when *_date_written is a range
@@ -64,31 +66,46 @@ def helper_render_date(value, var_date, var_start_date, var_end_date):
 
     if var_start_date != None and var_end_date != None:
 
-        overlay_help_text = str(var_start_date) + " - " + str(var_end_date)
+        var_start_date_j = julian.from_gregorian(
+            year=var_start_date.year,
+            month=var_start_date.month,
+            day=var_start_date.day
+        )
+        var_start_date_j_str = \
+            str(var_start_date_j[0]) + "-" + \
+            str(var_start_date_j[1]) + "-" + \
+            str(var_start_date_j[2])
 
-    elif var_start_date != None:
+        var_end_date_j = julian.from_gregorian(
+            year=var_end_date.year,
+            month=var_end_date.month,
+            day=var_end_date.day
+        )
+        var_end_date_j_str = \
+            str(var_end_date_j[0]) + "-" + \
+            str(var_end_date_j[1]) + "-" + \
+            str(var_end_date_j[2])
 
-        overlay_help_text = str(var_start_date)
+        overlay_help_text = var_start_date_j_str + " - " + var_end_date_j_str
 
-    elif var_end_date != None:
+    elif var_date != None:
 
-        overlay_help_text = str(var_end_date)
+        var_date_j = julian.from_gregorian(
+            year=var_date.year,
+            month=var_date.month,
+            day=var_date.day
+        )
+        var_date_j_str = \
+            str(var_date_j[0]) + "-" + \
+            str(var_date_j[1]) + "-" + \
+            str(var_date_j[2])
 
-    elif var_start_date == None and var_end_date == None:
-
-        if var_date != None:
-
-            overlay_help_text = str(var_date)
-
-        else:
-
-            return "—"
+        overlay_help_text = var_date_j_str
 
     else:
 
-        raise Exception(
-            "This should never happen! Something must have been changed incorrectly in the if-else-flow above."
-        )
+        return "—"
+
 
     return format_html("<abbr title='" + overlay_help_text + "'>" + value + "</b>")
 
