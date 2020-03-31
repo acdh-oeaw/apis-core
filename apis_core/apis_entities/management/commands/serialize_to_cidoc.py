@@ -175,13 +175,14 @@ class Command(BaseCommand):
                     out2.write(fin_vocab.serialize(format=options['format']))
             self.stdout.write(self.style.SUCCESS(f'Wrote file to {options["output"]}'))
         if options['update']:
+            print(options['triplestore'])
             if not options['triplestore']:
                 url, username, password = getattr(settings, 'APIS_BLAZEGRAPH', (False, False, False))
                 if not url:
                     self.stdout.write(self.style.ERROR('When asking for update you need to either specify settings in APIS_BLAZEGRAPH or in the management command (--triple-store)'))
                     return
             else:
-                url, username, password = options['triplestore']
+                url, username, password = options['triplestore'].split(',')
                 if not url or not username or not password:
                     self.stdout.write(self.style.ERROR('Missing some settings for Triplestore update'))
                     return
