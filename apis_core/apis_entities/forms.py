@@ -161,14 +161,22 @@ def get_entities_form(entity):
                     'Institution': [
                         'name',
                         'name_english',
+                        'start_date_written',
                         'end_date_written',
                     ],
                     'Place': [
                         'name',
                         'name_english'
+                    ],
+                    'Work': [
+                        'name',
+                        'name_english'
                     ]
                 }
-
+                sett_entities = getattr(settings, 'APIS_ENTITIES', None)
+                if sett_entities is not None:
+                    for ent in sett_entities.keys():
+                        fields_sort_preferences_per_entity[ent] = sett_entities[ent].get('form_order', fields_sort_preferences_per_entity[ent])
                 if entity_label in fields_sort_preferences_per_entity:
                     # for this entity an ordering was defined, go trough it
 
