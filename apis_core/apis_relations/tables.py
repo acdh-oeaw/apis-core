@@ -189,7 +189,6 @@ def get_generic_relations_table(relation_class, entity_instance, detail=None):
 
         def __init__(self, data, *args, **kwargs):
 
-
             # annotations for displaying data about the 'other side' of the relation.
             # Both of them ('other_related_entity' and 'other_relation_type') are necessary for displaying relations
             # in context to what entity we are calling this from.
@@ -198,6 +197,10 @@ def get_generic_relations_table(relation_class, entity_instance, detail=None):
                 # the queryset must be annotated accordingly. The following Case searches which of the two related instances
                 # of a relation queryset entry is the one corresponding to the current entity instance. When found, take the
                 # other related entity (since this is the one we are interested in displaying).
+                #
+                # The approach of using queryset's annotate method allows for per-instance case decision and thus
+                # guarantees that the other related entity is always correctly picked,
+                # even in case two entities are of the same class.
                 other_related_entity=Case(
                     # **kwargs pattern is needed here as the key-value pairs change with each relation class and entity instance.
                     When(**{
@@ -211,6 +214,10 @@ def get_generic_relations_table(relation_class, entity_instance, detail=None):
                 )
             ).annotate(
                 # Get the correct side of the relation type given the current entity instance.
+                #
+                # The approach of using queryset's annotate method allows for per-instance case decision and thus
+                # guarantees that the other related entity is always correctly picked,
+                # even in case two entities are of the same class.
                 other_relation_type=Case(
                     When(**{
                         # A->B relation and current entity instance is A, hence take forward name

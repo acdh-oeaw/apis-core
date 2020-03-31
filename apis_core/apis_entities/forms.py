@@ -15,7 +15,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.validators import URLValidator
 from django.conf import settings
 
-from .models import Person, Place, Institution, Event, Work
+from .models import Person, Place, Institution, Event, Work, AbstractEntity
 from apis_core.apis_vocabularies.models import TextType
 from apis_core.apis_metainfo.models import Text, Uri, Collection
 from apis_core.helper_functions import DateParser
@@ -44,8 +44,7 @@ def get_entities_form(entity):
     # TODO __sresch__ : consider moving this class outside of the function call to avoid redundant class definitions
     class GenericEntitiesForm(forms.ModelForm):
         class Meta:
-            model = ContentType.objects.get(
-                app_label='apis_entities', model=entity.lower()).model_class()
+            model = AbstractEntity.get_entity_class_of_name(entity)
 
             exclude = [
                 'start_date',

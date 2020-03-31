@@ -5,6 +5,8 @@ from dal import autocomplete
 from django import http
 from django.contrib.contenttypes.models import ContentType
 
+from apis_core.apis_entities.models import AbstractEntity
+
 
 class TeiEntAc(autocomplete.Select2ListView):
 
@@ -16,9 +18,7 @@ class TeiEntAc(autocomplete.Select2ListView):
             ac_type = "institution"
         choices = []
         headers = {'Content-Type': 'application/json'}
-        ent_model = ContentType.objects.get(
-            app_label='apis_entities', model=ac_type.lower()
-        ).model_class()
+        ent_model = AbstractEntity.get_entity_class_of_name(ac_type)
         q = self.q.strip()
 
         res = ent_model.objects.filter(name__startswith=q)
@@ -49,9 +49,7 @@ class TeiCompleterAc(autocomplete.Select2ListView):
             ac_type = "institution"
         choices = []
         headers = {'Content-Type': 'application/json'}
-        ent_model = ContentType.objects.get(
-            app_label='apis_entities', model=ac_type.lower()
-        ).model_class()
+        ent_model = AbstractEntity.get_entity_class_of_name(ac_type)
         q = self.q.strip()
 
         res = ent_model.objects.filter(name__startswith=q)

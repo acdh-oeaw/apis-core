@@ -23,7 +23,7 @@ from .models import (
     InstitutionWork, PlaceWork, EventWork, WorkWork
 )
 from apis_core.apis_metainfo.models import Uri
-from apis_core.apis_entities.models import Person, Institution, Place, Event, Work
+from apis_core.apis_entities.models import Person, Institution, Place, Event, Work, AbstractEntity
 from apis_core.apis_entities.forms import PersonResolveUriForm, GenericEntitiesStanbolForm
 from apis_core.apis_labels.models import Label
 from django.views.decorators.csrf import csrf_exempt
@@ -93,6 +93,7 @@ def get_form_ajax(request):
     entity_type_str = request.POST.get('entity_type')
     form_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+)(Highlighter)?Form', FormName)
     form_match2 = re.match(r'([A-Z][a-z]+)(Highlighter)?Form', FormName)
+    print("XXX")
     if FormName and form_match:
         entity_type_v1 = ContentType.objects.filter(
             model='{}{}'.format(form_match.group(1).lower(), form_match.group(2)).lower(),
@@ -154,8 +155,8 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
     else:
         instance_id = ObjectID
     entity_type_str = entity_type
-    entity_type = ContentType.objects.get(
-        app_label__startswith="apis_", model=entity_type.lower()).model_class()
+    entity_type = AbstractEntity.get_entity_class_of_name(entity_type)
+
     form_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+)?(Highlighter)?Form', kind_form)
     form_dict = {'data': request.POST,
                  'entity_type': entity_type,

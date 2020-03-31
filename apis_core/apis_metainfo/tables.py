@@ -66,29 +66,13 @@ def helper_render_date(value, var_date, var_start_date, var_end_date):
 
         overlay_help_text = str(var_start_date) + " - " + str(var_end_date)
 
-    elif var_start_date != None:
+    elif var_date != None:
 
-        overlay_help_text = str(var_start_date)
-
-    elif var_end_date != None:
-
-        overlay_help_text = str(var_end_date)
-
-    elif var_start_date == None and var_end_date == None:
-
-        if var_date != None:
-
-            overlay_help_text = str(var_date)
-
-        else:
-
-            return "—"
+        overlay_help_text = str(var_date)
 
     else:
 
-        raise Exception(
-            "This should never happen! Something must have been changed incorrectly in the if-else-flow above."
-        )
+        return "—"
 
     return format_html("<abbr title='" + overlay_help_text + "'>" + value + "</b>")
 
