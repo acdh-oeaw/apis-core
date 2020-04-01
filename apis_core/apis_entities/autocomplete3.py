@@ -143,7 +143,6 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
             else:
                 search_type = '__icontains'
                 q = q.strip()
-            print(f"searchtype: {search_type} / q: {q}")
             arg_list = [Q(**{x+search_type: q}) for x in settings.APIS_ENTITIES[ac_type.title()]['search']]
             res = ent_model.objects.filter(reduce(operator.or_, arg_list)).distinct()
             if q3:
