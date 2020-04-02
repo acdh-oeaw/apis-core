@@ -188,19 +188,22 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
         else:
             test_db = False
         headers = {'Content-Type': 'application/json'}
-        test_apis_ac = False
+        apis_ac_more = False
         if ref_resources:
-            for apis_ac in self.ac_apis_instances[ac_type]:
-                res_ac = requests.get(
-                    f"{apis_ac['url']}/apis/entities/autocomplete/{ac_type}/", params={'q': q}, headers=headers)
-                if res_ac.status_code == 200:
-                    for ar in res_ac.json()['results']:
-                        ar_text = re.search(
-                            r"</small>([^<]+)", ar['text']).group(1).strip()
-                        print(ar, ar_text)
-                        ar_f = {'id': ar['id']}
-                        ar_f['text'] = f"<span {dataclass}><small>{apis_ac['id']}</small> {ar_text}</span>"
-                        choices.append(ar_f)
+            for inst_id, apis_ac in self.ac_apis_instances.items():
+                if ac_type in apis_ac.keys():
+                    res_ac = requests.get(
+                        f"{apis_ac['url']}/apis/entities/autocomplete/{ac_type}/",
+                        params={'q': q, 'ref_resources': 'false'}, headers=headers)
+                    if res_ac.status_code == 200:
+                        for ar in res_ac.json()['results']:
+                            ar_text = re.search(
+                                r"</small>(.+)</span>", ar['text']).group(1).strip()
+                            ar_f = {'id': ar['id']}
+                            ar_f['text'] = f"<span {dataclass}><small>{inst_id}</small> {ar_text}</span>"
+                            choices.append(ar_f)
+                    if res_ac.json()['pagination']['more']:
+                        apis_ac_more = True
         if ac_type.title() in ac_settings.keys() and ref_resources:
             for y in ac_settings[ac_type.title()]:
                 ldpath = ""
@@ -347,7 +350,7 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                 cust_auto_more = cust_auto.more
                 if len(cust_auto.results) > 0:
                     choices.extend(cust_auto.results)
-        if not test_db and not test_stanbol and not cust_auto_more:
+        if not test_db and not test_stanbol and not cust_auto_more and not apis_ac_more:
             more = False
         return http.HttpResponse(json.dumps({
             'results': choices + [],

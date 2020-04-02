@@ -4,6 +4,7 @@ import re
 import string
 import time
 import unicodedata
+import requests
 
 import pandas as pd
 import rdflib
@@ -94,6 +95,10 @@ class RDFParser(object):
                 res['data'] = v
         res['matching'] = sett[self.kind]['matching']
         res['sameAs'] = sameAs
+        set_apis = getattr(settings, 'APIS_AC_INSTANCES', None)
+        if set_apis is not None:
+            res['apis'] = {'settings': set_apis}
+            res['apis urls'] = [x[1]['url'] for x in set_apis.items()]
         return res
 
     @staticmethod
@@ -105,10 +110,39 @@ class RDFParser(object):
         for d in del_items:
             del RDFParser._reserved_uris[d]
 
-    def _exist(self, uri, uri_check=True):
+    def _parse_apis_instance(self, uri):
+        print(uri)
+        print('parsing went through')
+        for k, s in self._settings['apis'].items():
+            if uri.split('/')[2] in s['url'] and self.kind.lower() in [d.lower() for d in s.keys()]:
+                sett = s
+                break
+        headers = {'accept': 'application/json',
+                  'Autorization': f"Token {sett['token']}"}
+        res = requests.get(uri, headers=headers)
+        if res.status_code == 200:
+            res = res.json()
+            atr = sett.get('attributes', None)
+            if atr is not None:
+                for k, v in res.items():
+                    if k not in atr:
+                        res.pop(k)
+            for k, v in res.items():
+                if type(v) == list:
+                    res.pop(k)
+                if k in ['id', 'url', 'entity_type', 'relations']:
+                    res.pop(k)
+                if k.endswith('date'):
+                    res.pop(k)
+            self.objct.create(**atr)
 
+
+    def _exist(self, uri, uri_check=True):
         if self.objct.objects.filter(uri__uri=uri).count() > 0:
             return True, self.objct.objects.get(uri__uri=uri)
+        elif uri.split('/')[2] in ';'.join(self._settings['apis urls']):
+            print('if worked')
+            self._parse_apis_instance(uri)
         else:
             if uri in RDFParser._reserved_uris.keys() and uri_check:
                 if (time.time() - RDFParser._reserved_uris[uri]) < (self._preserve_uri_minutes * 60):
