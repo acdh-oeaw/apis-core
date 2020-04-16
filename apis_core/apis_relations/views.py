@@ -93,7 +93,6 @@ def get_form_ajax(request):
     entity_type_str = request.POST.get('entity_type')
     form_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+)(Highlighter)?Form', FormName)
     form_match2 = re.match(r'([A-Z][a-z]+)(Highlighter)?Form', FormName)
-    print("XXX")
     if FormName and form_match:
         entity_type_v1 = ContentType.objects.filter(
             model='{}{}'.format(form_match.group(1).lower(), form_match.group(2)).lower(),
