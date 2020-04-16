@@ -10,7 +10,7 @@ from rest_framework.generics import GenericAPIView
 
 from apis_core.apis_metainfo.api_renderers import PaginatedCSVRenderer
 from apis_core.apis_metainfo.models import TempEntityClass, Uri
-from apis_core.apis_relations.models import PersonPlace, InstitutionPlace
+from apis_core.apis_relations.models import PersonPlace, InstitutionPlace, AbstractRelation
 from apis_core.apis_vocabularies.models import VocabsBaseClass
 from apis_core.default_settings.NER_settings import autocomp_settings, stb_base
 from apis_core.helper_functions.RDFParser import RDFParser
@@ -34,7 +34,7 @@ from rest_framework.settings import api_settings
 from rest_framework.views import APIView
 
 from .api_renderers import EntityToCIDOC, EntityToTEI
-from .models import Event, Institution, Person, Place, Passage, Publication
+from .models import Event, Institution, Person, Place, Passage, Publication, AbstractEntity
 from .serializers import (
     EventSerializer,
     GeoJsonSerializer,
@@ -53,7 +53,6 @@ from .serializers import (
     GeoJsonSerializerTheme
 )
 from .serializers_generic import EntitySerializer
-from .models import Institution, Person, Place, Event, Passage
 
 # from metainfo.models import TempEntityClass
 
@@ -190,7 +189,6 @@ class PassageViewSet(viewsets.ModelViewSet):
     # serializer_class = PassageSerializer
 
 
-    pagination_class = StandardResultsSetPagination
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     depth = 2
     filter_fields = ("name", "kind__name", "collection__name")
@@ -249,9 +247,7 @@ class NetJsonViewSet(viewsets.GenericViewSet):
 
     def get_queryset(self):
         rel = self.request.data["select_relation"]
-        q = ContentType.objects.get(
-            app_label="apis_relations", model="".join(rel.split("-"))
-        ).model_class()
+        q = AbstractRelation.get_relation_class_of_name("".join(rel.split("-")))
         return q.objects.all()
 
 
@@ -269,9 +265,7 @@ class NetJsonViewSet(viewsets.GenericViewSet):
             ann_include_all = True
         else:
             ann_include_all = False
-        q = ContentType.objects.get(
-            app_label="apis_relations", model="".join(rel.split("-"))
-        ).model_class()
+        q = AbstractRelation.get_relation_class_of_name("".join(rel.split("-")))
         rel_match = re.match(r"([A-Z][a-z]+)([A-Z][a-z]+$)", rel)
         lst_nodes = []
         rel_a = "related_" + rel.split("-")[0]
@@ -432,7 +426,7 @@ class GetOrCreateEntity(APIView):
                 if len(r1_2) == 2:
                     q_d['first_name'] = r1_2[1].strip()
                     q_d['name'] = r1_2[0].strip()
-            ent = ContentType.objects.get(app_label="apis_entities", model=entity.lower()).model_class().objects.create(**q_d)
+            ent = AbstractEntity.get_entity_class_of_name(entity).objects.create(**q_d)
         res = {
             "id": ent.pk,
             "url": reverse_lazy(

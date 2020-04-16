@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from .models import Place, Person, Institution, Event, Passage
+from .models import Place, Person, Institution, Event, Passage, AbstractEntity
 from apis_core.apis_metainfo.models import Uri, Collection
 from apis_core.default_settings.NER_settings import autocomp_settings as ac_settings
 from django.conf import settings
@@ -116,19 +116,17 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
         db_include = self.kwargs.get('db_include', False)
         choices = []
         headers = {'Content-Type': 'application/json'}
-        ent_model = ContentType.objects.get(
-            app_label='apis_entities', model=ac_type.lower()
-        ).model_class()
+        ent_model = AbstractEntity.get_entity_class_of_name(ac_type)
         if self.q.startswith('http'):
             res = ent_model.objects.filter(uri__uri=self.q.strip())
-        else:
+        elif len(self.q) > 0:
             q1 = re.match('^([^\[]+)\[([^\]]+)\]$', self.q)
             if q1:
                 q = q1.group(1).strip()
                 q3 = q1.group(2).split(',')
                 q3 = [e.strip() for e in q3]
             else:
-                q = re.match('^[^[]+', self.q).group(0)
+                q = re.match('^[^\[]+', self.q).group(0)
                 q3 = False
             if re.match('^[^*]+\*$', q.strip()):
                 search_type = '__istartswith'
@@ -136,16 +134,15 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
             elif re.match('^\*[^*]+$', q.strip()):
                 search_type = '__iendswith'
                 q = re.match('^\*([^*]+)$', q.strip()).group(1)
-            elif re.match('^\*[^*]+\*$', q.strip()):
-                search_type = '__icontains'
-                q = re.match('^\*([^*]+)\*$', q.strip()).group(1)
-            elif re.match('^[^*]+$', q.strip()):
+            elif re.match('^\"[^"]+\"$', q.strip()):
                 search_type = ''
+                q = re.match('^\"([^"]+)\"$', q.strip()).group(1)
+            elif re.match('^[^*]+$', q.strip()):
+                search_type = '__icontains'
                 q = q.strip()
             else:
-                search_type = ''
+                search_type = '__icontains'
                 q = q.strip()
-
             arg_list = [Q(**{x+search_type: q}) for x in settings.APIS_ENTITIES[ac_type.title()]['search']]
             res = ent_model.objects.filter(reduce(operator.or_, arg_list)).distinct()
             if q3:
@@ -156,6 +153,9 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                     res = res.filter(**f_dict2)
                 except Exception as e:
                     choices.append({'name': str(e)})
+        else:
+            q = ''
+            res = []
         test_db = True
         test_stanbol = False
         test_stanbol_list = dict()

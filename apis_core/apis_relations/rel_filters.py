@@ -3,7 +3,7 @@ from dal import autocomplete
 from django.forms import ModelMultipleChoiceField
 from django.urls import reverse
 
-from .models import Person, Place, Institution, Event, Passage
+from .models import Person, Place, Institution, Event, Passage, AbstractRelation
 from django.db.models import Q
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
@@ -131,8 +131,7 @@ def get_generic_relation_filter(entity):
             return queryset.filter(**{f: value})
 
         class Meta:
-            model = ContentType.objects.get(
-                app_label__startswith='apis_', model=entity.lower()).model_class()
+            model = AbstractRelation.get_relation_class_of_name(entity)
             fields = get_filters(
                 model,
                 exclude=get_excluded_fields(model),

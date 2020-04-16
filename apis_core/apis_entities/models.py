@@ -591,7 +591,7 @@ def create_default_uri(sender, instance, **kwargs):
             base1 = BASE_URI
         uri_c = "{}{}".format(
             base1,
-            reverse("apis_core:apis_api2:GetEntityGeneric", kwargs={"pk": instance.pk}),
+            reverse("GetEntityGenericRoot", kwargs={"pk": instance.pk}),
         )
         uri2 = Uri(uri=uri_c, domain="apis default", entity=instance)
         uri2.save()

@@ -16,7 +16,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.validators import URLValidator
 from django.conf import settings
 
-from .models import Person, Place, Institution, Event, Passage
+from .models import Person, Place, Institution, Event, Passage, AbstractEntity
 from apis_core.apis_vocabularies.models import TextType
 from apis_core.apis_metainfo.models import Text, Uri, Collection
 from apis_core.helper_functions import DateParser
@@ -45,8 +45,7 @@ def get_entities_form(entity):
     # TODO __sresch__ : consider moving this class outside of the function call to avoid redundant class definitions
     class GenericEntitiesForm(forms.ModelForm):
         class Meta:
-            model = ContentType.objects.get(
-                app_label='apis_entities', model=entity.lower()).model_class()
+            model = AbstractEntity.get_entity_class_of_name(entity)
 
             exclude = [
                 'start_date',
@@ -163,14 +162,28 @@ def get_entities_form(entity):
                     'Institution': [
                         'name',
                         'name_english',
+                        'start_date_written',
                         'end_date_written',
                     ],
                     'Place': [
                         'name',
                         'name_english'
-                    ]
+                    ],
+                    'Passage': [
+                        'name',
+                        'start_date_written',
+                        'end_date_written',
+                    ],
+                    'Publication': [
+                        'name',
+                        'start_date_written',
+                        'end_date_written',
+                    ],
                 }
-
+                sett_entities = getattr(settings, 'APIS_ENTITIES', None)
+                if sett_entities is not None:
+                    for ent in sett_entities.keys():
+                        fields_sort_preferences_per_entity[ent] = sett_entities[ent].get('form_order', fields_sort_preferences_per_entity[ent])
                 if entity_label in fields_sort_preferences_per_entity:
                     # for this entity an ordering was defined, go trough it
 
@@ -226,6 +239,7 @@ def get_entities_form(entity):
                         single_end_date=instance.start_end_date,
                         single_date_written=instance.start_date_written,
                         single_date_is_exact=instance.start_date_is_exact,
+
                     )
                 else:
                     self.fields['start_date_written'].help_text = DateParser.get_date_help_text_default()

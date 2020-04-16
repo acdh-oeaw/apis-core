@@ -4,7 +4,7 @@ from convertdate import julian
 from datetime import datetime, timedelta
 
 
-def parse_date( date_string: str ) -> (datetime, datetime, datetime):
+def parse_date(date_string: str) -> (datetime, datetime, datetime):
     """
     function to parse a string date field of an entity
 
@@ -23,7 +23,6 @@ def parse_date( date_string: str ) -> (datetime, datetime, datetime):
     :return date_is_exact : boolean :
         True if date was decided to be exact, False otherwise
     """
-
 
     def parse_date_range_individual(date, ab=False, bis=False):
         """
@@ -50,7 +49,6 @@ def parse_date( date_string: str ) -> (datetime, datetime, datetime):
             One datetime object representing the gregorian date.
             if a single date was given.
         """
-
 
         def get_last_day_of_month(month, year):
             """
@@ -98,8 +96,6 @@ def parse_date( date_string: str ) -> (datetime, datetime, datetime):
                 1 <= month <= 12 and \
                 1 <= day <= get_last_day_of_month(month=month, year=year)
 
-
-
         # replace all kinds of delimiters
         date = date.replace(" ", "").replace("-", ".").replace("/", ".").replace("\\", ".")
 
@@ -142,7 +138,6 @@ def parse_date( date_string: str ) -> (datetime, datetime, datetime):
             # No sensical interpretation found
             raise ValueError("Could not interpret date.")
 
-
         if (ab and bis) or year is None:
             # both ab and bis in one single date are not valid, neither is the absence of a year.
             raise ValueError("Could not interpret date.")
@@ -169,9 +164,9 @@ def parse_date( date_string: str ) -> (datetime, datetime, datetime):
 
             # check for valid values
             if not date_has_valid_values(year=year, month=month_ab, day=day_ab):
-                raise ValueError("Date has invliad values: " + str(year) + "-" + str(month_ab) + "-" + str(day_ab) )
+                raise ValueError("Date has invliad values: " + str(year) + "-" + str(month_ab) + "-" + str(day_ab))
             if not date_has_valid_values(year=year, month=month_bis, day=day_bis):
-                raise ValueError("Date has invliad values: " + str(year) + "-" + str(month_bis) + "-" + str(day_bis) )
+                raise ValueError("Date has invliad values: " + str(year) + "-" + str(month_bis) + "-" + str(day_bis))
 
             # convert from user input in julian date format to gregorian format for database storage
             year_ab_g, month_ab_g, day_ab_g = julian.to_gregorian(year=year, month=month_ab, day=day_ab)
@@ -207,154 +202,157 @@ def parse_date( date_string: str ) -> (datetime, datetime, datetime):
 
             # check for valid values
             if not date_has_valid_values(year=year, month=month, day=day):
-                raise ValueError("Date has invliad values: " + str(year) + "-" + str(month) + "-" + str(day) )
+                raise ValueError("Date has invliad values: " + str(year) + "-" + str(month) + "-" + str(day))
 
             # convert from user input in julian date format to gregorian format for database storage
             year_g, month_g, day_g = julian.to_gregorian(year=year, month=month, day=day)
             return datetime(year=year_g, month=month_g, day=day_g)
 
+    try:
 
-    # return variables
-    date_single = None
-    date_ab = None
-    date_bis = None
-    date_is_exact = None
+        # return variables
+        date_single = None
+        date_ab = None
+        date_bis = None
+        date_is_exact = None
 
-    # split for angle brackets, check if explicit iso date is contained within them
-    date_split_angle = re.split(r"(<.*?>)", date_string)
+        # split for angle brackets, check if explicit iso date is contained within them
+        date_split_angle = re.split(r"(<.*?>)", date_string)
 
-    if len(date_split_angle) > 1:
-        # date string contains angle brackets. Parse them, ignore the rest
+        if len(date_split_angle) > 1:
+            # date string contains angle brackets. Parse them, ignore the rest
 
-        def parse_iso_date(date_string):
-            date_string_split = date_string.split("-")
-            try:
-                return datetime(year=int(date_string_split[0]), month=int(date_string_split[1]), day=int(date_string_split[2]) )
-            except:
-                raise ValueError("Invalid iso date: ", date_string)
+            def parse_iso_date(date_string):
+                date_string_split = date_string.split("-")
+                try:
+                    return datetime(year=int(date_string_split[0]), month=int(date_string_split[1]),
+                                    day=int(date_string_split[2]))
+                except:
+                    raise ValueError("Invalid iso date: ", date_string)
 
-        if len(date_split_angle) > 3:
-            # invalid case
-            raise ValueError("Too many angle brackets.")
+            if len(date_split_angle) > 3:
+                # invalid case
+                raise ValueError("Too many angle brackets.")
 
-        elif len(date_split_angle) == 3:
-            # the right amount of substrings, indicating exactly one pair of angle brackets.
-            # Parse the iso date in between
+            elif len(date_split_angle) == 3:
+                # the right amount of substrings, indicating exactly one pair of angle brackets.
+                # Parse the iso date in between
 
-            # remove angle brackets and split by commas
-            dates_iso = date_split_angle[1][1:-1]
+                # remove angle brackets and split by commas
+                dates_iso = date_split_angle[1][1:-1]
 
-            # check for commas, which would indicate that either one iso date or three are being input
-            dates_iso = dates_iso.split(",")
-            if len(dates_iso) != 1 and len(dates_iso) != 3:
-                # only either one iso date or three are allowed
-                raise ValueError(
-                    "Incorrect number of dates given. Within angle brackets only one or three (separated by commas) are allowed.")
+                # check for commas, which would indicate that either one iso date or three are being input
+                dates_iso = dates_iso.split(",")
+                if len(dates_iso) != 1 and len(dates_iso) != 3:
+                    # only either one iso date or three are allowed
+                    raise ValueError(
+                        "Incorrect number of dates given. Within angle brackets only one or three (separated by commas) are allowed.")
 
-            elif len(dates_iso) == 3:
-                # three iso dates indicate further start and end dates
+                elif len(dates_iso) == 3:
+                    # three iso dates indicate further start and end dates
 
-                # parse start date
-                date_ab_string = dates_iso[1].strip()
-                if date_ab_string != "":
-                    date_ab = parse_iso_date(date_ab_string)
+                    # parse start date
+                    date_ab_string = dates_iso[1].strip()
+                    if date_ab_string != "":
+                        date_ab = parse_iso_date(date_ab_string)
 
-                # parse end date
-                date_bis_string = dates_iso[2].strip()
-                if date_bis_string != "":
-                    date_bis = parse_iso_date(date_bis_string)
+                    # parse end date
+                    date_bis_string = dates_iso[2].strip()
+                    if date_bis_string != "":
+                        date_bis = parse_iso_date(date_bis_string)
 
-            # parse single date
-            date_single_string = dates_iso[0].strip()
-            if date_single_string != "":
-                date_single = parse_iso_date(date_single_string)
+                # parse single date
+                date_single_string = dates_iso[0].strip()
+                if date_single_string != "":
+                    date_single = parse_iso_date(date_single_string)
 
 
-    else:
-        # date string contains no angle brackets. Interpret the possible date formats
-        date_string = date_string.lower()
-        date_string = date_string.replace(" ","")
-
-        # helper variables for the following loop
-        found_ab = False
-        found_bis = False
-        found_single = False
-
-        if "ungenau" in date_string :
-            date_is_exact = False
         else:
-            date_is_exact = True
+            # date string contains no angle brackets. Interpret the possible date formats
+            date_string = date_string.lower()
+            date_string = date_string.replace(" ", "")
 
-        date_string = date_string.replace("ungenau", "").replace("genau", "")
+            # helper variables for the following loop
+            found_ab = False
+            found_bis = False
+            found_single = False
 
+            if "ungenau" in date_string:
+                date_is_exact = False
+            else:
+                date_is_exact = True
 
-        # split by allowed keywords 'ab' and 'bis' and iterate over them
-        date_split_ab_bis = re.split(r"(ab|bis)", date_string)
-        for i, v in enumerate(date_split_ab_bis):
+            date_string = date_string.replace("ungenau", "").replace("genau", "")
 
-            if v == "ab":
-                # indicates that the next value must be a start date
+            # split by allowed keywords 'ab' and 'bis' and iterate over them
+            date_split_ab_bis = re.split(r"(ab|bis)", date_string)
+            for i, v in enumerate(date_split_ab_bis):
 
-                if found_ab or found_single:
-                    # if already found a ab_date or single date before then there is non-conformative redundancy
-                    raise ValueError("Redundant dates found.")
-                found_ab = True
+                if v == "ab":
+                    # indicates that the next value must be a start date
 
-                # parse the next value which must be a parsable date string
-                date_ab = parse_date_range_individual(date_split_ab_bis[i + 1], ab=True)
+                    if found_ab or found_single:
+                        # if already found a ab_date or single date before then there is non-conformative redundancy
+                        raise ValueError("Redundant dates found.")
+                    found_ab = True
 
-            elif v == "bis":
-                # indicates that the next value must be an end date
+                    # parse the next value which must be a parsable date string
+                    date_ab = parse_date_range_individual(date_split_ab_bis[i + 1], ab=True)
 
-                if found_bis or found_single:
-                    # if already found a bis_date or single date before then there is non-conformative redundancy
-                    raise ValueError("Redundant dates found.")
-                found_bis = True
+                elif v == "bis":
+                    # indicates that the next value must be an end date
 
-                # parse the next value which must be a parsable date string
-                date_bis = parse_date_range_individual(date_split_ab_bis[i + 1], bis=True)
+                    if found_bis or found_single:
+                        # if already found a bis_date or single date before then there is non-conformative redundancy
+                        raise ValueError("Redundant dates found.")
+                    found_bis = True
 
-            elif v != "" and not found_ab and not found_bis and not found_single:
-                # indicates that this value must be a date
+                    # parse the next value which must be a parsable date string
+                    date_bis = parse_date_range_individual(date_split_ab_bis[i + 1], bis=True)
 
-                found_single = True
+                elif v != "" and not found_ab and not found_bis and not found_single:
+                    # indicates that this value must be a date
 
-                # parse the this value which must be a parsable date string
-                date_single = parse_date_range_individual(v)
+                    found_single = True
 
-                if type(date_single) is tuple:
-                    #  if result of parse_date_range_individual is a tuple then the date was an implict range.
-                    #  Then split it into start and end dates
-                    date_ab = date_single[0]
-                    date_bis = date_single[1]
+                    # parse the this value which must be a parsable date string
+                    date_single = parse_date_range_individual(v)
 
-        if date_ab and date_bis:
-            # date is a range
+                    if type(date_single) is tuple:
+                        #  if result of parse_date_range_individual is a tuple then the date was an implict range.
+                        #  Then split it into start and end dates
+                        date_ab = date_single[0]
+                        date_bis = date_single[1]
 
-            if date_ab > date_bis:
-                raise ValueError("'ab-date' must be before 'bis-date' in time")
+            if date_ab and date_bis:
+                # date is a range
 
-            # calculate difference between start and end date of range,
-            # and use it to calculate a single date for usage as median.
-            days_delta_half = math.floor((date_bis - date_ab).days / 2, )
-            date_single = date_ab + timedelta(days=days_delta_half)
+                if date_ab > date_bis:
+                    raise ValueError("'ab-date' must be before 'bis-date' in time")
 
-        elif date_ab is not None and date_bis is None:
-            # date is only the start of a range, save it also as the single date
+                # calculate difference between start and end date of range,
+                # and use it to calculate a single date for usage as median.
+                days_delta_half = math.floor((date_bis - date_ab).days / 2, )
+                date_single = date_ab + timedelta(days=days_delta_half)
 
-            date_single = date_ab
+            elif date_ab is not None and date_bis is None:
+                # date is only the start of a range, save it also as the single date
 
-        elif date_ab is None and date_bis is not None:
-            # date is only the end of a range, save it also as the single date
+                date_single = date_ab
 
-            date_single = date_bis
+            elif date_ab is None and date_bis is not None:
+                # date is only the end of a range, save it also as the single date
+
+                date_single = date_bis
+
+    except Exception as e:
+        print("Could not parse date: '", date_string, "' due to error: ", e)
 
     return date_single, date_ab, date_bis, date_is_exact
 
 
-
-
-def get_date_help_text_from_dates(single_date, single_start_date, single_end_date, single_date_written, single_date_is_exact):
+def get_date_help_text_from_dates(single_date, single_start_date, single_end_date, single_date_written,
+                                  single_date_is_exact):
     """
     function for creating string help text from parsed dates, to provide feedback to the user
     about the parsing status of a given date field.
@@ -377,7 +375,6 @@ def get_date_help_text_from_dates(single_date, single_start_date, single_end_dat
     :return help_text: str :
         The text to be displayed underneath a date field, informing the user about the parsing result
     """
-
 
     # check which of the dates could be parsed to construct the relevant feedback text
 
@@ -463,7 +460,5 @@ def get_date_help_text_from_dates(single_date, single_start_date, single_end_dat
     return help_text
 
 
-
 def get_date_help_text_default():
-
     return "Dates are interpreted by defined rules. If this fails, an iso-date can be explicitly set with '&lt;YYYY-MM-DD&gt;'."

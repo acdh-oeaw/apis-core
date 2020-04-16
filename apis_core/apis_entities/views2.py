@@ -15,6 +15,7 @@ from django_tables2 import RequestConfig
 from guardian.core import ObjectPermissionChecker
 from reversion.models import Version
 
+from apis_core.apis_entities.models import AbstractEntity
 from apis_core.apis_relations.models import AbstractRelation
 from .views import get_highlighted_texts
 from apis_core.apis_labels.models import Label
@@ -34,8 +35,7 @@ class GenericEntitiesEditView(View):
     def get(self, request, *args, **kwargs):
         entity = kwargs['entity']
         pk = kwargs['pk']
-        entity_model = ContentType.objects.get(
-            app_label='apis_entities', model=entity).model_class()
+        entity_model = AbstractEntity.get_entity_class_of_name(entity)
         instance = get_object_or_404(entity_model, pk=pk)
         request = set_session_variables(request)
         relations = AbstractRelation.get_relation_classes_of_entity_name(entity_name=entity)
@@ -115,15 +115,14 @@ class GenericEntitiesEditView(View):
             'form_ann_agreement': form_ann_agreement,
             'apis_bibsonomy': apis_bibsonomy,
             'permissions': permissions}
-        if entity.lower() != 'place':
-            form_merge_with = GenericEntitiesStanbolForm(entity, ent_merge_pk=pk)
-            context['form_merge_with'] = form_merge_with
+        form_merge_with = GenericEntitiesStanbolForm(entity, ent_merge_pk=pk)
+        context['form_merge_with'] = form_merge_with
         return HttpResponse(template.render(request=request, context=context))
 
     def post(self, request, *args, **kwargs):
         entity = kwargs['entity']
         pk = kwargs['pk']
-        entity_model = ContentType.objects.get(app_label='apis_entities', model=entity).model_class()
+        entity_model = AbstractEntity.get_entity_class_of_name(entity)
         instance = get_object_or_404(entity_model, pk=pk)
         form = get_entities_form(entity.title())
         form = form(request.POST, instance=instance)

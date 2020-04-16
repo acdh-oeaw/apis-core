@@ -95,9 +95,9 @@ class GenericListFilter(django_filters.FilterSet):
 
                         filter_dict_tmp[enabled_filter_key] = default_filter_dict[enabled_filter_key]
 
-                    else:
-                        raise ValueError("Expected either str or dict as type for an individual filter in the settings file.",
-                                "\nGot instead:", type(enabled_filter))
+                else:
+                    raise ValueError("Expected either str or dict as type for an individual filter in the settings file.",
+                            "\nGot instead:", type(enabled_filter))
 
             return filter_dict_tmp
 
