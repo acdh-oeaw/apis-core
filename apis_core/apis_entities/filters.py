@@ -105,45 +105,46 @@ class GenericListFilter(django_filters.FilterSet):
 
 
 
-    def construct_lookup_from_wildcard(self, value):
+    def construct_lookup(self, value):
         """
         Parses user input for wildcards and returns a tuple containing the interpreted django lookup string and the trimmed value
         E.g.
-            "*example" -> ("__iendswith", "example")
-            "example*" -> ("__istartswith", "example")
-            "*example*" -> ("__icontains", "example")
-            ""example"" -> ("__exact", "example")
+            'example' -> ('__icontains', 'example')
+            '*example' -> ('__iendswith', 'example')
+            'example*' -> ('__istartswith', 'example')
+            '"example"' -> ('__iexact', 'example')
 
         :param value : str : text to be parsed for *
         :return: (lookup : str, value : str)
         """
 
-        search_startswith = False
-        search_endswith = False
+        if value.startswith("*") and not value.endswith("*"):
 
-        if value.startswith("*"):
             value = value[1:]
-            search_startswith = True
-
-        if value.endswith("*"):
-            value = value[:-1]
-            search_endswith = True
-
-        if search_startswith and not search_endswith:
             return "__iendswith", value
 
-        elif not search_startswith and search_endswith:
+        elif not value.startswith("*") and value.endswith("*"):
+
+            value = value[:-1]
             return "__istartswith", value
 
-        elif search_startswith and search_endswith:
-            return "__icontains", value
+        elif value.startswith('"') and value.endswith('"'):
+
+            value = value[1:-1]
+            return "__iexact", value
 
         else:
-            return "__exact", value
+
+            if value.startswith("*") and value.endswith("*"):
+
+                value = value[1:-1]
+
+            return "__icontains", value
+
 
 
     def string_wildcard_filter(self, queryset, name, value):
-        lookup, value = self.construct_lookup_from_wildcard(value)
+        lookup, value = self.construct_lookup(value)
         return queryset.filter(**{name + lookup : value})
 
 
@@ -151,7 +152,7 @@ class GenericListFilter(django_filters.FilterSet):
     def name_label_filter(self, queryset, name, value):
         # TODO __sresch__ : include alternative names queries
 
-        lookup, value = self.construct_lookup_from_wildcard(value)
+        lookup, value = self.construct_lookup(value)
 
         queryset_related_label=queryset.filter(**{"label__label"+lookup : value})
         queryset_self_name=queryset.filter(**{name+lookup : value})
@@ -186,7 +187,7 @@ class GenericListFilter(django_filters.FilterSet):
 
         # step 1
         # first find all tempentities where the lookup and value applies, select only their primary keys.
-        lookup, value = self.construct_lookup_from_wildcard(value)
+        lookup, value = self.construct_lookup(value)
         tempentity_hit = TempEntityClass.objects.filter(**{"name" + lookup: value}).values_list("pk", flat=True)
 
         # list for querysets where relations will be saved which are related to the primary keys of the tempentity list above
@@ -262,7 +263,7 @@ class GenericListFilter(django_filters.FilterSet):
         :return: filtered queryset
         """
 
-        lookup, value = self.construct_lookup_from_wildcard(value)
+        lookup, value = self.construct_lookup(value)
 
         # look up through name and name_reverse of RelationBaseClass
         relationbaseclass_hit = (
@@ -320,7 +321,7 @@ class GenericListFilter(django_filters.FilterSet):
                 Using this example of professions, such a lookup would be generated: Person.objects.filter(profession__name__... ) )
         """
 
-        lookup, value = self.construct_lookup_from_wildcard(value)
+        lookup, value = self.construct_lookup(value)
 
         # name variable is the name of the filter and needs the corresponding field within the model
         return queryset.filter( **{ name + "__name" + lookup : value } )
@@ -355,7 +356,7 @@ class PersonListFilter(GenericListFilter):
 
     def person_name_filter(self, queryset, name, value):
 
-        lookup, value = self.construct_lookup_from_wildcard(value)
+        lookup, value = self.construct_lookup(value)
 
         queryset_related_label=queryset.filter(**{"label__label"+lookup : value})
         queryset_self_name=queryset.filter(**{name+lookup : value})

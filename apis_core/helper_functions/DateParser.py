@@ -250,7 +250,7 @@ def parse_date( date_string: str ) -> (datetime, datetime, datetime):
         else:
             # date string contains no angle brackets. Interpret the possible date formats
             date_string = date_string.lower()
-            date_string = date_string.replace(" " ,"")
+            date_string = date_string.replace(" ", "")
 
             # helper variables for the following loop
             found_ab = False
