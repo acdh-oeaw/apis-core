@@ -18,6 +18,7 @@ from .models import (
     PersonPassageRelation, InstitutionEventRelation, InstitutionPassageRelation, PlacePassageRelation, PlaceEventRelation,
     PlacePlaceRelation, EventPassageRelation, EventEventRelation, PassagePassageRelation, EventType, PassageType)
 
+# TODO __sresch__ : implement Publication related Viewsets
 
 ###########################################################
 #

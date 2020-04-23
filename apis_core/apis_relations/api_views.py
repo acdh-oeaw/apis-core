@@ -9,6 +9,7 @@ from .models import (InstitutionInstitution, PersonInstitution, PersonPlace, Per
                      PlacePlace, PassagePassage)
 from apis_core.apis_entities.api_views import StandardResultsSetPagination
 
+# TODO __sresch__ : implement Publication related Viewsets
 
 class InstitutionInstitutionViewSet(viewsets.ModelViewSet):
     queryset = InstitutionInstitution.objects.all()

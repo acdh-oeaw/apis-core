@@ -2,8 +2,13 @@ from rest_framework.decorators import api_view, renderer_classes
 from rest_framework import response, schemas
 from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
 from apis_core.apis_entities.api_views import (
+    EventViewSet,
+    InstitutionViewSet,
     NetJsonViewSet,
+    PersonViewSet,
     PlaceGeoJsonViewSet,
+    PlaceViewSet,
+    PassageViewSet,
 )
 
 # from rest_framework_swagger.views import get_swagger_view
@@ -16,11 +21,49 @@ from apis_core.apis_metainfo.api_views import (
     UriSerializerViewSet,
 )
 from apis_core.apis_relations.api_views import (
-    InstitutionInstitutionViewSet, InstitutionPlaceViewSet, InstitutionEventViewSet, InstitutionPassageViewSet,
-    PersonInstitutionViewSet, PersonPlaceViewSet, PersonPersonViewSet, PersonEventViewSet, PersonPassageViewSet,
-    PlacePassageViewSet, PlaceEventViewSet, EventPassageViewSet, EventEventViewSet, PassagePassageViewSet,
-    PlacePlaceViewSet)
-from apis_core.apis_vocabularies.api_views import UserViewSet
+    EventEventViewSet,
+    EventPassageViewSet,
+    InstitutionEventViewSet,
+    InstitutionInstitutionViewSet,
+    InstitutionPlaceViewSet,
+    InstitutionPassageViewSet,
+    PersonEventViewSet,
+    PersonInstitutionViewSet,
+    PersonPersonViewSet,
+    PersonPlaceViewSet,
+    PersonPassageViewSet,
+    PlaceEventViewSet,
+    PlacePlaceViewSet,
+    PlacePassageViewSet,
+    PassagePassageViewSet,
+)
+from apis_core.apis_vocabularies.api_views import (
+    CollectionTypeViewSet,
+    EventEventRelationViewSet,
+    EventTypeViewSet,
+    EventPassageRelationViewSet,
+    InstitutionEventRelationViewSet,
+    InstitutionInstitutionRelationViewSet,
+    InstitutionPlaceRelationViewSet,
+    InstitutionTypeViewSet,
+    InstitutionPassageRelationViewSet,
+    PersonEventRelationViewSet,
+    PersonInstitutionRelationViewSet,
+    PersonPersonRelationViewSet,
+    PersonPlaceRelationViewSet,
+    PersonPassageRelationViewSet,
+    PlaceEventRelationViewSet,
+    PlacePlaceRelationViewSet,
+    PlaceTypeViewSet,
+    PlacePassageRelationViewSet,
+    ProfessionTypeViewSet,
+    TextTypeViewSet,
+    UserViewSet,
+    VocabNamesViewSet,
+    VocabsBaseClassViewSet,
+    PassageTypeViewSet,
+    PassagePassageRelationViewSet,
+)
 from django.conf import settings
 from django.urls import path
 from django.conf.urls import include, url
@@ -40,8 +83,6 @@ for app_label in ["entities", "metainfo", "vocabularies", "relations"]:
     for ent in ContentType.objects.filter(app_label="apis_{}".format(app_label)):
         name = "".join([x.title() for x in ent.name.split(" ")])
         try:
-            if name.lower() in ['texttype-collectionrelationship']:
-                continue
             router.register(
                 r"{}/{}".format(app_label, name.lower()),
                 create_generic_api_viewset(
