@@ -2,6 +2,8 @@ trigger_build:
   only:
      refs:
          - master
+         - jwv
+         - coladay
   stage: deploy
   trigger: acdh-oeaw/apis/apis-webpage-base
   variables:
