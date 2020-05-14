@@ -73,8 +73,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.views.static import serve
 from rest_framework import routers
 from rest_framework.schemas import get_schema_view
-from .api_routers import create_generic_api_viewset
 from rest_framework_swagger.views import get_swagger_view
+from apis_core.api_routers import views
 
 app_name = "apis_core"
 
@@ -85,9 +85,7 @@ for app_label in ["entities", "metainfo", "vocabularies", "relations"]:
         try:
             router.register(
                 r"{}/{}".format(app_label, name.lower()),
-                create_generic_api_viewset(
-                    entity=name, app_label="apis_{}".format(app_label)
-                ),
+                views[f"{str(ent.model).lower().replace(' ', '')}"]
             )
         except Exception as e:
             print("{} not found, skipping".format(name.lower()))
@@ -131,12 +129,12 @@ from drf_yasg import openapi
 
 schema_view2 = get_schema_view2(
    openapi.Info(
-      title="Snippets API",
+      title="APIS API",
       default_version='v1',
-      description="Test description",
-      terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="contact@snippets.local"),
-      license=openapi.License(name="BSD License"),
+      description="Hyperlinked API of the APIS Framework",
+      #terms_of_service="https://www.google.com/policies/terms/",
+      contact=openapi.Contact(email="matthias.schloegl@oeaw.ac.at"),
+      license=openapi.License(name="MIT"),
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
@@ -200,6 +198,7 @@ if "apis_highlighter" in settings.INSTALLED_APPS:
     )
 
 if "apis_fulltext_download" in settings.INSTALLED_APPS:
+
     urlpatterns.append(
         url(
             r"fulltext_download/",
