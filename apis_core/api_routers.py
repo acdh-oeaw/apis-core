@@ -62,9 +62,6 @@ class LabelSerializer(serializers.Serializer):
 
 
 def generic_serializer_creation_factory():
-    #lst_1 = list(ContentType.objects.filter(app_label="apis_vocabularies"))
-    #lst_1.extend(list(ContentType.objects.filter(app_label__in=['apis_metainfo', 'apis_entities', 'apis_relations', ])))
-    #for cont in lst_1:
     for cont in ContentType.objects.filter(app_label__in=['apis_vocabularies', 'apis_metainfo', 'apis_entities', 'apis_relations', ]):
         test_search = getattr(settings, cont.app_label.upper(), False)
         entity_str = str(cont).replace(' ', '')
@@ -81,16 +78,14 @@ def generic_serializer_creation_factory():
             exclude_lst.extend(
                 deep_get(set_prem, "{}.exclude".format(entity_str), [])
             )
-        print(exclude_lst)
-    
+        exclude_lst_fin = [x for x in exclude_lst if x in list(entity._meta.get_fields())]
+
         class Meta:
             model = entity
-            exclude = exclude_lst
+            exclude = exclude_lst_fin
     
         def init_serializers(self, *args, **kwargs):
             super(self.__class__, self).__init__(*args, **kwargs)
-            print(self._entity._meta.get_fields())
-            print(self.fields.keys())
             for f in self._entity._meta.get_fields():
                 if getattr(settings, "APIS_API_EXCLUDE_SETS", False) and str(f.name).endswith('_set'):
                     if f.name in self.fields.keys():
