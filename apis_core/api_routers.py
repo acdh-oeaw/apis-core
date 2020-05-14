@@ -61,6 +61,97 @@ class LabelSerializer(serializers.Serializer):
         return str(obj)
 
 
+def generic_serializer_creation_factory():
+    #lst_1 = list(ContentType.objects.filter(app_label="apis_vocabularies"))
+    #lst_1.extend(list(ContentType.objects.filter(app_label__in=['apis_metainfo', 'apis_entities', 'apis_relations', ])))
+    #for cont in lst_1:
+    for cont in ContentType.objects.filter(app_label__in=['apis_vocabularies', 'apis_metainfo', 'apis_entities', 'apis_relations', ]):
+        test_search = getattr(settings, cont.app_label.upper(), False)
+        entity_str = str(cont).replace(' ', '')
+        entity = cont.model_class()
+        app_label = cont.app_label.replace(' ', '_')
+        exclude_lst = []
+        if app_label == "apis_entities":
+            exclude_lst = deep_get(
+                test_search, "{}.api_exclude".format(entity_str), []
+            )
+        else:
+            set_prem = getattr(settings, f"{cont.app_label.upper()}", {})
+            exclude_lst = deep_get(set_prem, "exclude", [])
+            exclude_lst.extend(
+                deep_get(set_prem, "{}.exclude".format(entity_str), [])
+            )
+        print(exclude_lst)
+    
+        class Meta:
+            model = entity
+            exclude = exclude_lst
+    
+        def init_serializers(self, *args, **kwargs):
+            super(self.__class__, self).__init__(*args, **kwargs)
+            print(self._entity._meta.get_fields())
+            print(self.fields.keys())
+            for f in self._entity._meta.get_fields():
+                if getattr(settings, "APIS_API_EXCLUDE_SETS", False) and str(f.name).endswith('_set'):
+                    if f.name in self.fields.keys():
+                        print(f.name)
+                        self.fields.pop(f.name)
+                    continue
+                if f.name in exclude_lst:
+                    continue
+                elif (
+                        f.__class__.__name__ == "ManyToManyField"
+                        and f.name
+                        in deep_get(
+                    getattr(settings, app_label.upper(), {}),
+                    "{}.labels".format(entity_str),
+                    [],
+                )
+                ):
+                    self.fields[f.name] = LabelSerializer(
+                        many=True, read_only=True
+                    )
+                elif f.__class__.__name__ == "ManyToManyField":
+                    self.fields[f.name] = serializers.HyperlinkedRelatedField(
+                        view_name="apis:apis_api:{}-detail".format(
+                            f.related_model.__name__.lower()
+                        ),
+                        queryset=f.related_model.objects.all(),
+                        many=True,
+                        allow_null=True,
+                    )
+                elif (
+                        f.__class__.__name__ == "ForeignKey"
+                        and f.name
+                        in deep_get(
+                    getattr(settings, app_label.upper(), {}),
+                    "{}.labels".format(entity_str),
+                    [],
+                )
+                ):
+                    self.fields[f.name] = LabelSerializer(read_only=True)
+    
+                elif f.__class__.__name__ == "ForeignKey":
+                    self.fields[f.name] = serializers.HyperlinkedRelatedField(
+                        view_name="apis:apis_api:{}-detail".format(
+                            f.related_model.__name__.lower()
+                        ),
+                        queryset=f.related_model.objects.all(),
+                        allow_null=True
+                    )
+    
+        s_dict = {
+            "id": serializers.ReadOnlyField(),
+            "url": serializers.HyperlinkedIdentityField(
+                view_name=f"apis:apis_api:{entity_str.lower()}-detail"),
+            "_entity": entity,
+            "Meta": Meta,
+            "add_labels": lambda self, obj: {"id": obj.pk, "label": str(obj)},
+            "__init__": init_serializers
+        }
+        serializer_classes[entity_str.lower().replace(' ', '')] = type(f"{entity_str.title().replace(' ', '')}Serializer", (serializers.HyperlinkedModelSerializer,), s_dict)
+
+
 def create_generic_api_viewset(**kwargs):
 
     class GenericFilterSet(ModelFilterSet):
@@ -87,6 +178,7 @@ def create_generic_api_viewset(**kwargs):
             return super(GenericAPIViewSet, self).dispatch(request, *args, **kwargs)
 
         def get_serializer_class(self):
+            return serializer_classes[self.entity_str.lower()]
             entity_str = self.entity_str
             entity = self.entity
             test_search = self.test_search
@@ -114,6 +206,70 @@ def create_generic_api_viewset(**kwargs):
                 exclude_lst.extend(
                     deep_get(set_prem, "{}.exclude".format(entity_str), [])
                 )
+                
+            class Meta:
+                model = entity
+                exclude = exclude_lst
+            
+            def init_serializers(self, *args, **kwargs):
+                super(self.__class__, self).__init__(*args, **kwargs)
+                for f in entity._meta.get_fields():
+                    if getattr(settings, "APIS_API_EXCLUDE_SETS", False) and str(f.name).endswith('_set'):
+                        if f.name in self.fields.keys():
+                            self.fields.pop(f.name)
+                        continue
+                    if f.name in exclude_lst:
+                        continue
+                    elif (
+                            f.__class__.__name__ == "ManyToManyField"
+                            and f.name
+                            in deep_get(
+                        getattr(settings, app_label.upper(), {}),
+                        "{}.labels".format(entity_str),
+                        [],
+                    )
+                    ):
+                        self.fields[f.name] = LabelSerializer(
+                            many=True, read_only=True
+                        )
+                    elif f.__class__.__name__ == "ManyToManyField":
+                        self.fields[f.name] = serializers.HyperlinkedRelatedField(
+                            view_name="apis:apis_api:{}-detail".format(
+                                f.related_model.__name__.lower()
+                            ),
+                            queryset=f.related_model.objects.all(),
+                            many=True,
+                            allow_null=True,
+                        )
+                    elif (
+                            f.__class__.__name__ == "ForeignKey"
+                            and f.name
+                            in deep_get(
+                        getattr(settings, app_label.upper(), {}),
+                        "{}.labels".format(entity_str),
+                        [],
+                    )
+                    ):
+                        self.fields[f.name] = LabelSerializer(read_only=True)
+
+                    elif f.__class__.__name__ == "ForeignKey":
+                        self.fields[f.name] = serializers.HyperlinkedRelatedField(
+                            view_name="apis:apis_api:{}-detail".format(
+                                f.related_model.__name__.lower()
+                            ),
+                            queryset=f.related_model.objects.all(),
+                            allow_null=True
+                        )
+
+            s_dict = {
+                "id": serializers.ReadOnlyField(),
+                "url": serializers.HyperlinkedIdentityField(
+                    view_name=f"apis:apis_api:{entity_str.lower()}-detail"),
+                "Meta": Meta,
+                "add_labels": lambda self, obj: {"id": obj.pk, "label": str(obj)},
+                "__init__": init_serializers
+            }
+            serializer_class = type(f"{entity_str.title().replace(' ', '')}Serializer", (serializers.HyperlinkedModelSerializer,), s_dict)
 
             class CustomSerializer(serializers.HyperlinkedModelSerializer):
                 id = serializers.ReadOnlyField()
@@ -178,6 +334,10 @@ def create_generic_api_viewset(**kwargs):
                                 allow_null=True
                             )
 
-            return CustomSerializer
+            return serializer_class
 
     return GenericAPIViewSet
+
+serializer_classes = dict()
+generic_serializer_creation_factory()
+print(serializer_classes)
