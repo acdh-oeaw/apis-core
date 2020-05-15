@@ -86,6 +86,8 @@ def generic_serializer_creation_factory():
     
         def init_serializers(self, *args, **kwargs):
             super(self.__class__, self).__init__(*args, **kwargs)
+            entity_str = self._entity.__name__
+            app_label = self._app_label
             for f in self._entity._meta.get_fields():
                 if getattr(settings, "APIS_API_EXCLUDE_SETS", False) and str(f.name).endswith('_set'):
                     if f.name in self.fields.keys():
@@ -140,6 +142,7 @@ def generic_serializer_creation_factory():
                 view_name=f"apis:apis_api:{entity_str.lower()}-detail"),
             "_entity": entity,
             "_exclude_lst": exclude_lst_fin,
+            "_app_label": app_label,
             "Meta": Meta,
             "add_labels": lambda self, obj: {"id": obj.pk, "label": str(obj)},
             "__init__": init_serializers
