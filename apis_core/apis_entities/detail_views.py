@@ -49,7 +49,7 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
                 dict_1 = {'related_' + entity.lower() + 'A': instance}
                 dict_2 = {'related_' + entity.lower() + 'B': instance}
                 if 'apis_highlighter' in settings.INSTALLED_APPS:
-                    objects = rel.annotation_links.filter_ann_proj(request=request).filter(
+                    objects = rel.objects.filter_ann_proj(request=request).filter_for_user().filter(
                         Q(**dict_1) | Q(**dict_2))
                 else:
                     objects = rel.objects.filter(
@@ -61,7 +61,7 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
                     title_card = match[0].title()
                 dict_1 = {'related_' + entity.lower(): instance}
                 if 'apis_highlighter' in settings.INSTALLED_APPS:
-                    objects = rel.annotation_links.filter_ann_proj(request=request).filter(**dict_1)
+                    objects = rel.objects.filter_ann_proj(request=request).filter_for_user().filter(**dict_1)
                 else:
                     objects = rel.objects.filter(**dict_1)
             tb_object = table(data=objects, prefix=prefix)

@@ -85,7 +85,8 @@ for app_label in ["entities", "metainfo", "vocabularies", "relations"]:
         try:
             router.register(
                 r"{}/{}".format(app_label, name.lower()),
-                views[f"{str(ent.model).lower().replace(' ', '')}"]
+                views[f"{str(ent.model).lower().replace(' ', '')}"],
+                name.lower(),
             )
         except Exception as e:
             print("{} not found, skipping".format(name.lower()))

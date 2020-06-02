@@ -28,7 +28,7 @@ class GenericRelationView(GenericListViewNew):
         self.filter = get_generic_relation_filter(
             self.entity.title())(self.request.GET, queryset=qs)
         self.filter.form.helper = self.formhelper_class()
-        return self.filter.qs.distinct()
+        return self.filter.qs.filter_for_user().distinct()
 
     def get_table(self, **kwargs):
         relation_name = self.kwargs['entity'].lower()

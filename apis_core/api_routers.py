@@ -152,17 +152,27 @@ def generic_serializer_creation_factory():
         class Meta_filter(object):
             model = entity
         
+        def get_queryset(self):
+            #qs = super(self.__class__, self).get_queryset()
+            print(dir(self.model))
+            if "apis_relations" in str(self.model):
+                print('used filter_for_user')
+                return self.model.objects.filter_for_user()
+            else:
+                print('the other one')
+                return self.model.objects.all()
+
         filter_class = type(f"Generic{entity_str.title().replace(' ', '')}FilterClass", (ModelFilterSet,), {'Meta': Meta_filter})
-        
         viewset_dict = {
             'pagination_class': CustomPagination,
             'model': entity,
-            'queryset': entity.objects.all(),
+            #'queryset': entity.objects.all(),
             'filter_backends': (DjangoFilterBackend, ),
             'depth': 2,
             'renderer_classes': (renderers.JSONRenderer, renderers.BrowsableAPIRenderer, NetJsonRenderer),
             'filter_class': filter_class,
             'serializer_class': serializer_class,
+            "get_queryset": get_queryset,
             'dispatch': lambda self, request, *args, **kwargs: super(self.__class__, self).dispatch(request, *args, **kwargs)
             }
         views[f"{entity_str.lower().replace(' ', '')}"] = type(f"Generic{entity_str.title().replace(' ', '')}ViewSet", (viewsets.ModelViewSet, ), viewset_dict)

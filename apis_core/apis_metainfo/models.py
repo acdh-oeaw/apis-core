@@ -77,6 +77,7 @@ class TempEntityClass(models.Model):
     )
     references = models.TextField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
+    published = models.BooleanField(default=False)
     objects = models.Manager()
     objects_inheritance = InheritanceManager()
 
@@ -342,9 +343,17 @@ class Collection(models.Model):
     parent_class = models.ForeignKey(
         "self", blank=True, null=True, on_delete=models.CASCADE
     )
+    published = models.BooleanField(default=False)
 
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        if self.published != self.__original_published:
+            for ent in self.tempentityclass_set.all():
+                ent.published = self.published
+                ent.save()
+        super().save(*args, **kwargs)
 
 
 @reversion.register()
@@ -467,3 +476,5 @@ class UriCandidate(models.Model):
 #def remove_default_uri(sender, instance, **kwargs):
 #    if Uri.objects.filter(entity=instance.entity).count() > 1:
 #        Uri.objects.filter(entity=instance.entity, domain="apis default").delete()
+
+

@@ -68,7 +68,7 @@ class EntitySerializer(serializers.Serializer):
                 reverse = True
             res["{}s".format(mk2.group(1))] = []
             if mk2.group(1).lower() != mk.lower():
-                for rel2 in getattr(obj, "{}_set".format(rel.model)).all():
+                for rel2 in getattr(obj, "{}_set".format(rel.model)).all().filter_for_user():
                     res["{}s".format(mk2.group(1))].append(
                         RelationEntitySerializer(
                             rel2, own_class=mk, read_only=True, context=self.context, reverse=reverse
@@ -78,7 +78,7 @@ class EntitySerializer(serializers.Serializer):
                 for t in ["A", "B"]:
                     for rel2 in getattr(
                         obj, "related_{}{}".format(mk.lower(), t)
-                    ).all():
+                    ).all().filter_for_user():
                         if t == "A":
                             ok = "{}B".format(mk.lower())
                             reverse = True
