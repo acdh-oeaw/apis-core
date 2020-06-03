@@ -43,18 +43,15 @@ def find_if_user_accepted():
 
 class RelationPublishedQueryset(models.QuerySet):
     def filter_for_user(self, *args, **kwargs):
-        print('running qs')
         if getattr(settings, "APIS_SHOW_ONLY_PUBLISHED", False):
             request = get_current_request()
             if request is not None:
                 if request.user.is_authenticated:
-                    print('user given')
                     return self
                 else:
                     return self.filter(published=True)
             else:
                 return self.filter(published=True)
-                print('user not specified')
         else:
             return self
                 #return self

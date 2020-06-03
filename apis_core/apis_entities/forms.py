@@ -57,6 +57,7 @@ def get_entities_form(entity):
                 'end_date_is_exact',
                 'text',
                 'source',
+                'published'
             ]
             exclude.extend(model.get_related_entity_field_names())
             exclude.extend(model.get_related_relationtype_field_names())
