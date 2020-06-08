@@ -345,6 +345,12 @@ class Collection(models.Model):
     )
     published = models.BooleanField(default=False)
 
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        instance = super().from_db(db, field_names, values)
+        instance._loaded_values = dict(zip(field_names, values))
+        return instance
+
     def __str__(self):
         return self.name
     
