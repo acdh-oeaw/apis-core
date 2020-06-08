@@ -355,10 +355,11 @@ class Collection(models.Model):
         return self.name
     
     def save(self, *args, **kwargs):
-        if self.published != self._loaded_values['published']:
-            for ent in self.tempentityclass_set.all():
-                ent.published = self.published
-                ent.save()
+        if hasattr(self, '_loaded_values'):
+            if self.published != self._loaded_values['published']:
+                for ent in self.tempentityclass_set.all():
+                    ent.published = self.published
+                    ent.save()
         super().save(*args, **kwargs)
 
 
