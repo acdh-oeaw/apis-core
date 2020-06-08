@@ -54,6 +54,8 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
                 else:
                     objects = rel.objects.filter(
                         Q(**dict_1) | Q(**dict_2))
+                    if callable(getattr(objects, 'filter_for_user', None)):
+                        objects = objects.filter_for_user()
             else:
                 if match[0].lower() == entity.lower():
                     title_card = match[1].title()
@@ -64,6 +66,8 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
                     objects = rel.objects.filter_ann_proj(request=request).filter_for_user().filter(**dict_1)
                 else:
                     objects = rel.objects.filter(**dict_1)
+                    if callable(getattr(objects, 'filter_for_user', None)):
+                        objects = objects.filter_for_user()
             tb_object = table(data=objects, prefix=prefix)
             tb_object_open = request.GET.get(prefix + 'page', None)
             RequestConfig(request, paginate={"per_page": 10}).configure(tb_object)

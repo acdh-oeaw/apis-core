@@ -54,7 +54,6 @@ class RelationPublishedQueryset(models.QuerySet):
                 return self.filter(published=True)
         else:
             return self
-                #return self
 
     def filter_ann_proj(self, request=None, ann_proj=1, include_all=True):
         """The filter function provided by the manager class.
@@ -80,14 +79,10 @@ class RelationPublishedQueryset(models.QuerySet):
 
 class BaseRelationManager(models.Manager):
     def get_queryset(self):
-        return RelationPublishedQueryset(self.model, using=self._db)
-        if getattr(settings, "APIS_SHOW_ONLY_PUBLISHED", False):
-            print('running base')
+        if hasattr(settings, "APIS_SHOW_ONLY_PUBLISHED") or "apis_highlighter" in getattr(settings, "INSTALLED_APPS"):
             return RelationPublishedQueryset(self.model, using=self._db)
         else:
-            print('no request object')
             return super().get_queryset()
-                #return super().get_queryset()
 
     def filter_ann_proj(self, request=None, ann_proj=1, include_all=True):
         return self.get_queryset().filter_ann_proj(request=request, ann_proj=ann_proj, include_all=include_all)

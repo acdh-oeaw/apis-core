@@ -2,67 +2,12 @@ from rest_framework.decorators import api_view, renderer_classes
 from rest_framework import response, schemas
 from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
 from apis_core.apis_entities.api_views import (
-    EventViewSet,
-    InstitutionViewSet,
     NetJsonViewSet,
-    PersonViewSet,
     PlaceGeoJsonViewSet,
-    PlaceViewSet,
-    WorkViewSet,
 )
 
-# from rest_framework_swagger.views import get_swagger_view
-# from entities.views2 import GenericEntitiesCreateStanbolView
-from apis_core.apis_metainfo.api_views import (
-    CollectionViewSet,
-    SourceSerializerViewSet,
-    TempEntityClassViewSet,
-    TextViewSet,
-    UriSerializerViewSet,
-)
-from apis_core.apis_relations.api_views import (
-    EventEventViewSet,
-    EventWorkViewSet,
-    InstitutionEventViewSet,
-    InstitutionInstitutionViewSet,
-    InstitutionPlaceViewSet,
-    InstitutionWorkViewSet,
-    PersonEventViewSet,
-    PersonInstitutionViewSet,
-    PersonPersonViewSet,
-    PersonPlaceViewSet,
-    PersonWorkViewSet,
-    PlaceEventViewSet,
-    PlacePlaceViewSet,
-    PlaceWorkViewSet,
-    WorkWorkViewSet,
-)
 from apis_core.apis_vocabularies.api_views import (
-    CollectionTypeViewSet,
-    EventEventRelationViewSet,
-    EventTypeViewSet,
-    EventWorkRelationViewSet,
-    InstitutionEventRelationViewSet,
-    InstitutionInstitutionRelationViewSet,
-    InstitutionPlaceRelationViewSet,
-    InstitutionTypeViewSet,
-    InstitutionWorkRelationViewSet,
-    PersonEventRelationViewSet,
-    PersonInstitutionRelationViewSet,
-    PersonPersonRelationViewSet,
-    PersonPlaceRelationViewSet,
-    PersonWorkRelationViewSet,
-    PlaceEventRelationViewSet,
-    PlacePlaceRelationViewSet,
-    PlaceTypeViewSet,
-    PlaceWorkRelationViewSet,
-    ProfessionTypeViewSet,
-    TextTypeViewSet,
     UserViewSet,
-    VocabNamesViewSet,
-    VocabsBaseClassViewSet,
-    WorkTypeViewSet,
-    WorkWorkRelationViewSet,
 )
 from django.conf import settings
 from django.urls import path
