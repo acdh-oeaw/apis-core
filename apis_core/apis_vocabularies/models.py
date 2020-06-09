@@ -48,7 +48,7 @@ class VocabsBaseClass(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return self.label
 
     def save(self, *args, **kwargs):
         d, created = VocabNames.objects.get_or_create(name=type(self).__name__)

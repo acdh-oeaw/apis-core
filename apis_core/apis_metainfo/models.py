@@ -371,6 +371,10 @@ class Text(models.Model):
     kind = models.ForeignKey(TextType, blank=True, null=True, on_delete=models.SET_NULL)
     text = models.TextField(blank=True)
     source = models.ForeignKey(Source, blank=True, null=True, on_delete=models.SET_NULL)
+    lang = models.CharField(
+        max_length=3, blank=True, null=True,
+        help_text="The ISO 639-3 (or 2) code for the label's language.",
+        verbose_name='ISO Code', default='deu')
 
     def __str__(self):
         if self.text != "":
