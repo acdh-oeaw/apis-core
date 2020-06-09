@@ -148,8 +148,7 @@ def generic_serializer_creation_factory():
         
         def get_queryset(self):
             if "apis_relations" in str(self.model):
-                if callable(getattr(self.model.objects, 'filter_for_user', None)):
-                    return self.model.objects.filter_for_user()
+                return self.model.objects.filter_for_user()
             return self.model.objects.all()
 
         filter_class = type(f"Generic{entity_str.title().replace(' ', '')}FilterClass", (ModelFilterSet,), {'Meta': Meta_filter})

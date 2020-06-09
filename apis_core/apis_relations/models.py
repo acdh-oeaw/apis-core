@@ -88,7 +88,10 @@ class BaseRelationManager(models.Manager):
         return self.get_queryset().filter_ann_proj(request=request, ann_proj=ann_proj, include_all=include_all)
 
     def filter_for_user(self):
-        return self.get_queryset().filter_for_user()
+        if hasattr(settings, "APIS_SHOW_ONLY_PUBLISHED") or "apis_highlighter" in getattr(settings, "INSTALLED_APPS"):
+            return self.get_queryset().filter_for_user()
+        else:
+            return self.get_queryset()
 
 #######################################################################
 #
