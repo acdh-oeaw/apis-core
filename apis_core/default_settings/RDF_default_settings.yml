@@ -88,7 +88,7 @@ Place:
         field name: lng
         data type: float
         regex:
-          - '([0-9\.]+)'
+          - '([\-0-9\.]+)'
           - 1
       lat-gnd:
         domain: d-nb.info
@@ -96,7 +96,7 @@ Place:
         field name: lat
         data type: float
         regex:
-          - \d\s\+([0-9\.]+)
+          - \d\s\+([\-0-9\.]+)
           - 1
 
     labels:
