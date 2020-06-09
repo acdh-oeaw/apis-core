@@ -75,7 +75,10 @@ class EntitySerializer(serializers.Serializer):
             res["{}s".format(mk2.group(1))] = []
             if mk2.group(1).lower() != mk.lower():
                 if self._only_published:
-                    rel_qs = getattr(obj, "{}_set".format(rel.model)).all().filter_for_user()
+                    if callable(getattr(rel.model_class().objects, 'filter_for_user', None)):
+                        rel_qs = getattr(obj, "{}_set".format(rel.model)).all().filter_for_user()
+                    else:
+                        rel_qs = getattr(obj, "{}_set".format(rel.model)).all()
                 else:
                     rel_qs = getattr(obj, "{}_set".format(rel.model)).all()
                 for rel2 in rel_qs:

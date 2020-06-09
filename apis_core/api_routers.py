@@ -49,17 +49,41 @@ class CustomPagination(pagination.LimitOffsetPagination):
 class LabelSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
     label = serializers.SerializerMethodField(method_name="add_label")
-    uri = serializers.SerializerMethodField(method_name="add_uri")
+    url = serializers.SerializerMethodField(method_name="add_uri")
 
     def add_uri(self, obj):
-        return reverse(
+        return self.context['view'].request.build_absolute_uri(reverse(
             "apis:apis_api:{}-detail".format(obj.__class__.__name__.lower()),
             kwargs={"pk": obj.pk},
-        )
+        ))
+
+    def add_label(self, obj):
+        return str(obj)
+    
+
+class RelatedObjectSerializer(serializers.Serializer):
+    id = serializers.ReadOnlyField()
+    url = serializers.SerializerMethodField(method_name="add_uri")
+    type = serializers.SerializerMethodField(method_name="add_type")
+    label = serializers.SerializerMethodField(method_name="add_label")
+
+    def add_uri(self, obj):
+        return self.context['view'].request.build_absolute_uri(reverse(
+            "apis:apis_api:{}-detail".format(obj.__class__.__name__.lower()),
+            kwargs={"pk": obj.pk},
+        ))
 
     def add_label(self, obj):
         return str(obj)
 
+    def add_type(self, obj):
+        lst_type = ['kind', 'type', 'collection_type']
+        lst_kind = [x for x in obj._meta.fields if x.name in lst_type and "apis_vocabularies" in str(x.related_model)]
+        if len(lst_kind):
+            pk_obj = getattr(obj, f"{lst_kind[0].name}_id")
+            if pk_obj is not None:
+                return self.context['view'].request.build_absolute_uri(reverse(f"apis:apis_api:{lst_kind[0].related_model.__name__.lower()}-detail", kwargs={"pk": pk_obj}))
+            
 
 def generic_serializer_creation_factory():
     for cont in ContentType.objects.filter(app_label__in=['apis_vocabularies', 'apis_metainfo', 'apis_entities', 'apis_relations', ]):
@@ -88,54 +112,24 @@ def generic_serializer_creation_factory():
             super(self.__class__, self).__init__(*args, **kwargs)
             entity_str = self._entity.__name__
             app_label = self._app_label
+            lst_labels_set = deep_get(
+                    getattr(settings, app_label.upper(), {}),
+                    "{}.labels".format(entity_str),
+                    [],
+                )
             for f in self._entity._meta.get_fields():
                 if getattr(settings, "APIS_API_EXCLUDE_SETS", False) and str(f.name).endswith('_set'):
                     if f.name in self.fields.keys():
                         self.fields.pop(f.name)
                     continue
+                ck_many = f.__class__.__name__ == 'ManyToManyField'
                 if f.name in self._exclude_lst:
                     continue
-                elif (
-                        f.__class__.__name__ == "ManyToManyField"
-                        and f.name
-                        in deep_get(
-                    getattr(settings, app_label.upper(), {}),
-                    "{}.labels".format(entity_str),
-                    [],
-                )
-                ):
-                    self.fields[f.name] = LabelSerializer(
-                        many=True, read_only=True
-                    )
-                elif f.__class__.__name__ == "ManyToManyField":
-                    self.fields[f.name] = serializers.HyperlinkedRelatedField(
-                        view_name="apis:apis_api:{}-detail".format(
-                            f.related_model.__name__.lower()
-                        ),
-                        queryset=f.related_model.objects.all(),
-                        many=True,
-                        allow_null=True,
-                    )
-                elif (
-                        f.__class__.__name__ == "ForeignKey"
-                        and f.name
-                        in deep_get(
-                    getattr(settings, app_label.upper(), {}),
-                    "{}.labels".format(entity_str),
-                    [],
-                )
-                ):
-                    self.fields[f.name] = LabelSerializer(read_only=True)
-    
-                elif f.__class__.__name__ == "ForeignKey":
-                    self.fields[f.name] = serializers.HyperlinkedRelatedField(
-                        view_name="apis:apis_api:{}-detail".format(
-                            f.related_model.__name__.lower()
-                        ),
-                        queryset=f.related_model.objects.all(),
-                        allow_null=True
-                    )
-    
+                elif f.__class__.__name__ in ["ManyToManyField", "ForeignKey"] and "apis_vocabularies" not in str(f.related_model):
+                    self.fields[f.name] = RelatedObjectSerializer(many=ck_many, read_only=True)
+                elif f.__class__.__name__ in ["ManyToManyField", "ForeignKey"]:
+                    self.fields[f.name] = LabelSerializer(many=ck_many, read_only=True)
+
         s_dict = {
             "id": serializers.ReadOnlyField(),
             "url": serializers.HyperlinkedIdentityField(
@@ -153,14 +147,10 @@ def generic_serializer_creation_factory():
             model = entity
         
         def get_queryset(self):
-            #qs = super(self.__class__, self).get_queryset()
-            print(dir(self.model))
             if "apis_relations" in str(self.model):
-                print('used filter_for_user')
-                return self.model.objects.filter_for_user()
-            else:
-                print('the other one')
-                return self.model.objects.all()
+                if callable(getattr(self.model.objects, 'filter_for_user', None)):
+                    return self.model.objects.filter_for_user()
+            return self.model.objects.all()
 
         filter_class = type(f"Generic{entity_str.title().replace(' ', '')}FilterClass", (ModelFilterSet,), {'Meta': Meta_filter})
         viewset_dict = {
