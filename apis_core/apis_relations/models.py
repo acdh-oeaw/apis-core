@@ -1,25 +1,15 @@
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
-#from reversion import revisions as reversion
-import reversion
-from django.db.models import Q
-import operator
-import pdb
 import inspect
 import sys
+
+# from reversion import revisions as reversion
+import reversion
 from crum import get_current_request
 from django.conf import settings
-from django.db.models.signals import post_save
-from django.dispatch import receiver
+from django.db import models
+from django.db.models import Q
 
-from apis_core.apis_entities.models import Person, Place, Institution, Event, Work
+from apis_core.apis_entities.models import Person
 from apis_core.apis_metainfo.models import TempEntityClass
-from apis_core.apis_vocabularies.models import (PersonPlaceRelation, PersonPersonRelation,
-    PersonInstitutionRelation, PersonEventRelation, PersonWorkRelation,
-    InstitutionInstitutionRelation, InstitutionPlaceRelation,
-    InstitutionEventRelation, PlacePlaceRelation, PlaceEventRelation,
-    PlaceWorkRelation, EventEventRelation, EventWorkRelation,
-    WorkWorkRelation, InstitutionWorkRelation)
 
 
 #######################################################################
@@ -79,10 +69,7 @@ class RelationPublishedQueryset(models.QuerySet):
 
 class BaseRelationManager(models.Manager):
     def get_queryset(self):
-        if hasattr(settings, "APIS_SHOW_ONLY_PUBLISHED") or "apis_highlighter" in getattr(settings, "INSTALLED_APPS"):
-            return RelationPublishedQueryset(self.model, using=self._db)
-        else:
-            return super().get_queryset()
+        return RelationPublishedQueryset(self.model, using=self._db)
 
     def filter_ann_proj(self, request=None, ann_proj=1, include_all=True):
         return self.get_queryset().filter_ann_proj(request=request, ann_proj=ann_proj, include_all=include_all)
