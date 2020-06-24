@@ -1,12 +1,26 @@
 import fnmatch
-import json
 import os
 import re
 from datetime import datetime
 from io import TextIOWrapper
 
 import requests
+from django.conf import settings
+from django.db.models import Q, Prefetch
+from django.http import Http404
+from django.shortcuts import redirect
+from django.urls import reverse
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, viewsets
+from rest_framework.decorators import api_view
 from rest_framework.generics import GenericAPIView
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import FileUploadParser
+from rest_framework.permissions import DjangoObjectPermissions
+from rest_framework.response import Response
+from rest_framework.reverse import reverse_lazy
+from rest_framework.settings import api_settings
+from rest_framework.views import APIView
 
 from apis_core.apis_metainfo.api_renderers import PaginatedCSVRenderer
 from apis_core.apis_metainfo.models import TempEntityClass, Uri
@@ -15,25 +29,8 @@ from apis_core.apis_vocabularies.models import VocabsBaseClass
 from apis_core.default_settings.NER_settings import autocomp_settings, stb_base
 from apis_core.helper_functions.RDFParser import RDFParser
 from apis_core.helper_functions.stanbolQueries import find_loc
-from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q, Prefetch
-from django.http import Http404
-from django.shortcuts import redirect
-from django.urls import reverse
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, generics, viewsets
-from rest_framework.decorators import api_view
-from rest_framework.exceptions import NotFound, bad_request
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.parsers import FileUploadParser
-from rest_framework.permissions import AllowAny, DjangoObjectPermissions
-from rest_framework.response import Response
-from rest_framework.reverse import reverse_lazy
-from rest_framework.settings import api_settings
-from rest_framework.views import APIView
-
-from .api_renderers import EntityToCIDOC, EntityToTEI
+from .api_renderers import EntityToTEI, EntityToCIDOCXML, EntityToProsopogrAPhI, EntityToCIDOCN3, EntityToCIDOCNQUADS, \
+    EntityToCIDOCTURTLE
 from .models import Event, Institution, Person, Place, Work, AbstractEntity
 from .serializers import (
     EventSerializer,
@@ -48,9 +45,8 @@ from .serializers import (
 )
 from .serializers_generic import EntitySerializer
 
-# from metainfo.models import TempEntityClass
 
-from . api_renderers import EntityToTEI, EntityToCIDOCXML, EntityToProsopogrAPhI, EntityToCIDOCN3, EntityToCIDOCNQUADS, EntityToCIDOCTURTLE
+# from metainfo.models import TempEntityClass
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 25
@@ -81,7 +77,6 @@ class GetEntityGeneric(GenericAPIView):
         ent = self.get_object(pk)
         res = EntitySerializer(ent, context={"request": request})
         return Response(res.data)
-
 
 @api_view(["GET"])
 def uri_resolver(request):
@@ -438,7 +433,7 @@ class GetRelatedPlaces(APIView):
         relation_types = request.query_params.get("relation_types", None)
         place_pk = dict()
         res = []
-        p = PersonPlace.objects.select_related('related_place').filter(related_person_id=person_pk)
+        p = PersonPlace.objects.select_related('related_place').filter(related_person_id=person_pk).filter_for_user()
         for pp in p:
             if pp.related_place_id not in place_pk:
                 res.append((pp.related_place, [(pp.relation_type, pp.start_date, pp.end_date)]))
