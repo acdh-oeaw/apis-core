@@ -1,6 +1,7 @@
 import time
 
 from django.test import TestCase
+
 from apis_core.apis_relations.models import PersonPlace, InstitutionPlace
 from apis_core.helper_functions.RDFParser import RDFParser
 
@@ -24,30 +25,30 @@ class RDFPlaceParserNewTestCase(TestCase):
 
 
 
-    def test_parse_person(self):
-        o = RDFParser('http://d-nb.info/gnd/118650130', 'Person', uri_check=False)
-        o.create_objct()
-        print(o._foreign_keys)
-        print(o.objct)
-        print(o._attributes)
-        print(o.objct.name)
-        print(o._foreign_keys)
-        self.assertEqual(o.objct.name, 'Aristoteles')
-        o2 = o.save()
-        print(o2)
-        o3 = RDFParser('http://d-nb.info/gnd/118566512', 'Person', uri_check=False)
-        o3.create_objct()
-        print(o3._foreign_keys)
-        print(o3.objct)
-        print(o3._attributes)
-        print(f"name: {o3.objct.name}, {o3.objct.first_name}")
-        print(o3._foreign_keys)
-        self.assertEqual(o3.objct.name, 'Kreisky')
-        self.assertEqual(o3.objct.start_date_written, '1911-01-22')
-        o4 = o3.save()
-        print(o4)
-        print(o4.profession.all())
-        print(o4.start_date)
+    #def test_parse_person(self):
+     #   o = RDFParser('http://d-nb.info/gnd/118650130', 'Person', uri_check=False)
+      #  o.create_objct()
+       # print(o._foreign_keys)
+        #print(o.objct)
+       # print(o._attributes)
+       # print(o.objct.name)
+       # print(o._foreign_keys)
+       # self.assertEqual(o.objct.name, 'Aristoteles')
+       # o2 = o.save()
+       # print(o2)
+       # o3 = RDFParser('http://d-nb.info/gnd/118566512', 'Person', uri_check=False)
+       # o3.create_objct()
+       # print(o3._foreign_keys)
+       # print(o3.objct)
+       # print(o3._attributes)
+       # print(f"name: {o3.objct.name}, {o3.objct.first_name}")
+       # print(o3._foreign_keys)
+       # self.assertEqual(o3.objct.name, 'Kreisky')
+       # self.assertEqual(o3.objct.start_date_written, '1911-01-22')
+       # o4 = o3.save()
+       # print(o4)
+       # print(o4.profession.all())
+       # print(o4.start_date)
 
     def test_merge(self):
         o = RDFParser('http://d-nb.info/gnd/118566512', 'Person', uri_check=False)

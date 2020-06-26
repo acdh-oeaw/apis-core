@@ -2,67 +2,12 @@ from rest_framework.decorators import api_view, renderer_classes
 from rest_framework import response, schemas
 from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
 from apis_core.apis_entities.api_views import (
-    EventViewSet,
-    InstitutionViewSet,
     NetJsonViewSet,
-    PersonViewSet,
     PlaceGeoJsonViewSet,
-    PlaceViewSet,
-    PassageViewSet,
 )
 
-# from rest_framework_swagger.views import get_swagger_view
-# from entities.views2 import GenericEntitiesCreateStanbolView
-from apis_core.apis_metainfo.api_views import (
-    CollectionViewSet,
-    SourceSerializerViewSet,
-    TempEntityClassViewSet,
-    TextViewSet,
-    UriSerializerViewSet,
-)
-from apis_core.apis_relations.api_views import (
-    EventEventViewSet,
-    EventPassageViewSet,
-    InstitutionEventViewSet,
-    InstitutionInstitutionViewSet,
-    InstitutionPlaceViewSet,
-    InstitutionPassageViewSet,
-    PersonEventViewSet,
-    PersonInstitutionViewSet,
-    PersonPersonViewSet,
-    PersonPlaceViewSet,
-    PersonPassageViewSet,
-    PlaceEventViewSet,
-    PlacePlaceViewSet,
-    PlacePassageViewSet,
-    PassagePassageViewSet,
-)
 from apis_core.apis_vocabularies.api_views import (
-    CollectionTypeViewSet,
-    EventEventRelationViewSet,
-    EventTypeViewSet,
-    EventPassageRelationViewSet,
-    InstitutionEventRelationViewSet,
-    InstitutionInstitutionRelationViewSet,
-    InstitutionPlaceRelationViewSet,
-    InstitutionTypeViewSet,
-    InstitutionPassageRelationViewSet,
-    PersonEventRelationViewSet,
-    PersonInstitutionRelationViewSet,
-    PersonPersonRelationViewSet,
-    PersonPlaceRelationViewSet,
-    PersonPassageRelationViewSet,
-    PlaceEventRelationViewSet,
-    PlacePlaceRelationViewSet,
-    PlaceTypeViewSet,
-    PlacePassageRelationViewSet,
-    ProfessionTypeViewSet,
-    TextTypeViewSet,
     UserViewSet,
-    VocabNamesViewSet,
-    VocabsBaseClassViewSet,
-    PassageTypeViewSet,
-    PassagePassageRelationViewSet,
 )
 from django.conf import settings
 from django.urls import path
@@ -73,8 +18,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.views.static import serve
 from rest_framework import routers
 from rest_framework.schemas import get_schema_view
-from .api_routers import create_generic_api_viewset
 from rest_framework_swagger.views import get_swagger_view
+from apis_core.api_routers import views
 
 app_name = "apis_core"
 
@@ -85,9 +30,8 @@ for app_label in ["entities", "metainfo", "vocabularies", "relations"]:
         try:
             router.register(
                 r"{}/{}".format(app_label, name.lower()),
-                create_generic_api_viewset(
-                    entity=name, app_label="apis_{}".format(app_label)
-                ),
+                views[f"{str(ent.model).lower().replace(' ', '')}"],
+                name.lower(),
             )
         except Exception as e:
             print("{} not found, skipping".format(name.lower()))
@@ -131,12 +75,12 @@ from drf_yasg import openapi
 
 schema_view2 = get_schema_view2(
    openapi.Info(
-      title="Snippets API",
+      title="APIS API",
       default_version='v1',
-      description="Test description",
-      terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="contact@snippets.local"),
-      license=openapi.License(name="BSD License"),
+      description="Hyperlinked API of the APIS Framework",
+      #terms_of_service="https://www.google.com/policies/terms/",
+      contact=openapi.Contact(email="matthias.schloegl@oeaw.ac.at"),
+      license=openapi.License(name="MIT"),
    ),
    public=True,
    permission_classes=(permissions.AllowAny,),
@@ -200,6 +144,7 @@ if "apis_highlighter" in settings.INSTALLED_APPS:
     )
 
 if "apis_fulltext_download" in settings.INSTALLED_APPS:
+
     urlpatterns.append(
         url(
             r"fulltext_download/",

@@ -26,7 +26,7 @@ from apis_core.helper_functions import DateParser
 from .tables import get_generic_relations_table
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
-    from apis_highlighter.models import Annotation
+    from apis_highlighter.models import Annotation, AnnotationProject
 
 
 def validate_target_autocomplete(value):
@@ -38,6 +38,8 @@ def validate_target_autocomplete(value):
             sett = yaml.load(open(APIS_RDF_URI_SETTINGS, 'r'))
             regx = [x['regex'] for x in sett['mappings']]
             regx.append('http.*oeaw\.ac\.at')
+            for k, v in getattr(settings, 'APIS_AC_INSTANCES', {}).items():
+                regx.append(v['url'].replace('.', '\.'))
             for r in regx:
                 if re.match(r, value):
                     test = True
@@ -94,6 +96,9 @@ class GenericRelationForm(forms.ModelForm):
         if not t1:
             t1 = RDFParser(cd['target'], self.rel_accessor[0]).get_or_create()
         setattr(x, self.rel_accessor[2], t1)
+        if self.highlighter:
+            an_proj = AnnotationProject.objects.get(pk=int(self.request.session.get('annotation_project', 1)))
+            x.published = an_proj.published
         if commit:
             x.save()
         if self.highlighter:
@@ -127,7 +132,7 @@ class GenericRelationForm(forms.ModelForm):
             dic_a = {'related_'+entity_type.lower()+'A': site_instance}
             dic_b = {'related_' + entity_type.lower() + 'B': site_instance}
             if 'apis_highlighter' in settings.INSTALLED_APPS:
-                objects = self.relation_form.annotation_links.filter_ann_proj(request=request).filter(
+                objects = self.relation_form.objects.filter_ann_proj(request=request).filter(
                     Q(**dic_a) | Q(**dic_b)
                 )
             else:
@@ -139,7 +144,7 @@ class GenericRelationForm(forms.ModelForm):
         else:
             tab_query = {'related_'+entity_type.lower(): site_instance}
             if 'apis_highlighter' in settings.INSTALLED_APPS:
-                ttab = self.relation_form.annotation_links.filter_ann_proj(
+                ttab = self.relation_form.objects.filter_ann_proj(
                     request=request).filter(**tab_query)
             else:
                 ttab = self.relation_form.objects.filter(**tab_query)

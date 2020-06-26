@@ -1,12 +1,12 @@
 import django_filters
 from dal import autocomplete
-from django.forms import ModelMultipleChoiceField
-from django.urls import reverse
-
-from .models import Person, Place, Institution, Event, Passage, AbstractRelation
-from django.db.models import Q
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
+from django.urls import reverse
+
+from .models import AbstractRelation
+
 
 # TODO __sresch__ : Change this whole module according to the same logic as in apis_core/apis_entities/filters.py
 

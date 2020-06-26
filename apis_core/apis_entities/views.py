@@ -273,7 +273,8 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
 ############################################################################
 ############################################################################
 
-@login_required
+
+@user_passes_test(access_for_all_function)
 def getGeoJson(request):
     '''Used to retrieve GeoJsons for single objects'''
     # if request.is_ajax():
@@ -334,7 +335,7 @@ def getGeoJson(request):
     return HttpResponse(json.dumps(lst_json), content_type='application/json')
 
 
-@login_required
+@user_passes_test(access_for_all_function)
 def getGeoJsonList(request):
     '''Used to retrieve a list of GeoJsons. To generate the list the kind of connection
     and the connected entity is needed'''
@@ -361,7 +362,7 @@ def getGeoJsonList(request):
     return HttpResponse(json.dumps(lst_json), content_type='application/json')
 
 
-@login_required
+@user_passes_test(access_for_all_function)
 def getNetJsonList(request):
     '''Used to retrieve a Json to draw a network'''
     relation = AbstractRelation.get_relation_class_of_name('PersonPlace')
@@ -399,7 +400,7 @@ def getNetJsonList(request):
     return HttpResponse(json.dumps(lst_json), content_type='application/json')
 
 
-@login_required
+@user_passes_test(access_for_all_function)
 def getNetJsonListInstitution(request):
     '''Used to retrieve a Json to draw a network'''
     relation = AbstractRelation.get_relation_class_of_name('PersonInstitution')
@@ -473,22 +474,22 @@ def resolve_ambigue_person(request):
 ############################################################################
 ############################################################################
 
-@login_required
+@user_passes_test(access_for_all_function)
 def birth_death_map(request):
     return render(request, 'apis_entities/map_list.html')
 
 
-@login_required
+@user_passes_test(access_for_all_function)
 def pers_place_netw(request):
     return render(request, 'apis_entities/network.html')
 
 
-@login_required
+@user_passes_test(access_for_all_function)
 def pers_inst_netw(request):
     return render(request, 'apis_entities/network_institution.html')
 
 
-@login_required
+@user_passes_test(access_for_all_function)
 def generic_network_viz(request):
     if request.method == 'GET':
         form = NetworkVizFilterForm()

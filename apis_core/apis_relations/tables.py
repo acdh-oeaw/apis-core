@@ -219,18 +219,24 @@ def get_generic_relations_table(relation_class, entity_instance, detail=None):
                 # guarantees that the other related entity is always correctly picked,
                 # even in case two entities are of the same class.
                 other_relation_type=Case(
-                    When(**{
-                        # A->B relation and current entity instance is A, hence take forward name
-                        related_entity_field_name_a + "__pk": entity_instance.pk,
-                        "then": "relation_type__name"
-                    }),
-                    When(**{
-                        # A->B relation and current entity instance is B, hence take reverse name.
-                        related_entity_field_name_b + "__pk": entity_instance.pk,
-                        "then": "relation_type__name_reverse"
-                    }),
-                )
+                When(**{
+                    # A->B relation and current entity instance is A, hence take forward name
+                    related_entity_field_name_a + "__pk": entity_instance.pk,
+                    "then": "relation_type__name"
+                }),
+                When(**{
+                    # A->B relation and current entity instance is B, hence take reverse name.
+                    related_entity_field_name_b + "__pk": entity_instance.pk,
+                    "then": "relation_type__name_reverse"
+                }),
             )
+            )
+            for an in data:
+                if getattr(an, f"{related_entity_field_name_a}_id") == entity_instance.pk:
+                    an.other_relation_type = getattr(an.relation_type, "label")
+                else:
+                    an.other_relation_type = getattr(an.relation_type, "label_reverse")
+
 
             super().__init__(data, *args, **kwargs)
 

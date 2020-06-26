@@ -30,6 +30,12 @@ class EntityUriSerializer(serializers.Serializer):
     uri = serializers.URLField()
 
 
+class TextSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    kind = VocabsSerializer()
+    text = serializers.CharField()
+
+
 class EntitySerializer(serializers.Serializer):
     id = serializers.IntegerField()
     url = serializers.SerializerMethodField(method_name="add_url")
@@ -68,7 +74,11 @@ class EntitySerializer(serializers.Serializer):
                 reverse = True
             res["{}s".format(mk2.group(1))] = []
             if mk2.group(1).lower() != mk.lower():
-                for rel2 in getattr(obj, "{}_set".format(rel.model)).all():
+                if self._only_published:
+                    rel_qs = getattr(obj, "{}_set".format(rel.model)).all().filter_for_user()
+                else:
+                    rel_qs = getattr(obj, "{}_set".format(rel.model)).all()
+                for rel2 in rel_qs:
                     res["{}s".format(mk2.group(1))].append(
                         RelationEntitySerializer(
                             rel2, own_class=mk, read_only=True, context=self.context, reverse=reverse
@@ -78,7 +88,7 @@ class EntitySerializer(serializers.Serializer):
                 for t in ["A", "B"]:
                     for rel2 in getattr(
                         obj, "related_{}{}".format(mk.lower(), t)
-                    ).all():
+                    ).all().filter_for_user():
                         if t == "A":
                             ok = "{}B".format(mk.lower())
                             reverse = True
@@ -99,8 +109,9 @@ class EntitySerializer(serializers.Serializer):
         url = f"{base_uri}{reverse('GetEntityGenericRoot', kwargs={'pk': obj.pk})}"
         return url
 
-    def __init__(self, *args, depth_ent=1, **kwargs):
+    def __init__(self, *args, depth_ent=1, only_published=True, add_texts=False, **kwargs):
         super(EntitySerializer, self).__init__(*args, **kwargs)
+        self._only_published = only_published
         if type(self.instance) == QuerySet:
             inst = self.instance[0]
         else:
@@ -135,10 +146,16 @@ class EntitySerializer(serializers.Serializer):
             self.fields["relations"] = serializers.SerializerMethodField(
                 method_name="add_relations"
             )
+        if add_texts:
+            self.fields["text"] = TextSerializer(many=True)
 
 
 class RelationEntitySerializer(serializers.Serializer):
     id = serializers.IntegerField()
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
+    start_date_written = serializers.DateField()
+    end_date_written = serializers.DateField()
     relation_type = serializers.SerializerMethodField(method_name="add_relation_label")
     annotation = serializers.SerializerMethodField(method_name="add_annotations")
     revisions = serializers.SerializerMethodField(method_name="add_revisions")
@@ -194,6 +211,7 @@ class RelationEntitySerializer(serializers.Serializer):
     def add_relation_label(self, obj):
         cm = obj.__class__.__name__
         res_1 = dict()
+        res_1["id"] = obj.relation_type.pk
         res_1["url"] = f"{base_uri}{reverse('apis_core:apis_api:{}relation-detail'.format(cm).lower(), kwargs={'pk': obj.relation_type.pk},)}"
         if self.reverse and len(obj.relation_type.label_reverse) > 0:
             res_1["label"] = obj.relation_type.label_reverse

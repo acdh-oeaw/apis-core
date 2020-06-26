@@ -79,6 +79,7 @@ class TempEntityClass(models.Model):
     )
     references = models.TextField(blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
+    published = models.BooleanField(default=False)
     objects = models.Manager()
     objects_inheritance = InheritanceManager()
 
@@ -434,9 +435,24 @@ class Collection(models.Model):
     parent_class = models.ForeignKey(
         "self", blank=True, null=True, on_delete=models.CASCADE
     )
+    published = models.BooleanField(default=False)
+
+    @classmethod
+    def from_db(cls, db, field_names, values):
+        instance = super().from_db(db, field_names, values)
+        instance._loaded_values = dict(zip(field_names, values))
+        return instance
 
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        if hasattr(self, '_loaded_values'):
+            if self.published != self._loaded_values['published']:
+                for ent in self.tempentityclass_set.all():
+                    ent.published = self.published
+                    ent.save()
+        super().save(*args, **kwargs)
 
 
 @reversion.register()
@@ -447,6 +463,10 @@ class Text(models.Model):
     kind = models.ForeignKey(TextType, blank=True, null=True, on_delete=models.SET_NULL)
     text = models.TextField(blank=True)
     source = models.ForeignKey(Source, blank=True, null=True, on_delete=models.SET_NULL)
+    lang = models.CharField(
+        max_length=3, blank=True, null=True,
+        help_text="The ISO 639-3 (or 2) code for the label's language.",
+        verbose_name='ISO Code', default='deu')
 
     def __str__(self):
         if self.text != "":
@@ -559,3 +579,5 @@ class UriCandidate(models.Model):
 #def remove_default_uri(sender, instance, **kwargs):
 #    if Uri.objects.filter(entity=instance.entity).count() > 1:
 #        Uri.objects.filter(entity=instance.entity, domain="apis default").delete()
+
+

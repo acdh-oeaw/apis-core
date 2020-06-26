@@ -1,21 +1,15 @@
-from django.contrib.contenttypes.models import ContentType
-from django.db import models
-#from reversion import revisions as reversion
-import reversion
-from django.db.models import Q
-import operator
-import pdb
 import inspect
 import sys
 
-from apis_core.apis_entities.models import Person, Place, Institution, Event, Passage, Publication
+# from reversion import revisions as reversion
+import reversion
+from crum import get_current_request
+from django.conf import settings
+from django.db import models
+from django.db.models import Q
+
+from apis_core.apis_entities.models import Person
 from apis_core.apis_metainfo.models import TempEntityClass
-from apis_core.apis_vocabularies.models import (PersonPersonRelation, PersonPlaceRelation,
-    PersonInstitutionRelation, PersonEventRelation, PersonPassageRelation, PersonPublicationRelation,
-    InstitutionInstitutionRelation, InstitutionEventRelation, InstitutionPlaceRelation,
-    InstitutionPassageRelation, InstitutionPublicationRelation, PlacePlaceRelation, PlaceEventRelation,
-    PlacePassageRelation, PlacePublicationRelation, EventEventRelation, EventPassageRelation,
-    EventPublicationRelation, PassagePassageRelation, PassagePublicationRelation, PublicationPublicationRelation)
 
 
 #######################################################################
@@ -24,20 +18,33 @@ from apis_core.apis_vocabularies.models import (PersonPersonRelation, PersonPlac
 #
 #######################################################################
 
+def find_if_user_accepted():
+    request = get_current_request()
+    if request is not None:
+        print('running through request')
+        if request.user.is_authenticated:
+            print('authenticated')
+            return {}
+        else:
+            return {'published': True}
+    else:
+        return {}
 
-class AnnotationRelationLinkManager(models.Manager):
-    """Manager used to retrieve only those relations that are highlighted in the texts.
-    Reads out the ``annotation_project`` and ``users_show_highlighter`` session variables and provides a filter.
-    Needs a :class:`django.request` object in order to read out the ``session`` variable.
 
-    *Example:*
-    ::
+class RelationPublishedQueryset(models.QuerySet):
+    def filter_for_user(self, *args, **kwargs):
+        if getattr(settings, "APIS_SHOW_ONLY_PUBLISHED", False):
+            request = get_current_request()
+            if request is not None:
+                if request.user.is_authenticated:
+                    return self
+                else:
+                    return self.filter(published=True)
+            else:
+                return self.filter(published=True)
+        else:
+            return self
 
-        relation = PersonPlace.objects.filter(related_place='Wien').filter_ann_project(request=request)
-
-    Returns only those relations that are connected with an annotation that fits the session variables or are not
-    connected to any annotation at all.
-    """
     def filter_ann_proj(self, request=None, ann_proj=1, include_all=True):
         """The filter function provided by the manager class.
 
@@ -45,20 +52,33 @@ class AnnotationRelationLinkManager(models.Manager):
         :return: queryset that contains only objects that are shown in the highlighted text or those not connected
             to an annotation at all.
         """
+        qs = self
         users_show = None
         if request:
-            ann_proj = request.session.get('annotation_project', 1)
+            ann_proj = request.session.get('annotation_project', False)
             if not ann_proj:
-                ann_proj = 1
+                return qs
             users_show = request.session.get('users_show_highlighter', None)
         query = Q(annotation__annotation_project_id=ann_proj)
-        qs = super(AnnotationRelationLinkManager, self).get_queryset()
         if users_show is not None:
             query.add(Q(annotation__user_added_id__in=users_show), Q.AND)
         if include_all:
             query.add(Q(annotation__annotation_project__isnull=True), Q.OR)
         return qs.filter(query)
 
+
+class BaseRelationManager(models.Manager):
+    def get_queryset(self):
+        return RelationPublishedQueryset(self.model, using=self._db)
+
+    def filter_ann_proj(self, request=None, ann_proj=1, include_all=True):
+        return self.get_queryset().filter_ann_proj(request=request, ann_proj=ann_proj, include_all=include_all)
+
+    def filter_for_user(self):
+        if hasattr(settings, "APIS_SHOW_ONLY_PUBLISHED") or "apis_highlighter" in getattr(settings, "INSTALLED_APPS"):
+            return self.get_queryset().filter_for_user()
+        else:
+            return self.get_queryset()
 
 #######################################################################
 #
@@ -72,11 +92,13 @@ class AbstractRelation(TempEntityClass):
     Abstract super class which encapsulates common logic between the different relations and provides various methods
     relating to either all or specific relations.
     """
+    objects = BaseRelationManager()
 
-    annotation_links = AnnotationRelationLinkManager()
+    #annotation_links = AnnotationRelationLinkManager()
 
     class Meta:
         abstract = True
+        default_manager_name = 'objects'
 
 
 
@@ -176,11 +198,13 @@ class AbstractRelation(TempEntityClass):
             # using python's reflective logic, the following loop iterates over all classes of this current module.
             for relation_name, relation_class in inspect.getmembers(
                     sys.modules[__name__], inspect.isclass):
-
+                print('inspecting classes')
                 # check for python classes not to be used.
                 if \
                         relation_class.__module__ == "apis_core.apis_relations.models" and \
                         relation_class.__name__ != "AnnotationRelationLinkManager" and \
+                        relation_class.__name__ != "BaseRelationManager" and \
+                        relation_class.__name__ != "RelationPublishedQueryset" and \
                         relation_class.__name__ != "AbstractRelation":
 
                     relation_classes.append(relation_class)

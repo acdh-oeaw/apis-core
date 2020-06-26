@@ -123,7 +123,15 @@ class Command(BaseCommand):
             action='store_true',
             dest='include-vocabs',
             default=False,
-            help='Set if xou want to include the vocabs in the entities graph (Boolean, Default: False).',
+            help='Set if you want to include the vocabs in the entities graph (Boolean, Default: False).',
+        )
+
+        parser.add_argument(
+            '--only-published',
+            action='store_true',
+            dest='only-published',
+            default=False,
+            help='Set if you want to include published relations only. (Boolean, Default: False).',
         )
 
     def handle(self, *args, **options):
@@ -139,7 +147,7 @@ class Command(BaseCommand):
             while (cnt * 1000) < objcts.count():
                 r = []
                 for e in objcts[1000*cnt:(1000*cnt+1000)]:
-                    r.append(EntitySerializer(e).data)
+                    r.append(EntitySerializer(e, only_published=options['only-published']).data)
                 with open(f'serializer_cache/{cnt}.pkl', 'wb') as out:
                     pickle.dump(r, out)
                     self.stdout.write(self.style.NOTICE(f'Pickle written to: serializer_cache/{cnt}.pkl'))
@@ -147,7 +155,7 @@ class Command(BaseCommand):
             res = '/home/sennierer/projects/apis-webpage-base/serializer_cache'
         elif not options['use-cache']:
             for e in objcts:
-                res.append(EntitySerializer(e).data)
+                res.append(EntitySerializer(e, only_published=options['only-published']).data)
         elif options['use-cache']:
             self.stdout.write(self.style.NOTICE('using cache for serializing'))
             res = '/home/sennierer/projects/apis-webpage-base/serializer_cache'
