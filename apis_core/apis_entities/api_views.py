@@ -32,7 +32,7 @@ from apis_core.helper_functions.RDFParser import RDFParser
 from apis_core.helper_functions.stanbolQueries import find_loc
 from .api_renderers import EntityToTEI, EntityToCIDOCXML, EntityToProsopogrAPhI, EntityToCIDOCN3, EntityToCIDOCNQUADS, \
     EntityToCIDOCTURTLE
-from .models import Event, Institution, Person, Place, Work, AbstractEntity
+from .models import Event, Institution, Person, Place, Passage, AbstractEntity
 from .serializers import (
     EventSerializer,
     GeoJsonSerializer,
@@ -41,7 +41,7 @@ from .serializers import (
     NetJsonNodeSerializer,
     PersonSerializer,
     PlaceSerializer,
-    WorkSerializer,
+    PassageSerializer,
     GeoJsonSerializerTheme
 )
 from .serializers_generic import EntitySerializer
