@@ -1,17 +1,19 @@
-from django.core.management.base import BaseCommand, CommandError
-from apis_core.apis_entities.models import Person, AbstractEntity
-from django.contrib.contenttypes.models import ContentType
-from apis_core.apis_entities.serializers_generic import EntitySerializer
-from apis_core.apis_entities.api_renderers import EntityToCIDOC
-from apis_core.apis_vocabularies.serializers import GenericVocabsSerializer
-from apis_core.apis_vocabularies.api_renderers import VocabToSkos
 import json
 import pickle
-from django.conf import settings
+
 import requests
+from SPARQLWrapper import SPARQLWrapper, POST, BASIC, JSON
+from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.core.management.base import BaseCommand
 from rdflib import Graph
 from rdflib.plugins.memory import IOMemory
-from SPARQLWrapper import SPARQLWrapper, POST, BASIC, JSON
+
+from apis_core.apis_entities.api_renderers import EntityToCIDOC
+from apis_core.apis_entities.models import AbstractEntity
+from apis_core.apis_entities.serializers_generic import EntitySerializer
+from apis_core.apis_vocabularies.api_renderers import VocabToSkos
+from apis_core.apis_vocabularies.serializers import GenericVocabsSerializer
 
 map_ct = {
     'trig': ('application/x-trig', 'trig'),
@@ -152,13 +154,13 @@ class Command(BaseCommand):
                     pickle.dump(r, out)
                     self.stdout.write(self.style.NOTICE(f'Pickle written to: serializer_cache/{cnt}.pkl'))
                 cnt += 1
-            res = '/home/sennierer/projects/apis-webpage-base/serializer_cache'
+            res = 'serializer_cache'
         elif not options['use-cache']:
             for e in objcts:
                 res.append(EntitySerializer(e, only_published=options['only-published']).data)
         elif options['use-cache']:
             self.stdout.write(self.style.NOTICE('using cache for serializing'))
-            res = '/home/sennierer/projects/apis-webpage-base/serializer_cache'
+            res = 'serializer_cache'
         self.stdout.write(self.style.SUCCESS(f'serialized {len(res)} objects'))
         self.stdout.write(self.style.NOTICE('Starting to create the graph'))
         store = IOMemory()
