@@ -24,8 +24,8 @@ from rest_framework.views import APIView
 
 from apis_core.apis_metainfo.api_renderers import PaginatedCSVRenderer
 from apis_core.apis_metainfo.models import TempEntityClass, Uri
-from apis_core.apis_relations.models import PersonPlace, InstitutionPlace, AbstractRelation
-from apis_core.apis_vocabularies.models import VocabsBaseClass
+from apis_core.apis_relations.models import PersonPlace, InstitutionPlace, AbstractRelation, PersonInstitution
+from apis_core.apis_vocabularies.models import VocabsBaseClass, PersonPlaceRelation
 from apis_core.default_settings.NER_settings import autocomp_settings, stb_base
 from apis_core.helper_functions.RDFParser import RDFParser
 from apis_core.helper_functions.stanbolQueries import find_loc
@@ -41,7 +41,7 @@ from .serializers import (
     PersonSerializer,
     PlaceSerializer,
     WorkSerializer,
-    GeoJsonSerializerTheme
+    GeoJsonSerializerTheme, LifePathSerializer
 )
 from .serializers_generic import EntitySerializer
 
@@ -442,3 +442,29 @@ class GetRelatedPlaces(APIView):
                 res[place_pk[pp.related_place_id]][1].append((pp.relation_type, pp.start_date, pp.end_date))
         res = GeoJsonSerializerTheme(res, many=True)
         return Response(res.data)
+
+
+class LifePathViewset(APIView):
+
+    def get(self, request, pk):
+        b_rel = PersonPlaceRelation.objects.get(name=getattr(settings, 'BIRTH_REL_NAME', ''))
+        d_rel = PersonPlaceRelation.objects.get(name=getattr(settings, 'DEATH_REL_NAME', ''))
+        pb_pd = [b_rel.pk, d_rel.pk]
+        #pb_pd = list(PersonPlaceRelation.objects.filter(name__in=[b_rel, d_rel]).values_list('pk', flat=True))
+        lst_inst = list(PersonInstitution.objects.filter(Q(related_person_id=pk), Q(start_date__isnull=False)|Q(end_date__isnull=False)))
+        lst_place = list(PersonPlace.objects.filter(Q(related_person_id=pk), Q(start_date__isnull=False)|Q(end_date__isnull=False)|Q(relation_type_id__in=pb_pd)))
+        comb_lst = lst_inst + lst_place
+        p1 = Person.objects.get(pk=pk)
+        if p1.start_date:
+            for e in comb_lst:
+                if e.relation_type_id == b_rel.pk:
+                    e.start_date = p1.start_date
+        if p1.end_date:
+            for e in comb_lst:
+                if e.relation_type_id == d_rel.pk:
+                    e.start_date = p1.end_date
+        data = LifePathSerializer(comb_lst, many=True).data
+        data = [d for d in data if d is not None]
+        data = sorted(data, key = lambda i: i['year'])
+
+        return Response(data)

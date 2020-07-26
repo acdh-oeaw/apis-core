@@ -1,7 +1,12 @@
+import re
+
+from django.conf import settings
 from django.urls import reverse_lazy
 from rest_framework import serializers
+
 from .models import Institution, Person, Place, Event, Work
-import re
+from ..apis_relations.models import PersonInstitution, InstitutionPlace, PersonPlace
+from ..apis_vocabularies.models import RelationBaseClass
 
 
 class BaseEntitySerializer(serializers.HyperlinkedModelSerializer):
@@ -258,3 +263,57 @@ class NetJsonNodeSerializer(serializers.BaseSerializer):
             if obj.gender:
                 r['data']['gender'] = obj.gender
         return r
+
+class LifePathPlaceSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
+    name = serializers.CharField()
+    lat = serializers.FloatField()
+    long = serializers.FloatField(source='lng')
+
+    class Meta:
+        fields = ['id', 'name', 'lat', 'long']
+        model = Place
+
+
+class LifePathSerializer(serializers.BaseSerializer):
+    place = serializers.SerializerMethodField(method_name='get_place')
+    year = serializers.SerializerMethodField(method_name='get_year')
+    relation_type = serializers.CharField(source='relation_type__name')
+
+    def get_place(self, obj):
+        if isinstance(obj, PersonInstitution):
+            inst = obj.related_institution
+            rel_type = getattr(settings, 'APIS_LOCATED_IN_ATTR', 'located in')
+            plc = InstitutionPlace.objects.filter(relation_type__name=rel_type, related_institution=inst)
+            if plc.count() == 1:
+                plc = plc.first().related_place
+                if plc.lng and plc.lat:
+                    return LifePathPlaceSerializer(plc).data
+        elif isinstance(obj, PersonPlace):
+            plc = obj.related_place
+            if plc.lat and plc.lng:
+                return LifePathPlaceSerializer(plc).data
+
+    def get_year(self, obj):
+        if not obj.start_date and not obj.end_date:
+            return None
+        if obj.start_date and obj.end_date:
+            start = int(obj.start_date.strftime("%Y"))
+            end = int(obj.end_date.strftime("%Y"))
+            return int((start + end) / 2)
+        elif obj.start_date:
+            return int(obj.start_date.strftime("%Y"))
+        elif obj.end_date:
+            return int(obj.end_date.strftime("%Y"))
+
+    def to_representation(self, instance):
+        p = self.get_place(instance)
+        if p is None:
+            return None
+        res = {
+            'coords': [p['lat'], p['long']],
+            'name': p['name'],
+            'year': self.get_year(instance),
+            'relation_type': str(instance.relation_type)
+        }
+        return res

@@ -1,9 +1,8 @@
+from django.conf import settings
 from django.conf.urls import url
 from django.urls import path
-from django.conf import settings
-from rest_framework.urlpatterns import format_suffix_patterns
-from . import api_views
 
+from . import api_views
 
 app_name = 'apis_entities'
 
@@ -12,7 +11,8 @@ urlpatterns = [
     url(r'^getorcreateentity/$', api_views.GetOrCreateEntity.as_view(), name='GetOrCreateEntity'),
     path(r'entity/<int:pk>/', api_views.GetEntityGeneric.as_view(), name="GetEntityGeneric"),
     path(r'uri/', api_views.uri_resolver, name="UriResolver"),
-    path(r'getrelatedplaces/', api_views.GetRelatedPlaces.as_view(), name="GetRelatedPlaces")
+    path(r'getrelatedplaces/', api_views.GetRelatedPlaces.as_view(), name="GetRelatedPlaces"),
+    path(r'lifepath/<int:pk>/', api_views.LifePathViewset.as_view(), name="Lifepathviewset")
 ]
 
 if 'deep learning' in getattr(settings, "APIS_COMPONENTS", []) and 'apis_highlighter' in settings.INSTALLED_APPS:
