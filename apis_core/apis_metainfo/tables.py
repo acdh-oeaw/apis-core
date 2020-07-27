@@ -1,8 +1,8 @@
 import django_tables2 as tables
 from django.db.models import F
 from django.utils.html import format_html
-from . models import Uri
 
+from .models import Uri
 
 
 # generic order_FOO methods for start_date_written and end_date_written to be used in all kinds of tables where a queryset is loaded

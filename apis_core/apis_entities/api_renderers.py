@@ -1,18 +1,20 @@
 import json
-from datetime import date
-import pickle
 import os
+import pickle
+from datetime import date
 
-from apis_core.apis_tei.tei import TeiEntCreator
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
-from rdflib import RDF, XSD, Graph, Literal, Namespace, URIRef, ConjunctiveGraph, OWL
-from rdflib.void import generateVoID
+from rdflib import XSD, Graph, Literal, Namespace, URIRef, ConjunctiveGraph, OWL
 from rdflib.namespace import DCTERMS, VOID
 from rdflib.plugins.memory import IOMemory
+from rdflib.void import generateVoID
 from rest_framework import renderers
+
+from apis_core.apis_tei.tei import TeiEntCreator
 from .api_mappings.cidoc_mapping import m_person, m_place, m_work, m_institution
+
 try:
     from webpage.metadata import PROJECT_METADATA
 except ImportError:

@@ -1,5 +1,6 @@
 from dal import autocomplete
-from . models import TempEntityClass
+
+from .models import TempEntityClass
 
 
 class TempEntityClassAC(autocomplete.Select2QuerySetView):

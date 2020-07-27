@@ -1,28 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from datetime import datetime
 
-from django import forms
-from django.utils.translation import ugettext_lazy as _
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout
-from crispy_forms.bootstrap import Accordion, AccordionGroup
-from django.contrib.contenttypes.models import ContentType
+from django import forms
 
-from .models import (PersonPlace, PersonPerson, PersonInstitution,
-                     InstitutionPlace, InstitutionInstitution, PersonEvent, InstitutionEvent,
-                     PlaceEvent, PersonWork, InstitutionWork, PlaceWork, EventWork, PlacePlace)
-from apis_core.apis_entities.models import Place, Institution, Person, Event, Work
-from apis_core.apis_metainfo.models import Uri, Text
-from apis_core.apis_vocabularies.models import (
-    PersonInstitutionRelation, PersonPlaceRelation, InstitutionPlaceRelation,
-    PersonEventRelation, InstitutionEventRelation, PlaceEventRelation,
-    InstitutionInstitutionRelation, PersonPersonRelation
-)
+from apis_core.apis_entities.models import Place
 from apis_core.apis_labels.models import Label
-from apis_core.helper_functions.RDFParser import RDFParser
 from apis_core.helper_functions import DateParser
-from dal import autocomplete
+from apis_core.helper_functions.RDFParser import RDFParser
 
 
 ##############################################

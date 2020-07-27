@@ -1,10 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.urls import reverse, reverse_lazy
-from django.views.generic.edit import DeleteView
+from django.urls import reverse_lazy
 from django.views import generic
+from django.views.generic.edit import DeleteView
 
-from .models import Label
 from .forms import LabelForm
+from .models import Label
 
 
 class LabelListView(generic.ListView):

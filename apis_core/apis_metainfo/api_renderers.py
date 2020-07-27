@@ -1,7 +1,5 @@
-from rest_framework import renderers
 from django.template.loader import render_to_string
-from rest_framework.settings import api_settings
-
+from rest_framework import renderers
 from rest_framework_csv.renderers import CSVRenderer
 
 

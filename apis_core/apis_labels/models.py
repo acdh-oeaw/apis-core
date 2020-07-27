@@ -1,11 +1,12 @@
+import unicodedata
+
+# from metainfo.models import TempEntityClass
+# from reversion import revisions as reversion
+import reversion
 from django.db import models
+
 from apis_core.apis_vocabularies.models import LabelType
 from apis_core.helper_functions import DateParser
-#from metainfo.models import TempEntityClass
-#from reversion import revisions as reversion
-import reversion
-
-import unicodedata
 
 
 @reversion.register()

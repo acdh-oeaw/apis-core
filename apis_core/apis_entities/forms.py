@@ -1,26 +1,23 @@
 # -*- coding: utf-8 -*-
-from dal import autocomplete
-from .fields import ListSelect2, Select2Multiple, Select2
-from django import forms
-from django.urls import reverse_lazy
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit
-from crispy_forms.layout import Layout, Fieldset
 from crispy_forms.bootstrap import Accordion, AccordionGroup
-from django.forms import ModelMultipleChoiceField, ModelChoiceField
-from django.utils.translation import ugettext_lazy as _
-from django.urls import reverse
-from django.db.models.fields import BLANK_CHOICE_DASH
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Fieldset
+from crispy_forms.layout import Submit
+from dal import autocomplete
+from django import forms
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import URLValidator
-from django.conf import settings
+from django.db.models.fields import BLANK_CHOICE_DASH
+from django.forms import ModelMultipleChoiceField, ModelChoiceField
+from django.urls import reverse
 
-from .models import Person, Place, Institution, Event, Work, AbstractEntity
-from apis_core.apis_vocabularies.models import TextType
 from apis_core.apis_metainfo.models import Text, Uri, Collection
+from apis_core.apis_vocabularies.models import TextType
 from apis_core.helper_functions import DateParser
-
 from apis_core.helper_functions.RDFParser import RDFParser
+from .fields import ListSelect2, Select2Multiple
+from .models import AbstractEntity
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.models import AnnotationProject

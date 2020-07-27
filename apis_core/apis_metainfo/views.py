@@ -1,15 +1,14 @@
 from django.contrib.auth.decorators import login_required
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.urls import reverse, reverse_lazy
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import DeleteView
 
-from . models import Uri
-from . filters import UriListFilter
-from . forms import UriFilterFormHelper, UriForm
-from .tables import UriTable
-
 from browsing.browsing_utils import GenericListView, BaseCreateView, BaseUpdateView
+from .filters import UriListFilter
+from .forms import UriFilterFormHelper, UriForm
+from .models import Uri
+from .tables import UriTable
 
 
 class UriListView(GenericListView):

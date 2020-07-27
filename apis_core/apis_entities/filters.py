@@ -1,10 +1,11 @@
 from functools import reduce
+
 import django_filters
-from apis_core.apis_vocabularies.models import RelationBaseClass
-from django.db.models import Q
-from apis_core.apis_entities.models import *
 from django.conf import settings
-from django.db.models import QuerySet
+
+from apis_core.apis_entities.models import *
+from apis_core.apis_vocabularies.models import RelationBaseClass
+
 
 # The following classes define the filter sets respective to their models.
 # Also by what was enabled in the global settings file (or disabled by not explicitley enabling it).

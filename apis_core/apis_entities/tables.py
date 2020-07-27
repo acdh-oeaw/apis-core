@@ -1,7 +1,7 @@
 import django_tables2 as tables
-from django_tables2.utils import A
-from django.conf import settings
 from django.utils.safestring import mark_safe
+from django_tables2.utils import A
+
 from apis_core.apis_entities.models import AbstractEntity
 from apis_core.apis_metainfo.tables import (
     generic_order_start_date_written,

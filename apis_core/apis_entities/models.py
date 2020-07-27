@@ -1,13 +1,20 @@
-import re
-import unicodedata
-import sys
 import inspect
+import re
+import sys
+import unicodedata
+
 # from reversion import revisions as reversion
 import reversion
+from django.conf import settings
+from django.contrib.auth.models import Group
+from django.db import models
 from django.db.models import Q
+from django.db.models.signals import m2m_changed, post_save
+from django.dispatch import receiver
+from django.urls import reverse
+from guardian.shortcuts import assign_perm, remove_perm
 
-from apis_core.apis_labels.models import Label
-from apis_core.apis_metainfo.models import Collection, TempEntityClass, Text, Uri
+from apis_core.apis_metainfo.models import Collection, TempEntityClass, Uri
 from apis_core.apis_vocabularies.models import (
     EventType,
     InstitutionType,
@@ -16,16 +23,7 @@ from apis_core.apis_vocabularies.models import (
     Title,
     WorkType,
 )
-from django.conf import settings
-from django.contrib.auth.models import Group
-from django.db import models
-from django.db.models.signals import m2m_changed, post_save, class_prepared
-from django.dispatch import receiver
-from django.urls import reverse
-from guardian.shortcuts import assign_perm, remove_perm
-from django.contrib.contenttypes.models import ContentType
 from apis_core.helper_functions import EntityRelationFieldGenerator
-
 
 BASE_URI = getattr(settings, "APIS_BASE_URI", "http://apis.info/")
 
@@ -513,7 +511,7 @@ class Person(AbstractEntity):
     )
     profession = models.ManyToManyField(ProfessionType, blank=True)
     title = models.ManyToManyField(Title, blank=True)
-    gender = models.CharField(max_length=15, choices=GENDER_CHOICES, blank=True)
+    gender = models.CharField(max_length=15, choices=GENDER_CHOICES, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if self.first_name:

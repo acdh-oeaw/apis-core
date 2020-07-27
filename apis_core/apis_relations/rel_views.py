@@ -1,14 +1,11 @@
 from django.conf import settings
 from django.views.generic.detail import DetailView
-from django.contrib.contenttypes.models import ContentType
-
 from django_tables2 import RequestConfig
 
 from apis_core.apis_entities.views import GenericListViewNew
 from apis_core.apis_relations.models import AbstractRelation
-from . forms2 import GenericRelationForm
-from . tables import get_generic_relation_listview_table
-from . rel_filters import get_generic_relation_filter
+from .rel_filters import get_generic_relation_filter
+from .tables import get_generic_relation_listview_table
 
 
 class GenericRelationView(GenericListViewNew):

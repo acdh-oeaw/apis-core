@@ -1,25 +1,23 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from .models import Place, Person, Institution, Event, Work, AbstractEntity
-from apis_core.apis_metainfo.models import Uri, Collection
-from apis_core.default_settings.NER_settings import autocomp_settings as ac_settings
-from django.conf import settings
-from django.core.exceptions import FieldError
-from .custom_autocompletes import *
-
-from dal import autocomplete
-from django.db.models import Q
-from django import http
-from django.contrib.contenttypes.models import ContentType
-
-import requests
 import json
 import operator
-from functools import reduce
-import dateutil.parser
 import re
+from functools import reduce
 
+import dateutil.parser
+import requests
+from dal import autocomplete
+from django import http
+from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import FieldError
+from django.db.models import Q
+
+from apis_core.apis_metainfo.models import Uri, Collection
 from apis_core.apis_vocabularies.models import VocabsBaseClass
+from apis_core.default_settings.NER_settings import autocomp_settings as ac_settings
+from .models import AbstractEntity
 
 
 class CustomEntityAutocompletes(object):

@@ -1,8 +1,7 @@
 from django.test import TestCase
 
-from .models import Text, Source
-from apis_core.apis_vocabularies.models import TextType
 from apis_highlighter.models import Annotation
+from .models import Text, Source
 
 
 class TextModelTestCase(TestCase):

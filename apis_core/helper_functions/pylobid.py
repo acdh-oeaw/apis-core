@@ -1,6 +1,4 @@
-import json
 import requests
-import pandas as pd
 
 
 def create_qs(row, cell, q_field="dateOfBirth", char_limit=0):

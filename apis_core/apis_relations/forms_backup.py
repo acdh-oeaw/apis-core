@@ -1,26 +1,24 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from datetime import datetime
 
-from django import forms
 import autocomplete_light.shortcuts as al
-from django.utils.translation import ugettext_lazy as _
+from apis_core.entities.models import Place, Institution, Person, Event, Work
+from apis_core.helper_functions.RDFparsers import GenericRDFParser
+from apis_core.labels.models import Label
+from apis_core.metainfo.models import Uri, Text
+from apis_core.vocabularies.models import (PersonInstitutionRelation, PersonPlaceRelation, PersonEventRelation,
+                                           InstitutionEventRelation)
+from crispy_forms.bootstrap import Accordion, AccordionGroup
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout
-from crispy_forms.bootstrap import Accordion, AccordionGroup
+from django import forms
 from django.contrib.contenttypes.models import ContentType
+from django.utils.translation import ugettext_lazy as _
+from highlighter.models import Annotation
 
 from .models import (PersonPlace, PersonPerson, PersonInstitution,
                      InstitutionPlace, InstitutionInstitution, PersonEvent, InstitutionEvent,
                      PlaceEvent, PersonWork, InstitutionWork, PlaceWork, EventWork, PlacePlace)
-from apis_core.entities.models import Place, Institution, Person, Event, Work
-from apis_core.metainfo.models import Uri, Text
-from apis_core.vocabularies.models import (PersonInstitutionRelation, PersonPlaceRelation, InstitutionPlaceRelation,
-                                 PersonEventRelation, InstitutionEventRelation, PlaceEventRelation,
-                                 InstitutionInstitutionRelation, PersonPersonRelation)
-from apis_core.labels.models import Label
-from highlighter.models import Annotation
-from apis_core.helper_functions.RDFparsers import GenericRDFParser
 
 
 ##############################################

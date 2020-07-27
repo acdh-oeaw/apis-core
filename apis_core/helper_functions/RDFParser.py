@@ -1,4 +1,4 @@
-import json
+import os
 import os
 import re
 import string
@@ -8,20 +8,20 @@ import unicodedata
 import pandas as pd
 import rdflib
 import yaml
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError, MultipleObjectsReturned
-from rdflib import URIRef, RDFS
-from rdflib.namespace import SKOS, OWL
-
-from apis_core.apis_labels.models import Label
-from apis_core.apis_vocabularies.models import LabelType
-from apis_core.default_settings.RDF_settings_new import sett_RDF_generic, sameAs
-from apis_core.apis_metainfo.models import Uri as genUri, Collection, Uri
 from django.db.models.fields import CharField as TCharField
 from django.db.models.fields import FloatField as TFloatField
 from django.db.models.fields.related import ForeignKey as TForeignKey
 from django.db.models.fields.related import ManyToManyField as TManyToMany
-from django.conf import settings
+from rdflib import URIRef, RDFS
+from rdflib.namespace import SKOS, OWL
+
+from apis_core.apis_labels.models import Label
+from apis_core.apis_metainfo.models import Uri as genUri, Collection, Uri
+from apis_core.apis_vocabularies.models import LabelType
+from apis_core.default_settings.RDF_settings_new import sameAs
 
 APIS_RDF_YAML_SETTINGS = getattr(
         settings,

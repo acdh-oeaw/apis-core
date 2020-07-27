@@ -2,16 +2,12 @@ from django.test import TestCase
 from django.contrib.auth.models import User, Group
 from django.urls import reverse
 
-from .models import Person, Place, Institution, Work, Event
-from apis_core.apis_metainfo.models import Text, Collection, Source, Uri, UriCandidate
-from apis_core.apis_vocabularies.models import PersonPlaceRelation, ProfessionType
-from apis_core.apis_labels.models import Label
-from apis_core.apis_relations.models import PersonPlace
-from reversion.models import Version
+from .models import Person, Event
+from apis_core.apis_metainfo.models import Text, Collection
+from apis_core.apis_vocabularies.models import ProfessionType
 from reversion import revisions as reversion
 
 from datetime import datetime
-from guardian.shortcuts import assign_perm, remove_perm, get_objects_for_user
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 from django.contrib.auth.models import Permission

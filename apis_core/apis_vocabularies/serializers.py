@@ -1,6 +1,6 @@
-from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.db.models.query import QuerySet
+from rest_framework import serializers
 
 from .models import (
     InstitutionInstitutionRelation, TextType, CollectionType, VocabsBaseClass,

@@ -2,7 +2,6 @@ from dal.autocomplete import ListSelect2 as DALListSelect2
 from dal.autocomplete import ModelSelect2 as DALModelSelect2
 from dal.autocomplete import ModelSelect2Multiple as DALModelSelect2Multiple
 from dal.autocomplete import Select2 as DALSelect2
-from dal.autocomplete import TagSelect2 as DALTagSelect2
 from dal.autocomplete import Select2Multiple as DALSelect2Multiple
 from dal.autocomplete import TagSelect2 as DALTagSelect2
 from dal_select2.widgets import Select2WidgetMixin as DALSelect2WidgetMixin

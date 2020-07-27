@@ -1,6 +1,12 @@
 from django.contrib.auth.models import User
-
 from rest_framework import viewsets
+
+from .models import (
+    InstitutionInstitutionRelation, TextType, CollectionType, VocabsBaseClass,
+    InstitutionType, ProfessionType, PlaceType, PersonInstitutionRelation, PersonPlaceRelation, PersonPersonRelation,
+    VocabNames, InstitutionPlaceRelation, PersonEventRelation,
+    PersonWorkRelation, InstitutionEventRelation, InstitutionWorkRelation, PlaceWorkRelation, PlaceEventRelation,
+    PlacePlaceRelation, EventWorkRelation, EventEventRelation, WorkWorkRelation, EventType, WorkType)
 from .serializers import (
     InstitutionInstitutionRelationSerializer, TextTypeSerializer,
     CollectionTypeSerializer, VocabsBaseClassSerializer,
@@ -11,12 +17,6 @@ from .serializers import (
     InstitutionEventRelationSerializer, InstitutionWorkRelationSerializer, PlaceEventRelationSerializer,
     PlaceWorkRelationSerializer, PlacePlaceRelationSerializer, EventWorkRelationSerializer,
     EventEventRelationSerializer, WorkWorkRelationSerializer, EventTypeSerializer, WorkTypeSerializer)
-from .models import (
-    InstitutionInstitutionRelation, TextType, CollectionType, VocabsBaseClass,
-    InstitutionType, ProfessionType, PlaceType, PersonInstitutionRelation, InstitutionPlaceRelation,
-    PersonPlaceRelation, PersonPersonRelation, VocabNames, InstitutionPlaceRelation, PersonEventRelation,
-    PersonWorkRelation, InstitutionEventRelation, InstitutionWorkRelation, PlaceWorkRelation, PlaceEventRelation,
-    PlacePlaceRelation, EventWorkRelation, EventEventRelation, WorkWorkRelation, EventType, WorkType)
 
 
 ###########################################################
