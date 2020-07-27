@@ -173,6 +173,8 @@ class GeoJsonSerializer(serializers.BaseSerializer):
 class GeoJsonSerializerTheme(serializers.BaseSerializer):
 
     def to_representation(self, obj):
+        if obj[0] is None:
+            return ''
         url_r = reverse_lazy(
             'apis:apis_core:place-detail',
             kwargs={'pk': str(obj[0].pk)}
@@ -186,7 +188,7 @@ class GeoJsonSerializerTheme(serializers.BaseSerializer):
                 "properties": {
                     "name": obj[0].name,
                     "uris": [x.uri for x in obj[0].uri_set.all()],
-                    "kind": obj[0].kind.name,
+                    "kind": obj[0].kind.name if obj[0].kind is not None else 'undefined',
                     "url": url_r,
                     "relation_kind": ", ".join([x[0].name for x in obj[1]])
                 },
