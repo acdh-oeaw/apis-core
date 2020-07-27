@@ -450,9 +450,8 @@ class LifePathViewset(APIView):
         b_rel = PersonPlaceRelation.objects.get(name=getattr(settings, 'BIRTH_REL_NAME', ''))
         d_rel = PersonPlaceRelation.objects.get(name=getattr(settings, 'DEATH_REL_NAME', ''))
         pb_pd = [b_rel.pk, d_rel.pk]
-        #pb_pd = list(PersonPlaceRelation.objects.filter(name__in=[b_rel, d_rel]).values_list('pk', flat=True))
-        lst_inst = list(PersonInstitution.objects.filter(Q(related_person_id=pk), Q(start_date__isnull=False)|Q(end_date__isnull=False)))
-        lst_place = list(PersonPlace.objects.filter(Q(related_person_id=pk), Q(start_date__isnull=False)|Q(end_date__isnull=False)|Q(relation_type_id__in=pb_pd)))
+        lst_inst = list(PersonInstitution.objects.filter(Q(related_person_id=pk), Q(start_date__isnull=False)|Q(end_date__isnull=False)).filter_for_user())
+        lst_place = list(PersonPlace.objects.filter(Q(related_person_id=pk), Q(start_date__isnull=False)|Q(end_date__isnull=False)|Q(relation_type_id__in=pb_pd)).filter_for_user())
         comb_lst = lst_inst + lst_place
         p1 = Person.objects.get(pk=pk)
         if p1.start_date:
