@@ -1,13 +1,13 @@
 import re
 
-from apis_core.apis_labels.serializers import LabelSerializer
-from apis_core.apis_vocabularies.models import ProfessionType
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.query import QuerySet
 from django.urls import reverse
 from rest_framework import serializers
 from reversion.models import Version
+
+from apis_core.apis_labels.serializers import LabelSerializerLegacy as LabelSerializer
 
 base_uri = getattr(settings, 'APIS_BASE_URI', 'http://apis.info')
 if base_uri.endswith('/'):
@@ -116,6 +116,8 @@ class EntitySerializer(serializers.Serializer):
             inst = self.instance[0]
         else:
             inst = self.instance
+        if inst is None:
+            return
         for f in inst._meta.fields:
             field_name = re.search(r"([A-Za-z]+)\'>", str(f.__class__)).group(1)
             if field_name in [
