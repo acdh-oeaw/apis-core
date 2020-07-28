@@ -424,22 +424,41 @@ class GetOrCreateEntity(APIView):
 
 
 class GetRelatedPlaces(APIView):
-    map_qs = {
-        'institution': Prefetch('personinstitution_set__related_institution__institutionplace_set', queryset=InstitutionPlace.objects.select_related('related_place'))
-    }
+    #map_qs = {
+     #   'institution': Prefetch('personinstitution_set__related_institution__institutionplace_set', queryset=InstitutionPlace.objects.select_related('related_place'))
+    #}
 
     def get(self, request):
+        b_rel = PersonPlaceRelation.objects.get(name=getattr(settings, 'BIRTH_REL_NAME', ''))
+        d_rel = PersonPlaceRelation.objects.get(name=getattr(settings, 'DEATH_REL_NAME', ''))
         person_pk = request.query_params.get("person_id", None)
+        pers = Person.objects.get(pk=person_pk)
         relation_types = request.query_params.get("relation_types", None)
         place_pk = dict()
         res = []
-        p = PersonPlace.objects.select_related('related_place').filter(related_person_id=person_pk).filter_for_user()
+        p = PersonPlace.objects.select_related('related_place').filter(related_person_id=person_pk, related_place__lat__isnull=False).filter_for_user()
         for pp in p:
             if pp.related_place_id not in place_pk:
-                res.append((pp.related_place, [(pp.relation_type, pp.start_date, pp.end_date)]))
+                res.append((pp.related_place, [(
+                    pp.relation_type, None,
+                    pers.start_date if b_rel.pk == pp.relation_type_id else pp.start_date,
+                    pers.end_date if d_rel.pk == pp.relation_type_id else pp.end_date)]))
                 place_pk[pp.related_place_id] = len(res)-1
             else:
-                res[place_pk[pp.related_place_id]][1].append((pp.relation_type, pp.start_date, pp.end_date))
+                res[place_pk[pp.related_place_id]][1].append((
+                    pp.relation_type, None,
+                    pers.start_date if b_rel.pk == pp.relation_type_id else pp.start_date,
+                    pers.end_date if d_rel.pk == pp.relation_type_id else pp.end_date))
+        for pi in PersonInstitution.objects.filter(related_person_id=person_pk).filter_for_user():
+            inst = pi.related_institution
+            rel_type = getattr(settings, 'APIS_LOCATED_IN_ATTR', 'situated in')
+            plc = InstitutionPlace.objects.filter(relation_type__name=rel_type, related_institution=inst)
+            if plc.count() == 1:
+                if plc[0].related_place_id not in place_pk:
+                    res.append((plc[0].related_place, [(pi.relation_type, pi.related_institution, pi.start_date, pi.end_date)]))
+                    place_pk[plc[0].related_place_id] = len(res)-1
+                else:
+                    res[place_pk[plc[0].related_place_id]][1].append((pi.relation_type, pi.related_institution, pi.start_date, pi.end_date))
         res = GeoJsonSerializerTheme(res, many=True)
         return Response(res.data)
 

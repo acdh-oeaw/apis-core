@@ -180,6 +180,22 @@ class GeoJsonSerializerTheme(serializers.BaseSerializer):
             kwargs={'pk': str(obj[0].pk)}
         )
         if obj[0].lng:
+            relations = []
+            for rel2 in obj[1]:
+                if rel2[1] is not None:
+                    res_str = f"{rel2[1].name} / {rel2[0].name}"
+                else:
+                    res_str = f"{rel2[0].name}"
+                if rel2[2] is not None:
+                    res_str += f" ({rel2[2]}-"
+                if rel2[3] is not None:
+                    if res_str.endswith('-'):
+                        res_str += f"{rel2[3]})"
+                    else:
+                        res_str += f" (-{rel2[3]})"
+                if "(" in res_str and not res_str.endswith(')'):
+                    res_str += ')'
+                relations.append((res_str, rel2[2], rel2[3]))
             r = {"geometry": {
                 "type": "Point",
                 "coordinates": [obj[0].lng, obj[0].lat]
@@ -190,7 +206,8 @@ class GeoJsonSerializerTheme(serializers.BaseSerializer):
                     "uris": [x.uri for x in obj[0].uri_set.all()],
                     "kind": obj[0].kind.name if obj[0].kind is not None else 'undefined',
                     "url": url_r,
-                    "relation_kind": ", ".join([x[0].name for x in obj[1]])
+                    #"relation_kind": ", ".join([x[0].name for x in obj[1]])
+                    "relations": relations
                 },
                 "id": url_r
             }
