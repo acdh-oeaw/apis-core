@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse, Http404
 from django.template.loader import render_to_string
+from apis_core.apis_relations import forms as forms_module
 
 from apis_core.apis_entities.models import Person, Institution, Place, Event, Work, AbstractEntity
 from apis_core.apis_labels.models import Label
@@ -117,7 +118,8 @@ def get_form_ajax(request):
             form_dict['highlighter'] = True
         form = GenericRelationForm(**form_dict)
     else:
-        form = globals()[FormName](**form_dict)
+        form_class = getattr(forms_module, FormName)
+        form = form_class(**form_dict)
     tab = FormName[:-4]
     data = {'tab': tab, 'form': render_to_string("apis_relations/_ajax_form.html", {
                 "entity_type": entity_type_str,
@@ -165,7 +167,8 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
             call_function = 'HighlForm_response'
         form = GenericRelationForm(**form_dict)
     else:
-        form = globals()[kind_form](**form_dict)
+        form_class = getattr(forms_module, kind_form)
+        form = form_class(**form_dict)
     if form.is_valid():
         site_instance = entity_type.objects.get(pk=SiteID)
         set_ann_proj = request.session.get('annotation_project', 1)
