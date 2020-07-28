@@ -1,9 +1,10 @@
-from django.contrib.contenttypes.models import ContentType
 from rest_framework.generics import ListAPIView
-from .serializers import *
-from apis_core.apis_relations.models import PersonInstitution, AbstractRelation
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
+from rest_framework.generics import ListAPIView
+
+from apis_core.apis_relations.models import AbstractRelation
+from .serializers import *
 
 
 class GetVisJson(ListAPIView):

@@ -1,9 +1,10 @@
 from rest_framework import serializers
-from .models import Label
+
 from apis_core.apis_vocabularies.serializers import LabelTypeSerializer
+from .models import Label
 
 
-class LabelSerializer(serializers.ModelSerializer):
+class LabelSerializerLegacy(serializers.ModelSerializer):
     label_type = LabelTypeSerializer()
 
     class Meta:

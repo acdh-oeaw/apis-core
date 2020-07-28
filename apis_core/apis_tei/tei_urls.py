@@ -1,6 +1,6 @@
 from django.conf.urls import url
 
-from . tei_ac import TeiEntAc, TeiCompleterAc
+from .tei_ac import TeiEntAc, TeiCompleterAc
 
 app_name = 'apis_tei'
 

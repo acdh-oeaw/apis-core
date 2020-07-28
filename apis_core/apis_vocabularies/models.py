@@ -1,11 +1,12 @@
-from django.db import models
-from reversion import revisions as reversion
-from django.contrib.auth.models import User
-from django.utils.functional import cached_property
-import re
-import unicodedata
-import sys
 import inspect
+import re
+import sys
+import unicodedata
+
+from django.contrib.auth.models import User
+from django.db import models
+from django.utils.functional import cached_property
+from reversion import revisions as reversion
 
 
 @reversion.register()
@@ -210,6 +211,10 @@ class TextType(VocabsBaseClass):
     """used to store the Text types for the forms"""
     entity = models.CharField(max_length=255)
     collections = models.ManyToManyField('apis_metainfo.Collection', blank=True)
+    lang = models.CharField(
+        max_length=3, blank=True, null=True,
+        help_text="The ISO 639-3 (or 2) code for the label's language.",
+        verbose_name='ISO Code', default='deu')
 
 #######################################################################
 #

@@ -1,7 +1,8 @@
-from rest_framework import serializers
 import pandas as pd
 from django.db.models import Avg
-from . utils import calculate_age
+from rest_framework import serializers
+
+from .utils import calculate_age
 
 
 class GenericBaseSerializer(serializers.BaseSerializer):

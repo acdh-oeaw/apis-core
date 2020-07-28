@@ -1,10 +1,8 @@
 from dal import autocomplete
-
-from django.contrib import admin
 from django.apps import apps
 from django.conf import settings
+from django.contrib import admin
 from django.urls import reverse
-from .models import PersonInstitutionRelation
 
 
 class BaseAdminVocabularies(admin.ModelAdmin):

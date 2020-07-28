@@ -1,10 +1,10 @@
 import django_tables2 as tables
-from django_tables2.utils import A
-from django.contrib.contenttypes.models import ContentType
-from django.conf import settings
 from django.utils.safestring import mark_safe
+from django_tables2.utils import A
+
 from django.db import models
 from django.db.models import Subquery, OuterRef, F, Q
+from apis_core.apis_entities.models import Person
 from apis_core.apis_vocabularies.models import PersonPublicationRelation
 from apis_core.apis_vocabularies.models import PassagePublicationRelation
 from apis_core.apis_entities.models import AbstractEntity
@@ -14,7 +14,6 @@ from apis_core.apis_metainfo.tables import (
     generic_render_start_date_written,
     generic_render_end_date_written
 )
-from .models import Person, Place, Institution, Event, Passage
 
 input_form = """
   <input type="checkbox" name="keep" value="{}" title="keep this"/> |

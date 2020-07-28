@@ -1,13 +1,10 @@
 import pandas as pd
-from collections import Counter
+from django.db.models import Avg
 from django.http import JsonResponse
 from django.views.generic import TemplateView
-from django.conf import settings
-from django.db.models import Avg
 
 from apis_core.apis_relations.models import *
-
-from . utils import calculate_age
+from .utils import calculate_age
 
 
 def get_inst_range_data(request):

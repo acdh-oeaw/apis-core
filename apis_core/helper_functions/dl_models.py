@@ -7,7 +7,6 @@ import os
 
 import spacy
 from spacy.matcher import Matcher
-from spacy.attrs import IS_PUNCT, LOWER, ENT_TYPE, IS_ALPHA, TAG
 
 import de_core_news_sm
 

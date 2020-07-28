@@ -1,24 +1,19 @@
-from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db.models import Q
 from django.http import HttpResponse
-from django.template.loader import select_template
-from django.utils.decorators import method_decorator
-from django.views import View
-from django.views.generic.detail import DetailView
-from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
+from django.template.loader import select_template
+from django.views import View
 from django_tables2 import RequestConfig
-from django.conf import settings
 
-from apis_core.apis_relations.models import AbstractRelation
-from apis_core.helper_functions.utils import access_for_all
-
-from .views import get_highlighted_texts
-from .models import AbstractEntity
 from apis_core.apis_labels.models import Label
 from apis_core.apis_metainfo.models import Uri
-from apis_core.apis_relations.tables import get_generic_relations_table, LabelTableBase#, EntityDetailViewLabelTable
+from apis_core.apis_relations.models import AbstractRelation
+from apis_core.apis_relations.tables import get_generic_relations_table, LabelTableBase  # , EntityDetailViewLabelTable
+from apis_core.helper_functions.utils import access_for_all
+from .models import AbstractEntity
+from .views import get_highlighted_texts
 
 
 class GenericEntitiesDetailView(UserPassesTestMixin, View):

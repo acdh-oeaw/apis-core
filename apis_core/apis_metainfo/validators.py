@@ -1,9 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import re
-from django.core import validators
-from django.core.validators import RegexValidator
 
+from django.core.validators import RegexValidator
 
 # TODO __sresch__ : remove once sure
 date_validator = RegexValidator(regex=re.compile(r'^([0-9]{1,2}\.[0-9]{1,2}\.)?[0-9]{4}$'),

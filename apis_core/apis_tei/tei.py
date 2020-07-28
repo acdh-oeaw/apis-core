@@ -1,10 +1,10 @@
-import lxml.etree as ET
 from xml.sax.saxutils import escape, unescape
 
-from django.utils.text import slugify
+import lxml.etree as ET
 from django.conf import settings
+from django.utils.text import slugify
 
-from . partials import TEI_NSMAP, tei_gen_header
+from .partials import TEI_NSMAP, tei_gen_header
 
 
 def custom_escape(somestring):

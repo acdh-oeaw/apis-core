@@ -1,8 +1,8 @@
+from django.conf import settings
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import SKOS, RDF, DC, RDFS
-
-from django.conf import settings
 from rest_framework import renderers
+
 try:
     from webpage.metadata import PROJECT_METADATA
 except ImportError:

@@ -1,5 +1,7 @@
-import requests
 import json
+
+import requests
+
 from apis_core.default_settings.NER_settings import StbGeoQuerySettings, autocomp_settings
 
 

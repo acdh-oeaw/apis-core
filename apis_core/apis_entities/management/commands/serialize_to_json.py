@@ -1,8 +1,8 @@
+import json
 import os
+import pickle
 
 from django.core.management.base import BaseCommand
-import json
-import pickle
 from django.core.serializers.json import DjangoJSONEncoder
 
 from apis_core.apis_entities.models import AbstractEntity

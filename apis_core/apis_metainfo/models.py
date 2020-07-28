@@ -1,20 +1,10 @@
 import re
 import unicodedata
-import math
-from datetime import datetime, timedelta
 from difflib import SequenceMatcher
-from dateutil.parser import parse
+
 import requests
-import json
 # from reversion import revisions as reversion
 import reversion
-from apis_core.apis_entities.serializers_generic import EntitySerializer
-from apis_core.apis_labels.models import Label
-from apis_core.apis_vocabularies.models import CollectionType, LabelType, TextType
-from apis_core.helper_functions import DateParser
-
-# from helper_functions.highlighter import highlight_text
-from apis_core.default_settings.NER_settings import autocomp_settings
 from django.apps import apps
 from django.conf import settings
 from django.contrib.auth.models import Group
@@ -22,11 +12,16 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models.query import QuerySet
-from django.db.models.signals import m2m_changed, post_save
-from django.dispatch import receiver
-from django.urls import NoReverseMatch, reverse
+from django.urls import reverse
 from django.utils.functional import cached_property
 from model_utils.managers import InheritanceManager
+
+from apis_core.apis_entities.serializers_generic import EntitySerializer
+from apis_core.apis_labels.models import Label
+from apis_core.apis_vocabularies.models import CollectionType, LabelType, TextType
+# from helper_functions.highlighter import highlight_text
+from apis_core.default_settings.NER_settings import autocomp_settings
+from apis_core.helper_functions import DateParser
 
 NEXT_PREV = getattr(settings, "APIS_NEXT_PREV", True)
 
@@ -463,10 +458,6 @@ class Text(models.Model):
     kind = models.ForeignKey(TextType, blank=True, null=True, on_delete=models.SET_NULL)
     text = models.TextField(blank=True)
     source = models.ForeignKey(Source, blank=True, null=True, on_delete=models.SET_NULL)
-    lang = models.CharField(
-        max_length=3, blank=True, null=True,
-        help_text="The ISO 639-3 (or 2) code for the label's language.",
-        verbose_name='ISO Code', default='deu')
 
     def __str__(self):
         if self.text != "":

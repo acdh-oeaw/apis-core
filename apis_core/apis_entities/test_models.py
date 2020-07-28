@@ -11,7 +11,6 @@ from reversion.models import Version
 from reversion import revisions as reversion
 
 from datetime import datetime
-from guardian.shortcuts import assign_perm, remove_perm, get_objects_for_user
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APIClient
 from django.contrib.auth.models import Permission

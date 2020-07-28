@@ -1,10 +1,6 @@
-import os
-from django.conf import settings
-from django.core.management.base import BaseCommand, CommandError
-
-from apis_core.apis_vocabularies.models import *
-
 import pandas as pd
+from django.conf import settings
+from django.core.management.base import BaseCommand
 
 cwd = settings.BASE_DIR
 

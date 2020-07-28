@@ -1,6 +1,7 @@
 import re
-from rest_framework import renderers
 from collections import OrderedDict
+
+from rest_framework import renderers
 
 
 class NetJsonRenderer(renderers.JSONRenderer):

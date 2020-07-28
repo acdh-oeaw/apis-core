@@ -1,27 +1,26 @@
-from django.contrib.auth.decorators import login_required
-from django.db.models import Q
-from django.template.response import TemplateResponse
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseRedirect, Http404
-from django.template import Context
+from django.contrib.auth.decorators import login_required
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
+from django.http import HttpResponse
+from django.shortcuts import redirect, get_object_or_404
 from django.template.loader import select_template
-from django.urls import reverse, reverse_lazy
+from django.template.response import TemplateResponse
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.contrib.contenttypes.models import ContentType
-from django.shortcuts import redirect, get_object_or_404
 from django.views.generic import DeleteView
 from django_tables2 import RequestConfig
 from guardian.core import ObjectPermissionChecker
 from reversion.models import Version
 
 from apis_core.apis_entities.models import AbstractEntity
-from apis_core.apis_relations.models import AbstractRelation
-from .views import get_highlighted_texts
 from apis_core.apis_labels.models import Label
 from apis_core.apis_metainfo.models import Uri
+from apis_core.apis_relations.models import AbstractRelation
 from apis_core.apis_relations.tables import get_generic_relations_table, LabelTableEdit
 from .forms import get_entities_form, FullTextForm, GenericEntitiesStanbolForm
+from .views import get_highlighted_texts
 from .views import set_session_variables
 from ..apis_vocabularies.models import TextType
 

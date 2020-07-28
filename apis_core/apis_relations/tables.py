@@ -1,16 +1,17 @@
 import django_tables2 as tables
+from django.conf import settings
 from django.db.models import Case, When
 from django_tables2.utils import A
-from django.conf import settings
+
 from apis_core.apis_labels.models import Label
 from apis_core.apis_metainfo.models import Uri
-from apis_core.apis_relations.models import AbstractRelation
 from apis_core.apis_metainfo.tables import (
     generic_order_start_date_written,
     generic_order_end_date_written,
     generic_render_start_date_written,
     generic_render_end_date_written
 )
+from apis_core.apis_relations.models import AbstractRelation
 
 empty_text_default = 'There are currently no relations'
 

@@ -1,9 +1,9 @@
 from django.conf.urls import url
 
+from . import views, views2, detail_views, merge_views
 from .autocomplete3 import GenericEntitiesAutocomplete, GenericNetworkEntitiesAutocomplete
 from .views import ReversionCompareView
 from .views2 import GenericEntitiesCreateStanbolView
-from . import views, views2, detail_views, merge_views
 
 app_name = 'apis_entities'
 

@@ -1,9 +1,7 @@
 import json
 
 from dal import autocomplete
-
 from django import http
-from django.contrib.contenttypes.models import ContentType
 
 from apis_core.apis_entities.models import AbstractEntity
 
@@ -25,7 +23,7 @@ class TeiEntAc(autocomplete.Select2ListView):
         for r in res[offset:offset+page_size]:
             dates = "time: {} - {}".format(r.start_date, r.end_date)
             f = dict()
-            f['id'] = "{}".format(r.uri_set.all()[0])
+            f['id'] = f"{request.build_absolute_uri('/entity/')}{r.pk}"
             if ac_type == 'institution':
                 f['type'] = "org"
             else:

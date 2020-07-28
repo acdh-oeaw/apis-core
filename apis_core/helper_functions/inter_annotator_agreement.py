@@ -1,11 +1,10 @@
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db.models.query import QuerySet
-from django.conf import settings
 
-from apis_highlighter.models import Annotation
 from apis_core.apis_metainfo.models import Text, TempEntityClass
-
+from apis_highlighter.models import Annotation
 
 if 'annotator agreement' in getattr(settings, "APIS_COMPONENTS", []):
     from nltk.metrics import AnnotationTask

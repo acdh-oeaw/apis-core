@@ -1,14 +1,14 @@
-from django.core.management.base import BaseCommand, CommandError
 import ast
+import logging
 
+import reversion
+from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand, CommandError
 from entities.models import Person
+from helper_functions.abbreviation_solver import ResolveAbbreviations
 from metainfo.models import Text
 from vocabularies.models import TextType
-from helper_functions.abbreviation_solver import ResolveAbbreviations
-from django.contrib.auth.models import User
-import reversion
 
-import logging
 
 class Command(BaseCommand):
     help = 'Command to resolve abbreviations in APIS biographies.'

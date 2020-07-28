@@ -1,4 +1,3 @@
-from apis_core.apis_vocabularies.serializers import TextTypeSerializer
 from rest_framework import serializers
 
 from .models import Collection, Source, TempEntityClass, Text, Uri

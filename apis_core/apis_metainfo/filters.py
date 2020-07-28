@@ -1,7 +1,6 @@
 import django_filters
-from dal import autocomplete
 
-from . models import *
+from .models import *
 
 
 class UriListFilter(django_filters.FilterSet):

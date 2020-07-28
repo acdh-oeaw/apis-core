@@ -1,9 +1,13 @@
-from django.urls import reverse_lazy
-from rest_framework import serializers
-from .models import Institution, Person, Place, Event, Passage
 import re
 
-# TODO __sresch__ : add PublicationSerializer
+from django.conf import settings
+from django.urls import reverse_lazy
+from rest_framework import serializers
+
+from .models import Institution, Person, Place, Event, Passage
+from ..apis_relations.models import PersonInstitution, InstitutionPlace, PersonPlace
+from ..apis_vocabularies.models import RelationBaseClass
+
 
 class BaseEntitySerializer(serializers.HyperlinkedModelSerializer):
     uri_set = serializers.HyperlinkedRelatedField(
@@ -105,7 +109,7 @@ class EventSerializer(BaseEntitySerializer):
 class PassageSerializer(BaseEntitySerializer):
 
     url = serializers.HyperlinkedIdentityField(
-        view_name="apis:apis_api:passage-detail",
+        view_name="apis:apis_api:work-detail",
         lookup_field="pk"
     )
 
@@ -169,11 +173,29 @@ class GeoJsonSerializer(serializers.BaseSerializer):
 class GeoJsonSerializerTheme(serializers.BaseSerializer):
 
     def to_representation(self, obj):
+        if obj[0] is None:
+            return ''
         url_r = reverse_lazy(
             'apis:apis_core:place-detail',
             kwargs={'pk': str(obj[0].pk)}
         )
         if obj[0].lng:
+            relations = []
+            for rel2 in obj[1]:
+                if rel2[1] is not None:
+                    res_str = f"{rel2[1].name} / {rel2[0].name}"
+                else:
+                    res_str = f"{rel2[0].name}"
+                if rel2[2] is not None:
+                    res_str += f" ({rel2[2]}-"
+                if rel2[3] is not None:
+                    if res_str.endswith('-'):
+                        res_str += f"{rel2[3]})"
+                    else:
+                        res_str += f" (-{rel2[3]})"
+                if "(" in res_str and not res_str.endswith(')'):
+                    res_str += ')'
+                relations.append((res_str, rel2[2], rel2[3]))
             r = {"geometry": {
                 "type": "Point",
                 "coordinates": [obj[0].lng, obj[0].lat]
@@ -182,9 +204,10 @@ class GeoJsonSerializerTheme(serializers.BaseSerializer):
                 "properties": {
                     "name": obj[0].name,
                     "uris": [x.uri for x in obj[0].uri_set.all()],
-                    "kind": obj[0].kind.name,
+                    "kind": obj[0].kind.name if obj[0].kind is not None else 'undefined',
                     "url": url_r,
-                    "relation_kind": ", ".join([x[0].name for x in obj[1]])
+                    #"relation_kind": ", ".join([x[0].name for x in obj[1]])
+                    "relations": relations
                 },
                 "id": url_r
             }
@@ -259,3 +282,57 @@ class NetJsonNodeSerializer(serializers.BaseSerializer):
             if obj.gender:
                 r['data']['gender'] = obj.gender
         return r
+
+class LifePathPlaceSerializer(serializers.ModelSerializer):
+    id = serializers.ReadOnlyField()
+    name = serializers.CharField()
+    lat = serializers.FloatField()
+    long = serializers.FloatField(source='lng')
+
+    class Meta:
+        fields = ['id', 'name', 'lat', 'long']
+        model = Place
+
+
+class LifePathSerializer(serializers.BaseSerializer):
+    place = serializers.SerializerMethodField(method_name='get_place')
+    year = serializers.SerializerMethodField(method_name='get_year')
+    relation_type = serializers.CharField(source='relation_type__name')
+
+    def get_place(self, obj):
+        if isinstance(obj, PersonInstitution):
+            inst = obj.related_institution
+            rel_type = getattr(settings, 'APIS_LOCATED_IN_ATTR', 'located in')
+            plc = InstitutionPlace.objects.filter(relation_type__name=rel_type, related_institution=inst)
+            if plc.count() == 1:
+                plc = plc.first().related_place
+                if plc.lng and plc.lat:
+                    return LifePathPlaceSerializer(plc).data
+        elif isinstance(obj, PersonPlace):
+            plc = obj.related_place
+            if plc.lat and plc.lng:
+                return LifePathPlaceSerializer(plc).data
+
+    def get_year(self, obj):
+        if not obj.start_date and not obj.end_date:
+            return None
+        if obj.start_date and obj.end_date:
+            start = int(obj.start_date.strftime("%Y"))
+            end = int(obj.end_date.strftime("%Y"))
+            return int((start + end) / 2)
+        elif obj.start_date:
+            return int(obj.start_date.strftime("%Y"))
+        elif obj.end_date:
+            return int(obj.end_date.strftime("%Y"))
+
+    def to_representation(self, instance):
+        p = self.get_place(instance)
+        if p is None:
+            return None
+        res = {
+            'coords': [p['lat'], p['long']],
+            'name': p['name'],
+            'year': self.get_year(instance),
+            'relation_type': str(instance.relation_type)
+        }
+        return res

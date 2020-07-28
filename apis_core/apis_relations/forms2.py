@@ -2,28 +2,28 @@ import copy
 import re
 
 import yaml
-from django.contrib.contenttypes.models import ContentType
-from django import forms
+from crispy_forms.bootstrap import Accordion, AccordionGroup
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout
-from crispy_forms.bootstrap import Accordion, AccordionGroup
-#import autocomplete_light.shortcuts as al
-from django.utils.translation import ugettext_lazy as _
-from django.db.models import Q
-from django.conf import settings
 from dal import autocomplete
+from django import forms
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from django.db.models import Q
 from django.urls import reverse
+# import autocomplete_light.shortcuts as al
+from django.utils.translation import ugettext_lazy as _
+
 from apis_core.apis_entities.fields import ListSelect2
 from apis_core.apis_entities.models import AbstractEntity
-from apis_core.apis_relations.models import AbstractRelation
-from django.core.exceptions import ValidationError
-#from dal.autocomplete import ListSelect2
-
-#from dal.autocomplete import ListSelect2
+# from dal.autocomplete import ListSelect2
 from apis_core.apis_metainfo.models import TempEntityClass, Text, Uri
-from apis_core.helper_functions.RDFParser import RDFParser, APIS_RDF_URI_SETTINGS
+from apis_core.apis_relations.models import AbstractRelation
 from apis_core.helper_functions import DateParser
+from apis_core.helper_functions.RDFParser import RDFParser, APIS_RDF_URI_SETTINGS
 from .tables import get_generic_relations_table
+
+# from dal.autocomplete import ListSelect2
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.models import Annotation, AnnotationProject

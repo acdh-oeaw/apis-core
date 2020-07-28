@@ -1,25 +1,27 @@
-from rest_framework.decorators import api_view, renderer_classes
-from rest_framework import response, schemas
-from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
-from apis_core.apis_entities.api_views import (
-    NetJsonViewSet,
-    PlaceGeoJsonViewSet,
-)
-
-from apis_core.apis_vocabularies.api_views import (
-    UserViewSet,
-)
 from django.conf import settings
-from django.urls import path
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
+from django.urls import path
 from django.views.static import serve
+from django_filters.rest_framework import DjangoFilterBackend
+from drf_yasg.generators import OpenAPISchemaGenerator
+from drf_yasg.inspectors import NotHandled
+from rest_framework import response, schemas
 from rest_framework import routers
+from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.schemas import get_schema_view
-from rest_framework_swagger.views import get_swagger_view
+from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
+
 from apis_core.api_routers import views
+from apis_core.apis_entities.api_views import (
+    NetJsonViewSet,
+    PlaceGeoJsonViewSet,
+)
+from apis_core.apis_vocabularies.api_views import (
+    UserViewSet,
+)
 
 app_name = "apis_core"
 
@@ -86,12 +88,40 @@ schema_view2 = get_schema_view2(
    permission_classes=(permissions.AllowAny,),
 )
 
+class APISSchemaGenerator(OpenAPISchemaGenerator):
+    info = "APIS test"
+    title = "APIS_API v2"
+
+    def __init__(self, *args, **kwargs):
+        super(APISSchemaGenerator, self).__init__(*args, **kwargs)
+
+
+class SchemaViewSwagger(schema_view2):
+    generator_class = APISSchemaGenerator
+
+    def get_filter_parameters(self, filter_backend):
+        if isinstance(filter_backend, DjangoFilterBackend):
+            result = super(SchemaViewSwagger, self).get_filter_parameters(filter_backend)
+            for param in result:
+                if not param.get('description', ''):
+                    param.description = "Filter the returned list by {field_name}".format(field_name=param.name)
+
+            return result
+
+        return NotHandled
+
+    def get_operation(self, operation_keys):
+        super(SchemaViewSwagger, self).get_operation(operation_keys)
+
+    def __init__(self, *args, **kwargs):
+        super(SchemaViewSwagger, self).__init__(*args, **kwargs)
+
 
 urlpatterns = [
     url(r"^admin/", admin.site.urls),
-    url(r'^swagger(?P<format>\.json|\.yaml)$', schema_view2.without_ui(cache_timeout=-1), name='schema-json'),
-    url(r'^swagger/$', schema_view2.with_ui('swagger', cache_timeout=-1), name='schema-swagger-ui'),
-    url(r'^redoc/$', schema_view2.with_ui('redoc', cache_timeout=-1), name='schema-redoc'),
+    url(r'^swagger(?P<format>\.json|\.yaml)$', SchemaViewSwagger.without_ui(cache_timeout=-1), name='schema-json'),
+    url(r'^swagger/$', SchemaViewSwagger.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    url(r'^redoc/$', SchemaViewSwagger.with_ui('redoc', cache_timeout=-1), name='schema-redoc'),
     url(r"labels/", include("apis_core.apis_labels.urls", namespace="apis_labels")),
     url(r"tei/", include("apis_core.apis_tei.tei_urls", namespace="apis_tei")),
     url(

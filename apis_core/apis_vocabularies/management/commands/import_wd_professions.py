@@ -1,5 +1,5 @@
 import requests
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from apis_core.apis_vocabularies.models import ProfessionType
 
