@@ -17,6 +17,7 @@ from .models import (
     InstitutionInstitution, PlacePlace, PersonEvent, InstitutionEvent, PlaceEvent, PersonWork,
     InstitutionWork, PlaceWork, EventWork, WorkWork
 )
+from .forms import PersonLabelForm, InstitutionLabelForm, PlaceLabelForm, EventLabelForm
 from .tables import LabelTableEdit
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
