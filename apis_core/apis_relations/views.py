@@ -1,11 +1,13 @@
 import json
 import re
+import inspect
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse, Http404
 from django.template.loader import render_to_string
+from apis_core.apis_relations import forms as relation_form_module
 
 from apis_core.apis_entities.models import Person, Institution, Place, Event, Work, AbstractEntity
 from apis_core.apis_labels.models import Label
@@ -20,8 +22,29 @@ from .models import (
 from .forms import PersonLabelForm, InstitutionLabelForm, PlaceLabelForm, EventLabelForm
 from .tables import LabelTableEdit
 
+form_module_list = [relation_form_module]
+
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_core.helper_functions.highlighter import highlight_text
+    from apis_highlighter import forms as highlighter_form_module
+    form_module_list.append(highlighter_form_module)
+
+
+def turn_form_modules_into_dict(form_module_list):
+    """
+    Since form classes are loaded dynamically from the respective modules and it's settings-dependent which modules
+    are imported and which not, it's better to differentiate here which modules are imported close to their imports
+    and then providing a dict for later extraction of the required form class.
+    """
+
+    form_class_dict = {}
+    for m in form_module_list:
+        for name, cls in inspect.getmembers(m, inspect.isclass):
+            form_class_dict[name] = cls
+
+    return form_class_dict
+
+form_class_dict = turn_form_modules_into_dict(form_module_list)
 
 
 ############################################################################
@@ -118,7 +141,8 @@ def get_form_ajax(request):
             form_dict['highlighter'] = True
         form = GenericRelationForm(**form_dict)
     else:
-        form = globals()[FormName](**form_dict)
+        form_class = form_class_dict[FormName]
+        form = form_class(**form_dict)
     tab = FormName[:-4]
     data = {'tab': tab, 'form': render_to_string("apis_relations/_ajax_form.html", {
                 "entity_type": entity_type_str,
@@ -166,7 +190,8 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
             call_function = 'HighlForm_response'
         form = GenericRelationForm(**form_dict)
     else:
-        form = globals()[kind_form](**form_dict)
+        form_class = form_class_dict[kind_form]
+        form = form_class(**form_dict)
     if form.is_valid():
         site_instance = entity_type.objects.get(pk=SiteID)
         set_ann_proj = request.session.get('annotation_project', 1)
