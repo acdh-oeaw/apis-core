@@ -195,7 +195,15 @@ class GeoJsonSerializerTheme(serializers.BaseSerializer):
                         res_str += f" (-{rel2[3]})"
                 if "(" in res_str and not res_str.endswith(')'):
                     res_str += ')'
-                relations.append((res_str, rel2[2], rel2[3]))
+                #relations.append((res_str, rel2[2], rel2[3]))
+                relations.append(
+                    {
+                        'id': rel2[-1].pk,
+                        'relation': res_str,
+                        'start_date': rel2[2],
+                        'end_date': rel2[3]
+                    }
+                )
             r = {"geometry": {
                 "type": "Point",
                 "coordinates": [obj[0].lng, obj[0].lat]
@@ -330,6 +338,7 @@ class LifePathSerializer(serializers.BaseSerializer):
         if p is None:
             return None
         res = {
+            'id': instance.pk,
             'coords': [p['lat'], p['long']],
             'name': p['name'],
             'year': self.get_year(instance),

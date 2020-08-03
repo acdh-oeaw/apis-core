@@ -442,23 +442,23 @@ class GetRelatedPlaces(APIView):
                 res.append((pp.related_place, [(
                     pp.relation_type, None,
                     pers.start_date if b_rel.pk == pp.relation_type_id else pp.start_date,
-                    pers.end_date if d_rel.pk == pp.relation_type_id else pp.end_date)]))
+                    pers.end_date if d_rel.pk == pp.relation_type_id else pp.end_date, pp)]))
                 place_pk[pp.related_place_id] = len(res)-1
             else:
                 res[place_pk[pp.related_place_id]][1].append((
                     pp.relation_type, None,
                     pers.start_date if b_rel.pk == pp.relation_type_id else pp.start_date,
-                    pers.end_date if d_rel.pk == pp.relation_type_id else pp.end_date))
+                    pers.end_date if d_rel.pk == pp.relation_type_id else pp.end_date, pp))
         for pi in PersonInstitution.objects.filter(related_person_id=person_pk).filter_for_user():
             inst = pi.related_institution
             rel_type = getattr(settings, 'APIS_LOCATED_IN_ATTR', 'situated in')
             plc = InstitutionPlace.objects.filter(relation_type__name=rel_type, related_institution=inst)
             if plc.count() == 1:
                 if plc[0].related_place_id not in place_pk:
-                    res.append((plc[0].related_place, [(pi.relation_type, pi.related_institution, pi.start_date, pi.end_date)]))
+                    res.append((plc[0].related_place, [(pi.relation_type, pi.related_institution, pi.start_date, pi.end_date, pi)]))
                     place_pk[plc[0].related_place_id] = len(res)-1
                 else:
-                    res[place_pk[plc[0].related_place_id]][1].append((pi.relation_type, pi.related_institution, pi.start_date, pi.end_date))
+                    res[place_pk[plc[0].related_place_id]][1].append((pi.relation_type, pi.related_institution, pi.start_date, pi.end_date, pi))
         res = GeoJsonSerializerTheme(res, many=True)
         return Response(res.data)
 
