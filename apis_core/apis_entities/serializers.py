@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from .models import Institution, Person, Place, Event, Work
 from ..apis_relations.models import PersonInstitution, InstitutionPlace, PersonPlace
-from ..apis_vocabularies.models import RelationBaseClass
+from ..apis_vocabularies.models import RelationBaseClass, InstitutionPlaceRelation
 
 
 class BaseEntitySerializer(serializers.HyperlinkedModelSerializer):
@@ -310,8 +310,9 @@ class LifePathSerializer(serializers.BaseSerializer):
     def get_place(self, obj):
         if isinstance(obj, PersonInstitution):
             inst = obj.related_institution
-            rel_type = getattr(settings, 'APIS_LOCATED_IN_ATTR', 'located in')
-            plc = InstitutionPlace.objects.filter(relation_type__name=rel_type, related_institution=inst)
+            rel_type = getattr(settings, 'APIS_LOCATED_IN_ATTR', ['situated in',])
+            ipl_rel = InstitutionPlaceRelation.objects.filter(name__in=rel_type).values_list('pk', flat=True)
+            plc = InstitutionPlace.objects.filter(relation_type_id__in=ipl_rel, related_institution=inst)
             if plc.count() == 1:
                 plc = plc.first().related_place
                 if plc.lng and plc.lat:

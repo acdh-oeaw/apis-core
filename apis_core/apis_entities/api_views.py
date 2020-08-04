@@ -25,7 +25,7 @@ from rest_framework.views import APIView
 from apis_core.apis_metainfo.api_renderers import PaginatedCSVRenderer
 from apis_core.apis_metainfo.models import TempEntityClass, Uri
 from apis_core.apis_relations.models import PersonPlace, InstitutionPlace, AbstractRelation, PersonInstitution
-from apis_core.apis_vocabularies.models import VocabsBaseClass, PersonPlaceRelation
+from apis_core.apis_vocabularies.models import VocabsBaseClass, PersonPlaceRelation, InstitutionPlaceRelation
 from apis_core.default_settings.NER_settings import autocomp_settings, stb_base
 from apis_core.helper_functions.RDFParser import RDFParser
 from apis_core.helper_functions.stanbolQueries import find_loc
@@ -451,8 +451,9 @@ class GetRelatedPlaces(APIView):
                     pers.end_date if d_rel.pk == pp.relation_type_id else pp.end_date, pp))
         for pi in PersonInstitution.objects.filter(related_person_id=person_pk).filter_for_user():
             inst = pi.related_institution
-            rel_type = getattr(settings, 'APIS_LOCATED_IN_ATTR', 'situated in')
-            plc = InstitutionPlace.objects.filter(relation_type__name=rel_type, related_institution=inst)
+            rel_type = getattr(settings, 'APIS_LOCATED_IN_ATTR', ['situated in',])
+            ipl_rel = InstitutionPlaceRelation.objects.filter(name__in=rel_type).values_list('pk', flat=True)
+            plc = InstitutionPlace.objects.filter(relation_type_id__in=ipl_rel, related_institution=inst)
             if plc.count() == 1:
                 if plc[0].related_place_id not in place_pk:
                     res.append((plc[0].related_place, [(pi.relation_type, pi.related_institution, pi.start_date, pi.end_date, pi)]))
