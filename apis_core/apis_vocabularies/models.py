@@ -184,7 +184,7 @@ class CollectionType(VocabsBaseClass):
 
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
-class PassageLanguage(VocabsBaseClass):
+class PublicationLanguage(VocabsBaseClass):
     """vocab to set the language of a passage"""
     pass
 

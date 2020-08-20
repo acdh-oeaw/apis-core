@@ -20,7 +20,7 @@ from apis_core.apis_vocabularies.models import (
     InstitutionType,
     PlaceType,
     Title,
-    PassageLanguage,
+    PublicationLanguage,
     PassageType,
     PassageTopics
 )
@@ -511,7 +511,7 @@ class Person(AbstractEntity):
         null=True,
     )
     title = models.ManyToManyField(Title, blank=True)
-    gender = models.CharField(max_length=15, choices=GENDER_CHOICES, blank=True, null=True)
+    gender = models.CharField(max_length=15, choices=GENDER_CHOICES, blank=True, null=True, default=None)
 
     def save(self, *args, **kwargs):
         if self.first_name:
@@ -569,7 +569,7 @@ class Passage(AbstractEntity):
 @reversion.register(follow=["tempentityclass_ptr"])
 class Publication(AbstractEntity):
     kind = models.ManyToManyField(PassageType, blank=True)
-    language = models.ForeignKey(PassageLanguage, blank=True, null=True, on_delete=models.SET_NULL)
+    language = models.ForeignKey(PublicationLanguage, blank=True, null=True, on_delete=models.SET_NULL)
     clavis_number = models.CharField(max_length=1024, blank=True, null=True)
     migne_number = models.CharField(max_length=1024, blank=True, null=True)
     publication_description = models.TextField(blank=True, null=True)

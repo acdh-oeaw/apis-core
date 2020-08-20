@@ -1,4 +1,4 @@
-from apis_core.vocabularies.models import ProfessionType, Title
+from apis_core.vocabularies.models import Title
 from autocomplete_light import shortcuts as al
 
 from .models import Person, Place, Institution, Event, Passage
@@ -13,17 +13,6 @@ class TitleAutocomplete(al.AutocompleteModelBase):
     }
 
 al.register(Title, TitleAutocomplete)
-
-
-class ProfessionTypeAutocomplete(al.AutocompleteModelBase):
-	search_fields=['name']
-	model = ProfessionType
-	attrs = {
-        'data-autocomplete-minimum-characters': 2,
-        'placeholder': 'Start typing to get suggestions',
-    }
-
-al.register(ProfessionType, ProfessionTypeAutocomplete)
 
 
 class DB_PersonAutocomplete(al.AutocompleteModelBase):
