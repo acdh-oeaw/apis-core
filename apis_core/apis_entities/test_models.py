@@ -4,7 +4,7 @@ from django.urls import reverse
 
 from .models import Person, Place, Institution, Passage, Event
 from apis_core.apis_metainfo.models import Text, Collection, Source, Uri, UriCandidate
-from apis_core.apis_vocabularies.models import PersonPlaceRelation, ProfessionType
+from apis_core.apis_vocabularies.models import PersonPlaceRelation
 from apis_core.apis_labels.models import Label
 from apis_core.apis_relations.models import PersonPlace
 from reversion.models import Version
@@ -24,8 +24,6 @@ class PersonModelTestCase(TestCase):
     col_name2 = 'Test collection2'
     start_date = '1.3.1930'
     end_date = '4.6.1960'
-    prof1 = 'Lehrer'
-    prof2 = 'Politiker'
 
     @classmethod
     def setUpTestData(cls):
@@ -33,8 +31,6 @@ class PersonModelTestCase(TestCase):
         cls.txt = Passage.objects.create(text=cls.text)
         cls.col = Collection.objects.create(name=cls.col_name)
         cls.col2 = Collection.objects.create(name=cls.col_name2)
-        cls.prof1 = ProfessionType.objects.create(name=cls.prof1)
-        cls.prof2 = ProfessionType.objects.create(name=cls.prof2)
 
     def test_init(self):
         Person()
@@ -107,12 +103,9 @@ class PersonModelTestCase(TestCase):
             name='person2'
         )
         p1.collection.add(self.col)
-        p1.profession.add(self.prof1)
         p2.collection.add(self.col2)
-        p2.profession.add(self.prof2)
         p1.merge_with(p2)
         self.assertEqual(p1.collection.all().count(), 2)
-        self.assertEqual(p1.profession.all().count(), 2)
 
 '''
     def test_object_reversion(self):

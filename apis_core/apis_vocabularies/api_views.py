@@ -4,7 +4,7 @@ from rest_framework import viewsets
 from .serializers import (
     InstitutionInstitutionRelationSerializer, TextTypeSerializer,
     CollectionTypeSerializer, VocabsBaseClassSerializer,
-    InstitutionTypeSerializer, ProfessionTypeSerializer, InstitutionPlaceRelationSerializer,
+    InstitutionTypeSerializer, InstitutionPlaceRelationSerializer,
     PlaceTypeSerializer, PersonInstitutionRelationSerializer,
     PersonPlaceRelationSerializer, UserAccSerializer, VocabNamesSerializer,
     PersonPersonRelationSerializer, PersonEventRelationSerializer, PersonPassageRelationSerializer,
@@ -13,7 +13,7 @@ from .serializers import (
     EventEventRelationSerializer, PassagePassageRelationSerializer, EventTypeSerializer, PassageTypeSerializer)
 from .models import (
     InstitutionInstitutionRelation, TextType, CollectionType, VocabsBaseClass,
-    InstitutionType, ProfessionType, PlaceType, PersonInstitutionRelation, InstitutionPlaceRelation,
+    InstitutionType, PlaceType, PersonInstitutionRelation, InstitutionPlaceRelation,
     PersonPlaceRelation, PersonPersonRelation, VocabNames, InstitutionPlaceRelation, PersonEventRelation,
     PersonPassageRelation, InstitutionEventRelation, InstitutionPassageRelation, PlacePassageRelation, PlaceEventRelation,
     PlacePlaceRelation, EventPassageRelation, EventEventRelation, PassagePassageRelation, EventType, PassageType)
@@ -62,11 +62,6 @@ class TextTypeViewSet(viewsets.ModelViewSet):
 class InstitutionTypeViewSet(viewsets.ModelViewSet):
     queryset = InstitutionType.objects.all()
     serializer_class = InstitutionTypeSerializer
-
-
-class ProfessionTypeViewSet(viewsets.ModelViewSet):
-    queryset = ProfessionType.objects.all()
-    serializer_class = ProfessionTypeSerializer
 
 
 class PlaceTypeViewSet(viewsets.ModelViewSet):

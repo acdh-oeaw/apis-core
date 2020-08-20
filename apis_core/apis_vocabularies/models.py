@@ -158,11 +158,6 @@ class Title(VocabsBaseClass):
 
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
-class ProfessionType(VocabsBaseClass):
-    pass
-
-
-@reversion.register(follow=['vocabsbaseclass_ptr'])
 class PlaceType(VocabsBaseClass):
     pass
 

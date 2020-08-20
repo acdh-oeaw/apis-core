@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from .models import (
     InstitutionInstitutionRelation, TextType, CollectionType, VocabsBaseClass,
-    InstitutionType, ProfessionType, PlaceType, PersonInstitutionRelation, InstitutionPlaceRelation,
+    InstitutionType, PlaceType, PersonInstitutionRelation, InstitutionPlaceRelation,
     PersonPlaceRelation, VocabNames, PersonPersonRelation, PersonEventRelation, PersonPassageRelation,
     InstitutionEventRelation, InstitutionPassageRelation, PlaceEventRelation, PlacePassageRelation, PlacePlaceRelation,
     EventPassageRelation, EventEventRelation, PassagePassageRelation, EventType, PassageType, LabelType)
@@ -143,17 +143,6 @@ class InstitutionTypeSerializer(VocabsBaseSerializer):
     class Meta:
         fields = '__all__'
         model = InstitutionType
-
-
-class ProfessionTypeSerializer(VocabsBaseSerializer):
-    url = serializers.HyperlinkedIdentityField(
-        view_name="apis:apis_api:profession-detail",
-        lookup_field="pk"
-    )
-
-    class Meta:
-        fields = '__all__'
-        model = ProfessionType
 
 
 class PlaceTypeSerializer(VocabsBaseSerializer):
