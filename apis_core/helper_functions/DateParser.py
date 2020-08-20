@@ -351,6 +351,29 @@ def parse_date(date_string: str) -> (datetime, datetime, datetime):
     return date_single, date_ab, date_bis, date_is_exact
 
 
+def get_primary_date(start_date, end_date):
+    """
+    In Sola, we need for visualization purposes on primary date for each object.
+    """
+
+    if start_date is not None and end_date is not None:
+
+        days_delta_half = math.floor((end_date - start_date).days / 2, )
+        return start_date + timedelta(days=days_delta_half)
+
+    elif start_date is None:
+
+        return end_date
+
+    elif end_date is None:
+
+        return start_date
+
+    else:
+
+        return None
+
+
 def get_date_help_text_from_dates(single_date, single_start_date, single_end_date, single_date_written,
                                   single_date_is_exact):
     """

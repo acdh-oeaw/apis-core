@@ -54,6 +54,7 @@ class TempEntityClass(models.Model):
     end_start_date = models.DateField(blank=True, null=True)
     end_end_date = models.DateField(blank=True, null=True)
     end_date_is_exact = models.NullBooleanField(blank=True, null=True)
+    primary_date = models.DateField(blank=True, null=True)
     start_date_written = models.CharField(
         max_length=255,
         blank=True,
@@ -117,6 +118,8 @@ class TempEntityClass(models.Model):
                 end_date, end_start_date, end_end_date, end_date_is_exact = \
                     DateParser.parse_date(self.end_date_written)
 
+            primary_date = DateParser.get_primary_date(start_date=start_date, end_date=end_date)
+
             self.start_date = start_date
             self.start_start_date = start_start_date
             self.start_end_date = start_end_date
@@ -125,6 +128,7 @@ class TempEntityClass(models.Model):
             self.end_start_date = end_start_date
             self.end_end_date = end_end_date
             self.end_date_is_exact = end_date_is_exact
+            self.primary_date = primary_date
 
         if self.name:
             self.name = unicodedata.normalize("NFC", self.name)

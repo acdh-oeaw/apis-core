@@ -39,7 +39,6 @@ class SearchForm(forms.Form):
 
 def get_entities_form(entity):
 
-    # TODO __sresch__ : consider moving this class outside of the function call to avoid redundant class definitions
     class GenericEntitiesForm(forms.ModelForm):
         class Meta:
             model = AbstractEntity.get_entity_class_of_name(entity)
@@ -53,6 +52,7 @@ def get_entities_form(entity):
                 'end_start_date',
                 'end_end_date',
                 'end_date_is_exact',
+                'primary_date',
                 'text',
                 'source',
                 'published'
