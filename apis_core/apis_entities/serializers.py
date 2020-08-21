@@ -52,17 +52,11 @@ class PersonSerializer(BaseEntitySerializer):
         view_name="apis:apis_api:person-detail",
         lookup_field="pk"
     )
-    profession = serializers.HyperlinkedRelatedField(
-        view_name="apis:apis_api:professiontype-detail",
-        lookup_field="pk",
-        many=True,
-        read_only=True
-    )
 
     class Meta:
         model = Person
         fields = (
-            'url', 'id', 'name', 'first_name', 'uri_set', 'profession', 'collection', 'text'
+            'url', 'id', 'name', 'first_name', 'uri_set', 'collection', 'text'
         )
 
 
@@ -278,7 +272,6 @@ class NetJsonNodeSerializer(serializers.BaseSerializer):
             r['data']['lat'] = obj.lat
             r['data']['lon'] = obj.lng
         if ent_obj.lower() == 'person':
-            r['data']['profession'] = [x.name for x in obj.profession.all()]
             if obj.gender:
                 r['data']['gender'] = obj.gender
         return r

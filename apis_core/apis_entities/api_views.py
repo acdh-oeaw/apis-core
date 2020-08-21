@@ -117,7 +117,7 @@ class InstitutionViewSet(viewsets.ModelViewSet):
 class PersonViewSet(viewsets.ModelViewSet):
     """Serialization of the Person class.
     In addition to the person this view includes related texts (e.g. biographies), \
-    a list of professions (separated objects) and the collection it belongs to."""
+    and the collection it belongs to."""
 
     permission_classes = (DjangoObjectPermissions,)
     queryset = Person.objects.all()
@@ -128,7 +128,6 @@ class PersonViewSet(viewsets.ModelViewSet):
         "name",
         "first_name",
         "gender",
-        "profession__name",
         "collection__name",
         "uri__uri",
     )
