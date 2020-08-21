@@ -175,21 +175,6 @@ class EntityToProsopogrAPhI(renderers.BaseRenderer):
                 }
                 stmts.append(s)
                 stmt_count += 1
-        if "profession" in data.keys():
-            if len(data["profession"]) > 0:
-                s = {
-                    "@id": stmt_temp.format(data["id"], stmt_count),
-                    "role": {"label": "profession"},
-                    "statementType": [],
-                }
-                for p in data["profession"]:
-                    s2 = {
-                        "uri": "apis_profession_type:{}".format(p["id"]),
-                        "label": p["label"],
-                    }
-                    s["statementType"].append(s2)
-                stmts.append(s)
-                stmt_count += 1
         f["statements"] = stmts
         factoids.append(f)
         facts = []

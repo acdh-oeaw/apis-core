@@ -47,7 +47,6 @@ class RDFPlaceParserNewTestCase(TestCase):
        # self.assertEqual(o3.objct.start_date_written, '1911-01-22')
        # o4 = o3.save()
        # print(o4)
-       # print(o4.profession.all())
        # print(o4.start_date)
 
     def test_merge(self):

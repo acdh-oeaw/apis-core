@@ -71,17 +71,5 @@
             </td>
         </tr>
         {% endif %}
-        {% if object.profession.all %}
-        <tr>
-            <th>
-                Professions
-            </th>
-            <td>
-              {% for prof in object.profession.all %}
-                {{ prof.name }}{% if forloop.last %}{% else %},{% endif %}
-              {% endfor %}
-            </td>
-        </tr>
-        {% endif %}
     </table>
     {% endblock info-table %}
