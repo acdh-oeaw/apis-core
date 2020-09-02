@@ -13,13 +13,13 @@ from apis_core.apis_entities.models import Person, Institution, Place, Event, Pa
 from apis_core.apis_labels.models import Label
 from apis_core.apis_metainfo.models import Uri
 from .forms2 import GenericRelationForm
-# from entities.forms import (PlaceHighlighterForm, PersonHighlighterForm)
 from .models import (
     PersonPlace, PersonPerson, PersonInstitution, InstitutionPlace,
     InstitutionInstitution, PlacePlace, PersonEvent, InstitutionEvent, PlaceEvent, PersonPassage,
     InstitutionPassage, PlacePassage, EventPassage, PassagePassage, PersonPublication, EventPublication,
     PassagePublication
 )
+#from .forms import PersonLabelForm, InstitutionLabelForm, PlaceLabelForm, EventLabelForm
 from .tables import LabelTableEdit
 
 form_module_list = [relation_form_module]

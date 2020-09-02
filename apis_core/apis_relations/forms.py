@@ -92,6 +92,9 @@ class InstitutionLabelForm(EntityLabelForm):
 # Places
 ##############################################
 
+class PlaceLabelForm(EntityLabelForm):
+    pass
+
 
 ##############################################
 # Events

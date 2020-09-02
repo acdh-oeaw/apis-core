@@ -6,7 +6,7 @@ from rest_framework import serializers
 
 from .models import Institution, Person, Place, Event, Passage
 from ..apis_relations.models import PersonInstitution, InstitutionPlace, PersonPlace
-from ..apis_vocabularies.models import RelationBaseClass
+from ..apis_vocabularies.models import RelationBaseClass, InstitutionPlaceRelation
 
 
 class BaseEntitySerializer(serializers.HyperlinkedModelSerializer):
@@ -189,7 +189,15 @@ class GeoJsonSerializerTheme(serializers.BaseSerializer):
                         res_str += f" (-{rel2[3]})"
                 if "(" in res_str and not res_str.endswith(')'):
                     res_str += ')'
-                relations.append((res_str, rel2[2], rel2[3]))
+                #relations.append((res_str, rel2[2], rel2[3]))
+                relations.append(
+                    {
+                        'id': rel2[-1].pk,
+                        'relation': res_str,
+                        'start_date': rel2[2],
+                        'end_date': rel2[3]
+                    }
+                )
             r = {"geometry": {
                 "type": "Point",
                 "coordinates": [obj[0].lng, obj[0].lat]
@@ -295,8 +303,9 @@ class LifePathSerializer(serializers.BaseSerializer):
     def get_place(self, obj):
         if isinstance(obj, PersonInstitution):
             inst = obj.related_institution
-            rel_type = getattr(settings, 'APIS_LOCATED_IN_ATTR', 'located in')
-            plc = InstitutionPlace.objects.filter(relation_type__name=rel_type, related_institution=inst)
+            rel_type = getattr(settings, 'APIS_LOCATED_IN_ATTR', ['situated in',])
+            ipl_rel = InstitutionPlaceRelation.objects.filter(name__in=rel_type).values_list('pk', flat=True)
+            plc = InstitutionPlace.objects.filter(relation_type_id__in=ipl_rel, related_institution=inst)
             if plc.count() == 1:
                 plc = plc.first().related_place
                 if plc.lng and plc.lat:
@@ -323,6 +332,7 @@ class LifePathSerializer(serializers.BaseSerializer):
         if p is None:
             return None
         res = {
+            'id': instance.pk,
             'coords': [p['lat'], p['long']],
             'name': p['name'],
             'year': self.get_year(instance),

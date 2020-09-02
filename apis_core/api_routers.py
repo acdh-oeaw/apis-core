@@ -177,20 +177,15 @@ def generic_serializer_creation_factory():
                 deep_get(set_prem, "{}.exclude".format(entity_str), [])
             )
         exclude_lst_fin = [x for x in exclude_lst if x in [x.name for x in entity._meta.get_fields()]]
+        if entity_str.lower() == "text":
+            exclude_lst_fin.extend(['kind', 'source'])
 
         class Meta:
             model = entity
             exclude = exclude_lst_fin
 
         def to_representation_txt(self, instance):
-            res = {
-                'id': instance.pk,
-                'url': self.context['view'].request.build_absolute_uri(reverse(
-                        "apis:apis_api:{}-detail".format(instance.__class__.__name__.lower()),
-                        kwargs={"pk": instance.pk},
-                        )),
-                'text': instance.text
-            }
+            res = super(self.__class__, self).to_representation(instance)
             if self._highlight:
                 txt_html, annotations = highlight_text_new(instance,
                     set_ann_proj=self._ann_proj_pk, types=self._types, users_show=self._users_show,
@@ -209,10 +204,12 @@ def generic_serializer_creation_factory():
                 self._types = self.context['request'].query_params.get('types', None)
                 self._users_show = self.context['request'].query_params.get('users_show', None)
                 self._inline_annotations = self.context['request'].query_params.get('inline_annotations', True)
-                if self._inline_annotations.lower() == 'false':
-                    self._inline_annotations = False
+                if not isinstance(self._inline_annotations, bool):
+                    if self._inline_annotations.lower() == 'false':
+                        self._inline_annotations = False
             else:
                 self._highlight = False
+            self.fields['kind'] = RelatedObjectSerializer(many=False, read_only=True)
 
 
         def init_serializers(self, *args, **kwargs):
