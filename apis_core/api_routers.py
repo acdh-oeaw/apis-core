@@ -164,7 +164,7 @@ def generic_serializer_creation_factory():
 
 
         print(cont)
-        if cont != "passagelanguage":
+        if cont.name != "passagelanguage":
 
             test_search = getattr(settings, cont.app_label.upper(), False)
             entity_str = str(cont).replace(' ', '')
@@ -283,7 +283,7 @@ def generic_serializer_creation_factory():
                 filterset_dict[field.name] = Filter(form_field=getattr(forms, f_class)(),
                                                     lookups=allowed_fields_filter[f_class])
                 filter_fields.append(field.name)
-    
+
             class MetaFilter(object):
                 model = entity
                 fields = filter_fields
