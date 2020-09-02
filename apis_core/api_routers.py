@@ -161,6 +161,10 @@ class RelatedObjectSerializer(ApisBaseSerializer):
 
 def generic_serializer_creation_factory():
     for cont in ContentType.objects.filter(app_label__in=['apis_entities', 'apis_metainfo', 'apis_relations', 'apis_vocabularies']):
+
+
+        print(cont)
+
         test_search = getattr(settings, cont.app_label.upper(), False)
         entity_str = str(cont).replace(' ', '')
         entity = cont.model_class()
