@@ -560,7 +560,7 @@ class Event(AbstractEntity):
 @reversion.register(follow=["tempentityclass_ptr"])
 class Passage(AbstractEntity):
 
-    topics = models.ManyToManyField(PassageTopics, blank=True)
+    topic = models.ManyToManyField(PassageTopics, blank=True)
     migne_number = models.CharField(max_length=1024, blank=True, null=True)
     kind = models.ManyToManyField(PassageType, blank=True)
 
