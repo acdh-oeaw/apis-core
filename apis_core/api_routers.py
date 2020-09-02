@@ -164,7 +164,7 @@ def generic_serializer_creation_factory():
 
 
         print(cont)
-        if cont.name != "passagelanguage":
+        if cont.name != "passagelanguage" and cont.name != "professiontype":
 
             test_search = getattr(settings, cont.app_label.upper(), False)
             entity_str = str(cont).replace(' ', '')
