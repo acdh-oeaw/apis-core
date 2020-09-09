@@ -113,7 +113,7 @@ class SchemaViewSwagger(schema_view2):
 urlpatterns = [
     url(r"^admin/", admin.site.urls),
     url(r'^swagger(?P<format>\.json|\.yaml)$', SchemaViewSwagger.without_ui(cache_timeout=-1), name='schema-json'),
-    url(r'^swagger/$', SchemaViewSwagger.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    url(r'^swagger/$', SchemaViewSwagger.with_ui('swagger', cache_timeout=-1), name='schema-swagger-ui'),
     url(r'^redoc/$', SchemaViewSwagger.with_ui('redoc', cache_timeout=-1), name='schema-redoc'),
     url(r"labels/", include("apis_core.apis_labels.urls", namespace="apis_labels")),
     url(r"tei/", include("apis_core.apis_tei.tei_urls", namespace="apis_tei")),
