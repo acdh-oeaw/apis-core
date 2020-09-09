@@ -280,6 +280,7 @@ def generic_serializer_creation_factory():
                 continue
             elif field.__class__.__name__ in ['ForeignKey',]:
                 for f2 in field.related_model._meta.fields:
+                    filter_fields[field.name] = ['exact']
                     if f2.__class__.__name__ in ['CharField', 'DateField', 'IntegerField']:
                         filter_fields[f"{field.name}__{f2.name}"] = allowed_fields_filter[f2.__class__.__name__]
                 continue
