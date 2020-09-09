@@ -151,12 +151,12 @@ urlpatterns = [
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # url(r'^api-schema/', schema_view),
     url(r"^apis-vis/", include("apis_core.apis_vis.urls", namespace="apis_vis")),
-    #url(
-    #    r"^docs/(?P<path>.*)",
-    #    login_required(serve),
-    #    {"document_root": "apis-core/docs/_build/html"},
-    #    "docs",
-#),
+    url(
+        r"^docs/(?P<path>.*)$",
+        login_required(serve),
+        {"document_root": "apis-core/docs/_build/html"},
+        "docs",
+),
     # url(r'^docs/', include('sphinxdoc.urls')),
     # url(r'^accounts/', include('registration.backends.simple.urls')),
 ]

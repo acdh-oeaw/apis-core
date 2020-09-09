@@ -9,13 +9,12 @@ from drf_yasg.utils import swagger_auto_schema
 from rest_framework import pagination, serializers, viewsets
 from rest_framework import renderers
 from rest_framework.response import Response
-from url_filter.filtersets import ModelFilterSet
-from url_filter.integrations.drf_coreapi import (
-    CoreAPIURLFilterBackend as DjangoFilterBackend)
+#from url_filter.filtersets import ModelFilterSet
+#from url_filter.integrations.drf_coreapi import (
+#    CoreAPIURLFilterBackend as DjangoFilterBackend)
 from django import forms
 from url_filter.filters import Filter
-
-#from django_filters.rest_framework import DjangoFilterBackend
+from django_filters import rest_framework as filters
 
 
 if 'apis_highlighter' in getattr(settings, 'INSTALLED_APPS'):
@@ -52,7 +51,7 @@ def create_query_parameters(entity):
 
 class DjangoFilterDescriptionInspector(CoreAPICompatInspector):
    def get_filter_parameters(self, filter_backend):
-      if isinstance(filter_backend, DjangoFilterBackend):
+      if isinstance(filter_backend, filters.DjangoFilterBackend):
          result = super(DjangoFilterDescriptionInspector, self).get_filter_parameters(filter_backend)
          for param in result:
             if not param.get('description', ''):
@@ -65,6 +64,7 @@ class DjangoFilterDescriptionInspector(CoreAPICompatInspector):
 
 
 class CustomPagination(pagination.LimitOffsetPagination):
+    
     def get_paginated_response(self, data):
         return Response(
             {
@@ -162,26 +162,10 @@ class RelatedObjectSerializer(ApisBaseSerializer):
 
 def generic_serializer_creation_factory():
     lst_cont = [x.model_class() for x in ContentType.objects.filter(app_label__in=['apis_metainfo', 'apis_vocabularies', 'apis_entities', 'apis_relations']).exclude(model__in=["tempentityclass", "texttype_collections", "vocabnames", "vocabsuri", "uricandidate"]).exclude(model__icontains="baseclass")]
-    lst_sort = []
-    not_allowed_filter_fields = ['useradded', 'vocab_name', 'parent_class', 'vocab', 'entity']
-    len_lst_cont = len(lst_cont)
-    len_lst_sort = len(lst_sort)
-    while len(lst_cont) > len(lst_sort):
-        for c in lst_cont:
-            if c in lst_sort:
-                continue
-            check = True
-            for fld in c._meta.get_fields():
-                if fld.__class__.__name__ in ['ForeignKey',]:
-                    if fld.related_model not in lst_sort and fld.name.lower() not in not_allowed_filter_fields:
-                        check = False
-            if check:
-                lst_sort.append(c)
-        if len_lst_cont == len(lst_cont) and len_lst_sort == len(lst_sort):
-            raise ValueError('no change in figures')
-        len_lst_cont = len(lst_cont)
-        len_lst_sort = len(lst_sort)
-    for cont in lst_sort:
+    not_allowed_filter_fields = ['useradded', 'vocab_name', 'parent_class', 'vocab', 'entity', 'autofield']
+    for cont in lst_cont:
+        prefetch_rel = []
+        select_related = []
         test_search = getattr(settings, cont.__module__.split('.')[1].upper(), False)
         entity_str = str(cont.__name__).replace(' ', '')
         entity = cont
@@ -263,6 +247,10 @@ def generic_serializer_creation_factory():
                     self.fields[f.name] = RelatedObjectSerializer(many=ck_many, read_only=True)
                 elif f.__class__.__name__ in ["ManyToManyField", "ForeignKey"]:
                     self.fields[f.name] = LabelSerializer(many=ck_many, read_only=True)
+                if f.__class__.__name__ == "ManyToManyField":
+                    prefetch_rel.append(f.name)
+                elif f.__class__.__name__ == "ForeignKey":
+                    select_related.append(f.name)
 
         s_dict = {
             "id": serializers.ReadOnlyField(),
@@ -281,28 +269,24 @@ def generic_serializer_creation_factory():
         serializer_class = type(f"{entity_str.title().replace(' ', '')}Serializer", (serializers.HyperlinkedModelSerializer,), s_dict)
         allowed_fields_filter = {'IntegerField': ['in', 'range'],
                                 'CharField': ['exact', 'icontains', 'iregex', 'isnull'],
-                                'BooleanField': ['exact'],
-                                'DateField': ['year', 'lte', 'gte', 'day', 'month'],
+                                'DateField': ['year', 'lt', 'gt', 'year__lt', 'year__gt'],
+                                'PositiveIntegerField': ['in', 'range'],
                                 }
         filterset_dict = {}
-        filter_fields = []
+        filter_fields = {}
 
         for field in entity._meta.fields:
             if field.name.lower() in not_allowed_filter_fields:
                 continue
-            if field.__class__.__name__ == 'AutoField':
-                f_class = 'IntegerField'
-            else:
-                f_class = field.__class__.__name__
-            if f_class in allowed_fields_filter.keys():
-                filterset_dict[field.name] = Filter(form_field=getattr(forms, f_class)(),
-                                                lookups=allowed_fields_filter[f_class])
-            elif f_class in ['ForeignKey',]:
-                filterset_dict[field.name] = filter_classes[field.related_model.__name__.lower()]
-                lst_filter_classes_check.append((entity_str.lower(), field.related_model.__name__.lower()))
-            else:
+            elif field.__class__.__name__ in ['ForeignKey',]:
+                for f2 in field.related_model._meta.fields:
+                    if f2.__class__.__name__ in ['CharField', 'DateField', 'IntegerField']:
+                        filter_fields[f"{field.name}__{f2.name}"] = allowed_fields_filter[f2.__class__.__name__]
                 continue
-            filter_fields.append(field.name)
+            if field.__class__.__name__ in allowed_fields_filter.keys():
+                filter_fields[field.name] = allowed_fields_filter[field.__class__.__name__]
+            else:
+                filter_fields[field.name] = ['exact']
 
         class MetaFilter(object):
             model = entity
@@ -310,13 +294,17 @@ def generic_serializer_creation_factory():
 
         filterset_dict['Meta'] = MetaFilter
 
-        filter_class = type(f"Generic{entity_str.title().replace(' ', '')}FilterClass", (ModelFilterSet,), filterset_dict)
-        filter_classes[entity_str.lower()] = filter_class
 
         def get_queryset(self):
             if "apis_relations" in str(self.model):
-                return self.model.objects.filter_for_user()
-            return self.model.objects.all()
+                qs = self.model.objects.filter_for_user()
+            else:
+                qs = self.model.objects.all()
+            if len(prefetch_rel) > 0:
+                qs = qs.prefetch_related(*prefetch_rel)
+            if len(select_related) > 0:
+                qs = qs.select_related(*select_related)
+            return qs
 
         @swagger_auto_schema(filter_inspectors=[DjangoFilterDescriptionInspector,])
         def list_viewset(self, request):
@@ -332,14 +320,14 @@ def generic_serializer_creation_factory():
             'pagination_class': CustomPagination,
             'model': entity,
             #'queryset': entity.objects.all(),
-            'filter_backends': (DjangoFilterBackend, ),
-            #'filter_fields': ['']
+            'filter_backends': (filters.DjangoFilterBackend, ),
+            'filterset_fields': filter_fields,
             'depth': 2,
             'renderer_classes': (renderers.JSONRenderer, renderers.BrowsableAPIRenderer, NetJsonRenderer),
-            'filter_class': filter_class,
+            #'filter_class': filter_class,
             'serializer_class': serializer_class,
             "get_queryset": get_queryset,
-            #'list': list_viewset,
+            'list': list_viewset,
             'dispatch': lambda self, request, *args, **kwargs: super(self.__class__, self).dispatch(request, *args, **kwargs)
             }
         if entity_str.lower() == 'text':
