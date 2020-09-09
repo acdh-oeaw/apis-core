@@ -52,22 +52,15 @@ if "apis_highlighter" in settings.INSTALLED_APPS:
     router.register(r"HLProjects", HighlighterProjectViewSet)
     router.register(r"HLTextHigh", HighlighterTextHighViewSet)
     router.register(r"HLMenuEntry", HighlighterMenuEntryViewSet)
-    router.register(
-        r"HLTextHighlighter", HighlighterHighlightTextViewSet, "HLTextHighlighter"
-    )
-    router.register(r"HLVocabularyAPI", HighlighterVocabularyAPIViewSet)
-    router.register(r"HLAnnotation", HighlighterAnnotationViewSet)
+    #router.register(
+    #    r"HLTextHighlighter", HighlighterHighlightTextViewSet, "HLTextHighlighter"
+    #)
+    #router.register(r"HLVocabularyAPI", HighlighterVocabularyAPIViewSet)
+    #router.register(r"HLAnnotation", HighlighterAnnotationViewSet)
 
 router.register(r"users", UserViewSet)
 router.register(r"GeoJsonPlace", PlaceGeoJsonViewSet, "PlaceGeoJson")
-router.register(r"NetJson", NetJsonViewSet, "NetJson")
-
-
-@api_view()
-@renderer_classes([SwaggerUIRenderer, OpenAPIRenderer])
-def schema_view(request):
-    generator = schemas.SchemaGenerator(title='APIS API')
-    return response.Response(generator.get_schema(request=request))
+#router.register(r"NetJson", NetJsonViewSet, "NetJson")
 
 
 from rest_framework import permissions
@@ -148,22 +141,22 @@ urlpatterns = [
     url(
         r"^api/", include((router.urls, "apis_core"), namespace="apis_api")
     ),  # routers do not support namespaces out of the box
-    path('openapi-2', schema_view),
-    path('openapi-api', get_schema_view(
-        title="APIS",
-        description="APIS API schema definition",
-        urlconf='apis_core.apis_entities.api_urls',
-    ), name='openapi-schema-api'),
+    #path('openapi-2', schema_view),
+    #path('openapi-api', get_schema_view(
+    #    title="APIS",
+    #    description="APIS API schema definition",
+   #    urlconf='apis_core.apis_entities.api_urls',
+    #), name='openapi-schema-api'),
     url(r"^api2/", include("apis_core.apis_entities.api_urls", namespace="apis_api2")),
     url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # url(r'^api-schema/', schema_view),
     url(r"^apis-vis/", include("apis_core.apis_vis.urls", namespace="apis_vis")),
-    url(
-        r"^docs/(?P<path>.*)",
-        login_required(serve),
-        {"document_root": "apis-core/docs/_build/html"},
-        "docs",
-    ),
+    #url(
+    #    r"^docs/(?P<path>.*)",
+    #    login_required(serve),
+    #    {"document_root": "apis-core/docs/_build/html"},
+    #    "docs",
+#),
     # url(r'^docs/', include('sphinxdoc.urls')),
     # url(r'^accounts/', include('registration.backends.simple.urls')),
 ]

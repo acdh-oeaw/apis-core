@@ -10,7 +10,8 @@ from rest_framework import pagination, serializers, viewsets
 from rest_framework import renderers
 from rest_framework.response import Response
 from url_filter.filtersets import ModelFilterSet
-from url_filter.integrations.drf_coreapi import CoreAPIURLFilterBackend as DjangoFilterBackend
+from url_filter.integrations.drf_coreapi import (
+    CoreAPIURLFilterBackend as DjangoFilterBackend)
 from django import forms
 from url_filter.filters import Filter
 
@@ -156,22 +157,42 @@ class LabelSerializer(ApisBaseSerializer):
 
 
 class RelatedObjectSerializer(ApisBaseSerializer):
-    parent_id = serializers.ReadOnlyField(source='parent_class_id')
+    parent_id = serializers.ReadOnlyField(source="parent_class_id")
 
 
 def generic_serializer_creation_factory():
-    for cont in ContentType.objects.filter(app_label__in=['apis_entities', 'apis_metainfo', 'apis_relations', 'apis_vocabularies']):
-        test_search = getattr(settings, cont.app_label.upper(), False)
-        entity_str = str(cont).replace(' ', '')
-        entity = cont.model_class()
-        app_label = cont.app_label.replace(' ', '_')
+    lst_cont = [x.model_class() for x in ContentType.objects.filter(app_label__in=['apis_metainfo', 'apis_vocabularies', 'apis_entities', 'apis_relations']).exclude(model__in=["tempentityclass", "texttype_collections", "vocabnames", "vocabsuri", "uricandidate"]).exclude(model__icontains="baseclass")]
+    lst_sort = []
+    not_allowed_filter_fields = ['useradded', 'vocab_name', 'parent_class', 'vocab', 'entity']
+    len_lst_cont = len(lst_cont)
+    len_lst_sort = len(lst_sort)
+    while len(lst_cont) > len(lst_sort):
+        for c in lst_cont:
+            if c in lst_sort:
+                continue
+            check = True
+            for fld in c._meta.get_fields():
+                if fld.__class__.__name__ in ['ForeignKey',]:
+                    if fld.related_model not in lst_sort and fld.name.lower() not in not_allowed_filter_fields:
+                        check = False
+            if check:
+                lst_sort.append(c)
+        if len_lst_cont == len(lst_cont) and len_lst_sort == len(lst_sort):
+            raise ValueError('no change in figures')
+        len_lst_cont = len(lst_cont)
+        len_lst_sort = len(lst_sort)
+    for cont in lst_sort:
+        test_search = getattr(settings, cont.__module__.split('.')[1].upper(), False)
+        entity_str = str(cont.__name__).replace(' ', '')
+        entity = cont
+        app_label = cont.__module__.split('.')[1].lower()
         exclude_lst = []
         if app_label == "apis_entities":
             exclude_lst = deep_get(
                 test_search, "{}.api_exclude".format(entity_str), []
             )
         else:
-            set_prem = getattr(settings, f"{cont.app_label.upper()}", {})
+            set_prem = getattr(settings, cont.__module__.split('.')[1].upper(), {})
             exclude_lst = deep_get(set_prem, "exclude", [])
             exclude_lst.extend(
                 deep_get(set_prem, "{}.exclude".format(entity_str), [])
@@ -259,21 +280,28 @@ def generic_serializer_creation_factory():
             s_dict['to_representation'] = to_representation_txt
         serializer_class = type(f"{entity_str.title().replace(' ', '')}Serializer", (serializers.HyperlinkedModelSerializer,), s_dict)
         allowed_fields_filter = {'IntegerField': ['in', 'range'],
-                                 'CharField': ['exact', 'icontains', 'iregex', 'isnull'],
-                                 'BooleanField': ['exact'],
-                                 'DateField': ['year', 'lte', 'gte', 'day', 'month']}
+                                'CharField': ['exact', 'icontains', 'iregex', 'isnull'],
+                                'BooleanField': ['exact'],
+                                'DateField': ['year', 'lte', 'gte', 'day', 'month'],
+                                }
         filterset_dict = {}
         filter_fields = []
 
         for field in entity._meta.fields:
+            if field.name.lower() in not_allowed_filter_fields:
+                continue
             if field.__class__.__name__ == 'AutoField':
                 f_class = 'IntegerField'
             else:
                 f_class = field.__class__.__name__
-            if f_class not in allowed_fields_filter.keys():
-                continue
-            filterset_dict[field.name] = Filter(form_field=getattr(forms, f_class)(),
+            if f_class in allowed_fields_filter.keys():
+                filterset_dict[field.name] = Filter(form_field=getattr(forms, f_class)(),
                                                 lookups=allowed_fields_filter[f_class])
+            elif f_class in ['ForeignKey',]:
+                filterset_dict[field.name] = filter_classes[field.related_model.__name__.lower()]
+                lst_filter_classes_check.append((entity_str.lower(), field.related_model.__name__.lower()))
+            else:
+                continue
             filter_fields.append(field.name)
 
         class MetaFilter(object):
@@ -283,6 +311,7 @@ def generic_serializer_creation_factory():
         filterset_dict['Meta'] = MetaFilter
 
         filter_class = type(f"Generic{entity_str.title().replace(' ', '')}FilterClass", (ModelFilterSet,), filterset_dict)
+        filter_classes[entity_str.lower()] = filter_class
 
         def get_queryset(self):
             if "apis_relations" in str(self.model):
@@ -315,8 +344,12 @@ def generic_serializer_creation_factory():
             }
         if entity_str.lower() == 'text':
             viewset_dict['retrieve'] = retrieve_view_txt
+        serializers_dict[serializer_class.__name__] = serializer_class
         views[f"{entity_str.lower().replace(' ', '')}"] = type(f"Generic{entity_str.title().replace(' ', '')}ViewSet", (viewsets.ModelViewSet, ), viewset_dict)
+    print('done')
 
-
+serializers_dict = dict()
 views = dict()
+filter_classes = dict()
+lst_filter_classes_check = []
 generic_serializer_creation_factory()
