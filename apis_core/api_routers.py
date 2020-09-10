@@ -267,10 +267,10 @@ def generic_serializer_creation_factory():
             s_dict['__init__'] = init_text_serializer
             s_dict['to_representation'] = to_representation_txt
         serializer_class = type(f"{entity_str.title().replace(' ', '')}Serializer", (serializers.HyperlinkedModelSerializer,), s_dict)
-        allowed_fields_filter = {'IntegerField': ['in', 'range'],
+        allowed_fields_filter = {'IntegerField': ['in', 'range', 'exact'],
                                 'CharField': ['exact', 'icontains', 'iregex', 'isnull'],
-                                'DateField': ['year', 'lt', 'gt', 'year__lt', 'year__gt'],
-                                'PositiveIntegerField': ['in', 'range'],
+                                'DateField': ['year', 'lt', 'gt', 'year__lt', 'year__gt', 'exact'],
+                                'PositiveIntegerField': ['in', 'range', 'exact'],
                                 }
         filterset_dict = {}
         filter_fields = {}
