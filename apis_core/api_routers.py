@@ -280,7 +280,7 @@ def generic_serializer_creation_factory():
                 continue
             elif field.__class__.__name__ in ['ForeignKey',]:
                 for f2 in field.related_model._meta.fields:
-                    filter_fields[field.name] = ['exact']
+                    filter_fields[field.name] = ['exact', 'in']
                     if f2.__class__.__name__ in ['CharField', 'DateField', 'IntegerField']:
                         filter_fields[f"{field.name}__{f2.name}"] = allowed_fields_filter[f2.__class__.__name__]
                 continue
@@ -301,10 +301,10 @@ def generic_serializer_creation_factory():
                 qs = self.model.objects.filter_for_user()
             else:
                 qs = self.model.objects.all()
-            if len(prefetch_rel) > 0:
-                qs = qs.prefetch_related(*prefetch_rel)
-            if len(select_related) > 0:
-                qs = qs.select_related(*select_related)
+            if len(self._prefetch_rel) > 0:
+                qs = qs.prefetch_related(*self._prefetch_rel)
+            if len(self._select_related) > 0:
+                qs = qs.select_related(*self._select_related)
             return qs
 
         @swagger_auto_schema(filter_inspectors=[DjangoFilterDescriptionInspector,])
@@ -318,6 +318,8 @@ def generic_serializer_creation_factory():
             return res
 
         viewset_dict = {
+            '_select_related': select_related,
+            '_prefetch_rel': prefetch_rel,
             'pagination_class': CustomPagination,
             'model': entity,
             #'queryset': entity.objects.all(),
@@ -335,7 +337,6 @@ def generic_serializer_creation_factory():
             viewset_dict['retrieve'] = retrieve_view_txt
         serializers_dict[serializer_class.__name__] = serializer_class
         views[f"{entity_str.lower().replace(' ', '')}"] = type(f"Generic{entity_str.title().replace(' ', '')}ViewSet", (viewsets.ModelViewSet, ), viewset_dict)
-    print('done')
 
 serializers_dict = dict()
 views = dict()
