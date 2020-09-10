@@ -275,12 +275,16 @@ def generic_serializer_creation_factory():
         filterset_dict = {}
         filter_fields = {}
 
-        for field in entity._meta.fields:
-            if field.name.lower() in not_allowed_filter_fields:
+        for field in entity._meta.fields + entity._meta.many_to_many:
+            if getattr(settings, "APIS_API_EXCLUDE_SETS", False) and '_set' in str(field.name.lower()):
                 continue
-            elif field.__class__.__name__ in ['ForeignKey',]:
+            if field.name.lower() in not_allowed_filter_fields or field.name == 'tempentityclass_ptr':
+                continue
+            elif field.__class__.__name__ in ['ForeignKey', 'ManyToManyField']:
+                filter_fields[field.name] = ['exact']
+                if field.__class__.__name__ == "ForeignKey":
+                    filter_fields[field.name].append('in')
                 for f2 in field.related_model._meta.fields:
-                    filter_fields[field.name] = ['exact', 'in']
                     if f2.__class__.__name__ in ['CharField', 'DateField', 'IntegerField']:
                         filter_fields[f"{field.name}__{f2.name}"] = allowed_fields_filter[f2.__class__.__name__]
                 continue
