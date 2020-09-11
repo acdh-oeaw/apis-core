@@ -161,7 +161,7 @@ class RelatedObjectSerializer(ApisBaseSerializer):
 
 
 def generic_serializer_creation_factory():
-    lst_cont = [x.model_class() for x in ContentType.objects.filter(app_label__in=['apis_metainfo', 'apis_vocabularies', 'apis_entities', 'apis_relations']).exclude(model__in=["tempentityclass", "texttype_collections", "relationbaseclass"])]
+    lst_cont = [x.model_class() for x in ContentType.objects.filter(app_label__in=['apis_metainfo', 'apis_vocabularies', 'apis_entities', 'apis_relations']).exclude(model__in=["texttype_collections", "relationbaseclass"])]
     not_allowed_filter_fields = ['useradded', 'vocab_name', 'parent_class', 'vocab', 'entity', 'autofield']
     for cont in lst_cont:
         prefetch_rel = []
