@@ -23,8 +23,6 @@ class APISTestRunner(DiscoverRunner):
 
     def setup_databases(self, **kwargs):
         super().setup_databases(**kwargs)
-        p = ct.objects.get(app_label="apis_entities", model='person')
-        p.model_class().objects.create(name="test")
 
         lst_cont = [x.model_class() for x in ct.objects.filter(app_label__in=['apis_metainfo', 'apis_vocabularies', 'apis_entities', 'apis_relations']).exclude(model__in=["tempentityclass", "texttype_collections", "vocabnames", "vocabsuri", "uricandidate"]).exclude(model__icontains="baseclass")]
         lst_sort = [ct.objects.get(app_label='apis_metainfo', model="uri").model_class()]
@@ -90,3 +88,4 @@ class APISTestRunner(DiscoverRunner):
             else:
                 dict_ents[ent.__name__].append(c_1_obj)
             print(f"created {c_1_obj}")
+        return {}

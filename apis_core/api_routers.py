@@ -184,6 +184,11 @@ def generic_serializer_creation_factory():
         exclude_lst_fin = [x for x in exclude_lst if x in [x.name for x in entity._meta.get_fields()]]
         if entity_str.lower() == "text":
             exclude_lst_fin.extend(['kind', 'source'])
+        for f in entity._meta.get_fields():
+            if f.__class__.__name__ == "ManyToManyField":
+                prefetch_rel.append(f.name)
+            elif f.__class__.__name__ == "ForeignKey":
+                select_related.append(f.name)
 
         class Meta:
             model = entity
@@ -247,10 +252,6 @@ def generic_serializer_creation_factory():
                     self.fields[f.name] = RelatedObjectSerializer(many=ck_many, read_only=True)
                 elif f.__class__.__name__ in ["ManyToManyField", "ForeignKey"]:
                     self.fields[f.name] = LabelSerializer(many=ck_many, read_only=True)
-                if f.__class__.__name__ == "ManyToManyField":
-                    prefetch_rel.append(f.name)
-                elif f.__class__.__name__ == "ForeignKey":
-                    select_related.append(f.name)
 
         s_dict = {
             "id": serializers.ReadOnlyField(),
