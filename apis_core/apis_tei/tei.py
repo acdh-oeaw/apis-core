@@ -369,9 +369,9 @@ def convert_to_etree(text_as_string):
 def group_annotations_by_text(ent_dict):
     annotations_by_text = defaultdict(list)
     for rel_type_name, rel_type_list in ent_dict.get('relations').items():
-        print(rel_type_name)
+        
         for rel in rel_type_list:
-            print(rel)
+            
             if rel.get('annotation'):
                 for ann in rel.get('annotation', []):
                     text_id = ann["text_url"].split('/')[-2] # parse the url to get the text id...
