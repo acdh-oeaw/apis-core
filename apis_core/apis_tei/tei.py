@@ -329,9 +329,13 @@ class TeiEntCreator():
 
             # Convert each annotation range from string-offset field ('34-52') into start and end indexes, and convert into tuple
             # of (start, end, tag) to run through standoff_to_inline function
+            
+
             annotations = [(int(ann["string_offset"].split('-')[0]), 
                             int(ann["string_offset"].split('-')[1]), 
-                            relation_type_to_tei_tag[ann["annotation_type"]]) for ann in anns]
+                            f'{relation_type_to_tei_tag[ann["annotation_type"]]} ref="{ann["target"]}"'
+                        
+                        ) for ann in anns]
 
             tagged_text = stand_off_to_inline(text_obj.text, annotations)
 
@@ -339,7 +343,7 @@ class TeiEntCreator():
             wrapped_text = '<p>{}</p>'.format('</p><p>'.join(tagged_text.split('\n\n')))
 
             # Embed the text in some TEI tags
-            embedded_text = '<text><body>{}</body></text>'.format(wrapped_text)
+            embedded_text = '<text xml:id="text__{}"><body>{}</body></text>'.format(text_obj.id, wrapped_text)
             texts.append(embedded_text)
         
         # For each text string, convert to ET element
@@ -369,15 +373,15 @@ def convert_to_etree(text_as_string):
 def group_annotations_by_text(ent_dict):
     annotations_by_text = defaultdict(list)
     for rel_type_name, rel_type_list in ent_dict.get('relations').items():
-        
+        #print(rel_type_name)
         for rel in rel_type_list:
             
             if rel.get('annotation'):
                 for ann in rel.get('annotation', []):
                     text_id = ann["text_url"].split('/')[-2] # parse the url to get the text id...
-                    
+                    target = rel.get('target', {}).get('url', None) 
                     # add the annotation to the text-group, also adding in a type for conversion later
-                    annotations_by_text[text_id].append({**ann, "annotation_type": rel_type_name}) 
+                    annotations_by_text[text_id].append({**ann, "annotation_type": rel_type_name, "target": target}) 
 
     return annotations_by_text
 
