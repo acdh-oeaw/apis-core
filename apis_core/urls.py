@@ -64,57 +64,68 @@ router.register(r"GeoJsonPlace", PlaceGeoJsonViewSet, "PlaceGeoJson")
 
 
 from rest_framework import permissions
-from drf_yasg.views import get_schema_view as get_schema_view2
-from drf_yasg import openapi
+#from drf_yasg.views import get_schema_view as get_schema_view2
+#from drf_yasg import openapi
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 
-schema_view2 = get_schema_view2(
-   openapi.Info(
-      title="APIS API",
-      default_version='v1',
-      description="Hyperlinked API of the APIS Framework",
+#schema_view2 = get_schema_view2(
+#   openapi.Info(
+#      title="APIS API",
+#      default_version='v1',
+#      description="Hyperlinked API of the APIS Framework",
       #terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="matthias.schloegl@oeaw.ac.at"),
-      license=openapi.License(name="MIT"),
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
-)
+#      contact=openapi.Contact(email="matthias.schloegl@oeaw.ac.at"),
+#      license=openapi.License(name="MIT"),
+#   ),
+#   public=True,
+#   permission_classes=(permissions.AllowAny,),
+#)
 
-class APISSchemaGenerator(OpenAPISchemaGenerator):
-    info = "APIS test"
-    title = "APIS_API v2"
+#class APISSchemaGenerator(OpenAPISchemaGenerator):
+#    info = "APIS test"
+#    title = "APIS_API v2"
 
-    def __init__(self, *args, **kwargs):
-        super(APISSchemaGenerator, self).__init__(*args, **kwargs)
+#    def __init__(self, *args, **kwargs):
+#        super(APISSchemaGenerator, self).__init__(*args, **kwargs)
 
 
-class SchemaViewSwagger(schema_view2):
-    generator_class = APISSchemaGenerator
+#class SchemaViewSwagger(schema_view2):
+#    generator_class = APISSchemaGenerator
 
-    def get_filter_parameters(self, filter_backend):
-        if isinstance(filter_backend, DjangoFilterBackend):
-            result = super(SchemaViewSwagger, self).get_filter_parameters(filter_backend)
-            for param in result:
-                if not param.get('description', ''):
-                    param.description = "Filter the returned list by {field_name}".format(field_name=param.name)
+#    def get_filter_parameters(self, filter_backend):
+ #       if isinstance(filter_backend, DjangoFilterBackend):
+#            result = super(SchemaViewSwagger, self).get_filter_parameters(filter_backend)
+#            for param in result:
+#                if not param.get('description', ''):
+#                    param.description = "Filter the returned list by {field_name}".format(field_name=param.name)
 
-            return result
+#            return result
 
-        return NotHandled
+#        return NotHandled
 
-    def get_operation(self, operation_keys):
-        super(SchemaViewSwagger, self).get_operation(operation_keys)
+#    def get_operation(self, operation_keys):
+#        super(SchemaViewSwagger, self).get_operation(operation_keys)
 
-    def __init__(self, *args, **kwargs):
-        super(SchemaViewSwagger, self).__init__(*args, **kwargs)
+#    def __init__(self, *args, **kwargs):
+#        super(SchemaViewSwagger, self).__init__(*args, **kwargs)
 
+def build_apis_mock_request(method, path, view, original_request, **kwargs):
+    # default mock request
+    request = build_mock_request(method, path, view, original_request, **kwargs)
+    # the added wagtail magic
+    request.router = router
+    return request
 
 urlpatterns = [
     url(r"^admin/", admin.site.urls),
-    url(r'^swagger(?P<format>\.json|\.yaml)$', SchemaViewSwagger.without_ui(cache_timeout=-1), name='schema-json'),
-    url(r'^swagger/$', SchemaViewSwagger.with_ui('swagger', cache_timeout=-1), name='schema-swagger-ui'),
-    url(r'^redoc/$', SchemaViewSwagger.with_ui('redoc', cache_timeout=-1), name='schema-redoc'),
+    #url(r'^swagger(?P<format>\.json|\.yaml)$', SchemaViewSwagger.without_ui(cache_timeout=-1), name='schema-json'),
+    #url(r'^swagger/$', SchemaViewSwagger.with_ui('swagger', cache_timeout=-1), name='schema-swagger-ui'),
+    #url(r'^redoc/$', SchemaViewSwagger.with_ui('redoc', cache_timeout=-1), name='schema-redoc'),
+    path('swagger/schema/', SpectacularAPIView.as_view(), name='schema'),
+    # Optional UI:
+    path('swagger/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='apis_core:schema'), name='swagger-ui'),
+    path('swagger/schema/redoc/', SpectacularRedocView.as_view(url_name='apis_core:schema'), name='redoc'),
     url(r"labels/", include("apis_core.apis_labels.urls", namespace="apis_labels")),
     url(r"tei/", include("apis_core.apis_tei.tei_urls", namespace="apis_tei")),
     url(
