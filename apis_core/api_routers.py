@@ -20,6 +20,7 @@ from .apis_relations.models import AbstractRelation
 if 'apis_highlighter' in getattr(settings, 'INSTALLED_APPS'):
     from apis_core.helper_functions.highlighter import highlight_text_new
     from apis_highlighter.serializer import annotationSerializer
+    from apis_highlighter.models import Annotation
 
 
 try:
@@ -135,6 +136,13 @@ class RelationObjectSerializer2(ApisBaseSerializer):
         super(RelationObjectSerializer2, self).__init__(*args, **kwargs)
 
 
+class AnnotationSerializer(serializers.ModelSerializer):
+    related_entity = VocabsBaseSerializer(source="get_related_entity", read_only=True, many=False)
+
+    class Meta:
+        model = Annotation
+        fields = ['id', 'start', 'end', 'related_entity']
+
 
 def generic_serializer_creation_factory():
     lst_cont = [x.model_class() for x in ContentType.objects.filter(app_label__in=['apis_metainfo', 'apis_vocabularies', 'apis_entities', 'apis_relations']).exclude(model__in=["texttype_collections", "relationbaseclass"])]
@@ -171,18 +179,20 @@ def generic_serializer_creation_factory():
         class Meta:
             model = entity
             exclude = exclude_lst_fin
-
-        def to_representation_txt(self, instance):
-            res = super(self.__class__, self).to_representation(instance)
-            if self._highlight:
-                txt_html, annotations = highlight_text_new(instance,
-                    set_ann_proj=self._ann_proj_pk, types=self._types, users_show=self._users_show,
-                    inline_annotations=self._inline_annotations)
-                res['text'] = txt_html
-                res['annotations'] = annotations
+        
+        def txt_serializer_add_text(self, instance):
+            if self._inline_annotations:
+                return self._txt_html
             else:
-                res['annotations'] = None
-            return res
+                return instance.text
+
+        @extend_schema_field(AnnotationSerializer)
+        def txt_serializer_add_annotations(self, instance):
+            if self._highlight:
+                return AnnotationSerializer(self._annotations, context=self.context, many=True).data
+            else:
+                return None
+
 
         def init_text_serializer(self, *args, **kwargs):
             super(self.__class__, self).__init__(*args, **kwargs)
@@ -260,6 +270,8 @@ def generic_serializer_creation_factory():
             highlight = self.context.get('highlight', True)
             if highlight is not None and 'apis_highlighter' in getattr(settings,'INSTALLED_APPS'):
                 self._highlight = highlight
+                if self._highlight == '':
+                    self._highlight = True
                 if not isinstance(self._highlight, bool):
                     if self._highlight.lower() == 'false':
                         self._highlight = False
@@ -270,6 +282,19 @@ def generic_serializer_creation_factory():
                 if not isinstance(self._inline_annotations, bool):
                     if self._inline_annotations.lower() == 'false':
                         self._inline_annotations = False
+                try:
+                    self._txt_html, self._annotations = highlight_text_new(self.instance,
+                        set_ann_proj=self._ann_proj_pk, types=self._types, users_show=self._users_show,
+                        inline_annotations=self._inline_annotations)
+                    qs_an = {'text': self.instance}
+                    if self._users_show is not None:
+                        qs_an['users_added__in'] = self._users_show
+                    if self._ann_proj_pk is not None:
+                        qs_an['annotation_project_id'] = self._ann_proj_pk
+                    self._annotations = Annotation.objects.filter(**qs_an) #FIXME: Currently this QS is called twice (highlight_text_new)
+                except Exception as e:
+                    self._txt_html = ""
+                    self._annotations = []
             else:
                 self._highlight = False
             self.fields['kind'] = LabelSerializer(many=False, read_only=True)
@@ -279,7 +304,10 @@ def generic_serializer_creation_factory():
 
         if entity_str.lower() == 'text':
             s_dict_detail['__init__'] = init_text_serializer_retrieve
-            s_dict_detail['to_representation'] = to_representation_txt
+            s_dict_detail['txt_serializer_add_text'] = txt_serializer_add_text
+            s_dict_detail['text'] = serializers.SerializerMethodField(method_name='txt_serializer_add_text')
+            s_dict_detail['txt_serializer_add_annotations'] = txt_serializer_add_annotations
+            s_dict_detail['annotations'] = serializers.SerializerMethodField(method_name="txt_serializer_add_annotations")
 
         serializer_class_retrieve = type(f"{entity_str.title().replace(' ', '')}DetailSerializer", (serializers.HyperlinkedModelSerializer,), s_dict_detail)
 
