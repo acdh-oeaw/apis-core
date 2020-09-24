@@ -8,7 +8,7 @@ from rest_framework import pagination, serializers, viewsets
 from rest_framework import renderers
 from rest_framework.response import Response
 from drf_spectacular.contrib.django_filters import DjangoFilterBackend as DjangoFilterbackendSpectacular
-from drf_spectacular.utils import extend_schema, extend_schema_field, OpenApiParameter
+from drf_spectacular.utils import extend_schema, extend_schema_field, OpenApiParameter, extend_schema_serializer
 from drf_spectacular.types import OpenApiTypes
 from django import forms
 from django_filters import rest_framework as filters
@@ -98,6 +98,16 @@ class ApisBaseSerializer(serializers.ModelSerializer):
         fields = ['id', 'label', 'url']
 
 
+class EntitySerializer(ApisBaseSerializer):
+    type = serializers.SerializerMethodField(method_name="add_type")
+
+    def add_type(self, instance):
+        return instance.__class__.__name__
+
+    class Meta(ApisBaseSerializer.Meta):
+        fields = ApisBaseSerializer.Meta.fields + ['type']
+
+
 class LabelSerializer(ApisBaseSerializer):
     parent_id = serializers.PrimaryKeyRelatedField(many=False, source='parent_class_id', read_only=True)
 
@@ -108,25 +118,18 @@ class LabelSerializer(ApisBaseSerializer):
     class Meta(ApisBaseSerializer.Meta):
         fields = ApisBaseSerializer.Meta.fields + ['parent_id',]
 
-
-class VocabsBaseSerializer(LabelSerializer):
-    type = serializers.SerializerMethodField(method_name="add_type")
-
-    def add_type(self, instance):
-        return instance.__class__.__name__
-
-    class Meta(LabelSerializer.Meta):
-        fields = LabelSerializer.Meta.fields + ['type']
-
+class VocabsBaseSerializer(LabelSerializer, EntitySerializer):
+    pass
 
 class RelationObjectSerializer2(ApisBaseSerializer):
     relation_type = VocabsBaseSerializer(read_only=True)
     related_entity = serializers.SerializerMethodField(method_name="add_related_entity")
 
+    @extend_schema_field(EntitySerializer)
     def add_related_entity(self, instance):
         for at in dir(instance):
             if at.startswith("related_") and at.endswith("_id") and getattr(instance, at) != instance.pk:
-                return VocabsBaseSerializer(getattr(instance, at[:-3]), context=self.context).data
+                return EntitySerializer(getattr(instance, at[:-3]), context=self.context).data
 
     class Meta(ApisBaseSerializer.Meta):
         fields = ApisBaseSerializer.Meta.fields + ['relation_type', 'related_entity']
@@ -186,7 +189,7 @@ def generic_serializer_creation_factory():
             else:
                 return instance.text
 
-        @extend_schema_field(AnnotationSerializer)
+        @extend_schema_field(AnnotationSerializer(many=True))
         def txt_serializer_add_annotations(self, instance):
             if self._highlight:
                 return AnnotationSerializer(self._annotations, context=self.context, many=True).data
