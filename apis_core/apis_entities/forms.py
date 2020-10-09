@@ -174,7 +174,7 @@ def get_entities_form(entity):
                 sett_entities = getattr(settings, 'APIS_ENTITIES', None)
                 if sett_entities is not None:
                     for ent in sett_entities.keys():
-                        fields_sort_preferences_per_entity[ent] = sett_entities[ent].get('form_order', fields_sort_preferences_per_entity[ent])
+                        fields_sort_preferences_per_entity[ent] = sett_entities[ent].get('form_order', fields_sort_preferences_per_entity.get(ent, ['name',]))
                 if entity_label in fields_sort_preferences_per_entity:
                     # for this entity an ordering was defined, go trough it
 

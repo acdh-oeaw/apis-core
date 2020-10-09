@@ -1,4 +1,5 @@
 from functools import reduce
+import importlib
 
 import django_filters
 from django.conf import settings
@@ -417,6 +418,29 @@ class WorkListFilter(GenericListFilter):
         exclude = GenericListFilter.fields_to_exclude
 
 
+a_ents = getattr(settings, 'APIS_ADDITIONAL_ENTITIES', False)
+
+if a_ents:
+    with open(a_ents, 'r') as ents_file:
+        ents = yaml.load(ents_file, Loader=yaml.CLoader)
+        for ent in ents['entities']:
+            ent_class = getattr(importlib.import_module(f"apis_core.apis_entities.models"), ent['name'])
+            vocabs = []
+            for v in ent.get('vocabs', []):
+                ent_class_type = getattr(importlib.import_module(f"apis_core.apis_vocabularies.models"), v)
+                vocabs.append((v, ent_class_type))
+            class filterMeta:
+                model = ent_class
+                exclude = GenericListFilter.fields_to_exclude
+            dict_fc = {
+                "Meta": filterMeta,
+            }
+            for v in vocabs:
+                dict_fc[v] =  django_filters.ModelChoiceFilter(queryset=ent_class_type.objects.all())
+            filterclass_ent = type(f"{ent['name'].title()}Filter", (GenericListFilter, ), dict_fc)
+            globals()[f"{ent['name'].title()}ListFilter"] = filterclass_ent
+
+
 def get_list_filter_of_entity(entity):
     """
     Main method to be called somewhere else in the codebase in order to get the FilterClass respective to the entity string input
@@ -425,22 +449,9 @@ def get_list_filter_of_entity(entity):
     :return: Entity specific FilterClass
     """
 
-    el = entity.lower()
+    el = entity.title()
 
-    if el == "person":
-        return PersonListFilter
-
-    elif el == "place":
-        return PlaceListFilter
-
-    elif el == "institution":
-        return InstitutionListFilter
-
-    elif el == "event":
-        return EventListFilter
-
-    elif el == "work":
-        return WorkListFilter
-
-    else:
+    try:
+        return globals()[f"{el}ListFilter"]
+    except KeyError:
         raise ValueError("Could not find respective filter for given entity type:", el)

@@ -2,6 +2,7 @@ import inspect
 import re
 import sys
 import unicodedata
+import yaml
 
 # from reversion import revisions as reversion
 import reversion
@@ -223,6 +224,7 @@ class AbstractEntity(TempEntityClass):
             for entity_name, entity_class in inspect.getmembers(sys.modules[__name__], inspect.isclass):
 
                 if entity_class.__module__ == "apis_core.apis_entities.models" and \
+                        entity_name != "ent_class" and \
                         entity_name != "AbstractEntity":
 
                     entity_classes.append(entity_class)
@@ -562,14 +564,36 @@ class Work(AbstractEntity):
         WorkType, blank=True, null=True, on_delete=models.SET_NULL
     )
 
+a_ents = getattr(settings, 'APIS_ADDITIONAL_ENTITIES', False)
 
-@receiver(post_save, sender=Event, dispatch_uid="create_default_uri")
-@receiver(post_save, sender=Work, dispatch_uid="create_default_uri")
-@receiver(post_save, sender=Institution, dispatch_uid="create_default_uri")
-@receiver(post_save, sender=Person, dispatch_uid="create_default_uri")
-@receiver(post_save, sender=Place, dispatch_uid="create_default_uri")
+def prepare_fields_dict(fields_list, vocabs, vocabs_m2m):
+    res = dict()
+    for f in fields_list:
+        res[f['name']] = getattr(models, f['field_type'])(**f['attributes'])
+    for v in vocabs:
+        res[v] = models.ForeignKey(f"apis_vocabularies.{v}", blank=True, null=True, on_delete=models.SET_NULL)
+    for v2 in vocabs_m2m:
+        res[v2] = models.ManyToManyField(f"apis_vocabularies.{v2}", blank=True)
+    return res
+
+
+if a_ents:
+    with open(a_ents, 'r') as ents_file:
+        ents = yaml.load(ents_file, Loader=yaml.CLoader)
+        print(ents)
+        ents_cls_list = []
+        for ent in ents['entities']:
+            attributes = prepare_fields_dict(ent['fields'], ent.get('vocabs', []), ent.get('vocabs_m2m', []))
+            attributes["__module__"] = __name__
+            ent_class = type(ent['name'], (AbstractEntity,), attributes)
+            globals()[ent['name']] = ent_class
+            ents_cls_list.append(ent_class)
+            reversion.register(ent_class, follow=["tempentityclass_ptr"])
+
+
+@receiver(post_save, dispatch_uid="create_default_uri")
 def create_default_uri(sender, instance, **kwargs):
-    if kwargs['created']:
+    if kwargs['created'] and sender in [Person, Place, Work, Event]+ents_cls_list:
         if BASE_URI.endswith('/'):
             base1 = BASE_URI[:-1]
         else:
@@ -582,33 +606,14 @@ def create_default_uri(sender, instance, **kwargs):
         uri2.save()
 
 
+perm_change_senders = [getattr(getattr(x, "collection"), "through") for x in [Person, Place, Work, Event]+ents_cls_list]
+
 @receiver(
     m2m_changed,
-    sender=Event.collection.through,
-    dispatch_uid="create_object_permissions",
-)
-@receiver(
-    m2m_changed,
-    sender=Work.collection.through,
-    dispatch_uid="create_object_permissions",
-)
-@receiver(
-    m2m_changed,
-    sender=Institution.collection.through,
-    dispatch_uid="create_object_permissions",
-)
-@receiver(
-    m2m_changed,
-    sender=Person.collection.through,
-    dispatch_uid="create_object_permissions",
-)
-@receiver(
-    m2m_changed,
-    sender=Place.collection.through,
     dispatch_uid="create_object_permissions",
 )
 def create_object_permissions(sender, instance, **kwargs):
-    if kwargs["action"] == "pre_add":
+    if kwargs["action"] == "pre_add" and sender in perm_change_senders:
         perms = []
         for j in kwargs["model"].objects.filter(pk__in=kwargs["pk_set"]):
             perms.extend(j.groups_allowed.all())

@@ -1,8 +1,10 @@
 from functools import reduce
 import copy
+import importlib
+import inspect
 
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
+#from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from rest_framework import pagination, serializers, viewsets
 from rest_framework import renderers
@@ -15,6 +17,7 @@ from django_filters import rest_framework as filters
 from .apis_metainfo.models import TempEntityClass
 from .api_renderers import NetJsonRenderer
 from .apis_relations.models import AbstractRelation
+from apis_core.helper_functions.ContentType import GetContentTypes
 
 
 if 'apis_highlighter' in getattr(settings, 'INSTALLED_APPS'):
@@ -138,17 +141,19 @@ class RelationObjectSerializer2(ApisBaseSerializer):
         self._pk_instance = kwargs.pop('pk_instance')
         super(RelationObjectSerializer2, self).__init__(*args, **kwargs)
 
+ 
+if 'apis_highlighter' in getattr(settings, 'INSTALLED_APPS'):
+    class AnnotationSerializer(serializers.ModelSerializer):
+        related_entity = VocabsBaseSerializer(source="get_related_entity", read_only=True, many=False)
 
-class AnnotationSerializer(serializers.ModelSerializer):
-    related_entity = VocabsBaseSerializer(source="get_related_entity", read_only=True, many=False)
-
-    class Meta:
-        model = Annotation
-        fields = ['id', 'start', 'end', 'related_entity']
+        class Meta:
+            model = Annotation
+            fields = ['id', 'start', 'end', 'related_entity']
 
 
 def generic_serializer_creation_factory():
-    lst_cont = [x.model_class() for x in ContentType.objects.filter(app_label__in=['apis_metainfo', 'apis_vocabularies', 'apis_entities', 'apis_relations']).exclude(model__in=["texttype_collections", "relationbaseclass"])]
+    #lst_cont = [x.model_class() for x in ContentType.objects.filter(app_label__in=['apis_metainfo', 'apis_vocabularies', 'apis_entities', 'apis_relations']).exclude(model__in=["texttype_collections", "relationbaseclass"])]
+    lst_cont = GetContentTypes().get_model_classes()
     not_allowed_filter_fields = ['useradded', 'vocab_name', 'parent_class', 'vocab', 'entity', 'autofield']
     for cont in lst_cont:
         prefetch_rel = []
@@ -189,12 +194,13 @@ def generic_serializer_creation_factory():
             else:
                 return instance.text
 
-        @extend_schema_field(AnnotationSerializer(many=True))
-        def txt_serializer_add_annotations(self, instance):
-            if self._highlight:
-                return AnnotationSerializer(self._annotations, context=self.context, many=True).data
-            else:
-                return None
+        if 'apis_highlighter' in getattr(settings, 'INSTALLED_APPS'):
+            @extend_schema_field(AnnotationSerializer(many=True))
+            def txt_serializer_add_annotations(self, instance):
+                if self._highlight:
+                    return AnnotationSerializer(self._annotations, context=self.context, many=True).data
+                else:
+                    return None
 
 
         def init_text_serializer(self, *args, **kwargs):
@@ -264,7 +270,8 @@ def generic_serializer_creation_factory():
                     self.fields[f.name] = ApisBaseSerializer(many=ck_many, read_only=True)
                 elif f.__class__.__name__ in ["ManyToManyField", "ForeignKey"]:
                     self.fields[f.name] = LabelSerializer(many=ck_many, read_only=True)
-            include = list(ContentType.objects.filter(app_label="apis_relations", model__icontains=entity_str).values_list('model', flat=True))
+            #include = list(ContentType.objects.filter(app_label="apis_relations", model__icontains=entity_str).values_list('model', flat=True))
+            include = [x for x in lst_cont if x.__module__ == "apis_relations" and entity_str.lower() in x.__name__.lower()]
             if len(include) > 0:
                 self.fields['relations'] = RelationObjectSerializer2(read_only=True, source='get_related_relation_instances', many=True, pk_instance=self._entity.pk)
         
@@ -308,8 +315,9 @@ def generic_serializer_creation_factory():
         if entity_str.lower() == 'text':
             s_dict_detail['__init__'] = init_text_serializer_retrieve
             s_dict_detail['txt_serializer_add_text'] = txt_serializer_add_text
-            s_dict_detail['text'] = serializers.SerializerMethodField(method_name='txt_serializer_add_text')
-            s_dict_detail['txt_serializer_add_annotations'] = txt_serializer_add_annotations
+            s_dict_detail['text'] = serializers.SerializerMethodField(method_name='txt_serializer_add_text')            
+            if 'apis_highlighter' in getattr(settings, 'INSTALLED_APPS'):
+                s_dict_detail['txt_serializer_add_annotations'] = txt_serializer_add_annotations
             s_dict_detail['annotations'] = serializers.SerializerMethodField(method_name="txt_serializer_add_annotations")
 
         serializer_class_retrieve = type(f"{entity_str.title().replace(' ', '')}DetailSerializer", (serializers.HyperlinkedModelSerializer,), s_dict_detail)
