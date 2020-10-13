@@ -155,12 +155,22 @@ def get_entities_form(entity):
                     for field in list_unsorted:
                         try:
                             # if this succeeds, then the field has been given a priorites ordering above
-                            field_rank_pair = (field, sort_preferences.index(field))
+                            ranking_by_index = sort_preferences.index(field)
+                            del sort_preferences[ranking_by_index]
+                            field_rank_pair = (field, ranking_by_index)
                         except Exception as e:
                             # if no ordering for the field was found, then give it 'Inf'
                             # so that it will be attached at the end.
                             field_rank_pair = (field, float('Inf'))
                         field_rank_pair_list.append(field_rank_pair)
+                    # Make a check if all items of sort_preferences were used. If not, this indicates an out of sync setting
+                    if len(sort_preferences) > 0:
+                        raise Exception(
+                            "An item in 'form_order' was not used. \n"
+                            "This propably indicates that the 'form_order' settings is out of sync with the effective django models.\n"
+                            f"The relevant entity is: {entity_label}\n"
+                            f"And the items of 'form_order' which were not used are: {sort_preferences}"
+                        )
                     # sort the list according to the second element in each tuple
                     # and then take the first elements from it and return as list
                     return [ t[0] for t in sorted(field_rank_pair_list, key=lambda x: x[1]) ]
