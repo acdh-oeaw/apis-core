@@ -124,7 +124,6 @@ def get_entities_form(entity):
                     # append to unsorted list, so that it can be sorted and afterwards attached to accordion group acc_grp1
                     fields_list_unsorted.append(f)
 
-
             def sort_fields_list(list_unsorted, entity_label):
                 """
                 Sorts a list of model fields according to a defined order.
@@ -141,72 +140,34 @@ def get_entities_form(entity):
                     The sorted list if entity-specific ordering was defined, the same unordered list if not.
                 """
 
-                fields_sort_preferences_per_entity = {
-                    'Person': [
-                        'name',
-                        'first_name',
-                        'gender',
-                        'title',
-                        'start_date_written',
-                        'end_date_written',
-                        'status',
-                        'collection',
-                    ],
-                    'Event': [
-                        'name',
-                        'name_english',
-                    ],
-                    'Institution': [
-                        'name',
-                        'name_english',
-                        'start_date_written',
-                        'end_date_written',
-                    ],
-                    'Place': [
-                        'name',
-                        'name_english'
-                    ],
-                    'Work': [
-                        'name',
-                        'name_english'
-                    ]
-                }
-                sett_entities = getattr(settings, 'APIS_ENTITIES', None)
-                if sett_entities is not None:
-                    for ent in sett_entities.keys():
-                        fields_sort_preferences_per_entity[ent] = sett_entities[ent].get('form_order', fields_sort_preferences_per_entity[ent])
-                if entity_label in fields_sort_preferences_per_entity:
-                    # for this entity an ordering was defined, go trough it
+                entity_settings = getattr(settings, 'APIS_ENTITIES', None)
 
-                    sort_preferences = fields_sort_preferences_per_entity[entity_label]
+                if entity_settings is None:
+                    return list_unsorted
 
+                sort_preferences = entity_settings[entity_label].get('form_order', None)
+
+                if sort_preferences is None:
+                    return list_unsorted
+                else:
                     # list of tuples to be sorted later
                     field_rank_pair_list = []
-
                     for field in list_unsorted:
                         try:
                             # if this succeeds, then the field has been given a priorites ordering above
                             field_rank_pair = (field, sort_preferences.index(field))
-
                         except Exception as e:
                             # if no ordering for the field was found, then give it 'Inf'
                             # so that it will be attached at the end.
                             field_rank_pair = (field, float('Inf'))
-
                         field_rank_pair_list.append(field_rank_pair)
-
                     # sort the list according to the second element in each tuple
                     # and then take the first elements from it and return as list
                     return [ t[0] for t in sorted(field_rank_pair_list, key=lambda x: x[1]) ]
 
-                else:
-                    # for this entity no ordering was defined, return unsorted list
-                    return list_unsorted
-
             # sort field list, iterate over it and append each element to the accordion group
             for f in sort_fields_list(fields_list_unsorted, entity):
                 acc_grp1.append(f)
-
 
             self.helper.layout = Layout(
                 Accordion(
