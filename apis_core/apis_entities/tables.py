@@ -4,6 +4,8 @@ from django_tables2.utils import A
 
 from django.db import models
 from django.db.models import Subquery, OuterRef, F, Q
+from reversion.models import Version
+
 from apis_core.apis_entities.models import Person
 from apis_core.apis_vocabularies.models import PersonPublicationRelation
 from apis_core.apis_vocabularies.models import PassagePublicationRelation
@@ -185,6 +187,22 @@ def get_entities_table(entity, edit_v, default_cols):
         default_cols = ['name', ]
 
     class GenericEntitiesTable(tables.Table):
+
+        def order_assigned_user(self, queryset, is_descending):
+            """django-tables2 plugin searches for 'order_FOO' methods and if found assigns them to the 'FOO'
+            column. So in this case this method 'order_assigned_user' is the ordering method for the column
+            'assigned_user'.
+
+            And while the default ordering works fine usually, what it misses is that empty values are always
+            sorted last. Hence this method call where 'desc(nulls_last=True)' does this.
+            """
+
+            if is_descending:
+                queryset = queryset.order_by(F("assigned_user").desc(nulls_last=True))
+            else:
+                queryset = queryset.order_by(F("assigned_user").asc(nulls_last=True))
+
+            return (queryset, True)
 
         # reuse the logic for ordering and rendering *_date_written
         # Important: The names of these class variables must correspond to the column field name,

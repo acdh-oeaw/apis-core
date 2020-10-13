@@ -15,7 +15,7 @@ from django.db.models.query import QuerySet
 from django.urls import reverse
 from django.utils.functional import cached_property
 from model_utils.managers import InheritanceManager
-
+from django.contrib.auth.models import User
 from apis_core.apis_entities.serializers_generic import EntitySerializer
 from apis_core.apis_labels.models import Label
 from apis_core.apis_vocabularies.models import CollectionType, LabelType, TextType
@@ -24,7 +24,6 @@ from apis_core.default_settings.NER_settings import autocomp_settings
 from apis_core.helper_functions import DateParser
 
 NEXT_PREV = getattr(settings, "APIS_NEXT_PREV", True)
-
 
 if "apis_highlighter" in settings.INSTALLED_APPS:
     from apis_highlighter.models import Annotation
@@ -78,7 +77,7 @@ class TempEntityClass(models.Model):
     published = models.BooleanField(default=False)
     objects = models.Manager()
     objects_inheritance = InheritanceManager()
-
+    assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Zuständiger User")
 
     def __str__(self):
         if self.name != "" and hasattr(
@@ -133,8 +132,6 @@ class TempEntityClass(models.Model):
         if self.name:
             self.name = unicodedata.normalize("NFC", self.name)
 
-
-
         # Check if the tempentity to be saved is a passage<->bible relation (special form of passage<->publication),
         # if so parse the references field and save it into the relation
 
@@ -161,11 +158,9 @@ class TempEntityClass(models.Model):
 
                 try:
                     temp_int = int(potential_int)
-                    return str( temp_int )
+                    return str(temp_int)
                 except:
                     return None
-
-
 
             if unparsed_string:
 
@@ -179,8 +174,8 @@ class TempEntityClass(models.Model):
                     if len(ref) == 3:
 
                         book = ref[0].lower()
-                        chapter = make_string_of_int( ref[1] )
-                        verse = make_string_of_int( ref[2] )
+                        chapter = make_string_of_int(ref[1])
+                        verse = make_string_of_int(ref[2])
 
                         # compare the split values against the json bible dictionary
                         if \
@@ -216,8 +211,6 @@ class TempEntityClass(models.Model):
                 self.bible_book_ref = None
                 self.bible_chapter_ref = None
                 self.bible_verse_ref = None
-
-
 
         super(TempEntityClass, self).save(*args, **kwargs)
 
@@ -444,7 +437,7 @@ class Collection(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     def save(self, *args, **kwargs):
         if hasattr(self, '_loaded_values'):
             if self.published != self._loaded_values['published']:
@@ -569,9 +562,8 @@ class UriCandidate(models.Model):
                 ]
                 return (label, desc)
 
-
-#@receiver(post_save, sender=Uri, dispatch_uid="remove_default_uri")
-#def remove_default_uri(sender, instance, **kwargs):
+# @receiver(post_save, sender=Uri, dispatch_uid="remove_default_uri")
+# def remove_default_uri(sender, instance, **kwargs):
 #    if Uri.objects.filter(entity=instance.entity).count() > 1:
 #        Uri.objects.filter(entity=instance.entity, domain="apis default").delete()
 

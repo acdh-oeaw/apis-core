@@ -92,7 +92,8 @@ def get_entities_form(entity):
                         'apis_metainfo',
                         'apis_relations',
                         'apis_vocabularies',
-                        'apis_labels'
+                        'apis_labels',
+                        'auth',
                     ], model=v_name_p.lower()).app_label.lower() == 'apis_vocabularies':
                         self.fields[f].widget = widget1(
                             url=reverse(
