@@ -114,20 +114,6 @@ class AbstractRelation(TempEntityClass):
         nameA = self.get_related_entity_instanceA().name
         nameB = self.get_related_entity_instanceB().name
 
-        if self.get_related_entity_classA() == Person:
-            nameA += ", "
-            if self.get_related_entity_instanceA().first_name is None:
-                nameA += "-"
-            else:
-                nameA += self.get_related_entity_instanceA().first_name
-
-        if self.get_related_entity_classB() == Person:
-            nameB += ", "
-            if self.get_related_entity_instanceB().first_name is None:
-                nameB += "-"
-            else:
-                nameB += self.get_related_entity_instanceB().first_name
-
         result = {
             'relation_pk': self.pk,
             'relation_type': self.relation_type.name,

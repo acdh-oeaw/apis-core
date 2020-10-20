@@ -126,12 +126,11 @@ class PersonViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     filter_fields = (
         "name",
-        "first_name",
         "gender",
         "collection__name",
         "uri__uri",
     )
-    search_fields = ("name", "first_name")
+    search_fields = ("name",)
 
 
 class PlaceViewSet(viewsets.ModelViewSet):
@@ -412,7 +411,6 @@ class GetOrCreateEntity(APIView):
             if entity == 'person':
                 r1_2 = r1.group(0).split(',')
                 if len(r1_2) == 2:
-                    q_d['first_name'] = r1_2[1].strip()
                     q_d['name'] = r1_2[0].strip()
             ent = AbstractEntity.get_entity_class_of_name(entity).objects.create(**q_d)
         res = {

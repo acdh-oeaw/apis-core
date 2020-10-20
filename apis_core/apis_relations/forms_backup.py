@@ -996,7 +996,7 @@ class InstitutionPersonForm(forms.ModelForm):
         super(InstitutionPersonForm, self).__init__(*args, **kwargs)
         instance = getattr(self, 'instance', None)
         if instance and instance.id:
-            self.fields['person'].initial = instance.related_person.name+", "+instance.related_person.first_name
+            self.fields['person'].initial = instance.related_person.name
             self.fields['person_uri'].initial = Uri.objects.filter(entity=instance.related_person)[0]
         self.fields['relation_type'].required = True
         self.helper = FormHelper()

@@ -80,11 +80,7 @@ class TempEntityClass(models.Model):
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Zuständiger User")
 
     def __str__(self):
-        if self.name != "" and hasattr(
-            self, "first_name"
-        ):  # relation usually don´t have names
-            return "{}, {} (ID: {})".format(self.name, self.first_name, self.id)
-        elif self.name != "":
+        if self.name != "":
             return "{} (ID: {})".format(self.name, self.id)
         else:
             return "(ID: {})".format(self.id)

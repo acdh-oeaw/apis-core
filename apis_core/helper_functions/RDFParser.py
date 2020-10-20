@@ -331,8 +331,6 @@ class RDFParser(object):
         for z in Label.objects.filter(temp_entity=m_obj):
             z.temp_entity_id = self.objct.pk
             z.save()
-        if hasattr(m_obj, 'first_name'):
-            legacy_name = '{}, {}'.format(m_obj.name, m_obj.first_name)
         else:
             legacy_name = m_obj.name
         lt, created = LabelType.objects.get_or_create(name='legacy name')

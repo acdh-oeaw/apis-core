@@ -494,10 +494,6 @@ class Person(AbstractEntity):
     gender = models.CharField(max_length=15, choices=GENDER_CHOICES, blank=True, null=True, default=None)
 
     def save(self, *args, **kwargs):
-        if self.first_name:
-            # secure correct unicode encoding
-            if self.first_name != unicodedata.normalize("NFC", self.first_name):
-                self.first_name = unicodedata.normalize("NFC", self.first_name)
         super(Person, self).save(*args, **kwargs)
         return self
 

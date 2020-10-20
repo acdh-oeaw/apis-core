@@ -175,7 +175,7 @@ class InstitutionAutocomplete(StanbolAutocompleteBase):
 
 class PersonAutocomplete(StanbolAutocompleteBase):
     autocomplete_type = ['Person', ]
-    autocomplete_type_model = [(Person, ['name', 'first_name', 'label__label'], ('Geburtsdatum: {}, Sterbedatum: {}', ['start_date_written', 'end_date_written']))]
+    autocomplete_type_model = [(Person, ['name', 'label__label'], ('Geburtsdatum: {}, Sterbedatum: {}', ['start_date_written', 'end_date_written']))]
 
 
 class EventAutocomplete(StanbolAutocompleteBase):

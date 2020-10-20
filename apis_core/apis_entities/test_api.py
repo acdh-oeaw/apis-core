@@ -9,7 +9,6 @@ from .models import Place, Person
 
 class PersonModelTestCase(TestCase):
     name = 'test name'
-    first_name = 'test first name'
     place_name = 'test place name'
     start_date = '1.3.1930'
     end_date = '4.6.1960'
@@ -17,7 +16,7 @@ class PersonModelTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         # Set up data for the whole TestCase
-        cls.person = Person.objects.create(name=cls.name, first_name=cls.first_name)
+        cls.person = Person.objects.create(name=cls.name)
         cls.place = Place.objects.create(name=cls.place_name)
         user = User.objects.create_user(username="lauren", password="pas_1234$")
         token = Token.objects.create(user=user)

@@ -29,10 +29,7 @@ class GenericVocabsSerializer(serializers.Serializer):
         print(f"user pk: {obj.userAdded_id}")
         try:
             u = User.objects.get(pk=obj.userAdded_id)
-            if u.first_name and u.last_name:
-                return f"{u.last_name}, {u.first_name}"
-            else:
-                return str(u)
+            return str(u)
         except:
             return ""
 
