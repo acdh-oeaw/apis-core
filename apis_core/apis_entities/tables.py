@@ -188,6 +188,12 @@ def get_entities_table(entity, edit_v, default_cols):
 
     class GenericEntitiesTable(tables.Table):
 
+        def render_name(self, record, value):
+            if value == "":
+                return "(No name provided)"
+            else:
+                return value
+
         def order_assigned_user(self, queryset, is_descending):
             """django-tables2 plugin searches for 'order_FOO' methods and if found assigns them to the 'FOO'
             column. So in this case this method 'order_assigned_user' is the ordering method for the column
@@ -218,12 +224,14 @@ def get_entities_table(entity, edit_v, default_cols):
         if edit_v:
             name = tables.LinkColumn(
                 'apis:apis_entities:generic_entities_edit_view',
-                args=[entity.lower(), A('pk')]
+                args=[entity.lower(), A('pk')],
+                empty_values=[]
             )
         else:
             name = tables.LinkColumn(
                 'apis:apis_entities:generic_entities_detail_view',
-                args=[entity.lower(), A('pk')]
+                args=[entity.lower(), A('pk')],
+                empty_values=[]
             )
         export_formats = [
             'csv',
