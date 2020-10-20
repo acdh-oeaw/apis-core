@@ -56,23 +56,10 @@ class AbstractEntity(TempEntityClass):
 
     def __str__(self):
 
-        if self.__class__ == Person:
-
-            if self.first_name != "" and self.name != "":
-                return "{}, {}".format(self.name, self.first_name)
-            elif self.first_name != "" and self.name == "":
-                return "{}, {}".format("no surename provided", self.first_name)
-            elif self.first_name == "" and self.name != "":
-                return self.name
-            elif self.first_name == "" and self.name == "":
-                return "no name provided"
-
+        if self.name != "":
+            return self.name
         else:
-
-            if self.name != "":
-                return self.name
-            else:
-                return "no name provided"
+            return "no name provided"
 
 
     @classmethod
@@ -504,13 +491,6 @@ class AbstractEntity(TempEntityClass):
 class Person(AbstractEntity):
 
     GENDER_CHOICES = (("female", "female"), ("male", "male"), ("third gender", "third gender"))
-    first_name = models.CharField(
-        max_length=255,
-        help_text="The persons´s forename. In case of more then one name...",
-        blank=True,
-        null=True,
-    )
-    title = models.ManyToManyField(Title, blank=True)
     gender = models.CharField(max_length=15, choices=GENDER_CHOICES, blank=True, null=True, default=None)
 
     def save(self, *args, **kwargs):
