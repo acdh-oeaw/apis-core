@@ -244,16 +244,23 @@ def get_entities_table(entity, edit_v, default_cols):
         if 'id' in default_cols:
             id = tables.LinkColumn()
 
-
         class Meta:
             model = AbstractEntity.get_entity_class_of_name(entity_name=entity)
 
             fields = default_cols
             attrs = {"class": "table table-hover table-striped table-condensed"}
 
+            # quick ensurance if column is indeed a field of this entity
+            for col in default_cols:
+                if not hasattr(model, col):
+                    raise Exception(
+                        f"Could not find field in entity: {entity}"
+                        f"of column (probably defined in 'table_fields' settings): {col}\n"
+                    )
 
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
 
-
     return GenericEntitiesTable
+
+

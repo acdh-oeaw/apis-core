@@ -362,7 +362,8 @@ class AbstractEntity(TempEntityClass):
                 q_args |= Q(**{relation_class.get_related_entity_field_nameB(): self})
 
             queryset = relation_class.objects.filter( q_args )
-            queryset_list.append( queryset )
+            queryset_list.extend(list(queryset))
+
 
         return queryset_list
 
