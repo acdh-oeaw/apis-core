@@ -53,13 +53,16 @@ class AbstractEntity(TempEntityClass):
 
         if self.__class__ == Person:
 
-            if self.first_name != "" and self.name != "":
+            def valid(name):
+                return name != "" and name is not None
+
+            if valid(self.first_name) and valid(self.name):
                 return "{}, {}".format(self.name, self.first_name)
-            elif self.first_name != "" and self.name == "":
+            elif valid(self.first_name) and not valid(self.name):
                 return "{}, {}".format("no surename provided", self.first_name)
-            elif self.first_name == "" and self.name != "":
+            elif not valid(self.first_name) and valid(self.name):
                 return self.name
-            elif self.first_name == "" and self.name == "":
+            elif not valid(self.first_name) and not valid(self.name):
                 return "no name provided"
 
         else:
