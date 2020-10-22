@@ -53,6 +53,7 @@ def get_entities_form(entity):
                 "end_start_date",
                 "end_end_date",
                 "end_date_is_exact",
+                "primary_date",
                 "text",
                 "source",
                 "published",
@@ -94,6 +95,7 @@ def get_entities_form(entity):
                                 "apis_relations",
                                 "apis_vocabularies",
                                 "apis_labels",
+                                "auth",
                             ],
                             model=v_name_p.lower(),
                         ).app_label.lower()
@@ -146,40 +148,13 @@ def get_entities_form(entity):
                     The sorted list if entity-specific ordering was defined, the same unordered list if not.
                 """
 
-                fields_sort_preferences_per_entity = {
-                    "Person": [
-                        "name",
-                        "first_name",
-                        "gender",
-                        "title",
-                        "start_date_written",
-                        "end_date_written",
-                        "status",
-                        "collection",
-                    ],
-                    "Event": ["name", "name_english",],
-                    "Institution": [
-                        "name",
-                        "name_english",
-                        "start_date_written",
-                        "end_date_written",
-                    ],
-                    "Place": ["name", "name_english"],
-                    "Work": ["name", "name_english"],
-                }
-                sett_entities = getattr(settings, "APIS_ENTITIES", None)
-                if sett_entities is not None:
-                    for ent in sett_entities.keys():
-                        fields_sort_preferences_per_entity[ent] = sett_entities[
-                            ent
-                        ].get(
-                            "form_order",
-                            fields_sort_preferences_per_entity.get(ent, ["name",]),
-                        )
-                if entity_label in fields_sort_preferences_per_entity:
-                    # for this entity an ordering was defined, go trough it
+                entity_settings = getattr(settings, 'APIS_ENTITIES', None)
 
-                    sort_preferences = fields_sort_preferences_per_entity[entity_label]
+                if entity_settings is None:
+                    return list_unsorted
+
+                sort_preferences = entity_settings[entity_label].get('form_order', None)
+                sort_preferences_used = []
 
                 if sort_preferences is None:
                     return list_unsorted
@@ -187,18 +162,19 @@ def get_entities_form(entity):
                     # list of tuples to be sorted later
                     field_rank_pair_list = []
                     for field in list_unsorted:
-                        try:
+                        if field in sort_preferences:
                             # if this succeeds, then the field has been given a priorites ordering above
                             ranking_by_index = sort_preferences.index(field)
-                            del sort_preferences[ranking_by_index]
+                            sort_preferences_used.append(field)
                             field_rank_pair = (field, ranking_by_index)
-                        except Exception as e:
+                        else:
                             # if no ordering for the field was found, then give it 'Inf'
                             # so that it will be attached at the end.
-                            field_rank_pair = (field, float("Inf"))
+                            field_rank_pair = (field, float('Inf'))
                         field_rank_pair_list.append(field_rank_pair)
                     # Make a check if all items of sort_preferences were used. If not, this indicates an out of sync setting
-                    if len(sort_preferences) > 0:
+                    # if len(sort_preferences) > 0:
+                    if len(sort_preferences_used) != len(sort_preferences):
                         raise Exception(
                             "An item in 'form_order' was not used. \n"
                             "This propably indicates that the 'form_order' settings is out of sync with the effective django models.\n"
@@ -207,9 +183,8 @@ def get_entities_form(entity):
                         )
                     # sort the list according to the second element in each tuple
                     # and then take the first elements from it and return as list
-                    return [
-                        t[0] for t in sorted(field_rank_pair_list, key=lambda x: x[1])
-                    ]
+                    return [ t[0] for t in sorted(field_rank_pair_list, key=lambda x: x[1]) ]
+
 
             # sort field list, iterate over it and append each element to the accordion group
             for f in sort_fields_list(fields_list_unsorted, entity):
@@ -232,6 +207,7 @@ def get_entities_form(entity):
                         single_start_date=instance.start_start_date,
                         single_end_date=instance.start_end_date,
                         single_date_written=instance.start_date_written,
+                        single_date_is_exact=instance.start_date_is_exact,
                     )
                 else:
                     self.fields[
@@ -246,6 +222,7 @@ def get_entities_form(entity):
                         single_start_date=instance.end_start_date,
                         single_end_date=instance.end_end_date,
                         single_date_written=instance.end_date_written,
+                        single_date_is_exact=instance.end_date_is_exact,
                     )
                 else:
                     self.fields[

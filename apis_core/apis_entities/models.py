@@ -20,8 +20,6 @@ from apis_core.apis_vocabularies.models import (
     EventType,
     InstitutionType,
     PlaceType,
-    ProfessionType,
-    Title,
     PublicationLanguage,
     PassageType,
     PassageTopics
@@ -583,7 +581,7 @@ if a_ents:
 
 @receiver(post_save, dispatch_uid="create_default_uri")
 def create_default_uri(sender, instance, **kwargs):
-    if kwargs['created'] and sender in [Person, Place, Work, Event]+ents_cls_list:
+    if kwargs['created'] and sender in [Person, Place, Event, Passage, Publication]+ents_cls_list:
         if BASE_URI.endswith('/'):
             base1 = BASE_URI[:-1]
         else:
@@ -596,7 +594,7 @@ def create_default_uri(sender, instance, **kwargs):
         uri2.save()
 
 
-perm_change_senders = [getattr(getattr(x, "collection"), "through") for x in [Person, Place, Work, Event]+ents_cls_list]
+perm_change_senders = [getattr(getattr(x, "collection"), "through") for x in [Person, Place, Event, Passage, Publication]+ents_cls_list]
 
 @receiver(
     m2m_changed,

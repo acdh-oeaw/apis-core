@@ -406,12 +406,22 @@ class EventListFilter(GenericListFilter):
 
 
 
-class WorkListFilter(GenericListFilter):
+class PassageListFilter(GenericListFilter):
 
-    kind = django_filters.ModelChoiceFilter(queryset=WorkType.objects.all())
+    kind = django_filters.ModelChoiceFilter(queryset=PassageType.objects.all())
 
     class Meta:
-        model = Work
+        model = Passage
+        # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
+        # order to load all filters of all model fields by default so that they are available in the first place.
+        # Later those which are not referenced in the settings file will be removed again
+        exclude = GenericListFilter.fields_to_exclude
+
+
+class PublicationListFilter(GenericListFilter):
+
+    class Meta:
+        model = Publication
         # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
         # order to load all filters of all model fields by default so that they are available in the first place.
         # Later those which are not referenced in the settings file will be removed again
