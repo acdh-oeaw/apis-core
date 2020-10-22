@@ -6,13 +6,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.urls import path
 from django.views.static import serve
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_yasg.generators import OpenAPISchemaGenerator
-from drf_yasg.inspectors import NotHandled
 from rest_framework import response, schemas
 from rest_framework import routers
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.schemas import get_schema_view
-from rest_framework_swagger.renderers import OpenAPIRenderer, SwaggerUIRenderer
 
 from apis_core.api_routers import views
 from apis_core.apis_entities.api_views import (
@@ -22,21 +19,20 @@ from apis_core.apis_entities.api_views import (
 from apis_core.apis_vocabularies.api_views import (
     UserViewSet,
 )
+from apis_core.helper_functions.ContentType import GetContentTypes
 
 app_name = "apis_core"
 
 router = routers.DefaultRouter()
-for app_label in ["entities", "metainfo", "vocabularies", "relations"]:
-    for ent in ContentType.objects.filter(app_label="apis_{}".format(app_label)):
-        name = "".join([x.title() for x in ent.name.split(" ")])
-        try:
-            router.register(
-                r"{}/{}".format(app_label, name.lower()),
-                views[f"{str(ent.model).lower().replace(' ', '')}"],
-                name.lower(),
-            )
-        except Exception as e:
-            print("{} not found, skipping".format(name.lower()))
+for app_label, ent in GetContentTypes().get_names():
+    try:
+        router.register(
+            r"{}/{}".format(app_label, ent.lower()),
+            views[ent.lower()],
+            ent.lower(),
+        )
+    except Exception as e:
+        print("{} not found, skipping".format(ent.lower()))
 
 
 if "apis_highlighter" in settings.INSTALLED_APPS:

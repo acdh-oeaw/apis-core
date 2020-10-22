@@ -1,4 +1,5 @@
 from functools import reduce
+import importlib
 
 import django_filters
 from django.conf import settings
@@ -341,6 +342,7 @@ class GenericListFilter(django_filters.FilterSet):
 class PersonListFilter(GenericListFilter):
 
     gender = django_filters.ChoiceFilter(choices=(('', 'any'), ('male', 'male'), ('female', 'female')))
+    profession = django_filters.CharFilter(method="related_arbitrary_model_name")
     title = django_filters.CharFilter(method="related_arbitrary_model_name")
     name = django_filters.CharFilter(method="person_name_filter", label="Name or Label of person")
 
@@ -360,8 +362,10 @@ class PersonListFilter(GenericListFilter):
 
         queryset_related_label=queryset.filter(**{"label__label"+lookup : value})
         queryset_self_name=queryset.filter(**{name+lookup : value})
+        queryset_first_name=queryset.filter(**{"first_name"+lookup : value})
 
-        return (queryset_related_label | queryset_self_name).distinct().all()
+        # return QuerySet.union(queryset_related_label, queryset_self_name, queryset_first_name)
+        return (queryset_related_label | queryset_self_name | queryset_first_name).distinct().all()
 
 
 
@@ -402,27 +406,39 @@ class EventListFilter(GenericListFilter):
 
 
 
-class PassageListFilter(GenericListFilter):
+class WorkListFilter(GenericListFilter):
 
-    kind = django_filters.ModelChoiceFilter(queryset=PassageType.objects.all())
+    kind = django_filters.ModelChoiceFilter(queryset=WorkType.objects.all())
 
     class Meta:
-        model = Passage
+        model = Work
         # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
         # order to load all filters of all model fields by default so that they are available in the first place.
         # Later those which are not referenced in the settings file will be removed again
         exclude = GenericListFilter.fields_to_exclude
 
 
+a_ents = getattr(settings, 'APIS_ADDITIONAL_ENTITIES', False)
 
-class PublicationListFilter(GenericListFilter):
-
-    class Meta:
-        model = Publication
-        # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
-        # order to load all filters of all model fields by default so that they are available in the first place.
-        # Later those which are not referenced in the settings file will be removed again
-        exclude = GenericListFilter.fields_to_exclude
+if a_ents:
+    with open(a_ents, 'r') as ents_file:
+        ents = yaml.load(ents_file, Loader=yaml.CLoader)
+        for ent in ents['entities']:
+            ent_class = getattr(importlib.import_module(f"apis_core.apis_entities.models"), ent['name'])
+            vocabs = []
+            for v in ent.get('vocabs', []):
+                ent_class_type = getattr(importlib.import_module(f"apis_core.apis_vocabularies.models"), v)
+                vocabs.append((v, ent_class_type))
+            class filterMeta:
+                model = ent_class
+                exclude = GenericListFilter.fields_to_exclude
+            dict_fc = {
+                "Meta": filterMeta,
+            }
+            for v in vocabs:
+                dict_fc[v] =  django_filters.ModelChoiceFilter(queryset=ent_class_type.objects.all())
+            filterclass_ent = type(f"{ent['name'].title()}Filter", (GenericListFilter, ), dict_fc)
+            globals()[f"{ent['name'].title()}ListFilter"] = filterclass_ent
 
 
 def get_list_filter_of_entity(entity):
@@ -433,25 +449,9 @@ def get_list_filter_of_entity(entity):
     :return: Entity specific FilterClass
     """
 
-    el = entity.lower()
+    el = entity.title()
 
-    if el == "person":
-        return PersonListFilter
-
-    elif el == "place":
-        return PlaceListFilter
-
-    elif el == "institution":
-        return InstitutionListFilter
-
-    elif el == "event":
-        return EventListFilter
-
-    elif el == "passage":
-        return PassageListFilter
-
-    elif el == "publication":
-        return PublicationListFilter
-
-    else:
+    try:
+        return globals()[f"{el}ListFilter"]
+    except KeyError:
         raise ValueError("Could not find respective filter for given entity type:", el)

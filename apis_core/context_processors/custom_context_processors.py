@@ -9,7 +9,7 @@ def add_entities(request):
     for name, obj in inspect.getmembers(
         sys.modules['apis_core.apis_entities.models'], inspect.isclass
     ):
-        if obj.__module__ == 'apis_core.apis_entities.models' and name != "AbstractEntity":
+        if obj.__module__ == 'apis_core.apis_entities.models' and name != "AbstractEntity" and name != "ent_class":
             ent_list.append(str(name).lower())
     res = {
         'entities_list': ent_list,
@@ -23,7 +23,7 @@ def add_relations(request):
     for name, obj in inspect.getmembers(
         sys.modules['apis_core.apis_relations.models'], inspect.isclass
     ):
-        if obj.__module__ == 'apis_core.apis_relations.models' and name != "AbstractRelation" and name != "AnnotationRelationLinkManager":
+        if obj.__module__ == 'apis_core.apis_relations.models' and name not in ["AbstractRelation", "AnnotationRelationLinkManager", "ent_class"]:
             relations_list.append(str(name).lower())
     res = {
         'relations_list': relations_list,

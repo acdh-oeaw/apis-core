@@ -1,5 +1,6 @@
 import inspect
 import sys
+import yaml
 
 # from reversion import revisions as reversion
 import reversion
@@ -191,7 +192,8 @@ class AbstractRelation(TempEntityClass):
                         relation_class.__name__ != "AnnotationRelationLinkManager" and \
                         relation_class.__name__ != "BaseRelationManager" and \
                         relation_class.__name__ != "RelationPublishedQueryset" and \
-                        relation_class.__name__ != "AbstractRelation":
+                        relation_class.__name__ != "AbstractRelation" and \
+                        relation_name != "ent_class":
 
                     relation_classes.append(relation_class)
                     relation_names.append(relation_name.lower())
@@ -314,7 +316,8 @@ class AbstractRelation(TempEntityClass):
         # get the list of the class dictionary, create if not yet exists.
         relation_names_list = cls._relation_field_names_of_entity_class.get(entity_class, [])
         # append the current relation field name to the list.
-        relation_names_list.append(relation_name)
+        if relation_name not in relation_names_list: 
+            relation_names_list.append(relation_name) #TODO: this is a workaround, find out why it is called several times
         # save into the dictionary, which uses the entity class as key and the extended list above as value.
         cls._relation_field_names_of_entity_class[entity_class] = relation_names_list
 
@@ -540,27 +543,3 @@ class PassagePassage(AbstractRelation):
 
     pass
 
-
-@reversion.register(follow=['tempentityclass_ptr'])
-class PassagePublication(AbstractRelation):
-
-    # fields relating only to bible references, unfortunately it was not possible to subclass PassagePublication into
-    # say PassageBible, because it broke APIS on too many other aspects. Hence the fields are attached here, and are
-    # regarded to indiciate a passage<->bible relation if not null. Otherwise this stays an ordinary PassagePublication.
-    bible_book_ref = models.CharField(max_length=3, blank=True, null=True)
-    bible_chapter_ref = models.CharField(max_length=3, blank=True, null=True)
-    bible_verse_ref = models.CharField(max_length=3, blank=True, null=True)
-
-
-
-#######################################################################
-#
-#   Publication - ... - Relation
-#
-#######################################################################
-
-
-@reversion.register(follow=['tempentityclass_ptr'])
-class PublicationPublication(AbstractRelation):
-
-    pass
