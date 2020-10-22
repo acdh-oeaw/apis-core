@@ -577,11 +577,11 @@ def prepare_fields_dict(fields_list, vocabs, vocabs_m2m):
     return res
 
 
+ents_cls_list = []
 if a_ents:
     with open(a_ents, 'r') as ents_file:
         ents = yaml.load(ents_file, Loader=yaml.CLoader)
         print(ents)
-        ents_cls_list = []
         for ent in ents['entities']:
             attributes = prepare_fields_dict(ent['fields'], ent.get('vocabs', []), ent.get('vocabs_m2m', []))
             attributes["__module__"] = __name__
