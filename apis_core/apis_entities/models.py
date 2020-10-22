@@ -20,6 +20,7 @@ from apis_core.apis_vocabularies.models import (
     EventType,
     InstitutionType,
     PlaceType,
+    ProfessionType,
     Title,
     PublicationLanguage,
     PassageType,
@@ -432,7 +433,7 @@ class AbstractEntity(TempEntityClass):
         """
         :return: a list of names of all ManyToMany field names relating to relationtypes from the respective entity class
 
-        E.g. for Person.get_related_relationtype_field_names() or person_instance.get_related_relationtype_field_names() ->
+        E.g. for PersonPerson.get_related_relationtype_field_names() or person_instance.get_related_relationtype_field_names() ->
         ['event_relationtype_set', 'institution_relationtype_set', 'personB_relationtype_set', 'personA_relationtype_set', 'place_relationtype_set', 'work_relationtype_set']
 
         Note: this method depends on the 'generate_all_fields' function of the EntityRelationFieldGenerator class 
@@ -565,11 +566,12 @@ def prepare_fields_dict(fields_list, vocabs, vocabs_m2m):
         res[v2] = models.ManyToManyField(f"apis_vocabularies.{v2}", blank=True)
     return res
 
+
+ents_cls_list = []
 if a_ents:
     with open(a_ents, 'r') as ents_file:
         ents = yaml.load(ents_file, Loader=yaml.CLoader)
         print(ents)
-        ents_cls_list = []
         for ent in ents['entities']:
             attributes = prepare_fields_dict(ent['fields'], ent.get('vocabs', []), ent.get('vocabs_m2m', []))
             attributes["__module__"] = __name__
