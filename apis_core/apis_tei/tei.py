@@ -8,6 +8,8 @@ from django.utils.text import slugify
 from .partials import TEI_NSMAP, tei_gen_header
 
 from apis_core.apis_metainfo.models import Text
+from apis_core.apis_entities.models import Person, Place, Event, Work, Institution
+
 
 from collections import defaultdict
 
@@ -21,8 +23,20 @@ def custom_escape(somestring):
     return escape(un_escaped)
 
 
+# When serializing texts, we need to be able to look up
+# the entity in DB to check we have all the texts (not just the
+# annotated ones) — so need to map string values to classes.
+# REPLACE THIS WITH LIST OF TEXTS IN ent_dict!
+entity_type_string_to_class = {
+    "Person": Person,
+    "Place": Place,
+    "Event": Event,
+    "Work": Work,
+    "Insitution": Institution,
+}
+
 relation_type_to_tei_tag = {
-    "events": "EVENT",
+    "events": "EVENT",  # What to do with this?
     "institutions": "orgName",
     "persons": "persName",
     "places": "placeName",
@@ -30,7 +44,9 @@ relation_type_to_tei_tag = {
 
 
 class TeiEntCreator:
-    def __init__(self, ent_dict, base_url="apis/api2/"):
+    def __init__(
+        self, ent_dict, base_url="apis/api2/", include_entity_tagged_texts=False
+    ):
         """
         Entry point: called from apis_core/apis_entities/api_renderers.py
         
@@ -50,6 +66,7 @@ class TeiEntCreator:
         self.ent_type = ent_dict.get("entity_type")
         self.ent_apis_id = ent_dict.get("id")
         self.gen_tei_header = tei_gen_header
+        self.include_entity_tagged_texts = include_entity_tagged_texts
 
     def relation_groups(self):
         ent_dict = self.ent_dict
@@ -321,13 +338,52 @@ class TeiEntCreator:
 
     def build_annotated_texts_objects(self):
         # Get annotations grouped by text
+
         annotations_by_text_id = group_annotations_by_text(self.ent_dict)
+
         texts = []
 
+        # Here, we need to look up the entity in the DB
+        ####  IDEALLY, pre-do this in initial query and add to ent_dict
+        # though, this is likely to be quite a lot of stuff when not necessary...
+        this_entity = entity_type_string_to_class[self.ent_type].objects.get(
+            pk=self.ent_apis_id
+        )
+        this_entity_texts = {t for t in this_entity.text.all() if t.text}
+
+        print([text.id for text in this_entity_texts])
+
+        # Then, check all the entity texts to see whether it's an annotated one;
+        # otherwise, we'll need to include it here...
+        for text in this_entity_texts:
+            if str(text.id) not in annotations_by_text_id:
+                wrapped_text = "<p>{}</p>".format(
+                    "</p><p>".join(text.text.split("\n\n"))
+                )
+                # Embed the text in some TEI tags
+                embedded_text = '<text xml:id="text__{}"><body>{}</body></text>'.format(
+                    text.id, wrapped_text
+                )
+                texts.append(embedded_text)
+
+        # This loop here iterates texts from self.ent_dict annotations and embeds
+        # annotations as TEI tags
         for text_id, anns in annotations_by_text_id.items():
+
             # Get the text object from database via its ID
-            ### (in future, this should be embedded in ent_dict to avoid further query)
+            ### (in future, this should be embedded in ent_dict to avoid further query??)
             text_obj = Text.objects.get(pk=text_id)
+            text_obj_pk = text_obj.tempentityclass_set.first().pk
+
+            # If we *don't* want to include other entity_tagged texts,
+            # skip this text if the object to which the text is not the
+            # object we're serializing
+            if not self.include_entity_tagged_texts and text_obj_pk != self.ent_apis_id:
+                continue
+
+            # On the other hand, if there is a text attached to this entity,
+            # we might want to serialize it even if there is no annotation mentioning
+            # this entity... (TAKEN CARE OF ABOVE)
 
             # Convert each annotation range from string-offset field ('34-52') into start and end indexes, and convert into tuple
             # of (start, end, tag) to run through standoff_to_inline function
@@ -383,8 +439,9 @@ def convert_to_etree(text_as_string):
 
 def group_annotations_by_text(ent_dict):
     annotations_by_text = defaultdict(list)
+
     for rel_type_name, rel_type_list in ent_dict.get("relations").items():
-        # print(rel_type_name)
+
         for rel in rel_type_list:
 
             if rel.get("annotation"):
