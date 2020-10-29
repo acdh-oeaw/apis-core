@@ -5,7 +5,7 @@ trigger_build:
          - jwv
          - coladay
   stage: deploy
-  trigger: acdh-oeaw/apis/apis-webpage-base
+  trigger: acdh-oeaw/apis/apis-docker
   variables:
       APIS_TRIGGERD_BY: 'apis-core'
       APIS_VERSION: '0.9'
