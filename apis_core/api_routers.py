@@ -177,13 +177,13 @@ class RelationObjectSerializer2(ApisBaseSerializer):
 if "apis_highlighter" in getattr(settings, "INSTALLED_APPS"):
 
     class AnnotationSerializer(serializers.ModelSerializer):
-        related_entity = VocabsBaseSerializer(
+        related_object = VocabsBaseSerializer(
             source="get_related_entity", read_only=True, many=False
         )
 
         class Meta:
             model = Annotation
-            fields = ["id", "start", "end", "related_entity"]
+            fields = ["id", "start", "end", "related_object"]
 
 
 def generic_serializer_creation_factory():
@@ -247,6 +247,7 @@ def generic_serializer_creation_factory():
 
         def init_text_serializer(self, *args, **kwargs):
             super(self.__class__, self).__init__(*args, **kwargs)
+
             self._highlight = False
             self.fields["kind"] = LabelSerializer(many=False, read_only=True)
 
@@ -334,7 +335,7 @@ def generic_serializer_creation_factory():
             include = [
                 x
                 for x in lst_cont
-                if x.__module__ == "apis_relations"
+                if x.__module__ == "apis_core.apis_relations.models"
                 and entity_str.lower() in x.__name__.lower()
             ]
             if len(include) > 0:
@@ -348,6 +349,7 @@ def generic_serializer_creation_factory():
         def init_text_serializer_retrieve(self, *args, **kwargs):
             super(self.__class__, self).__init__(*args, **kwargs)
             highlight = self.context.get("highlight", True)
+            self._inline_annotations = False
             if highlight is not None and "apis_highlighter" in getattr(
                 settings, "INSTALLED_APPS"
             ):
