@@ -36,7 +36,9 @@ from apis_core.apis_vocabularies.models import RelationBaseClass
 
 class GenericListFilter(django_filters.FilterSet):
 
-    fields_to_exclude = getattr(settings, "APIS_RELATIONS_FILTER_EXCLUDE", [])
+    class Meta:
+        model = None # must be overriden with entity specific Filter Classes
+        exclude = getattr(settings, "APIS_RELATIONS_FILTER_EXCLUDE", [])
 
     name = django_filters.CharFilter(method="name_label_filter", label="Name or Label")
     collection = django_filters.ModelMultipleChoiceFilter(queryset=Collection.objects.all())
@@ -330,8 +332,6 @@ class GenericListFilter(django_filters.FilterSet):
 
 
 
-
-
 #######################################################################
 #
 #   Overriding Entity filter classes
@@ -341,20 +341,13 @@ class GenericListFilter(django_filters.FilterSet):
 
 class PersonListFilter(GenericListFilter):
 
+    class Meta(GenericListFilter.Meta):
+        model = Person
+
     gender = django_filters.ChoiceFilter(choices=(('', 'any'), ('male', 'male'), ('female', 'female')))
     profession = django_filters.CharFilter(method="related_arbitrary_model_name")
     title = django_filters.CharFilter(method="related_arbitrary_model_name")
     name = django_filters.CharFilter(method="person_name_filter", label="Name or Label of person")
-
-
-    # TODO __sresch__ : look into how the meta class can be inherited from the superclass so that the Meta class' exclude attribute must not be defined multiple times
-    class Meta:
-        model = Person
-        # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
-        # order to load all filters of all model fields by default so that they are available in the first place.
-        # Later those which are not referenced in the settings file will be removed again
-        exclude = GenericListFilter.fields_to_exclude
-
 
     def person_name_filter(self, queryset, name, value):
 
@@ -368,54 +361,34 @@ class PersonListFilter(GenericListFilter):
         return (queryset_related_label | queryset_self_name | queryset_first_name).distinct().all()
 
 
-
 class PlaceListFilter(GenericListFilter):
+
+    class Meta(GenericListFilter.Meta):
+        model = Place
 
     # TODO __sresch__ : decide on margin tolerance of input, for now the number must be precise
     lng = django_filters.NumberFilter(label='Longitude')
     lat = django_filters.NumberFilter(label='Latitude')
 
-    class Meta:
-        model = Place
-        # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
-        # order to load all filters of all model fields by default so that they are available in the first place.
-        # Later those which are not referenced in the settings file will be removed again
-        exclude = GenericListFilter.fields_to_exclude
-
-
 
 class InstitutionListFilter(GenericListFilter):
 
-    class Meta:
+    class Meta(GenericListFilter.Meta):
         model = Institution
-        # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
-        # order to load all filters of all model fields by default so that they are available in the first place.
-        # Later those which are not referenced in the settings file will be removed again
-        exclude = GenericListFilter.fields_to_exclude
-
 
 
 class EventListFilter(GenericListFilter):
 
-    class Meta:
+    class Meta(GenericListFilter.Meta):
         model = Event
-        # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
-        # order to load all filters of all model fields by default so that they are available in the first place.
-        # Later those which are not referenced in the settings file will be removed again
-        exclude = GenericListFilter.fields_to_exclude
-
 
 
 class WorkListFilter(GenericListFilter):
 
-    kind = django_filters.ModelChoiceFilter(queryset=WorkType.objects.all())
-
-    class Meta:
+    class Meta(GenericListFilter.Meta):
         model = Work
-        # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
-        # order to load all filters of all model fields by default so that they are available in the first place.
-        # Later those which are not referenced in the settings file will be removed again
-        exclude = GenericListFilter.fields_to_exclude
+
+    kind = django_filters.ModelChoiceFilter(queryset=WorkType.objects.all())
 
 
 a_ents = getattr(settings, 'APIS_ADDITIONAL_ENTITIES', False)
