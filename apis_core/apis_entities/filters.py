@@ -399,6 +399,15 @@ class PassageListFilter(GenericListFilter):
 
 Passage.set_list_filter_class(PassageListFilter)
 
+class PublicationListFilter(GenericListFilter):
+
+    class Meta(GenericListFilter.Meta):
+        model = Publication
+
+    kind = django_filters.ModelChoiceFilter(queryset=PassageType.objects.all())
+
+Publication.set_list_filter_class(PublicationListFilter)
+
 
 a_ents = getattr(settings, 'APIS_ADDITIONAL_ENTITIES', False)
 
