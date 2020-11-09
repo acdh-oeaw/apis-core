@@ -94,6 +94,7 @@ def get_entities_form(entity):
                                 "apis_relations",
                                 "apis_vocabularies",
                                 "apis_labels",
+                                "auth",
                             ],
                             model=v_name_p.lower(),
                         ).app_label.lower()
