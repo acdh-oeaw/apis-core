@@ -174,11 +174,20 @@ def get_entities_form(entity):
                     # Make a check if all items of sort_preferences were used. If not, this indicates an out of sync setting
                     # if len(sort_preferences) > 0:
                     if len(sort_preferences_used) != len(sort_preferences):
+
+                        differences = []
+                        for p in sort_preferences_used:
+                            if p not in sort_preferences:
+                                differences.append(p)
+                        for p in sort_preferences:
+                            if p not in sort_preferences_used:
+                                differences.append(p)
+
                         raise Exception(
-                            "An item in 'form_order' was not used. \n"
+                            "An item of the entity setting 'form_order' list was not used. \n"
                             "This propably indicates that the 'form_order' settings is out of sync with the effective django models.\n"
                             f"The relevant entity is: {entity_label}\n"
-                            f"And the item which was not used must be in this list: {sort_preferences}"
+                            f"And the differences between used list and settings list are: {differences}"
                         )
                     # sort the list according to the second element in each tuple
                     # and then take the first elements from it and return as list
