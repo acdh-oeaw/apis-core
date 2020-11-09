@@ -214,6 +214,7 @@ def get_entities_form(entity):
                         single_start_date=instance.start_start_date,
                         single_end_date=instance.start_end_date,
                         single_date_written=instance.start_date_written,
+                        single_date_is_exact=instance.start_date_is_exact,
                     )
                 else:
                     self.fields[
@@ -228,6 +229,7 @@ def get_entities_form(entity):
                         single_start_date=instance.end_start_date,
                         single_end_date=instance.end_end_date,
                         single_date_written=instance.end_date_written,
+                        single_date_is_exact=instance.end_date_is_exact,
                     )
                 else:
                     self.fields[
@@ -333,7 +335,7 @@ class FullTextForm(forms.Form):
             else:
                 q = TextType.objects.filter(entity__iexact=entity)
             for txt in q:
-                self.fields["text_" + str(txt.pk)] = forms.CharField(
+                self.fields['text_' + str(txt.pk)] = SummernoteTextFormField(
                     label=txt.name,
                     help_text=txt.description,
                     required=False,

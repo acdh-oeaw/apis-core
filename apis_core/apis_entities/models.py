@@ -502,10 +502,10 @@ class Person(AbstractEntity):
     )
 
     def save(self, *args, **kwargs):
-        if self.first_name:
-            # secure correct unicode encoding
-            if self.first_name != unicodedata.normalize("NFC", self.first_name):
-                self.first_name = unicodedata.normalize("NFC", self.first_name)
+        # if self.first_name:
+        #     # secure correct unicode encoding
+        #     if self.first_name != unicodedata.normalize("NFC", self.first_name):
+        #         self.first_name = unicodedata.normalize("NFC", self.first_name)
         super(Person, self).save(*args, **kwargs)
         return self
 
