@@ -103,7 +103,7 @@ class EventSerializer(BaseEntitySerializer):
         fields = ("url", "id", "name", "uri_set", "collection", "text", "kind")
 
 
-class WorkSerializer(BaseEntitySerializer):
+class PassageSerializer(BaseEntitySerializer):
 
     url = serializers.HyperlinkedIdentityField(
         view_name="apis:apis_api:work-detail", lookup_field="pk"
@@ -114,7 +114,7 @@ class WorkSerializer(BaseEntitySerializer):
     )
 
     class Meta:
-        model = Work
+        model = Passage
         fields = ("url", "id", "name", "uri_set", "collection", "text", "kind")
 
 
