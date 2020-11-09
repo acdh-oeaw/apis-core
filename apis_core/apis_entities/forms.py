@@ -53,7 +53,6 @@ def get_entities_form(entity):
                 "end_start_date",
                 "end_end_date",
                 "end_date_is_exact",
-                "primary_date",
                 "text",
                 "source",
                 "published",
@@ -95,7 +94,6 @@ def get_entities_form(entity):
                                 "apis_relations",
                                 "apis_vocabularies",
                                 "apis_labels",
-                                "auth",
                             ],
                             model=v_name_p.lower(),
                         ).app_label.lower()
@@ -179,12 +177,11 @@ def get_entities_form(entity):
                             "An item in 'form_order' was not used. \n"
                             "This propably indicates that the 'form_order' settings is out of sync with the effective django models.\n"
                             f"The relevant entity is: {entity_label}\n"
-                            f"And the items of 'form_order' which were not used are: {sort_preferences}"
+                            f"And the item which was not used must be in this list: {sort_preferences}"
                         )
                     # sort the list according to the second element in each tuple
                     # and then take the first elements from it and return as list
                     return [ t[0] for t in sorted(field_rank_pair_list, key=lambda x: x[1]) ]
-
 
             # sort field list, iterate over it and append each element to the accordion group
             for f in sort_fields_list(fields_list_unsorted, entity):
@@ -207,7 +204,6 @@ def get_entities_form(entity):
                         single_start_date=instance.start_start_date,
                         single_end_date=instance.start_end_date,
                         single_date_written=instance.start_date_written,
-                        single_date_is_exact=instance.start_date_is_exact,
                     )
                 else:
                     self.fields[
@@ -222,7 +218,6 @@ def get_entities_form(entity):
                         single_start_date=instance.end_start_date,
                         single_end_date=instance.end_end_date,
                         single_date_written=instance.end_date_written,
-                        single_date_is_exact=instance.end_date_is_exact,
                     )
                 else:
                     self.fields[
@@ -328,11 +323,12 @@ class FullTextForm(forms.Form):
             else:
                 q = TextType.objects.filter(entity__iexact=entity)
             for txt in q:
-                self.fields['text_' + str(txt.pk)] = SummernoteTextFormField(
+                self.fields["text_" + str(txt.pk)] = forms.CharField(
                     label=txt.name,
                     help_text=txt.description,
                     required=False,
-                    widget=forms.Textarea)
+                    widget=forms.Textarea,
+                )
             if instance:
                 for t in instance.text.all():
                     if "text_" + str(t.kind.pk) in self.fields.keys():

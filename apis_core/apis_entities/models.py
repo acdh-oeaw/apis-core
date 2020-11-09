@@ -38,6 +38,9 @@ class AbstractEntity(TempEntityClass):
     the subclass entity type. So they are to be understood in that dynamic context.
     """
 
+    # Placeholder for list filter classes attached to each entity later
+    list_filter_class = None
+
     class Meta:
         abstract = True
 
@@ -69,6 +72,10 @@ class AbstractEntity(TempEntityClass):
         except:
             print("Found no object corresponding to given uri.")
             return False
+
+    @classmethod
+    def set_list_filter_class(cls, list_filter_class):
+        cls.list_filter_class = list_filter_class
 
     # Various Methods enabling convenient shortcuts between entities, relations, fields, etc
     ####################################################################################################################

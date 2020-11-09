@@ -332,8 +332,6 @@ class GenericListFilter(django_filters.FilterSet):
 
 
 
-
-
 #######################################################################
 #
 #   Overriding Entity filter classes
@@ -362,6 +360,8 @@ class PersonListFilter(GenericListFilter):
         # return QuerySet.union(queryset_related_label, queryset_self_name, queryset_first_name)
         return (queryset_related_label | queryset_self_name | queryset_first_name).distinct().all()
 
+Person.set_list_filter_class(PersonListFilter)
+
 
 class PlaceListFilter(GenericListFilter):
 
@@ -372,11 +372,15 @@ class PlaceListFilter(GenericListFilter):
     lng = django_filters.NumberFilter(label='Longitude')
     lat = django_filters.NumberFilter(label='Latitude')
 
+Place.set_list_filter_class(PlaceListFilter)
+
 
 class InstitutionListFilter(GenericListFilter):
 
     class Meta(GenericListFilter.Meta):
         model = Institution
+
+Institution.set_list_filter_class(InstitutionListFilter)
 
 
 class EventListFilter(GenericListFilter):
@@ -384,6 +388,7 @@ class EventListFilter(GenericListFilter):
     class Meta(GenericListFilter.Meta):
         model = Event
 
+Event.set_list_filter_class(EventListFilter)
 
 class PassageListFilter(GenericListFilter):
 
@@ -391,6 +396,8 @@ class PassageListFilter(GenericListFilter):
         model = Passage
 
     kind = django_filters.ModelChoiceFilter(queryset=PassageType.objects.all())
+
+Passage.set_list_filter_class(PassageListFilter)
 
 
 a_ents = getattr(settings, 'APIS_ADDITIONAL_ENTITIES', False)
@@ -424,9 +431,14 @@ def get_list_filter_of_entity(entity):
     :return: Entity specific FilterClass
     """
 
-    el = entity.title()
+    entity_class = AbstractEntity.get_entity_class_of_name(entity)
+    filter_class = entity_class.list_filter_class
 
-    try:
-        return globals()[f"{el}ListFilter"]
-    except KeyError:
-        raise ValueError("Could not find respective filter for given entity type:", el)
+    if filter_class is not None:
+        return filter_class
+    else:
+        el = entity.title()
+        try:
+            return globals()[f"{el}ListFilter"]
+        except KeyError:
+            raise ValueError("Could not find respective filter for given entity type:", el)
