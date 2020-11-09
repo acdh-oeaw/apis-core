@@ -345,8 +345,6 @@ class PersonListFilter(GenericListFilter):
         model = Person
 
     gender = django_filters.ChoiceFilter(choices=(('', 'any'), ('male', 'male'), ('female', 'female')))
-    profession = django_filters.CharFilter(method="related_arbitrary_model_name")
-    title = django_filters.CharFilter(method="related_arbitrary_model_name")
     name = django_filters.CharFilter(method="person_name_filter", label="Name or Label of person")
 
     def person_name_filter(self, queryset, name, value):
@@ -355,10 +353,8 @@ class PersonListFilter(GenericListFilter):
 
         queryset_related_label=queryset.filter(**{"label__label"+lookup : value})
         queryset_self_name=queryset.filter(**{name+lookup : value})
-        queryset_first_name=queryset.filter(**{"first_name"+lookup : value})
 
-        # return QuerySet.union(queryset_related_label, queryset_self_name, queryset_first_name)
-        return (queryset_related_label | queryset_self_name | queryset_first_name).distinct().all()
+        return (queryset_related_label | queryset_self_name).distinct().all()
 
 Person.set_list_filter_class(PersonListFilter)
 
