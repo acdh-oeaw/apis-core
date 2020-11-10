@@ -12,7 +12,6 @@ from django.core.validators import URLValidator
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.forms import ModelMultipleChoiceField, ModelChoiceField
 from django.urls import reverse
-from django_summernote.fields import SummernoteTextFormField
 from apis_core.apis_metainfo.models import Text, Uri, Collection
 from apis_core.apis_vocabularies.models import TextType
 from apis_core.helper_functions import DateParser
@@ -335,7 +334,7 @@ class FullTextForm(forms.Form):
             else:
                 q = TextType.objects.filter(entity__iexact=entity)
             for txt in q:
-                self.fields['text_' + str(txt.pk)] = SummernoteTextFormField(
+                self.fields['text_' + str(txt.pk)] = forms.CharField(
                     label=txt.name,
                     help_text=txt.description,
                     required=False,
