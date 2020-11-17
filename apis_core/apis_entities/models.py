@@ -618,7 +618,7 @@ lst_entities_complete = [
 lst_entities_complete = list(dict.fromkeys(lst_entities_complete))
 perm_change_senders = [
     getattr(getattr(x, "collection"), "through") for x in lst_entities_complete
-]
+] # TODO: Inspect. This list here will contain only duplicates if `lst_entities_complete` contains all entities
 
 
 @receiver(
@@ -632,7 +632,7 @@ def create_object_permissions(sender, instance, **kwargs):
         for x in perms:
             assign_perm("change_" + instance.__class__.__name__.lower(), x, instance)
             assign_perm("delete_" + instance.__class__.__name__.lower(), x, instance)
-    elif kwargs["action"] == "post_remove":
+    elif kwargs["action"] == "post_remove" and sender in perm_change_senders:
         perms = []
         perms_keep = []
         for j in kwargs["model"].objects.filter(pk__in=kwargs["pk_set"]):
