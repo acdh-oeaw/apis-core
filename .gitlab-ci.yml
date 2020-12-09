@@ -24,7 +24,8 @@ build:
     - cluster
   script:
     - pip install poetry
-    - poetry publish --build --repository https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi --username gitlab-ci-token --password ${CI_JOB_TOKEN}
+    - poetry config repositories.gitlab https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi
+    - poetry publish --build --repository gitlab --username gitlab-ci-token --password ${CI_JOB_TOKEN}
 
 trigger_build:
   only:
