@@ -26,13 +26,13 @@ from apis_core.default_settings.RDF_settings_new import sameAs
 APIS_RDF_YAML_SETTINGS = getattr(
         settings,
         'APIS_RDF_YAML_SETTINGS',
-        os.path.join(settings.BASE_DIR, 'apis_core', 'default_settings', 'RDF_default_settings.yml')
+        os.path.join(os.path.dirname(__file__), '../default_settings', 'RDF_default_settings.yml')
     )
 
 APIS_RDF_URI_SETTINGS = getattr(
         settings,
         'APIS_RDF_URI_SETTINGS',
-        os.path.join(settings.BASE_DIR, 'apis_core', 'default_settings', "URI_replace_settings.yml")
+        os.path.join(os.path.dirname(__file__), '../default_settings', "URI_replace_settings.yml")
     )
 
 
@@ -447,7 +447,7 @@ class RDFParser(object):
         self._preserve_uri_minutes = preserve_uri_minutes
         self._uri_check = uri_check
         self._use_preferred = use_preferred
-        self.objct = ContentType.objects.get(app_label=app_label_entities, model=kind).model_class()
+        self.objct = ContentType.objects.get(app_label=app_label_entities, model__iexact=kind).model_class()
         self._app_label_relations = app_label_relations
         self.kind = kind
         self._foreign_keys = []

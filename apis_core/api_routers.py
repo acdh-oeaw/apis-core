@@ -401,9 +401,9 @@ def generic_serializer_creation_factory():
                 s_dict_detail[
                     "txt_serializer_add_annotations"
                 ] = txt_serializer_add_annotations
-            s_dict_detail["annotations"] = serializers.SerializerMethodField(
-                method_name="txt_serializer_add_annotations"
-            )
+                s_dict_detail["annotations"] = serializers.SerializerMethodField(
+                    method_name="txt_serializer_add_annotations"
+                )
 
         serializer_class_retrieve = type(
             f"{entity_str.title().replace(' ', '')}DetailSerializer",
