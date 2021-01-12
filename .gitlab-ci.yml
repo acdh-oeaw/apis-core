@@ -1,3 +1,32 @@
+variables:
+  DOCKER_HOST: tcp://docker:2375/
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  HTTP_PROXY: http://fifi:8080/
+  HTTPS_PROXY: http://fifi:8080/
+  NO_PROXY: "docker:2375,docker:2376"
+ 
+stages:
+  - build
+  - deploy
+image:
+  name: python:3.6
+
+build:
+  only:
+      refs:
+        - pipelines
+        - triggers
+        - master
+
+  stage: build
+  tags:
+    - cluster
+  script:
+    - pip install poetry
+    - poetry config repositories.gitlab https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/pypi
+    - poetry publish --build --repository gitlab --username gitlab-ci-token --password ${CI_JOB_TOKEN}
+
 trigger_build:
   only:
      refs:
