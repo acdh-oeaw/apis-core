@@ -10,7 +10,7 @@ stages:
   - build
   - deploy
 image:
-  name: python:3.8
+  name: python:3.6
 
 build:
   only:
