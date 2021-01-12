@@ -160,7 +160,7 @@ class RelationObjectSerializer2(ApisBaseSerializer):
             if (
                 at.startswith("related_")
                 and at.endswith("_id")
-                and getattr(instance, at) != instance.pk
+                and getattr(instance, at) != self._pk_instance
             ):
                 return EntitySerializer(
                     getattr(instance, at[:-3]), context=self.context
@@ -343,7 +343,7 @@ def generic_serializer_creation_factory():
                     read_only=True,
                     source="get_related_relation_instances",
                     many=True,
-                    pk_instance=self._entity.pk,
+                    pk_instance=args[0].pk,
                 )
 
         def init_text_serializer_retrieve(self, *args, **kwargs):
