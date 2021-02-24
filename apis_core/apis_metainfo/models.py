@@ -3,6 +3,7 @@ import unicodedata
 from difflib import SequenceMatcher
 import json
 import requests
+
 # from reversion import revisions as reversion
 import reversion
 from django.apps import apps
@@ -19,11 +20,13 @@ from django.contrib.auth.models import User
 from apis_core.apis_entities.serializers_generic import EntitySerializer
 from apis_core.apis_labels.models import Label
 from apis_core.apis_vocabularies.models import CollectionType, LabelType, TextType
+
 # from helper_functions.highlighter import highlight_text
 from apis_core.default_settings.NER_settings import autocomp_settings
 from apis_core.helper_functions import DateParser
 
 NEXT_PREV = getattr(settings, "APIS_NEXT_PREV", True)
+
 
 if "apis_highlighter" in settings.INSTALLED_APPS:
     from apis_highlighter.models import Annotation
@@ -31,7 +34,7 @@ if "apis_highlighter" in settings.INSTALLED_APPS:
 
 @reversion.register()
 class TempEntityClass(models.Model):
-    """ Base class to bind common attributes to many classes.
+    """Base class to bind common attributes to many classes.
 
     The common attributes are:
     written start and enddates
@@ -80,14 +83,17 @@ class TempEntityClass(models.Model):
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Zuständiger User")
 
     def __str__(self):
-        if self.name != "":
+        if self.name != "" and hasattr(
+            self, "first_name"
+        ):  # relation usually don´t have names
+            return "{}, {} (ID: {})".format(self.name, self.first_name, self.id)
+        elif self.name != "":
             return "{} (ID: {})".format(self.name, self.id)
         else:
             return "(ID: {})".format(self.id)
 
     def save(self, parse_dates=True, *args, **kwargs):
-        """Adaption of the save() method of the class to automatically parse string-dates into date objects
-        """
+        """Adaption of the save() method of the class to automatically parse string-dates into date objects"""
 
         if parse_dates:
 
@@ -104,14 +110,16 @@ class TempEntityClass(models.Model):
             if self.start_date_written:
                 # If some textual user input of a start date is there, then parse it
 
-                start_date, start_start_date, start_end_date, start_date_is_exact = \
-                    DateParser.parse_date(self.start_date_written)
+                start_date, start_start_date, start_end_date, start_date_is_exact = DateParser.parse_date(
+                    self.start_date_written
+                )
 
             if self.end_date_written:
                 # If some textual user input of an end date is there, then parse it
 
-                end_date, end_start_date, end_end_date, end_date_is_exact = \
-                    DateParser.parse_date(self.end_date_written)
+                end_date, end_start_date, end_end_date, end_date_is_exact = DateParser.parse_date(
+                    self.end_date_written
+                )
 
             primary_date = DateParser.get_primary_date(start_date=start_date, end_date=end_date)
 
@@ -213,7 +221,7 @@ class TempEntityClass(models.Model):
         return self
 
     def get_child_entity(self):
-        for x in [x for x in apps.all_models['apis_entities'].values()]:
+        for x in [x for x in apps.all_models["apis_entities"].values()]:
             if x.__name__ in list(settings.APIS_ENTITIES.keys()):
                 try:
                     my_ent = x.objects.get(id=self.id)
@@ -356,7 +364,7 @@ class TempEntityClass(models.Model):
                 if col2 not in col_list:
                     self.collection.add(col2)
             for f in ent._meta.local_many_to_many:
-                if not f.name.endswith('_set'):
+                if not f.name.endswith("_set"):
                     sl = list(getattr(self, f.name).all())
                     for s in getattr(ent, f.name).all():
                         if s not in sl:
@@ -435,8 +443,8 @@ class Collection(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if hasattr(self, '_loaded_values'):
-            if self.published != self._loaded_values['published']:
+        if hasattr(self, "_loaded_values"):
+            if self.published != self._loaded_values["published"]:
                 for ent in self.tempentityclass_set.all():
                     ent.published = self.published
                     ent.save()
@@ -445,8 +453,8 @@ class Collection(models.Model):
 
 @reversion.register()
 class Text(models.Model):
-    """ Holds unstructured text associeted with
-    one ore many entities/relations. """
+    """Holds unstructured text associeted with
+    one ore many entities/relations."""
 
     kind = models.ForeignKey(TextType, blank=True, null=True, on_delete=models.SET_NULL)
     text = models.TextField(blank=True)
@@ -470,8 +478,15 @@ class Text(models.Model):
                     for s in seq.get_matching_blocks():
                         count += 1
                         if s.a <= a.start and (s.a + s.size) >= a.end:
-                            a.start += s.b - s.a
-                            a.end += s.b - s.a
+                            cor = 0
+                            if s.a < s.b:
+                                nl = re.findall(r"\n", self.text[s.a : s.b])
+                                cor -= len("".join(nl)) + len(nl)
+                            elif s.a > s.b:
+                                nl = re.findall(r"\n", orig.text[s.b : s.a])
+                                cor += len("".join(nl)) + len(nl)
+                            a.start += s.b - s.a + cor
+                            a.end += s.b - s.a + cor
                             a.save()
                             changed = True
                     if not changed:
@@ -512,22 +527,21 @@ class Uri(models.Model):
 
     @classmethod
     def get_createview_url(self):
-        return reverse('apis_core:apis_metainfo:uri_create')
+        return reverse("apis_core:apis_metainfo:uri_create")
 
     def get_absolute_url(self):
-        return reverse('apis_core:apis_metainfo:uri_detail', kwargs={'pk': self.id})
+        return reverse("apis_core:apis_metainfo:uri_detail", kwargs={"pk": self.id})
 
     def get_delete_url(self):
-        return reverse('apis_core:apis_metainfo:uri_delete', kwargs={'pk': self.id})
+        return reverse("apis_core:apis_metainfo:uri_delete", kwargs={"pk": self.id})
 
     def get_edit_url(self):
-        return reverse('apis_core:apis_metainfo:uri_edit', kwargs={'pk': self.id})
+        return reverse("apis_core:apis_metainfo:uri_edit", kwargs={"pk": self.id})
 
 
 @reversion.register()
 class UriCandidate(models.Model):
-    """Used to store the URI candidates for automatically generated entities.
-    """
+    """Used to store the URI candidates for automatically generated entities."""
 
     uri = models.URLField()
     confidence = models.FloatField(blank=True, null=True)
@@ -558,9 +572,8 @@ class UriCandidate(models.Model):
                 ]
                 return (label, desc)
 
+
 # @receiver(post_save, sender=Uri, dispatch_uid="remove_default_uri")
 # def remove_default_uri(sender, instance, **kwargs):
 #    if Uri.objects.filter(entity=instance.entity).count() > 1:
 #        Uri.objects.filter(entity=instance.entity, domain="apis default").delete()
-
-
