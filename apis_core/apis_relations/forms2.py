@@ -112,7 +112,16 @@ class GenericRelationForm(forms.ModelForm):
                 user_added=self.request.user,
                 annotation_project_id=int(self.request.session.get('annotation_project', 1)))
             a.save()
-            a.entity_link.add(x)
+
+
+            # OLD:
+            # a.entity_link.add(x)
+
+            # NEW:
+            a.entity_link_new = x
+            a.save()
+
+
         print('saved: {}'.format(x))
         return x
 
