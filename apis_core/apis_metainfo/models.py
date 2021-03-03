@@ -81,7 +81,7 @@ class TempEntityClass(models.Model):
     objects = models.Manager()
     objects_inheritance = InheritanceManager()
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Zuständiger User")
-    annotation_set_new = GenericRelation(Annotation)
+    annotation_set = GenericRelation(Annotation)
 
     def __str__(self):
         if self.name != "" and hasattr(
