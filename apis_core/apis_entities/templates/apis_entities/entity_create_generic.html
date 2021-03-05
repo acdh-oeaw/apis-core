@@ -306,10 +306,7 @@
 </script>
 <script type='text/javascript'>
     function DeleteTempEntity(pk, kind, app_name=false) {
-        if (kind == 'HLAnnotation') {
-            var url = "/apis/api/metainfo/tempentityclass/"+pk.toString()
-        }
-        else if (app_name){
+        if (app_name){
             var url = '/apis/api/'+app_name+'/'+kind+'/'+pk.toString()
         } else {
         var url = '/apis/api/'+kind+'/'+pk.toString()}
