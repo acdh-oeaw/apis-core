@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "apis-core"
-version = "0.15.5"
+version = "0.15.6"
 description = "Base package for the APIS framework"
 authors = ["Matthias Schlögl <matthias.schloegl@oeaw.ac.at>"]
 license = "MIT"
