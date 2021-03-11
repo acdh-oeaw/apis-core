@@ -156,7 +156,7 @@ class TeiEntCreator():
                 node.attrib['type'] = 'alt'
                 try:
                     node.attrib['subtype'] = "{}".format(x['label_type']['name'])
-                except KeyError:
+                except (KeyError, TypeError):
                     pass
                 try:
                     node.attrib['{http://www.w3.org/XML/1998/namespace}lang'] = "{}".format(
