@@ -200,8 +200,8 @@ class TeiEntCreator:
                 node = ET.Element("placeName")
                 node.attrib["type"] = "alt"
                 try:
-                    node.attrib["subtype"] = "{}".format(x["label_type"]["name"])
-                except KeyError:
+                    node.attrib['subtype'] = "{}".format(x['label_type']['name'])
+                except (KeyError, TypeError):
                     pass
                 try:
                     node.attrib[

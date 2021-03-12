@@ -1,4 +1,5 @@
 from functools import reduce
+import importlib
 
 import django_filters
 from django.conf import settings
@@ -35,7 +36,9 @@ from apis_core.apis_vocabularies.models import RelationBaseClass
 
 class GenericListFilter(django_filters.FilterSet):
 
-    fields_to_exclude = getattr(settings, "APIS_RELATIONS_FILTER_EXCLUDE", [])
+    class Meta:
+        model = None # must be overriden with entity specific Filter Classes
+        exclude = getattr(settings, "APIS_RELATIONS_FILTER_EXCLUDE", [])
 
     name = django_filters.CharFilter(method="name_label_filter", label="Name or Label")
     collection = django_filters.ModelMultipleChoiceFilter(queryset=Collection.objects.all())
@@ -329,8 +332,6 @@ class GenericListFilter(django_filters.FilterSet):
 
 
 
-
-
 #######################################################################
 #
 #   Overriding Entity filter classes
@@ -340,20 +341,13 @@ class GenericListFilter(django_filters.FilterSet):
 
 class PersonListFilter(GenericListFilter):
 
+    class Meta(GenericListFilter.Meta):
+        model = Person
+
     gender = django_filters.ChoiceFilter(choices=(('', 'any'), ('male', 'male'), ('female', 'female')))
     profession = django_filters.CharFilter(method="related_arbitrary_model_name")
     title = django_filters.CharFilter(method="related_arbitrary_model_name")
     name = django_filters.CharFilter(method="person_name_filter", label="Name or Label of person")
-
-
-    # TODO __sresch__ : look into how the meta class can be inherited from the superclass so that the Meta class' exclude attribute must not be defined multiple times
-    class Meta:
-        model = Person
-        # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
-        # order to load all filters of all model fields by default so that they are available in the first place.
-        # Later those which are not referenced in the settings file will be removed again
-        exclude = GenericListFilter.fields_to_exclude
-
 
     def person_name_filter(self, queryset, name, value):
 
@@ -366,55 +360,68 @@ class PersonListFilter(GenericListFilter):
         # return QuerySet.union(queryset_related_label, queryset_self_name, queryset_first_name)
         return (queryset_related_label | queryset_self_name | queryset_first_name).distinct().all()
 
+Person.set_list_filter_class(PersonListFilter)
 
 
 class PlaceListFilter(GenericListFilter):
+
+    class Meta(GenericListFilter.Meta):
+        model = Place
 
     # TODO __sresch__ : decide on margin tolerance of input, for now the number must be precise
     lng = django_filters.NumberFilter(label='Longitude')
     lat = django_filters.NumberFilter(label='Latitude')
 
-    class Meta:
-        model = Place
-        # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
-        # order to load all filters of all model fields by default so that they are available in the first place.
-        # Later those which are not referenced in the settings file will be removed again
-        exclude = GenericListFilter.fields_to_exclude
-
+Place.set_list_filter_class(PlaceListFilter)
 
 
 class InstitutionListFilter(GenericListFilter):
 
-    class Meta:
+    class Meta(GenericListFilter.Meta):
         model = Institution
-        # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
-        # order to load all filters of all model fields by default so that they are available in the first place.
-        # Later those which are not referenced in the settings file will be removed again
-        exclude = GenericListFilter.fields_to_exclude
 
+Institution.set_list_filter_class(InstitutionListFilter)
 
 
 class EventListFilter(GenericListFilter):
 
-    class Meta:
+    class Meta(GenericListFilter.Meta):
         model = Event
-        # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
-        # order to load all filters of all model fields by default so that they are available in the first place.
-        # Later those which are not referenced in the settings file will be removed again
-        exclude = GenericListFilter.fields_to_exclude
 
+Event.set_list_filter_class(EventListFilter)
 
 
 class WorkListFilter(GenericListFilter):
 
+    class Meta(GenericListFilter.Meta):
+        model = Work
+
     kind = django_filters.ModelChoiceFilter(queryset=WorkType.objects.all())
 
-    class Meta:
-        model = Work
-        # exclude all hardcoded fields or nothing, however this exclude is only defined here as a temporary measure in
-        # order to load all filters of all model fields by default so that they are available in the first place.
-        # Later those which are not referenced in the settings file will be removed again
-        exclude = GenericListFilter.fields_to_exclude
+Work.set_list_filter_class(WorkListFilter)
+
+
+a_ents = getattr(settings, 'APIS_ADDITIONAL_ENTITIES', False)
+
+if a_ents:
+    with open(a_ents, 'r') as ents_file:
+        ents = yaml.load(ents_file, Loader=yaml.CLoader)
+        for ent in ents['entities']:
+            ent_class = getattr(importlib.import_module(f"apis_core.apis_entities.models"), ent['name'])
+            vocabs = []
+            for v in ent.get('vocabs', []):
+                ent_class_type = getattr(importlib.import_module(f"apis_core.apis_vocabularies.models"), v)
+                vocabs.append((v, ent_class_type))
+            class filterMeta:
+                model = ent_class
+                exclude = GenericListFilter.fields_to_exclude
+            dict_fc = {
+                "Meta": filterMeta,
+            }
+            for v in vocabs:
+                dict_fc[v] =  django_filters.ModelChoiceFilter(queryset=ent_class_type.objects.all())
+            filterclass_ent = type(f"{ent['name'].title()}Filter", (GenericListFilter, ), dict_fc)
+            globals()[f"{ent['name'].title()}ListFilter"] = filterclass_ent
 
 
 def get_list_filter_of_entity(entity):
@@ -425,22 +432,14 @@ def get_list_filter_of_entity(entity):
     :return: Entity specific FilterClass
     """
 
-    el = entity.lower()
+    entity_class = AbstractEntity.get_entity_class_of_name(entity)
+    filter_class = entity_class.list_filter_class
 
-    if el == "person":
-        return PersonListFilter
-
-    elif el == "place":
-        return PlaceListFilter
-
-    elif el == "institution":
-        return InstitutionListFilter
-
-    elif el == "event":
-        return EventListFilter
-
-    elif el == "work":
-        return WorkListFilter
-
+    if filter_class is not None:
+        return filter_class
     else:
-        raise ValueError("Could not find respective filter for given entity type:", el)
+        el = entity.title()
+        try:
+            return globals()[f"{el}ListFilter"]
+        except KeyError:
+            raise ValueError("Could not find respective filter for given entity type:", el)

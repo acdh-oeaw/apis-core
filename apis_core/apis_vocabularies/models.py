@@ -2,11 +2,13 @@ import inspect
 import re
 import sys
 import unicodedata
+import yaml
 
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils.functional import cached_property
 from reversion import revisions as reversion
+from django.conf import settings
 
 
 @reversion.register()
@@ -195,6 +197,8 @@ class TextType(VocabsBaseClass):
         help_text="The ISO 639-3 (or 2) code for the label's language.",
         verbose_name='ISO Code', default='deu')
 
+
+
 #######################################################################
 #
 #   relation types
@@ -235,6 +239,7 @@ class AbstractRelationType(RelationBaseClass):
                     sys.modules[__name__], inspect.isclass):
 
                 if relationtype_class.__module__ == "apis_core.apis_vocabularies.models" and \
+                        relationtype_name != "ent_class" and \
                         relationtype_name.endswith("Relation"):
 
                     relationtype_classes.append(relationtype_class)
@@ -422,3 +427,34 @@ class EventWorkRelation(AbstractRelationType):
 class WorkWorkRelation(AbstractRelationType):
     """Holds controlled vocabularies relation types of Works and Works"""
     pass
+
+
+a_ents = getattr(settings, 'APIS_ADDITIONAL_ENTITIES', False)
+
+if a_ents:
+    with open(a_ents, 'r') as ents_file:
+        ents = yaml.load(ents_file, Loader=yaml.CLoader)
+        print(ents)
+        for ent in ents['entities']:
+            for voc in ent.get('vocabs', []):
+                attributes = {"__module__": __name__}
+                ent_class = type(voc, (VocabsBaseClass,), attributes)
+                globals()[ent['name']] = ent_class
+            rels = ent.get("relations", [])
+            base_ents = ['Person', 'Institution', 'Place', 'Work', 'Event']
+            if isinstance(rels, str):
+                if rels == 'all':
+                    rels = base_ents + [x['name'].title() for x in ents['entities']]
+            else:
+                rels = base_ents + rels
+            for r2 in rels:
+                attributes = {"__module__":__name__}
+                if r2 in base_ents:
+                    rel_class_name = f"{r2.title()}{ent['name'].title()}"
+                else:
+                    rel_class_name = f"{ent['name'].title()}{r2.title()}"
+                attributes = {"__module__": __name__}
+                if f"{rel_class_name}Relation" not in globals().keys():
+                    ent_class = type(f"{rel_class_name}Relation", (AbstractRelationType,), attributes)
+                    globals()[f"{rel_class_name}Relation"] = ent_class
+

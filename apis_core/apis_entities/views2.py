@@ -13,6 +13,7 @@ from django.views.generic import DeleteView
 from django_tables2 import RequestConfig
 from guardian.core import ObjectPermissionChecker
 from reversion.models import Version
+import importlib
 
 from apis_core.apis_entities.models import AbstractEntity
 from apis_core.apis_labels.models import Label
@@ -218,8 +219,7 @@ class GenericEntitiesCreateStanbolView(View):
 
 @method_decorator(login_required, name='dispatch')
 class GenericEntitiesDeleteView(DeleteView):
-    model = ContentType.objects.get(
-        app_label='apis_metainfo', model='tempentityclass').model_class()
+    model = importlib.import_module("apis_core.apis_metainfo.models").TempEntityClass
     template_name = getattr(
         settings, 'APIS_DELETE_VIEW_TEMPLATE', 'apis_entities/confirm_delete.html'
     )

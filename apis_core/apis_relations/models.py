@@ -1,5 +1,6 @@
 import inspect
 import sys
+import yaml
 
 # from reversion import revisions as reversion
 import reversion
@@ -205,7 +206,8 @@ class AbstractRelation(TempEntityClass):
                         relation_class.__name__ != "AnnotationRelationLinkManager" and \
                         relation_class.__name__ != "BaseRelationManager" and \
                         relation_class.__name__ != "RelationPublishedQueryset" and \
-                        relation_class.__name__ != "AbstractRelation":
+                        relation_class.__name__ != "AbstractRelation" and \
+                        relation_name != "ent_class":
 
                     relation_classes.append(relation_class)
                     relation_names.append(relation_name.lower())
@@ -328,7 +330,8 @@ class AbstractRelation(TempEntityClass):
         # get the list of the class dictionary, create if not yet exists.
         relation_names_list = cls._relation_field_names_of_entity_class.get(entity_class, [])
         # append the current relation field name to the list.
-        relation_names_list.append(relation_name)
+        if relation_name not in relation_names_list: 
+            relation_names_list.append(relation_name) #TODO: this is a workaround, find out why it is called several times
         # save into the dictionary, which uses the entity class as key and the extended list above as value.
         cls._relation_field_names_of_entity_class[entity_class] = relation_names_list
 
@@ -527,3 +530,29 @@ class WorkWork(AbstractRelation):
 
     pass
 
+
+a_ents = getattr(settings, 'APIS_ADDITIONAL_ENTITIES', False)
+
+
+if a_ents:
+    with open(a_ents, 'r') as ents_file:
+        ents = yaml.load(ents_file, Loader=yaml.CLoader)
+        print(ents)
+        for ent in ents['entities']:
+            rels = ent.get("relations", [])
+            base_ents = ['Person', 'Institution', 'Place', 'Work', 'Event']
+            if isinstance(rels, str):
+                if rels == 'all':
+                    rels = base_ents + [x['name'].title() for x in ents['entities']]
+            else:
+                rels = base_ents + rels
+            for r2 in rels:
+                attributes = {"__module__":__name__}
+                if r2 in base_ents:
+                    rel_class_name = f"{r2.title()}{ent['name'].title()}"
+                else:
+                    rel_class_name = f"{ent['name'].title()}{r2.title()}"
+                if rel_class_name not in globals().keys():
+                    print(rel_class_name)
+                    ent_class = type(rel_class_name, (AbstractRelation,), attributes)
+                    globals()[rel_class_name] = ent_class

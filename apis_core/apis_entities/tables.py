@@ -35,6 +35,12 @@ def get_entities_table(entity, edit_v, default_cols):
 
     class GenericEntitiesTable(tables.Table):
 
+        def render_name(self, record, value):
+            if value == "":
+                return "(No name provided)"
+            else:
+                return value
+
         # reuse the logic for ordering and rendering *_date_written
         # Important: The names of these class variables must correspond to the column field name,
         # e.g. for start_date_written, the methods must be named order_start_date_written and render_start_date_written
@@ -46,12 +52,14 @@ def get_entities_table(entity, edit_v, default_cols):
         if edit_v:
             name = tables.LinkColumn(
                 'apis:apis_entities:generic_entities_edit_view',
-                args=[entity.lower(), A('pk')]
+                args=[entity.lower(), A('pk')],
+                empty_values=[]
             )
         else:
             name = tables.LinkColumn(
                 'apis:apis_entities:generic_entities_detail_view',
-                args=[entity.lower(), A('pk')]
+                args=[entity.lower(), A('pk')],
+                empty_values=[]
             )
         export_formats = [
             'csv',
@@ -64,17 +72,22 @@ def get_entities_table(entity, edit_v, default_cols):
         if 'id' in default_cols:
             id = tables.LinkColumn()
 
-
         class Meta:
             model = AbstractEntity.get_entity_class_of_name(entity_name=entity)
 
             fields = default_cols
             attrs = {"class": "table table-hover table-striped table-condensed"}
 
+            # quick ensurance if column is indeed a field of this entity
+            for col in default_cols:
+                if not hasattr(model, col):
+                    raise Exception(
+                        f"Could not find field in entity: {entity}\n"
+                        f"of column (probably defined in 'table_fields' settings): {col}\n"
+                    )
 
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
-
 
     return GenericEntitiesTable
 
