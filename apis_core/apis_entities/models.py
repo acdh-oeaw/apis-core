@@ -605,7 +605,7 @@ if a_ents:
 
 @receiver(post_save, dispatch_uid="create_default_uri")
 def create_default_uri(sender, instance, **kwargs):
-    if kwargs["created"] and sender in [Person, Place, Work, Event] + ents_cls_list:
+    if kwargs["created"] and sender in [Person, Institution, Place, Work, Event] + ents_cls_list:
         if BASE_URI.endswith("/"):
             base1 = BASE_URI[:-1]
         else:
