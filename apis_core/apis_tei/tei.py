@@ -32,7 +32,7 @@ entity_type_string_to_class = {
     "Place": Place,
     "Event": Event,
     "Work": Work,
-    "Insitution": Institution,
+    "Institution": Institution,
 }
 
 relation_type_to_tei_tag = {
