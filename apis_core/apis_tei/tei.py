@@ -45,7 +45,7 @@ relation_type_to_tei_tag = {
 
 class TeiEntCreator:
     def __init__(
-        self, ent_dict, base_url="apis/api2/", include_entity_tagged_texts=False
+        self, ent_dict, base_url="entity/", include_entity_tagged_texts=False
     ):
         """
         Entry point: called from apis_core/apis_entities/api_renderers.py
@@ -297,7 +297,7 @@ class TeiEntCreator:
         return person
 
     def populate_header(self):
-        main = "{}: {}".format(self.ent_type, self.ent_name)
+        main = f"{self.ent_type}: {self.ent_name}"
         header = self.gen_tei_header.format(main, self.project)
         return header
 
