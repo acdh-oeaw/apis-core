@@ -178,11 +178,11 @@ class TeiEntCreator:
         if self.ent_dict.get("end_date"):
             orgName.attrib["notAfter"] = self.ent_dict.get("end_date")
         org.append(orgName)
-        for x in self.relation_notes():
-            org.append(x)
         if self.uris_to_idnos():
             for x in self.uris_to_idnos():
                 org.append(x)
+        for x in self.relation_notes():
+            org.append(x)
         return org
 
     def create_place_node(self):
