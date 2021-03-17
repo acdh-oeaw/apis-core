@@ -160,9 +160,11 @@ class TeiEntCreator:
                 node = ET.Element("orgName")
                 node.attrib["type"] = "alt"
                 try:
-                    node.attrib["subtype"] = "{}".format(x["label_type"]["name"])
+                    node_subtype = f'{x["label_type"]["name"]}'
                 except KeyError:
-                    pass
+                    node_subtype = False
+                if node_subtype:
+                    node.attrib["subtype"] = slugify(node_subtype)
                 try:
                     node.attrib[
                         "{http://www.w3.org/XML/1998/namespace}lang"
@@ -200,9 +202,11 @@ class TeiEntCreator:
                 node = ET.Element("placeName")
                 node.attrib["type"] = "alt"
                 try:
-                    node.attrib['subtype'] = "{}".format(x['label_type']['name'])
-                except (KeyError, TypeError):
-                    pass
+                    node_subtype = f'{x["label_type"]["name"]}'
+                except KeyError:
+                    node_subtype = False
+                if node_subtype:
+                    node.attrib["subtype"] = slugify(node_subtype)
                 try:
                     node.attrib[
                         "{http://www.w3.org/XML/1998/namespace}lang"
@@ -244,9 +248,11 @@ class TeiEntCreator:
                 node = ET.Element("persName")
                 node.attrib["type"] = "alt"
                 try:
-                    node.attrib["subtype"] = "{}".format(x["label_type"]["name"])
+                    node_subtype = f'{x["label_type"]["name"]}'
                 except KeyError:
-                    pass
+                    node_subtype = False
+                if node_subtype:
+                    node.attrib["subtype"] = slugify(node_subtype)
                 try:
                     node.attrib[
                         "{http://www.w3.org/XML/1998/namespace}lang"
