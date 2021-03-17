@@ -215,11 +215,6 @@ class TeiEntCreator:
                     pass
                 node.text = x["label"]
                 place.append(node)
-        for x in self.relation_notes():
-            place.append(x)
-        if self.uris_to_idnos():
-            for x in self.uris_to_idnos():
-                place.append(x)
         if self.ent_dict.get("lat"):
             coords = "{} {}".format(self.ent_dict["lat"], self.ent_dict["lng"])
             location = ET.Element("location")
@@ -227,6 +222,11 @@ class TeiEntCreator:
             geo.text = coords
             location.append(geo)
             place.append(location)
+        for x in self.relation_notes():
+            place.append(x)
+        if self.uris_to_idnos():
+            for x in self.uris_to_idnos():
+                place.append(x)
         return place
 
     def create_person_node(self):
