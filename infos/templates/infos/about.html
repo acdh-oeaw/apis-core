@@ -1,0 +1,36 @@
+{% extends "webpage/base.html" %}
+{% load static %}
+{% load webpage_extras %}
+{% block title %}{{ object.name }}{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="card">
+            <div class="card-header" style="text-align: center">
+                <h1>{{ object.title }}</h1>
+                {% if object.subtitle %}
+                    <h2>{{ object.subtitle}}</h2>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {{ object.description|safe}}
+            </div>
+            <div class="card-footer" style="text-align: center">
+                <p>
+                    <small>{{ object.author }}</small>
+                    <br />
+                    <a href="{{ object.github }}">{{ object.github}}</a>
+                    {% if user.is_authenticated and object.get_edit_url %}
+                        <br />
+                        <a href="{{ object.get_edit_url }}">
+                            <i class="feather-32" data-feather="edit" title="edit"></i>
+                        </a>
+                    {% elif user.is_authenticated %}
+                        <br />
+                        <small>Data fetched from metadata file, better to create an <a href="{% url 'infos:about_create' %}">AboutTheProject</a> object</small>
+                    {% endif %}
+                </p>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

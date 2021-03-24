@@ -18,13 +18,16 @@ from .api_mappings.cidoc_mapping import m_person, m_place, m_work, m_institution
 try:
     from webpage.metadata import PROJECT_METADATA
 except ImportError:
-    from webpage.utils import PROJECT_METADATA
+    try:
+        from webpage.utils import PROJECT_METADATA
+    except ImportError:
+        PROJECT_METADATA = getattr(settings, "PROJECT_DEFAULT_MD")
 
 
-base_uri = getattr(settings, 'APIS_BASE_URI', 'http://apis.info')
-if base_uri.endswith('/'):
+base_uri = getattr(settings, "APIS_BASE_URI", "http://apis.info")
+if base_uri.endswith("/"):
     base_uri = base_uri[:-1]
-lang = getattr(settings, 'LANGUAGE_CODE', 'de')
+lang = getattr(settings, "LANGUAGE_CODE", "de")
 
 
 class EntityToTEI(renderers.BaseRenderer):
@@ -42,13 +45,23 @@ class EntityToCIDOC(renderers.BaseRenderer):
     media_type = "text/rdf"
 
     ent_func = {
-        'Person': m_person,
-        'Place': m_place,
-        'Work': m_work,
-        'Institution': m_institution,
-        }
+        "Person": m_person,
+        "Place": m_place,
+        "Work": m_work,
+        "Institution": m_institution,
+    }
 
-    def render(self, data1, media_type=None, renderer_context=None, format_1=None, binary=False, store=False, named_graph=None, provenance=False):
+    def render(
+        self,
+        data1,
+        media_type=None,
+        renderer_context=None,
+        format_1=None,
+        binary=False,
+        store=False,
+        named_graph=None,
+        provenance=False,
+    ):
         if isinstance(data1, dict):
             data1 = [data1]
         if format_1 is not None:
@@ -60,37 +73,69 @@ class EntityToCIDOC(renderers.BaseRenderer):
         if named_graph:
             uri_entities = URIRef(named_graph)
         else:
-            uri_entities = URIRef(f'{base_uri}/entities#')
+            uri_entities = URIRef(f"{base_uri}/entities#")
         g = Graph(store, identifier=uri_entities)
-        g.bind('cidoc', cidoc, override=False)
-        g.bind('geo', geo, override=False)
-        g.bind('owl', OWL, override=False)
-        ns = {'cidoc': cidoc, 'geo': geo}
+        g.bind("cidoc", cidoc, override=False)
+        g.bind("geo", geo, override=False)
+        g.bind("owl", OWL, override=False)
+        ns = {"cidoc": cidoc, "geo": geo}
         if type(data1) == list:
             for data in data1:
-                g, ent = self.ent_func[data['entity_type']](g, ns, data, drill_down=True)
+                g, ent = self.ent_func[data["entity_type"]](
+                    g, ns, data, drill_down=True
+                )
         elif type(data1) == str:
             directory = os.fsencode(data1)
             for fn in os.listdir(directory):
-                with open(os.path.join(directory, fn), 'rb') as inf:
+                with open(os.path.join(directory, fn), "rb") as inf:
                     data2 = pickle.load(inf)
                     for data in data2:
-                        g, ent = self.ent_func[data['entity_type']](g, ns, data, drill_down=True)
+                        g, ent = self.ent_func[data["entity_type"]](
+                            g, ns, data, drill_down=True
+                        )
         if provenance:
-            g_prov = Graph(store, identifier=URIRef('https://omnipot.acdh.oeaw.ac.at/provenance'))
-            g_prov.bind('dct', DCTERMS, override=False)
-            g_prov.bind('void', VOID, override=False)
-            g_prov.add((uri_entities, DCTERMS.title, Literal(PROJECT_METADATA['title'], lang=lang)))
-            g_prov.add((uri_entities, DCTERMS.description, Literal(PROJECT_METADATA['description'], lang=lang)))
-            g_prov.add((uri_entities, DCTERMS.creator, Literal(PROJECT_METADATA['author'], lang=lang)))
-            g_prov.add((uri_entities, DCTERMS.publisher, Literal('ACDH-OeAW', lang=lang)))
+            g_prov = Graph(
+                store, identifier=URIRef("https://omnipot.acdh.oeaw.ac.at/provenance")
+            )
+            g_prov.bind("dct", DCTERMS, override=False)
+            g_prov.bind("void", VOID, override=False)
+            g_prov.add(
+                (
+                    uri_entities,
+                    DCTERMS.title,
+                    Literal(PROJECT_METADATA["title"], lang=lang),
+                )
+            )
+            g_prov.add(
+                (
+                    uri_entities,
+                    DCTERMS.description,
+                    Literal(PROJECT_METADATA["description"], lang=lang),
+                )
+            )
+            g_prov.add(
+                (
+                    uri_entities,
+                    DCTERMS.creator,
+                    Literal(PROJECT_METADATA["author"], lang=lang),
+                )
+            )
+            g_prov.add(
+                (uri_entities, DCTERMS.publisher, Literal("ACDH-OeAW", lang=lang))
+            )
             g_prov.add((uri_entities, DCTERMS.source, URIRef(base_uri)))
-            g_prov.add((uri_entities, DCTERMS.created, Literal(str(date.today()), datatype=XSD.date)))
+            g_prov.add(
+                (
+                    uri_entities,
+                    DCTERMS.created,
+                    Literal(str(date.today()), datatype=XSD.date),
+                )
+            )
             g_prov, g = generateVoID(g, dataset=uri_entities, res=g_prov)
         g_all = ConjunctiveGraph(store=store)
         if binary:
             return g_all, store
-        return g_all.serialize(format=self.format.split('+')[-1])
+        return g_all.serialize(format=self.format.split("+")[-1])
 
 
 class EntityToCIDOCXML(EntityToCIDOC):
@@ -216,7 +261,9 @@ class EntityToProsopogrAPhI(renderers.BaseRenderer):
                                 )
                     ext_stc = False
                     t1 = {
-                        "uri": "{}/api2/entity/{}".format(base_uri, rel_1["target"]["id"]),
+                        "uri": "{}/api2/entity/{}".format(
+                            base_uri, rel_1["target"]["id"]
+                        ),
                         "label": rel_1["target"]["name"],
                     }
                     if fact_settings is not None:
@@ -233,20 +280,22 @@ class EntityToProsopogrAPhI(renderers.BaseRenderer):
                         s["statementType"] = [t1]
                     try:
                         if len(rel_1["annotation"]) > 0:
-                            s['statementContent'] = rel_1["annotation"][0]["text"]
+                            s["statementContent"] = rel_1["annotation"][0]["text"]
                     except TypeError:
                         pass
-                        #stct = {
+                        # stct = {
                         #    "@id": "Annotation_{}".format(rel_1["annotation"][0]["id"]),
                         #    "label": rel_1["annotation"][0]["text"]
-                        #}
-                        #if "statementContent" in s.keys():
+                        # }
+                        # if "statementContent" in s.keys():
                         #    s["statementContent"].append(stct)
-                        #else:
+                        # else:
                         #    s["statementContent"] = [stct,]
                     if len(rel_1["revisions"]) > 0:
                         user_1 = rel_1["revisions"][0]["user_created"]
-                        date_1 = rel_1["revisions"][0]["date_created"].strftime("%Y-%m-%d")
+                        date_1 = rel_1["revisions"][0]["date_created"].strftime(
+                            "%Y-%m-%d"
+                        )
                         rev_id = rel_1["revisions"][0]["id"]
                         if "{}_{}".format(user_1, date_1) not in facts_ind.keys():
                             facts_ind["{}_{}".format(user_1, date_1)] = len(factoids)
@@ -255,16 +304,22 @@ class EntityToProsopogrAPhI(renderers.BaseRenderer):
                                 "@id": "{}_{}".format(factoids[0]["@id"], len(stmts)),
                                 "source": {
                                     "@id": "APIS",
-                                    "label": "APIS highlighter annotations rev. {}".format(rev_id),
+                                    "label": "APIS highlighter annotations rev. {}".format(
+                                        rev_id
+                                    ),
                                 },
                                 "createdBy": user_1,
                                 "createdWhen": date_1,
-                                "statements": [s]
+                                "statements": [s],
                             }
                             factoids.append(s3)
                         else:
-                            factoids[facts_ind["{}_{}".format(user_1, date_1)]]["statements"].append(s)
-                            factoids[facts_ind["{}_{}".format(user_1, date_1)]]["source"]["label"] += " / {}".format(rev_id)
+                            factoids[facts_ind["{}_{}".format(user_1, date_1)]][
+                                "statements"
+                            ].append(s)
+                            factoids[facts_ind["{}_{}".format(user_1, date_1)]][
+                                "source"
+                            ]["label"] += " / {}".format(rev_id)
                     else:
                         factoids[0]["statements"].append(s)
         return json.dumps(

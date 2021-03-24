@@ -4,6 +4,8 @@ version = "0.16.5"
 description = "Base package for the APIS framework"
 authors = ["Matthias Schlögl <matthias.schloegl@oeaw.ac.at>"]
 license = "MIT"
+include = [{path = "LICENSE.txt", format = "sdist"}, {path = "README.rst", format = "sdist"}]
+exclude = ["apis/", "manage.py", "__pycache__"]
 
 [tool.poetry.dependencies]
 python = "~3.6"
@@ -37,6 +39,9 @@ unicodecsv = "^0.14.1"
 django-model-utils = "^4.1.1"
 django-summernote = "^0.8.11"
 djangorestframework-jsonschema = "^0.1.1"
+dj-database-url = "^0.5.0"
+mysqlclient = "^2.0.3"
+pandas = "^0.25.3"
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
