@@ -25,6 +25,8 @@ build:
   script:
     - pip install poetry
     - poetry config pypi-token.pypi ${PYPI_TOKEN}
+    - poetry install
+    - poetry run bash checkandbump.sh
     - poetry publish --build
 
 trigger_build:
