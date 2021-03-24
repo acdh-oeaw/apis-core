@@ -50,7 +50,7 @@ if "apis_highlighter" in settings.INSTALLED_APPS:
     #    r"HLTextHighlighter", HighlighterHighlightTextViewSet, "HLTextHighlighter"
     # )
     # router.register(r"HLVocabularyAPI", HighlighterVocabularyAPIViewSet)
-    # router.register(r"HLAnnotation", HighlighterAnnotationViewSet)
+    router.register(r"HLAnnotation", HighlighterAnnotationViewSet)
 
 router.register(r"users", UserViewSet)
 router.register(r"GeoJsonPlace", PlaceGeoJsonViewSet, "PlaceGeoJson")
