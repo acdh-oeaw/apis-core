@@ -29,7 +29,12 @@ tei_gen_header = """
         </fileDesc>
     </teiHeader>
     <text>
-        <body/>
+        <group>
+            <text type="entity">
+                <body/>
+            </text>
+        </group>
+      
     </text>
 </TEI>
 """
