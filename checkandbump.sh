@@ -3,6 +3,8 @@
 
 CURRENTLY_BUILT_VER=$(sed -n '3s/.*= "\(.*\)"/\1/p' pyproject.toml)
 LASTVER=$(lastversion apis-core --at pip -gt ${CURRENTLY_BUILT_VER})
+echo $LASTVER
+echo $CURRENTLY_BUILT_VER
 if [[ $? -eq 0 ]]; then
     echo "patching version"
     LASTVER_PYPI=$(lastversion apis-core --at pip)
