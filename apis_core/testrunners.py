@@ -23,7 +23,7 @@ def create_data(ft, ln=5):
 
 class APISTestRunner(DiscoverRunner):
     def setup_databases(self, **kwargs):
-        super().setup_databases(**kwargs)
+        old_names = super().setup_databases(**kwargs)
 
         lst_cont = [
             x.model_class()
@@ -145,4 +145,4 @@ class APISTestRunner(DiscoverRunner):
             else:
                 dict_ents[ent.__name__].append(c_1_obj)
             print(f"created {c_1_obj}")
-        return {}
+        return old_names

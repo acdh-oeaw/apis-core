@@ -287,7 +287,7 @@ class TempEntityClass(models.Model):
                 l.save()
             for r in rels.filter(model__icontains=e_b):
                 lst_ents_rel = str(r).split()
-                if lst_ents_rel[0] == lst_ents_rel[1]:
+                if lst_ents_rel[-1] == lst_ents_rel[-2]:
                     q_d = {"related_{}A".format(e_b.lower()): ent}
                     k = r.model_class().objects.filter(**q_d)
                     for t in k:
