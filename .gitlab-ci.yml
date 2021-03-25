@@ -31,9 +31,10 @@ test:
     - export DATABASE_URL=mysql://root:$MYSQL_ROOT_PASSWORD@mariadb:3306/$MYSQL_DATABASE
     - pip install poetry
     - poetry lock
-    - poetry install
-    - poetry run python manage.py migrate
-    - poetry run python manage.py test
+    - poetry export -o requirements.txt
+    - pip install -r requirements.txt
+    - python manage.py migrate
+    - python manage.py test
 build:
   only:
       refs:
