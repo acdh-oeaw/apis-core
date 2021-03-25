@@ -1,9 +1,10 @@
 [tool.poetry]
 name = "apis-core"
-version = "0.16.5"
+version = "0.16.9"
 description = "Base package for the APIS framework"
 authors = ["Matthias Schlögl <matthias.schloegl@oeaw.ac.at>"]
 license = "MIT"
+packages = [{include = "apis_core"}, {include = "browsing"}, {include = "infos"}]
 include = [{path = "LICENSE.txt", format = "sdist"}, {path = "README.rst", format = "sdist"}]
 exclude = ["apis/", "manage.py", "__pycache__"]
 
