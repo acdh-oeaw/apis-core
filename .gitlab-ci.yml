@@ -16,6 +16,7 @@ image:
 before_script:
   - pip install poetry
   - poetry config virtualenvs.create false
+  - poetry config pypi-token.pypi ${PYPI_TOKEN}
   - poetry install
 
 test:
@@ -47,7 +48,6 @@ build:
   tags:
     - cluster
   script:
-    - poetry config pypi-token.pypi ${PYPI_TOKEN}
     - poetry run bash checkandbump.sh
     - poetry publish --build
 
