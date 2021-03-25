@@ -13,6 +13,12 @@ stages:
 image:
   name: python:3.6
 
+before_script:
+  - pip install poetry
+  - poetry config virtualenvs.create false
+  - poetry config pypi-token.pypi ${PYPI_TOKEN}
+  - poetry install
+
 test:
   stage: test
   only:
@@ -29,8 +35,6 @@ test:
       MYSQL_PASSWORD: mariadb
   script:
     - export DATABASE_URL=mysql://root:$MYSQL_ROOT_PASSWORD@mariadb:3306/$MYSQL_DATABASE
-    - pip install poetry
-    - poetry install
     - poetry run python manage.py migrate
     - poetry run python manage.py test
 build:
@@ -44,9 +48,6 @@ build:
   tags:
     - cluster
   script:
-    - pip install poetry
-    - poetry config pypi-token.pypi ${PYPI_TOKEN}
-    - poetry install
     - poetry run bash checkandbump.sh
     - poetry publish --build
 
