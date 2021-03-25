@@ -7,11 +7,32 @@ variables:
   NO_PROXY: "docker:2375,docker:2376"
  
 stages:
+  - test
   - build
   - deploy
 image:
   name: python:3.6
 
+test:
+  stage: test
+  only:
+    refs:
+      - master
+      - coladay
+      - jwv
+  services:
+    - mariadb:latest
+  variables:
+      MYSQL_ROOT_PASSWORD: mariadb
+      MYSQL_DATABASE: apisdb
+      MYSQL_USER: mariadb
+      MYSQL_PASSWORD: mariadb
+  script:
+    - export DATABASE_URL=mysql://root:$MYSQL_ROOT_PASSWORD@mariadb:3306/$MYSQL_DATABASE
+    - pip install poetry
+    - poetry install
+    - poetry run python manage.py migrate
+    - poetry run python manage.py test
 build:
   only:
       refs:
