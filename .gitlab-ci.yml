@@ -46,10 +46,9 @@ build:
   tags:
     - cluster
   script:
-    - pip install poetry
+    - pip install poetry lastversion
     - poetry config pypi-token.pypi ${PYPI_TOKEN}
-    - poetry install
-    - poetry run bash checkandbump.sh
+    - python run bash checkandbump.sh
     - poetry publish --build
 
 trigger_build:
