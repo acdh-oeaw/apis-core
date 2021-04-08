@@ -275,7 +275,7 @@ python-versions = "*"
 
 [[package]]
 name = "django"
-version = "3.1.7"
+version = "3.1.8"
 description = "A high-level Python Web framework that encourages rapid development and clean, pragmatic design."
 category = "main"
 optional = false
@@ -1954,8 +1954,8 @@ dj-database-url = [
     {file = "dj_database_url-0.5.0-py2.py3-none-any.whl", hash = "sha256:851785365761ebe4994a921b433062309eb882fedd318e1b0fcecc607ed02da9"},
 ]
 django = [
-    {file = "Django-3.1.7-py3-none-any.whl", hash = "sha256:baf099db36ad31f970775d0be5587cc58a6256a6771a44eb795b554d45f211b8"},
-    {file = "Django-3.1.7.tar.gz", hash = "sha256:32ce792ee9b6a0cbbec340123e229ac9f765dff8c2a4ae9247a14b2ba3a365a7"},
+    {file = "Django-3.1.8-py3-none-any.whl", hash = "sha256:c348b3ddc452bf4b62361f0752f71a339140c777ebea3cdaaaa8fdb7f417a862"},
+    {file = "Django-3.1.8.tar.gz", hash = "sha256:f8393103e15ec2d2d313ccbb95a3f1da092f9f58d74ac1c61ca2ac0436ae1eac"},
 ]
 django-autocomplete-light = [
     {file = "django-autocomplete-light-3.8.2.tar.gz", hash = "sha256:25f0ea71b59a8f1f97a8a564e33e429570b0ea77c5eac81f7beb283073b4ba90"},
@@ -2156,6 +2156,8 @@ lxml = [
     {file = "lxml-4.6.3-cp27-cp27m-win_amd64.whl", hash = "sha256:8157dadbb09a34a6bd95a50690595e1fa0af1a99445e2744110e3dca7831c4ee"},
     {file = "lxml-4.6.3-cp27-cp27mu-manylinux1_i686.whl", hash = "sha256:7728e05c35412ba36d3e9795ae8995e3c86958179c9770e65558ec3fdfd3724f"},
     {file = "lxml-4.6.3-cp27-cp27mu-manylinux1_x86_64.whl", hash = "sha256:4bff24dfeea62f2e56f5bab929b4428ae6caba2d1eea0c2d6eb618e30a71e6d4"},
+    {file = "lxml-4.6.3-cp35-cp35m-manylinux1_i686.whl", hash = "sha256:74f7d8d439b18fa4c385f3f5dfd11144bb87c1da034a466c5b5577d23a1d9b51"},
+    {file = "lxml-4.6.3-cp35-cp35m-manylinux1_x86_64.whl", hash = "sha256:f90ba11136bfdd25cae3951af8da2e95121c9b9b93727b1b896e3fa105b2f586"},
     {file = "lxml-4.6.3-cp35-cp35m-win32.whl", hash = "sha256:f2380a6376dfa090227b663f9678150ef27543483055cc327555fb592c5967e2"},
     {file = "lxml-4.6.3-cp35-cp35m-win_amd64.whl", hash = "sha256:c4f05c5a7c49d2fb70223d0d5bcfbe474cf928310ac9fa6a7c6dddc831d0b1d4"},
     {file = "lxml-4.6.3-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:d2e35d7bf1c1ac8c538f88d26b396e73dd81440d59c1ef8522e1ea77b345ede4"},
