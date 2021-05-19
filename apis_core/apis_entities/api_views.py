@@ -24,13 +24,28 @@ from rest_framework.views import APIView
 
 from apis_core.apis_metainfo.api_renderers import PaginatedCSVRenderer
 from apis_core.apis_metainfo.models import TempEntityClass, Uri
-from apis_core.apis_relations.models import PersonPlace, InstitutionPlace, AbstractRelation, PersonInstitution
-from apis_core.apis_vocabularies.models import VocabsBaseClass, PersonPlaceRelation, InstitutionPlaceRelation
+from apis_core.apis_relations.models import (
+    PersonPlace,
+    InstitutionPlace,
+    AbstractRelation,
+    PersonInstitution,
+)
+from apis_core.apis_vocabularies.models import (
+    VocabsBaseClass,
+    PersonPlaceRelation,
+    InstitutionPlaceRelation,
+)
 from apis_core.default_settings.NER_settings import autocomp_settings, stb_base
 from apis_core.helper_functions.RDFParser import RDFParser
 from apis_core.helper_functions.stanbolQueries import find_loc
-from .api_renderers import EntityToTEI, EntityToCIDOCXML, EntityToProsopogrAPhI, EntityToCIDOCN3, EntityToCIDOCNQUADS, \
-    EntityToCIDOCTURTLE
+from .api_renderers import (
+    EntityToTEI,
+    EntityToCIDOCXML,
+    EntityToProsopogrAPhI,
+    EntityToCIDOCN3,
+    EntityToCIDOCNQUADS,
+    EntityToCIDOCTURTLE,
+)
 from .models import Event, Institution, Person, Place, Work, AbstractEntity
 from .serializers import (
     EventSerializer,
@@ -41,12 +56,14 @@ from .serializers import (
     PersonSerializer,
     PlaceSerializer,
     WorkSerializer,
-    GeoJsonSerializerTheme, LifePathSerializer
+    GeoJsonSerializerTheme,
+    LifePathSerializer,
 )
 from .serializers_generic import EntitySerializer
 
 
 # from metainfo.models import TempEntityClass
+
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 25
@@ -57,9 +74,15 @@ class StandardResultsSetPagination(PageNumberPagination):
 class GetEntityGeneric(GenericAPIView):
     serializer_class = EntitySerializer
     queryset = TempEntityClass.objects.all()
-    renderer_classes = tuple(
-        api_settings.DEFAULT_RENDERER_CLASSES) + (EntityToTEI, EntityToCIDOCXML, EntityToProsopogrAPhI, EntityToCIDOCN3, EntityToCIDOCNQUADS, EntityToCIDOCTURTLE)
-    if getattr(settings, 'APIS_RENDERERS', None) is not None:
+    renderer_classes = tuple(api_settings.DEFAULT_RENDERER_CLASSES) + (
+        EntityToTEI,
+        EntityToCIDOCXML,
+        EntityToProsopogrAPhI,
+        EntityToCIDOCN3,
+        EntityToCIDOCNQUADS,
+        EntityToCIDOCTURTLE,
+    )
+    if getattr(settings, "APIS_RENDERERS", None) is not None:
         rend_add = tuple()
         for rd in settings.APIS_RENDERERS:
             rend_mod = __import__(rd)
@@ -67,16 +90,23 @@ class GetEntityGeneric(GenericAPIView):
                 rend_add + (cls,)
         renderer_classes += rend_add
 
-    def get_object(self, pk):
+    def get_object(self, pk, request):
         try:
             return TempEntityClass.objects_inheritance.get_subclass(pk=pk)
         except TempEntityClass.DoesNotExist:
-            raise Http404
+            uri2 = Uri.objects.filter(uri=request.build_absolute_uri())
+            if uri2.count() == 1:
+                return TempEntityClass.objects_inheritance.get_subclass(
+                    pk=uri2[0].entity_id
+                )
+            else:
+                raise Http404
 
     def get(self, request, pk):
-        ent = self.get_object(pk)
+        ent = self.get_object(pk, request)
         res = EntitySerializer(ent, context={"request": request})
         return Response(res.data)
+
 
 @api_view(["GET"])
 def uri_resolver(request):
@@ -96,7 +126,7 @@ def uri_resolver(request):
         else:
             url = reverse(
                 "apis_core:apis_api2:GetEntityGeneric", kwargs={"pk": uri.entity_id}
-            ) + '?format={}'.format(f)
+            ) + "?format={}".format(f)
         return redirect(url)
 
 
@@ -229,12 +259,10 @@ class PlaceGeoJsonViewSet(viewsets.ViewSet):
 
 
 class NetJsonViewSet(viewsets.GenericViewSet):
-
     def get_queryset(self):
         rel = self.request.data["select_relation"]
         q = AbstractRelation.get_relation_class_of_name("".join(rel.split("-")))
         return q.objects.all()
-
 
     def create(self, request):
         rel = request.data["select_relation"]
@@ -395,22 +423,22 @@ class GetOrCreateEntity(APIView):
     def get(self, request):
         entity = request.query_params.get("entity2", None)
         uri = request.query_params.get("uri", None)
-        if uri.startswith('http:'):
+        if uri.startswith("http:"):
             ent = RDFParser(uri, entity.title()).get_or_create()
         else:
             r1 = re.search(r"^[^<]+", uri)
             r2 = re.search(r"<([^>]+)>", uri)
             q_d = dict()
-            q_d['name'] = r1
+            q_d["name"] = r1
             if r2:
-                for x in r2.group(1).split(';'):
-                    x2 = x.split('=')
+                for x in r2.group(1).split(";"):
+                    x2 = x.split("=")
                     q_d[x2[0].strip()] = x2[1].strip()
-            if entity == 'person':
-                r1_2 = r1.group(0).split(',')
+            if entity == "person":
+                r1_2 = r1.group(0).split(",")
                 if len(r1_2) == 2:
-                    q_d['first_name'] = r1_2[1].strip()
-                    q_d['name'] = r1_2[0].strip()
+                    q_d["first_name"] = r1_2[1].strip()
+                    q_d["name"] = r1_2[0].strip()
             ent = AbstractEntity.get_entity_class_of_name(entity).objects.create(**q_d)
         res = {
             "id": ent.pk,
@@ -424,54 +452,133 @@ class GetOrCreateEntity(APIView):
 
 
 class GetRelatedPlaces(APIView):
-    #map_qs = {
-     #   'institution': Prefetch('personinstitution_set__related_institution__institutionplace_set', queryset=InstitutionPlace.objects.select_related('related_place'))
-    #}
+    # map_qs = {
+    #   'institution': Prefetch('personinstitution_set__related_institution__institutionplace_set', queryset=InstitutionPlace.objects.select_related('related_place'))
+    # }
 
     def get(self, request):
-        b_rel = PersonPlaceRelation.objects.get(name=getattr(settings, 'BIRTH_REL_NAME', ''))
-        d_rel = PersonPlaceRelation.objects.get(name=getattr(settings, 'DEATH_REL_NAME', ''))
+        b_rel = PersonPlaceRelation.objects.get(
+            name=getattr(settings, "BIRTH_REL_NAME", "")
+        )
+        d_rel = PersonPlaceRelation.objects.get(
+            name=getattr(settings, "DEATH_REL_NAME", "")
+        )
         person_pk = request.query_params.get("person_id", None)
         pers = Person.objects.get(pk=person_pk)
         relation_types = request.query_params.get("relation_types", None)
         place_pk = dict()
         res = []
-        p = PersonPlace.objects.select_related('related_place').filter(related_person_id=person_pk, related_place__lat__isnull=False).filter_for_user()
+        p = (
+            PersonPlace.objects.select_related("related_place")
+            .filter(related_person_id=person_pk, related_place__lat__isnull=False)
+            .filter_for_user()
+        )
         for pp in p:
             if pp.related_place_id not in place_pk:
-                res.append((pp.related_place, [(
-                    pp.relation_type, None,
-                    pers.start_date if b_rel.pk == pp.relation_type_id else pp.start_date,
-                    pers.end_date if d_rel.pk == pp.relation_type_id else pp.end_date, pp)]))
-                place_pk[pp.related_place_id] = len(res)-1
+                res.append(
+                    (
+                        pp.related_place,
+                        [
+                            (
+                                pp.relation_type,
+                                None,
+                                pers.start_date
+                                if b_rel.pk == pp.relation_type_id
+                                else pp.start_date,
+                                pers.end_date
+                                if d_rel.pk == pp.relation_type_id
+                                else pp.end_date,
+                                pp,
+                            )
+                        ],
+                    )
+                )
+                place_pk[pp.related_place_id] = len(res) - 1
             else:
-                res[place_pk[pp.related_place_id]][1].append((
-                    pp.relation_type, None,
-                    pers.start_date if b_rel.pk == pp.relation_type_id else pp.start_date,
-                    pers.end_date if d_rel.pk == pp.relation_type_id else pp.end_date, pp))
-        for pi in PersonInstitution.objects.filter(related_person_id=person_pk).filter_for_user():
+                res[place_pk[pp.related_place_id]][1].append(
+                    (
+                        pp.relation_type,
+                        None,
+                        pers.start_date
+                        if b_rel.pk == pp.relation_type_id
+                        else pp.start_date,
+                        pers.end_date
+                        if d_rel.pk == pp.relation_type_id
+                        else pp.end_date,
+                        pp,
+                    )
+                )
+        for pi in PersonInstitution.objects.filter(
+            related_person_id=person_pk
+        ).filter_for_user():
             inst = pi.related_institution
-            rel_type = getattr(settings, 'APIS_LOCATED_IN_ATTR', ['situated in',])
-            ipl_rel = InstitutionPlaceRelation.objects.filter(name__in=rel_type).values_list('pk', flat=True)
-            plc = InstitutionPlace.objects.filter(relation_type_id__in=ipl_rel, related_institution=inst)
+            rel_type = getattr(
+                settings,
+                "APIS_LOCATED_IN_ATTR",
+                [
+                    "situated in",
+                ],
+            )
+            ipl_rel = InstitutionPlaceRelation.objects.filter(
+                name__in=rel_type
+            ).values_list("pk", flat=True)
+            plc = InstitutionPlace.objects.filter(
+                relation_type_id__in=ipl_rel, related_institution=inst
+            )
             if plc.count() == 1:
                 if plc[0].related_place_id not in place_pk:
-                    res.append((plc[0].related_place, [(pi.relation_type, pi.related_institution, pi.start_date, pi.end_date, pi)]))
-                    place_pk[plc[0].related_place_id] = len(res)-1
+                    res.append(
+                        (
+                            plc[0].related_place,
+                            [
+                                (
+                                    pi.relation_type,
+                                    pi.related_institution,
+                                    pi.start_date,
+                                    pi.end_date,
+                                    pi,
+                                )
+                            ],
+                        )
+                    )
+                    place_pk[plc[0].related_place_id] = len(res) - 1
                 else:
-                    res[place_pk[plc[0].related_place_id]][1].append((pi.relation_type, pi.related_institution, pi.start_date, pi.end_date, pi))
+                    res[place_pk[plc[0].related_place_id]][1].append(
+                        (
+                            pi.relation_type,
+                            pi.related_institution,
+                            pi.start_date,
+                            pi.end_date,
+                            pi,
+                        )
+                    )
         res = GeoJsonSerializerTheme(res, many=True)
         return Response(res.data)
 
 
 class LifePathViewset(APIView):
-
     def get(self, request, pk):
-        b_rel = PersonPlaceRelation.objects.get(name=getattr(settings, 'BIRTH_REL_NAME', ''))
-        d_rel = PersonPlaceRelation.objects.get(name=getattr(settings, 'DEATH_REL_NAME', ''))
+        b_rel = PersonPlaceRelation.objects.get(
+            name=getattr(settings, "BIRTH_REL_NAME", "")
+        )
+        d_rel = PersonPlaceRelation.objects.get(
+            name=getattr(settings, "DEATH_REL_NAME", "")
+        )
         pb_pd = [b_rel.pk, d_rel.pk]
-        lst_inst = list(PersonInstitution.objects.filter(Q(related_person_id=pk), Q(start_date__isnull=False)|Q(end_date__isnull=False)).filter_for_user())
-        lst_place = list(PersonPlace.objects.filter(Q(related_person_id=pk), Q(start_date__isnull=False)|Q(end_date__isnull=False)|Q(relation_type_id__in=pb_pd)).filter_for_user())
+        lst_inst = list(
+            PersonInstitution.objects.filter(
+                Q(related_person_id=pk),
+                Q(start_date__isnull=False) | Q(end_date__isnull=False),
+            ).filter_for_user()
+        )
+        lst_place = list(
+            PersonPlace.objects.filter(
+                Q(related_person_id=pk),
+                Q(start_date__isnull=False)
+                | Q(end_date__isnull=False)
+                | Q(relation_type_id__in=pb_pd),
+            ).filter_for_user()
+        )
         comb_lst = lst_inst + lst_place
         p1 = Person.objects.get(pk=pk)
         if p1.start_date:
@@ -484,6 +591,6 @@ class LifePathViewset(APIView):
                     e.start_date = p1.end_date
         data = LifePathSerializer(comb_lst, many=True).data
         data = [d for d in data if d is not None]
-        data = sorted(data, key = lambda i: i['year'])
+        data = sorted(data, key=lambda i: i["year"])
 
         return Response(data)
