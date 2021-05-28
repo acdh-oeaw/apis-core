@@ -81,6 +81,7 @@ INSTALLED_APPS = [
     "guardian",
     "charts",
     "infos",
+    "pycsvexport",
 ]
 
 USE_X_FORWARDED_HOST = True

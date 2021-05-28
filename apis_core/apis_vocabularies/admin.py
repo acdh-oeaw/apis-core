@@ -3,6 +3,7 @@ from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.urls import reverse
+from csvexport.actions import csvexport
 
 
 class BaseAdminVocabularies(admin.ModelAdmin):
@@ -10,6 +11,7 @@ class BaseAdminVocabularies(admin.ModelAdmin):
 
     search_fields = ('name', 'parent_class__name')
     exclude = ('userAdded',)
+    actions = [csvexport]
 
     def get_fields(self, request, obj=None):
         lst = super(BaseAdminVocabularies, self).get_fields(request, obj=None)
