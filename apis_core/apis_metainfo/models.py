@@ -137,88 +137,60 @@ class TempEntityClass(models.Model):
         if self.name:
             self.name = unicodedata.normalize("NFC", self.name)
 
-        # Check if the tempentity to be saved is a passage<->bible relation (special form of passage<->publication),
-        # if so parse the references field and save it into the relation
-
         def parse_bible_reference(unparsed_string):
             """
             function to parse the references field of a Passage<-> Publication relation to check if it contains
             bible references.
 
             :param unparsed_string: the raw string to be parsed
-            :return: either a dictionary if parsed succesfully or None if not
+            :return: a tuple with the parsed url and label
             """
-
-            def make_string_of_int(potential_int):
-                """
-                Since it's possible that the number of the chapter or verse reference has a leading zero, remove
-                it by temporarily turning the value into an integer and then back into a string (e.g "01" -> 1 -> "1").
-                Also checks if it's valid at all, since only numbers are accepted for chapters and verses.
-
-                :param potential_int : str : the chapter or verse the user has put in.
-                :return:
-                    if valid : str : the properly stringified chapter or verse without any potential leading zero
-                    if not valid : None
-                """
-
-                try:
-                    temp_int = int(potential_int)
-                    return str(temp_int)
-                except:
-                    return None
-
-            if unparsed_string:
-
+            url = None
+            label = None
+            if unparsed_string is not None:
                 # load the json file which contains all valid bible references, compare the user input against it
                 with open("./data/bible_refs.json") as json_file:
                     valid_bible_books = json.load(json_file)
+                    pattern = re.compile("([0-9a-zA-Z]+) +([0-9]+) *: *([0-9]+) *(- *([0-9]+))? *$")
+                    matches = pattern.match(unparsed_string)
+                    if matches is not None:
+                        parsed_elems = matches.groups()
+                        book = parsed_elems[0].lower()
+                        chapter = parsed_elems[1]
+                        verse_start = parsed_elems[2]
+                        verse_end = parsed_elems[-1]
 
-                    # User input of bible references must be separated either by whitespace or by double colon
-                    ref = re.split(" +|:", unparsed_string)
+                        if (
+                            book in valid_bible_books
+                            and chapter in valid_bible_books[book]
+                            and verse_start in valid_bible_books[book][chapter]
+                        ):
 
-                    if len(ref) == 3:
-
-                        book = ref[0].lower()
-                        chapter = make_string_of_int(ref[1])
-                        verse = make_string_of_int(ref[2])
-
-                        # compare the split values against the json bible dictionary
-                        if \
-                                chapter and verse and \
-                                book in valid_bible_books and \
-                                chapter in valid_bible_books[book] and \
-                                verse in valid_bible_books[book][chapter]:
-
-                            # if it exists, then it's valid. Return a dictionary of these values
-                            return {
-                                "book": book,
-                                "chapter": chapter,
-                                "verse": verse
-                            }
-
-            # if nothing was returned above, return None
-            return None
+                            if verse_end is not None:
+                                if verse_end in valid_bible_books[book][chapter]:
+                                    url = f"https://www.stepbible.org/?q=reference={book}.{chapter}:{verse_start}-{verse_end}"
+                                    label = f"Book: {book}, Chapter: {chapter}, Verses: {verse_start}-{verse_end}"
+                            else:
+                                url = f"https://www.stepbible.org/?q=reference={book}.{chapter}:{verse_start}"
+                                label = f"Book: {book}, Chapter: {chapter}, Verse: {verse_start}"
+            return (url, label)
 
         # TODO __sresch__ : check for best practice on local imports vs circularity problems.
         from apis_core.apis_relations.models import PassagePublication
 
-        if self.__class__ == PassagePublication and (self.relation_type.pk == 204 or self.relation_type.pk == 205):
-            # If class is passage<->publication and the relationtype is one of the two bible relations (204 or 205), then parse it.
-            # TODO __sresch__ : consider also checking for if the publication is the bible
-
-            parsed_bible_dict = parse_bible_reference(self.references)
-
-            if parsed_bible_dict:
-                self.bible_book_ref = parsed_bible_dict["book"]
-                self.bible_chapter_ref = parsed_bible_dict["chapter"]
-                self.bible_verse_ref = parsed_bible_dict["verse"]
-            else:
-                self.bible_book_ref = None
-                self.bible_chapter_ref = None
-                self.bible_verse_ref = None
-
+        # TODO __sresch__ : consider also checking for if the publication is the bible
+        if (
+            self.__class__ == PassagePublication
+            and (
+                # If class is passage<->publication and the relationtype is one of the two bible relations (204 or 205), then parse it.
+                self.relation_type.pk == 204
+                or self.relation_type.pk == 205
+            )
+        ):
+            url, label = parse_bible_reference(self.references)
+            self.bible_ref_url = url
+            self.bible_ref_label = label
         super(TempEntityClass, self).save(*args, **kwargs)
-
         return self
 
     def get_child_entity(self):
