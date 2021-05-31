@@ -29,7 +29,7 @@ from apis_core.helper_functions.ContentType import GetContentTypes
 
 
 if "apis_highlighter" in getattr(settings, "INSTALLED_APPS"):
-    from apis_core.helper_functions.highlighter import highlight_text_new
+    from apis_highlighter.highlighter import highlight_text_new
     from apis_highlighter.serializer import annotationSerializer
     from apis_highlighter.models import Annotation
 
@@ -270,10 +270,14 @@ def generic_serializer_creation_factory():
                 ck_many = f.__class__.__name__ == "ManyToManyField"
                 if f.name in self._exclude_lst:
                     continue
-                elif f.__class__.__name__ in [
-                    "ManyToManyField",
-                    "ForeignKey",
-                ] and "apis_vocabularies" not in str(f.related_model):
+                elif (
+                    f.__class__.__name__
+                    in [
+                        "ManyToManyField",
+                        "ForeignKey",
+                    ]
+                    and "apis_vocabularies" not in str(f.related_model)
+                ):
                     self.fields[f.name] = ApisBaseSerializer(
                         many=ck_many, read_only=True
                     )
@@ -322,10 +326,14 @@ def generic_serializer_creation_factory():
                 ck_many = f.__class__.__name__ == "ManyToManyField"
                 if f.name in self._exclude_lst:
                     continue
-                elif f.__class__.__name__ in [
-                    "ManyToManyField",
-                    "ForeignKey",
-                ] and "apis_vocabularies" not in str(f.related_model):
+                elif (
+                    f.__class__.__name__
+                    in [
+                        "ManyToManyField",
+                        "ForeignKey",
+                    ]
+                    and "apis_vocabularies" not in str(f.related_model)
+                ):
                     self.fields[f.name] = ApisBaseSerializer(
                         many=ck_many, read_only=True
                     )
@@ -338,12 +346,13 @@ def generic_serializer_creation_factory():
                 if x.__module__ == "apis_core.apis_relations.models"
                 and entity_str.lower() in x.__name__.lower()
             ]
-            if len(include) > 0:
+            if len(include) > 0 and len(args) > 0:
+                inst_pk2 = args[0].pk
                 self.fields["relations"] = RelationObjectSerializer2(
                     read_only=True,
                     source="get_related_relation_instances",
                     many=True,
-                    pk_instance=args[0].pk,
+                    pk_instance=inst_pk2,
                 )
 
         def init_text_serializer_retrieve(self, *args, **kwargs):
@@ -366,6 +375,8 @@ def generic_serializer_creation_factory():
                 if not isinstance(self._inline_annotations, bool):
                     if self._inline_annotations.lower() == "false":
                         self._inline_annotations = False
+                    elif self._inline_annotations.lower() == "true":
+                        self._inline_annotations = True
                 try:
                     self._txt_html, self._annotations = highlight_text_new(
                         self.instance,
@@ -379,9 +390,9 @@ def generic_serializer_creation_factory():
                         qs_an["users_added__in"] = self._users_show
                     if self._ann_proj_pk is not None:
                         qs_an["annotation_project_id"] = self._ann_proj_pk
-                    self._annotations = Annotation.objects.filter(
-                        **qs_an
-                    )  # FIXME: Currently this QS is called twice (highlight_text_new)
+                    #self._annotations = Annotation.objects.filter(
+                    #    **qs_an
+                    #)  # FIXME: Currently this QS is called twice (highlight_text_new)
                 except Exception as e:
                     self._txt_html = ""
                     self._annotations = []

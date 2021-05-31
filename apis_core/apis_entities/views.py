@@ -38,7 +38,7 @@ from .tables import get_entities_table
 
 if "apis_highlighter" in settings.INSTALLED_APPS:
     from apis_highlighter.forms import SelectAnnotationProject
-    from apis_core.helper_functions.highlighter import highlight_text
+    from apis_highlighter.highlighter import highlight_text_new
 
 if "charts" in settings.INSTALLED_APPS:
     from charts.models import ChartConfig
@@ -79,12 +79,12 @@ def get_highlighted_texts(request, instance):
         users_show = request.session.get("users_show_highlighter", None)
         object_texts = [
             {
-                "text": highlight_text(
+                "text": highlight_text_new(
                     x,
                     set_ann_proj=set_ann_proj,
                     types=entity_types_highlighter,
                     users_show=users_show,
-                ).strip(),
+                )[0].strip(),
                 "id": x.pk,
                 "kind": x.kind,
             }
@@ -118,7 +118,7 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
     context_filter_name = "filter"
     paginate_by = 25
     template_name = getattr(
-        settings, "APIS_LIST_VIEW_TEMPLATE", "apis_entities/generic_list.html"
+        settings, "APIS_LIST_VIEW_TEMPLATE", "apis:apis_entities/generic_list.html"
     )
     login_url = "/accounts/login/"
 
@@ -312,7 +312,7 @@ def getGeoJson(request):
             o = retrieve_obj(x.uri)
             if o:
                 url_r = reverse_lazy(
-                    "apis_entities:resolve_ambigue_place",
+                    "apis:apis_entities:resolve_ambigue_place",
                     kwargs={
                         "pk": str(instance.pk),
                         "uri": o["representation"]["id"][7:],
@@ -417,7 +417,7 @@ def getNetJsonList(request):
     for x in objects:
         if x.related_place.pk not in nodes.keys():
             place_url = reverse_lazy(
-                "apis_entities:place_edit", kwargs={"pk": str(x.related_place.pk)}
+                "apis:apis_entities:place_edit", kwargs={"pk": str(x.related_place.pk)}
             )
             tt = (
                 "<div class='arrow'></div>\
@@ -438,7 +438,8 @@ def getNetJsonList(request):
             }
         if x.related_person.pk not in nodes.keys():
             pers_url = reverse_lazy(
-                "apis_entities:person_edit", kwargs={"pk": str(x.related_person.pk)}
+                "apis:apis_entities:person_edit",
+                kwargs={"pk": str(x.related_person.pk)},
             )
             tt = (
                 "<div class='arrow'></div>\
@@ -481,7 +482,7 @@ def getNetJsonListInstitution(request):
     for x in objects:
         if x.related_institution.pk not in nodes.keys():
             inst_url = reverse_lazy(
-                "apis_entities:institution_edit",
+                "apis:apis_entities:institution_edit",
                 kwargs={"pk": str(x.related_institution.pk)},
             )
             tt = (
@@ -503,7 +504,8 @@ def getNetJsonListInstitution(request):
             }
         if x.related_person.pk not in nodes.keys():
             pers_url = reverse_lazy(
-                "apis_entities:person_edit", kwargs={"pk": str(x.related_person.pk)}
+                "apis:apis_entities:person_edit",
+                kwargs={"pk": str(x.related_person.pk)},
             )
             tt = (
                 "<div class='arrow'></div>\
@@ -561,7 +563,9 @@ def resolve_ambigue_person(request):
         form = PersonResolveUriForm(request.POST)
     if form.is_valid():
         pers = form.save()
-        return redirect(reverse("apis_entities:person_edit", kwargs={"pk": pers.pk}))
+        return redirect(
+            reverse("apis:apis_entities:person_edit", kwargs={"pk": pers.pk})
+        )
 
 
 ############################################################################
@@ -575,17 +579,17 @@ def resolve_ambigue_person(request):
 
 @user_passes_test(access_for_all_function)
 def birth_death_map(request):
-    return render(request, "apis_entities/map_list.html")
+    return render(request, "apis:apis_entities/map_list.html")
 
 
 @user_passes_test(access_for_all_function)
 def pers_place_netw(request):
-    return render(request, "apis_entities/network.html")
+    return render(request, "apis:apis_entities/network.html")
 
 
 @user_passes_test(access_for_all_function)
 def pers_inst_netw(request):
-    return render(request, "apis_entities/network_institution.html")
+    return render(request, "apis:apis_entities/network_institution.html")
 
 
 @user_passes_test(access_for_all_function)
@@ -593,7 +597,9 @@ def generic_network_viz(request):
     if request.method == "GET":
         form = NetworkVizFilterForm()
         return render(
-            request, "apis_entities/generic_network_visualization.html", {"form": form}
+            request,
+            "apis:apis_entities/generic_network_visualization.html",
+            {"form": form},
         )
 
 

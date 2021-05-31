@@ -389,11 +389,12 @@ class Text(models.Model):
                         if s.a <= a.start and (s.a + s.size) >= a.end:
                             cor = 0
                             if s.a < s.b:
-                                nl = re.findall(r"\n", self.text[s.a : s.b])
-                                cor -= len("".join(nl)) + len(nl)
+                                nl = re.findall(r"[\r\n]", self.text[s.a : s.b])
+                                #cor -= len(nl)
                             elif s.a > s.b:
-                                nl = re.findall(r"\n", orig.text[s.b : s.a])
-                                cor += len("".join(nl)) + len(nl)
+                                nl = re.findall(r"[\r\n]", orig.text[s.b : s.a])
+                                #cor += len(nl)
+                            cor = 0
                             a.start += s.b - s.a + cor
                             a.end += s.b - s.a + cor
                             a.save()
