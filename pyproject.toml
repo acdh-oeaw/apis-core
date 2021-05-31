@@ -43,6 +43,7 @@ djangorestframework-jsonschema = "^0.1.1"
 dj-database-url = "^0.5.0"
 mysqlclient = "^2.0.3"
 pandas = "^0.25.3"
+django-admin-csvexport = "^1.9"
 
 [tool.poetry.dev-dependencies]
 black = "^20.8b1"
