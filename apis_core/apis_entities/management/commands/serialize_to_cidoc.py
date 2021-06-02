@@ -1,5 +1,6 @@
 import json
 import pickle
+from rdflib.term import URIRef
 
 import requests
 from SPARQLWrapper import SPARQLWrapper, POST, BASIC, JSON
@@ -79,6 +80,14 @@ class Command(BaseCommand):
             default=False,
             help='Uri of named graph to use.',
         )
+        
+        parser.add_argument(
+            '--named-graph-vocabs',
+            action='store',
+            dest='namedgraph-vocabs',
+            default=False,
+            help='Uri of named graph to use for serialization of Vovcabs. If this is not set "/vocabs#" is appended to the main named graph',
+        )
 
         parser.add_argument(
             '--output',
@@ -137,6 +146,18 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
+        if options["namedgraph"]:
+            named_graph = options["namedgraph"]
+        else:
+            named_graph = f"{base_uri}/entities#"
+        if options["include-vocabs"]:
+            if options["namedgraph-vocabs"]:
+                named_graph_vocabs = options["namedgraph-vocabs"]
+            else:
+                if named_graph[-1] == "#":
+                    named_graph_vocabs = "/".join(named_graph.split("/")[:-1])+"/vocabs#"
+                else:
+                    named_graph_vocabs = named_graph + "/vocabs#"
         ent = AbstractEntity.get_entity_class_of_name(options['entity'])
         res = []
         objcts = ent.objects.filter(**json.loads(options['filter']))
@@ -164,19 +185,22 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f'serialized {len(res)} objects'))
         self.stdout.write(self.style.NOTICE('Starting to create the graph'))
         store = IOMemory()
-        fin, store = EntityToCIDOC().render(res, format_1=options['format'], store=store, binary=True, named_graph=options['namedgraph'], provenance=options['provenance'])
         if options['update-vocabs']:
             self.stdout.write(self.style.NOTICE('Starting to create the SKOS vocabs.'))
             if options['include-vocabs']:
-                graph2 = fin
+                graph2 = Graph(
+                store, identifier=URIRef(named_graph_vocabs)
+            )
             else:
                 graph2 = Graph()
+            v_res_ser = []
             for v in ContentType.objects.filter(app_label="apis_vocabularies").exclude(model__in=["vocabnames"]):
                 v_res = v.model_class().objects.all()
                 if v_res.count() > 0:
-                    v_res_ser = GenericVocabsSerializer(v_res, many=True).data
-                    graph2 = VocabToSkos().render(v_res_ser, g=graph2)
+                    v_res_ser.extend(GenericVocabsSerializer(v_res, many=True).data)
+            graph2, store = VocabToSkos().render(v_res_ser, g=graph2, store=store)
             fin_vocab = graph2
+        fin, store = EntityToCIDOC().render(res, format_1=options['format'], store=store, binary=True, named_graph=named_graph, provenance=options['provenance'])
         if options['output']:
             with open(options['output'], 'wb') as out:
                 out.write(fin.serialize(format=options['format']))
@@ -203,7 +227,7 @@ class Command(BaseCommand):
             sparql_serv.setReturnFormat(JSON)
             sp_count = f"""
                     SELECT (COUNT(*) AS ?triples)
-                    FROM <{base_uri}/entities#>
+                    FROM <{named_graph}>
                     WHERE {{ ?s ?p ?o }}
                     """
             if options['delete']:
@@ -212,9 +236,13 @@ class Command(BaseCommand):
                 count = int(res_count_1['results']['bindings'][0]['triples']['value'])
                 if count > 0:
                     self.stdout.write(self.style.NOTICE(f'Found {count} triples in named graph >> deleting'))
-                params = {'c': f'<{base_uri}/entities#>'}
+                params = {'c': f'<{named_graph}>'}
                 res3 = requests.delete(url, auth=(username, password), headers={'Accept': 'application/xml'}, params=params)
                 self.stdout.write(self.style.NOTICE(f'Deleted the graph: {res3.text} {res3.status_code}'))
+                if named_graph_vocabs:
+                    params = {'c': f'<{named_graph_vocabs}>'}
+                    res4 = requests.delete(url, auth=(username, password), headers={'Accept': 'application/xml'}, params=params)
+                    self.stdout.write(self.style.NOTICE(f'Deleted the vocabs graph: {res4.text} {res4.status_code}'))
                 for f in ['class', 'property']:
                     sparql_serv.setQuery(f"""
                         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -224,7 +252,7 @@ class Command(BaseCommand):
 
                         DELETE WHERE {{
                             GRAPH <https://omnipot.acdh.oeaw.ac.at/provenance> {{
-                                <{base_uri}/entities#> void:{f}Partition ?o.
+                                <{named_graph}> void:{f}Partition ?o.
                                 ?o ?p ?s
                                 }}
                                 }}
@@ -238,7 +266,7 @@ class Command(BaseCommand):
 
                     DELETE WHERE {{
                       GRAPH <https://omnipot.acdh.oeaw.ac.at/provenance> {{
-                        <{base_uri}/entities#> ?p ?o.
+                        <{named_graph}> ?p ?o.
                         
                     }}
                     }}

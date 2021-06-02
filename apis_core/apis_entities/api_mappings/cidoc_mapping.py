@@ -56,7 +56,9 @@ def m_h_find_map_function(rel, ent_type):
 def m_add_uris(g, ns, obj, uris):
     for u in uris:
         b_uri = URIRef(u["uri"])
-        g.add((obj, OWL.sameAs, b_uri))
+        if obj != b_uri:
+            g.add((obj, OWL.sameAs, b_uri))
+            g.add((b_uri, RDF.type, ns["cidoc"].E42_Identifier))
     return g
 
 
@@ -81,7 +83,8 @@ def m_place_of_birth(g, p, ns, data):
     if (None, ns["cidoc"].P98_brought_into_life, p) in g:
         b_birth = g.value(None, ns["cidoc"].P98_brought_into_life, p, any=False)
     else:
-        b_birth = URIRef(f"{base_uri}/appellation/birth/{data['id']}")
+        b_birth = URIRef(f"{base_uri}/entity/{data['id']}/birth")
+        """URI for person specific birth event"""
         g.set((b_birth, RDF.type, ns["cidoc"].E67_Birth))
         g.set((b_birth, ns["cidoc"].P98_brought_into_life, p))
     g, place_of_birth = m_place(g, ns, data["target"])
@@ -94,7 +97,8 @@ def m_place_of_death(g, p, ns, data):
     if (None, ns["cidoc"].P100_was_death_of, p) in g:
         b_death = g.value(None, ns["cidoc"].P100_was_death_of, p, any=False)
     else:
-        b_death = URIRef(f"{base_uri}/appellation/death/{data['id']}")
+        b_death = URIRef(f"{base_uri}/entity/{data['id']}/death")
+        """URI for person specific death event"""
         g.set((b_death, RDF.type, ns["cidoc"].E69_Death))
         g.set((b_death, ns["cidoc"].P100_was_death_of, p))
     g, place_of_death = m_place(g, ns, data["target"])
@@ -146,11 +150,13 @@ cd_mp = {
 
 def m_place(g, ns, data, drill_down=False):
     place_uri = URIRef("{}/entity/{}".format(base_uri, data["id"]))
+    """URI for location"""
     if (place_uri, RDF.type, ns["cidoc"].E53_Place) in g and not drill_down:
         return g, place_uri
     else:
         g.set((place_uri, RDF.type, ns["cidoc"].E53_Place))
         b_place_app1 = URIRef(f"{base_uri}/appellation/place/{data['id']}")
+        """URI for location appellation"""
         g.set((place_uri, ns["cidoc"].P1_is_identified_by, b_place_app1))
         g.set((b_place_app1, RDF.type, ns["cidoc"].E41_Appellation))
         g.set(
@@ -204,38 +210,171 @@ def m_person(g, ns, data, drill_down=False):
         return g, k_uri
     else:
         g.set((k_uri, RDF.type, ns["cidoc"].E21_Person))
-        b_app = BNode()
-        g.set((k_uri, ns["cidoc"].P1_is_identified_by, b_app))
-        g.set((b_app, RDF.type, ns["cidoc"].E41_Appellation))
+        apisid_stmt = URIRef(f"{base_uri}/entity/{data['id']}/apisid")
+        """URI for APIS ID"""
+        oblid_stmt = URIRef(f"{base_uri}/entity/{data['id']}/oblid")
+        """URI for OEBL ID"""
+        pnappell_stmt = URIRef(
+            f"{base_uri}/pnappellation#{data['id']}/{data['name'].replace(' ', '_')}"
+        )
+        """URI for preferred name"""
+        lname_stmt = URIRef(
+            f"{base_uri}/appellationsn#{data['id']}/{data['name'].replace(' ', '_')}"
+        )
+        """URI for surname"""
+        fname_stmt = URIRef(
+            f"{base_uri}/appellationfn#{data['id']}/{data['name'].replace(' ', '_')}"
+        )
+        """URI for last name"""
+        gender_stmt = URIRef(f"{get_skos_url()}/gender/{data['gender']}")
+        """replace URI with valid acdh.vocabs-URI and use namespace"""
+        g.set((pnappell_stmt, ns["cidoc"].P2_has_type, ns["cidoc"].E55_Type))
+        g.set((k_uri, ns["cidoc"].P1_is_identified_by, apisid_stmt))
+        g.add((k_uri, ns["cidoc"].P1_is_identified_by, pnappell_stmt))
+        g.set((apisid_stmt, RDF.type, ns["cidoc"].E42_Identifier))
         g.set(
             (
-                b_app,
+                apisid_stmt,
                 RDFS.label,
-                Literal("{} {}".format(data["first_name"], data["name"]), lang=lang),
+                Literal(
+                    "is identified by APIS Identifier as {}".format(data["id"]),
+                    lang=lang,
+                ),
             )
         )
+        g.set(
+            (
+                apisid_stmt,
+                RDF.value,
+                Literal(data["id"]),
+            )
+        )
+        g.add((k_uri, ns["cidoc"].P1_is_identified_by, oblid_stmt))
+        g.set((oblid_stmt, RDF.type, ns["cidoc"].E42_Identifier))
+        g.set(
+            (
+                oblid_stmt,
+                RDFS.label,
+                Literal("is identified by ÖBL Identifier as XXXX", lang=lang),
+                # Literal("is identified by ÖBL Identifier as {}".format(data['orig_id']), lang=lang),
+            )
+        )
+        g.set(
+            (
+                oblid_stmt,
+                RDF.value,
+                Literal("XXXX"),
+                # Literal(data['orig_id']),
+            )
+        )
+        g.set(
+            (
+                pnappell_stmt,
+                ns["cidoc"]["P2_has_type"],
+                URIRef(f"{get_skos_url()}/name/preferrred_name"),
+            )
+        )
+        """replace URI with valid acdh.vocabs-URI and use namespace"""
+        g.set(
+            (
+                pnappell_stmt,
+                RDFS.label,
+                Literal(
+                    f"Preferred name is {data['first_name']} {data['name']}", lang=lang
+                ),
+            )
+        )
+        g.set((pnappell_stmt, ns["cidoc"]["P106_is_composed_of"], lname_stmt))
+        g.add((pnappell_stmt, ns["cidoc"]["P106_is_composed_of"], fname_stmt))
+        g.set(
+            (
+                lname_stmt,
+                ns["cidoc"]["P2_has_type"],
+                URIRef(f"{get_skos_url()}/name/surname"),
+            )
+        )
+        """replace with valid acdh.vocabs-URI and use namespace"""
+        g.set(
+            (lname_stmt, RDFS.label, Literal(f"Surname is {data['name']}", lang=lang))
+        )
+        g.add((lname_stmt, RDF.value, Literal(data["name"])))
+        g.add(
+            (
+                fname_stmt,
+                ns["cidoc"]["P2_has_type"],
+                URIRef(f"{get_skos_url()}/name/forename"),
+            )
+        )
+        """replace with valid acdh.vocabs-URI and use namespace"""
+        g.set(
+            (
+                fname_stmt,
+                RDFS.label,
+                Literal(f"Forename is {data['first_name']}", lang=lang),
+            )
+        )
+        g.add((fname_stmt, RDF.value, Literal(data["first_name"])))
         g.set(
             (
                 k_uri,
                 RDFS.label,
-                Literal(f"{data['first_name']} {data['name']}", lang=lang),
+                Literal(
+                    f"Person known as {data['first_name']} {data['name']}", lang=lang
+                ),
             )
         )
+        # import alternative names: if data["alternate_name"] is not None:
+        # g.setusw.
+        if data["gender"] != "":
+            """Statement for known gender"""
+            g.set(((k_uri, ns["cidoc"]["P2_has_type"], gender_stmt)))
+            g.add((gender_stmt, RDF.type, ns["cidoc"].E55_Type))
+            g.add((gender_stmt, RDF.value, Literal(data["gender"])))
+            g.add(
+                (
+                    gender_stmt,
+                    RDFS.label,
+                    Literal(
+                        "Person was documented as {}".format(data["gender"]), lang=lang
+                    ),
+                )
+            )
+        if data["gender"] == "":
+            """Statement for unknown gender"""
+            g.add(
+                (
+                    (
+                        k_uri,
+                        ns["cidoc"]["P2_has_type"],
+                        URIRef(f"{get_skos_url()}/gender/unknown"),
+                    )
+                )
+            )
+            g.add((gender_stmt, RDF.type, ns["cidoc"].E55_Type))
+            g.add((gender_stmt, RDF.value, Literal("unknown")))
+            g.add(
+                (
+                    gender_stmt,
+                    RDFS.label,
+                    Literal("No Gender was documented.", lang=lang),
+                )
+            )
         if data["start_date"] is not None:
             if len(data["start_date"]) > 0:
-                b_birth = URIRef(f"{base_uri}/appellation/birth/{data['id']}")
+                b_birth = URIRef(f"{base_uri}/entity/{data['id']}/birth")
+                """URI for person specific birth event"""
                 g.set((b_birth, RDF.type, ns["cidoc"].E67_Birth))
                 g.set(
                     (
                         b_birth,
                         RDFS.label,
                         Literal(
-                            f"Geburt von {data['first_name']} {data['name']}", lang="de"
+                            f"Birth of {data['first_name']} {data['name']}", lang="de"
                         ),
                     )
                 )
                 b_birth_time_span = URIRef(
-                    f"{base_uri}/appellation/birth/date/{data['id']}"
+                    f"{base_uri}/entity/timestamp/{data['start_date']}"
                 )
                 g.set((b_birth, ns["cidoc"]["P4_has_time-span"], b_birth_time_span))
                 g.set((b_birth_time_span, RDF.type, ns["cidoc"]["E52_Time-Span"]))
@@ -253,23 +392,23 @@ def m_person(g, ns, data, drill_down=False):
                         Literal(data["start_date"], datatype=XSD.date),
                     )
                 )
-                g.set((b_birth_time_span, RDFS.label, Literal(f"{data['start_date']}")))
+                g.set((b_birth_time_span, RDF.value, Literal(f"{data['start_date']}")))
                 g.set((b_birth, ns["cidoc"].P98_brought_into_life, k_uri))
         if data["end_date"] is not None:
             if len(data["end_date"]) > 0:
-                b_death = URIRef(f"{base_uri}/appellation/death/{data['id']}")
+                b_death = URIRef(f"{base_uri}/entity/{data['id']}/death")
                 g.set((b_death, RDF.type, ns["cidoc"].E69_Death))
                 g.set(
                     (
                         b_death,
                         RDFS.label,
                         Literal(
-                            f"Tod von {data['first_name']} {data['name']}", lang="de"
+                            f"Death of {data['first_name']} {data['name']}", lang="de"
                         ),
                     )
                 )
                 b_death_time_span = URIRef(
-                    f"{base_uri}/appellation/death/date/{data['id']}"
+                    f"{base_uri}/entity/timestamp/{data['end_date']}"
                 )
                 g.set((b_death, ns["cidoc"]["P4_has_time-span"], b_death_time_span))
                 g.set((b_death_time_span, RDF.type, ns["cidoc"]["E52_Time-Span"]))
@@ -287,8 +426,18 @@ def m_person(g, ns, data, drill_down=False):
                         Literal(data["end_date"], datatype=XSD.date),
                     )
                 )
-                g.set((b_death_time_span, RDFS.label, Literal(f"{data['end_date']}")))
+                g.set((b_death_time_span, RDF.value, Literal(f"{data['end_date']}")))
                 g.set((b_death, ns["cidoc"].P100_was_death_of, k_uri))
+        if data["profession"] is not None:
+            for prof in data["profession"]:
+                prof_stmt = URIRef(
+                    f"{get_skos_url()}/profession/{prof['name'].replace(' ', '_')}"
+                )
+                g.set((k_uri, ns["cidoc"].P14i_performed, prof_stmt))
+                g.set((prof_stmt, RDF.type, ns["frbroo"].F51))
+                pref_prof = prof["label"]
+                g.set((prof_stmt, RDF.value, Literal(pref_prof)))
+                """adress most specific value or profession e.g. Architekt, Schriftsteller, current datatype is List with Ordered Dict"""
         if drill_down:
             for ent_1 in data["relations"]:
                 for p in data["relations"][ent_1]:

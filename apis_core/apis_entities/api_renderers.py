@@ -68,6 +68,7 @@ class EntityToCIDOC(renderers.BaseRenderer):
             self.format = format_1
         cidoc = Namespace("http://www.cidoc-crm.org/cidoc-crm/")
         geo = Namespace("http://www.opengis.net/ont/geosparql#")
+        frbroo = Namespace("http://iflastandards.info/ns/fr/frbr/frbroo#")
         if not store:
             store = IOMemory()
         if named_graph:
@@ -78,7 +79,8 @@ class EntityToCIDOC(renderers.BaseRenderer):
         g.bind("cidoc", cidoc, override=False)
         g.bind("geo", geo, override=False)
         g.bind("owl", OWL, override=False)
-        ns = {"cidoc": cidoc, "geo": geo}
+        g.bind("frbroo", frbroo, override=False)
+        ns = {"cidoc": cidoc, "geo": geo, "frbroo": frbroo}
         if type(data1) == list:
             for data in data1:
                 g, ent = self.ent_func[data["entity_type"]](
