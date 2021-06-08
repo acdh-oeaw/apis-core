@@ -351,7 +351,7 @@ class TempEntityClass(models.Model):
                 l.save()
             for r in rels.filter(model__icontains=e_b):
                 lst_ents_rel = str(r).split()
-                if lst_ents_rel[0] == lst_ents_rel[1]:
+                if lst_ents_rel[-1] == lst_ents_rel[-2]:
                     q_d = {"related_{}A".format(e_b.lower()): ent}
                     k = r.model_class().objects.filter(**q_d)
                     for t in k:
@@ -453,11 +453,12 @@ class Text(models.Model):
                         if s.a <= a.start and (s.a + s.size) >= a.end:
                             cor = 0
                             if s.a < s.b:
-                                nl = re.findall(r"\n", self.text[s.a : s.b])
-                                cor -= len("".join(nl)) + len(nl)
+                                nl = re.findall(r"[\r\n]", self.text[s.a : s.b])
+                                #cor -= len(nl)
                             elif s.a > s.b:
-                                nl = re.findall(r"\n", orig.text[s.b : s.a])
-                                cor += len("".join(nl)) + len(nl)
+                                nl = re.findall(r"[\r\n]", orig.text[s.b : s.a])
+                                #cor += len(nl)
+                            cor = 0
                             a.start += s.b - s.a + cor
                             a.end += s.b - s.a + cor
                             a.save()

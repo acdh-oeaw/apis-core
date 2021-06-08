@@ -19,8 +19,8 @@ class VocabToSkos(renderers.BaseRenderer):
 
     media_type = "text/rdf"
 
-    def render(self, data1, media_type=None, g=False, renderer_context=None, format1=None, binary=True):
-        if not g:
+    def render(self, data1, media_type=None, g=None, renderer_context=None, format1=None, binary=True, store=None):
+        if g is None:
             g = Graph()
         set_skos = getattr(settings, "APIS_SKOSMOS")
         base_uri = set_skos.get('url')
@@ -43,7 +43,7 @@ class VocabToSkos(renderers.BaseRenderer):
         for d in data1:
             if not cols.get(d["vocab_name"], False):
                 vc = URIRef(f"{uri_1}/{d['vocab_name']}")
-                g.add((vc, RDF.type, SKOS.collection))
+                g.add((vc, RDF.type, SKOS.Collection))
                 g.add((vc, SKOS.prefLabel, Literal(d['vocab_name'], lang=lang)))
                 cols[d["vocab_name"]] = vc
             else:
@@ -71,4 +71,4 @@ class VocabToSkos(renderers.BaseRenderer):
         if format1:
             return g.serialize(format1)
         elif binary:
-            return g
+            return g, store

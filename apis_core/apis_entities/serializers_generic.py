@@ -201,14 +201,7 @@ class RelationEntitySerializer(serializers.Serializer):
         if "apis_highlighter" in settings.INSTALLED_APPS:
             res = []
             offs = 50
-            anns_fin = []
-            for ann in obj.annotation_set.all():
-                for lb in re.finditer(r"[\r\n]", ann.text.text):
-                    if lb.start() < ann.start + (lb.end() - lb.start()):
-                        ann.start += lb.end() - lb.start()
-                        ann.end += lb.end() - lb.start()
-                anns_fin.append(ann)
-            for an in anns_fin:
+            for an in obj.annotation_set.all():
                 r1 = dict()
                 r1["id"] = an.pk
                 r1["user"] = an.user_added.username

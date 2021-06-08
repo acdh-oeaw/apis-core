@@ -3,6 +3,8 @@
 *.pyc
 *.idea
 
+__pycache__/
+
 *.sqlite3
 *.mp4
 
@@ -12,7 +14,6 @@ static_dir/
 downloads/
 
 /webpage
-/apis/settings
 
 bower_components/
 /custom_urls

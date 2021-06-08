@@ -7,3 +7,5 @@ recursive-include apis_core/apis_metainfo/templates/apis_metainfo *
 recursive-include apis_core/apis_relations/templates/apis_relations *
 recursive-include apis_core/templates/apis_templates *
 recursive-include apis_core/apis_vis/templates/apis_vis *
+exclude apis
+exclude manage.py
