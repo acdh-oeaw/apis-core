@@ -16,6 +16,7 @@ from django.db.models.query import QuerySet
 from django.urls import reverse
 from django.utils.functional import cached_property
 from model_utils.managers import InheritanceManager
+import copy
 
 from apis_core.apis_entities.serializers_generic import EntitySerializer
 from apis_core.apis_labels.models import Label
@@ -375,6 +376,33 @@ class Text(models.Model):
         else:
             return "ID: {}".format(self.id)
 
+    def check_for_deleted_annotations(self):
+        if self.pk is not None:
+            deleted = []
+            orig = Text.objects.get(pk=self.pk)
+            if orig.text != self.text and "apis_highlighter" in settings.INSTALLED_APPS:
+                ann = Annotation.objects.filter(text_id=self.pk).order_by("start")
+                min_ann_len = min([x.end-x.start for x in ann])
+                seq = SequenceMatcher(lambda x: len(x) > min_ann_len, orig.text, self.text)
+                for a in ann:
+                    changed = False
+                    count = 0
+                    for s in seq.get_matching_blocks():
+                        count += 1
+                        if s.a <= a.start and (s.a + s.size) >= a.end:
+                            old_start = copy.deepcopy(a.start)
+                            old_end = copy.deepcopy(a.end)
+                            new_start = a.start + (s.b - s.a)
+                            new_end =  a.end + (s.b - s.a)
+                            if orig.text[old_start:old_end] == self.text[new_start:new_end]:
+                                changed = True
+                                break
+                    if not changed:
+                        deleted.append(a.id)
+        else:
+            deleted = None
+        return deleted
+
     def save(self, *args, **kwargs):
         if self.pk is not None:
             orig = Text.objects.get(pk=self.pk)
@@ -387,18 +415,17 @@ class Text(models.Model):
                     for s in seq.get_matching_blocks():
                         count += 1
                         if s.a <= a.start and (s.a + s.size) >= a.end:
-                            cor = 0
-                            if s.a < s.b:
-                                nl = re.findall(r"[\r\n]", self.text[s.a : s.b])
-                                #cor -= len(nl)
-                            elif s.a > s.b:
-                                nl = re.findall(r"[\r\n]", orig.text[s.b : s.a])
-                                #cor += len(nl)
-                            cor = 0
-                            a.start += s.b - s.a + cor
-                            a.end += s.b - s.a + cor
-                            a.save()
-                            changed = True
+                            print(a.id)
+                            old_start = copy.deepcopy(a.start)
+                            old_end = copy.deepcopy(a.end)
+                            new_start = a.start + (s.b - s.a)
+                            new_end =  a.end + (s.b - s.a)
+                            if orig.text[old_start:old_end] == self.text[new_start:new_end]:
+                                a.start = new_start
+                                a.end = new_end
+                                a.save()
+                                changed = True
+                                break
                     if not changed:
                         a.delete()  # TODO: we might want to delete relations as well.
         super().save(*args, **kwargs)

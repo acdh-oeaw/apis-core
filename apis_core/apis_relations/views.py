@@ -24,7 +24,7 @@ from .tables import LabelTableEdit
 form_module_list = [relation_form_module]
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
-    from apis_core.helper_functions.highlighter import highlight_text
+    from apis_highlighter.highlighter import highlight_text_new
     from apis_highlighter import forms as highlighter_form_module
     form_module_list.append(highlighter_form_module)
 
@@ -206,10 +206,10 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
             table_html = form.get_html_table(entity_type_str, request, site_instance, form_match)
         if 'Highlighter' in tab or form_match.group(3) == 'Highlighter':
             hl_text = {
-                'text': highlight_text(form.get_text_id(),
+                'text': highlight_text_new(form.get_text_id(),
                                        users_show=users_show,
                                        set_ann_proj=set_ann_proj,
-                                       types=entity_types_highlighter).strip(),
+                                       types=entity_types_highlighter)[0].strip(),
                 'id': form.get_text_id()}
         if tab == 'PersonLabel':
             table_html = LabelTableEdit(
