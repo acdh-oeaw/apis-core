@@ -23,6 +23,8 @@ from apis_core.apis_entities.serializers_generic import EntitySerializer
 from apis_core.apis_labels.models import Label
 from apis_core.apis_vocabularies.models import CollectionType, LabelType, TextType
 
+from django.contrib.contenttypes.fields import GenericRelation
+from apis_highlighter.models import Annotation
 # from helper_functions.highlighter import highlight_text
 from apis_core.default_settings.NER_settings import autocomp_settings
 from apis_core.helper_functions import DateParser
@@ -79,6 +81,11 @@ class TempEntityClass(models.Model):
     published = models.BooleanField(default=False)
     objects = models.Manager()
     objects_inheritance = InheritanceManager()
+
+
+    # EL NEW:
+    annotation_set_new = GenericRelation(Annotation)
+
 
     def __str__(self):
         if self.name != "" and hasattr(
