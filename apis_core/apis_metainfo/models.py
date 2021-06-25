@@ -81,11 +81,7 @@ class TempEntityClass(models.Model):
     published = models.BooleanField(default=False)
     objects = models.Manager()
     objects_inheritance = InheritanceManager()
-
-
-    # EL NEW:
-    annotation_set_new = GenericRelation(Annotation)
-
+    annotation_set = GenericRelation(Annotation)
 
     def __str__(self):
         if self.name != "" and hasattr(

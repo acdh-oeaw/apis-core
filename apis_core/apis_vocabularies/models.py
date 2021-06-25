@@ -53,11 +53,7 @@ class VocabsBaseClass(models.Model):
         VocabNames, blank=True, null=True,
         on_delete=models.SET_NULL
     )
-
-
-    # EL NEW:
-    annotation_set_new = GenericRelation(Annotation)
-
+    annotation_set = GenericRelation(Annotation)
 
     def __str__(self):
         return self.label
