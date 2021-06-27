@@ -6,9 +6,11 @@ from django.db.models.base import ModelBase
 
 class GetContentTypes:
 
+
     # class memeber dictionary, used for caching ContentType objects in method get_content_type_of_class_or_instance
     class_content_type_dict = {}
-    
+
+
     def get_names(self):
         """Function to create Module/Class name tuples
 
@@ -28,9 +30,14 @@ class GetContentTypes:
         """            
         return self._lst_cont
 
+
     @classmethod
     def get_content_type_of_class_or_instance(cls, model_class_or_instance):
         """
+        Helper method which caches ContentType of a given model class or instance. When first called on a model
+        it fetches its respective ContentType from DB and caches it in a class dictionary. Later this dictionary is
+        called
+
         :param model_class_or_instance: can be either a model class or an instance of a model class
         :return: The django ContentType object for the given parameter
         """
@@ -43,11 +50,14 @@ class GetContentTypes:
             # true if model_class_or_instance is model instance
             model_class = type(model_class_or_instance)
         else:
-            raise Exception(f"Passed argument is neither model class nor model instance: {type(model_class_or_instance)}")
+            raise Exception(
+                f"Passed argument is neither model class nor model instance: {type(model_class_or_instance)}"
+            )
 
         if model_class not in cls.class_content_type_dict:
             cls.class_content_type_dict[model_class] = ContentType.objects.get(model=model_class.__name__)
         return cls.class_content_type_dict[model_class]
+
 
     def __init__(self, lst_conts=None):
         """

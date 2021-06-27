@@ -1,7 +1,5 @@
 import copy
 import re
-from math import inf
-
 import unicodedata
 from difflib import SequenceMatcher
 import json
@@ -18,6 +16,7 @@ from django.db import models
 from django.db.models.query import QuerySet
 from django.urls import reverse
 from django.utils.functional import cached_property
+from math import inf
 from model_utils.managers import InheritanceManager
 from django.contrib.auth.models import User
 from apis_core.apis_entities.serializers_generic import EntitySerializer
@@ -441,6 +440,33 @@ class Text(models.Model):
             return "ID: {} - {}".format(self.id, self.text[:25])
         else:
             return "ID: {}".format(self.id)
+
+    def check_for_deleted_annotations(self):
+        if self.pk is not None:
+            deleted = []
+            orig = Text.objects.get(pk=self.pk)
+            if orig.text != self.text and "apis_highlighter" in settings.INSTALLED_APPS:
+                ann = Annotation.objects.filter(text_id=self.pk).order_by("start")
+                min_ann_len = min([x.end-x.start for x in ann])
+                seq = SequenceMatcher(lambda x: len(x) > min_ann_len, orig.text, self.text)
+                for a in ann:
+                    changed = False
+                    count = 0
+                    for s in seq.get_matching_blocks():
+                        count += 1
+                        if s.a <= a.start and (s.a + s.size) >= a.end:
+                            old_start = copy.deepcopy(a.start)
+                            old_end = copy.deepcopy(a.end)
+                            new_start = a.start + (s.b - s.a)
+                            new_end =  a.end + (s.b - s.a)
+                            if orig.text[old_start:old_end] == self.text[new_start:new_end]:
+                                changed = True
+                                break
+                    if not changed:
+                        deleted.append(a.id)
+        else:
+            deleted = None
+        return deleted
 
     def save(self, *args, **kwargs):
 

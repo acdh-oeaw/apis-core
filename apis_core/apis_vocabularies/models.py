@@ -12,6 +12,10 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from apis_highlighter.models import Annotation
 
+from django.contrib.contenttypes.fields import GenericRelation
+from apis_highlighter.models import Annotation
+
+
 @reversion.register()
 class VocabNames(models.Model):
     """List of Vocabulary names to allow the easy retrieval\
