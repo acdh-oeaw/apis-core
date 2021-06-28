@@ -12,7 +12,9 @@ from django.conf import settings
 
 
 from django.contrib.contenttypes.fields import GenericRelation
-from apis_highlighter.models import Annotation
+
+if 'apis_highlighter' in settings.INSTALLED_APPS:
+    from apis_highlighter.models import Annotation
 
 
 @reversion.register()
