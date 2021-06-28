@@ -9,12 +9,7 @@ from django.db import models
 from django.utils.functional import cached_property
 from reversion import revisions as reversion
 from django.conf import settings
-
-
 from django.contrib.contenttypes.fields import GenericRelation
-
-if 'apis_highlighter' in settings.INSTALLED_APPS:
-    from apis_highlighter.models import Annotation
 
 
 @reversion.register()
@@ -55,7 +50,9 @@ class VocabsBaseClass(models.Model):
         VocabNames, blank=True, null=True,
         on_delete=models.SET_NULL
     )
-    annotation_set = GenericRelation(Annotation)
+    if 'apis_highlighter' in settings.INSTALLED_APPS:
+        from apis_highlighter.models import Annotation
+        annotation_set = GenericRelation(Annotation)
 
     def __str__(self):
         return self.label
