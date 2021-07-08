@@ -4,7 +4,7 @@
 {{block.super}}
 {% if highlighter_active %}
       <link rel="stylesheet" href="{% static 'apis_highlighter/apis_highlighter.css' %}" />
-	<script type="text/javascript" src="{% static 'apis_highlighter/apis_highlighter.js' %}"></script>
+	<script type="text/javascript" src="{% static 'apis_highlighter/apis_highlighter.js' %}?arbitrary_tag_to_avoid_cache"></script>
 	{% endif %}
     {% if apis_bibsonomy %}
 {% include 'apis_bibsonomy/apis_bibsonomy_include.html' %}

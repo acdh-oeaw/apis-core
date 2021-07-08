@@ -341,8 +341,8 @@ class RDFParser(object):
             self.objct.collection.add(col)
         if 'apis_highlighter' in settings.INSTALLED_APPS:
             for ann in m_obj.annotation_set.all():  # Todo: check if this works now with highlighter
-                ann.entity_link.remove(m_obj)
-                ann.entity_link.add(self.objct)
+                ann.entity_link = self.objct
+                ann.save()
         for txt in m_obj.text.all():
             self.objct.text.add(txt)
         if m_obj.source:

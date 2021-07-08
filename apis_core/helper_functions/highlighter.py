@@ -33,13 +33,11 @@ def highlight_text_new(*args, **kwargs):
         anns_fin.append(ann)
     for an in anns_fin:
         if types:
-            test = False
-            for m in an.entity_link.all():
+            m = an.entity_link
+            if m is not None:
                 t = ContentType.objects.get_for_model(m)
-                if str(t.pk) in types:
-                    test = True
-            if not test:
-                continue
+                if not (str(t.pk) in types):
+                    continue
         c_start = re.findall(r"[\r\n]+", obj.text[: an.start])
         if len(c_start) > 0:
             an.start += len("".join(c_start))
@@ -124,14 +122,11 @@ def highlight_text(*args, **kwargs):
         anns_fin.append(ann)
     for an in anns_fin:
         if types:
-            test = False
-            for m in an.entity_link.all():
+            m = an.entity_link
+            if m is not None:
                 t = ContentType.objects.get_for_model(m)
-                if str(t.pk) in types:
-                    test = True
-            if not test:
-                continue
-
+                if not (str(t.pk) in types):
+                    continue
         if an.start >= t_start and an.start <= t_end:
             lst_annot[-1].append(an)
         else:
@@ -207,14 +202,10 @@ def highlight_textTEI(*args, **kwargs):
         start = min([x.start for x in an])
         end = max([x.end for x in an])
         try:
-            lst_classes = " ".join(
-                [str(x.relation_type.pk) for x in an[0].entity_link.all()]
-            )
+            lst_classes = str(an[0].entity_link.relation_type.pk)
         except:
             try:
-                lst_classes = " ".join(
-                    [str(x.kind.pk) for x in an[0].entity_link.all()]
-                )
+                lst_classes = str(an[0].entity_link.kind.pk)
             except:
                 lst_classes = ""
         if len(an) > 1:
@@ -223,27 +214,16 @@ def highlight_textTEI(*args, **kwargs):
             )
         else:
             try:
-                entity_type = type(an[0].entity_link.all()[0]).__name__
-                entity_pk = an[0].entity_link.all()[0].pk
-                ent_lst_pk = []
-                for x in dir(an[0].entity_link.all()[0]):
-                    c = re.match("related_\w+_id", x)
-                    if c:
-                        ent_lst_pk.append(
-                            str(getattr(an[0].entity_link.all()[0], c.group(0)))
-                        )
-                if len(ent_lst_pk) == 0:
-                    ent_lst_pk.append(str(an[0].entity_link.all()[0].pk))
+                entity_type = type(an[0].entity_link).__name__
+                entity_pk = an[0].entity_link.pk
             except:
                 entity_type = ""
                 entity_pk = ""
                 ent_lst_pk = []
             try:
-                entity_uri = (
-                    an[0].entity_link.all()[0].uri_set.values_list("uri", flat=True)[0]
-                )
+                entity_uri = an[0].entity_link.uri_set.values_list('uri', flat=True)[0]
             except:
-                entity_uri = "internal db id: {}".format(an[0].entity_link.all()[0].pk)
+                entity_uri = 'internal db id: {}'.format(an[0].entity_link.pk)
             start_span = '<name hl-type="simple" hl-start="{}" hl-end="{}" hl-text-id="{}" hl-ann-id="{}" type="{}" entity-pk="{}" related-entity-pk="{}">'.format(
                 start,
                 end,
