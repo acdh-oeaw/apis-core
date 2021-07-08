@@ -1,12 +1,4 @@
-ResolveAbbreviations
-====================
-.. autoclass:: helper_functions.abbreviation_solver.ResolveAbbreviations
-    :members:
-
-    .. automethod:: __init__
-
-
 GenericRDFParser
 ====================
-.. autoclass:: helper_functions.RDFparsers.GenericRDFParser
+.. autoclass:: apis_core.helper_functions.RDFParser.RDFParser
     :members:

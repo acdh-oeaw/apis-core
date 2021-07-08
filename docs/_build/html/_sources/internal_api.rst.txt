@@ -9,5 +9,4 @@ Internal API
    modules/entities
    modules/relations
    modules/vocabularies
-   modules/highlighter
    modules/helper_functions

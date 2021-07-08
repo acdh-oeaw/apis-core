@@ -6,11 +6,11 @@ In the entities app all 5 core entites - Person, Place, Institution, Event and W
 Models
 ------
 
-.. automodule:: entities.models
+.. automodule:: apis_core.apis_entities.models
     :members:
 
 Views
 -----
 
-.. automodule:: entities.views
+.. automodule:: apis_core.apis_entities.views
     :members:

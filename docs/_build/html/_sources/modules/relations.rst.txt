@@ -7,11 +7,11 @@ We already explained that every entity in can be related to every other entity. 
 Models
 ------
 
-.. automodule:: relations.models
+.. automodule:: apis_core.apis_relations.models
     :members:
 
 Views
 -----
 
-.. automodule:: relations.views
+.. automodule:: apis_core.apis_relations.views
     :members:

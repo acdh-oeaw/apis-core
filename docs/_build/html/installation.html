@@ -1,58 +1,58 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Installation &mdash; APIS 0.1 documentation</title>
   
 
   
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
   
+  
+
   
   
 
   
 
   
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
 
-  
-
-  
-  
-    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  
-
-  
-
-  
-        <link rel="index" title="Index"
-              href="genindex.html"/>
-        <link rel="search" title="Search" href="search.html"/>
-    <link rel="top" title="APIS 0.1 documentation" href="index.html"/>
-        <link rel="next" title="Data Model" href="data_model.html"/>
-        <link rel="prev" title="Welcome to APIS’s documentation!" href="index.html"/> 
-
-  
-  <script src="_static/js/modernizr.min.js"></script>
-
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Data Model" href="data_model.html" />
+    <link rel="prev" title="Welcome to APIS’s documentation!" href="index.html" /> 
 </head>
 
-<body class="wy-body-for-nav" role="document">
+<body class="wy-body-for-nav">
 
    
   <div class="wy-grid-for-nav">
-
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
-        <div class="wy-side-nav-search">
+        <div class="wy-side-nav-search" >
           
 
           
@@ -83,6 +83,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -108,13 +109,14 @@
             
           
         </div>
+        
       </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+      <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">APIS</a>
@@ -122,10 +124,13 @@
       </nav>
 
 
-      
       <div class="wy-nav-content">
+        
         <div class="rst-content">
+        
           
+
+
 
 
 
@@ -145,14 +150,14 @@
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="index.html">Docs</a> &raquo;</li>
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
       <li>Installation</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/installation.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -172,7 +177,7 @@
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
 <p>APIS webapp needs Python 3.5+ and several python packages that can be easily installed by using pip.</p>
 <p>Create a new virtualenv and activate it:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">virtualenv -p pyton3.5 your_virtualenv_name</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">virtualenv -p pyton3.5 your_virtualenv_name</span>
 <span class="go">source your_virtualenv_name/bin/activate</span>
 </pre></div>
 </div>
@@ -183,22 +188,22 @@
 <p>We use the system in several different projects. To allow for high configurability while keeping it simple we decided
 to split the system in several git submodules:</p>
 <ul class="simple">
-<li>apis-core: the main application code (we refer to it in the Installation Documentation as apisapp)</li>
-<li>apis-PROJECTNAME-settings (for the main system used in apis project we omit the PROJECTNAME in the repo names): The settings folder of the various projects. These contain not only the app settings (e.g.
-db user, db password etc.) but also the settings for the autocompletes and the RDF parsers.</li>
-<li>apis-PROJECTNAME-webpage: The webpage app of the respective project. Seperating these base templates and javascripts
-from the rest of the app allows us to give every project its very own look.</li>
+<li><p>apis-core: the main application code (we refer to it in the Installation Documentation as apisapp)</p></li>
+<li><p>apis-PROJECTNAME-settings (for the main system used in apis project we omit the PROJECTNAME in the repo names): The settings folder of the various projects. These contain not only the app settings (e.g.
+db user, db password etc.) but also the settings for the autocompletes and the RDF parsers.</p></li>
+<li><p>apis-PROJECTNAME-webpage: The webpage app of the respective project. Seperating these base templates and javascripts
+from the rest of the app allows us to give every project its very own look.</p></li>
 </ul>
 <p>If you want to get a basic running system that you can work from, you can clone apis-apis and initialize the submodules:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="o">--</span><span class="n">recursive</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">acdh</span><span class="o">-</span><span class="n">oeaw</span><span class="o">/</span><span class="n">apis</span><span class="o">.</span><span class="n">git</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="o">--</span><span class="n">recursive</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">acdh</span><span class="o">-</span><span class="n">oeaw</span><span class="o">/</span><span class="n">apis</span><span class="o">.</span><span class="n">git</span>
 </pre></div>
 </div>
 <p>And to update the submodules to the latest commit:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">submodule</span> <span class="n">foreach</span> <span class="n">git</span> <span class="n">pull</span> <span class="n">origin</span> <span class="n">master</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">submodule</span> <span class="n">foreach</span> <span class="n">git</span> <span class="n">pull</span> <span class="n">origin</span> <span class="n">master</span>
 </pre></div>
 </div>
 <p>After that you need to set two symlinks:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">apis</span><span class="o">-</span><span class="n">core</span><span class="o">/</span><span class="n">apis</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">apis</span><span class="o">-</span><span class="n">core</span><span class="o">/</span><span class="n">apis</span>
 <span class="n">ln</span> <span class="o">-</span><span class="n">s</span> <span class="o">../../</span><span class="n">apis</span><span class="o">-</span><span class="n">settings</span> <span class="n">settings</span>
 <span class="n">cd</span> <span class="o">..</span>
 <span class="n">ln</span> <span class="o">-</span><span class="n">s</span> <span class="o">../</span><span class="n">apis</span><span class="o">-</span><span class="n">webpage</span> <span class="n">webpage</span>
@@ -206,27 +211,28 @@ from the rest of the app allows us to give every project its very own look.</li>
 </div>
 <p>To set the two symlinks in Windows, run the following commands (run cmd in admin mode):</p>
 <blockquote>
-<div>cd apis-coreapis
-mklink /D settings ….apis-settings
+<div><p>cd apis-coreapis
+mklink /D settings ....apis-settings
 cd ..
-mklink /D webpage ..apis-webpage</div></blockquote>
+mklink /D webpage ..apis-webpage</p>
+</div></blockquote>
 <p>Now you have the correct folder structure in place and are good to go on with installing</p>
 </div>
 <div class="section" id="id1">
 <h2>Installation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Change to the directory you have downloaded APIS to and install the needed Python packages:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">apis</span><span class="o">-</span><span class="n">core</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">apis</span><span class="o">-</span><span class="n">core</span>
 <span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
 </pre></div>
 </div>
-<p>Next you need to create a file called copy the <code class="docutils literal"><span class="pre">APIS_directory/apis-core/apis/settings/dummysettings.py</span></code> file to another name.
-We suggest <code class="docutils literal"><span class="pre">server.py</span></code>:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">cp</span> <span class="n">APIS_directory</span><span class="o">/</span><span class="n">apis</span><span class="o">-</span><span class="n">core</span><span class="o">/</span><span class="n">apis</span><span class="o">/</span><span class="n">settings</span><span class="o">/</span><span class="n">dummysettings</span><span class="o">.</span><span class="n">py</span> <span class="n">APIS_directory</span><span class="o">/</span><span class="n">apis</span><span class="o">-</span><span class="n">core</span><span class="o">/</span><span class="n">apis</span><span class="o">/</span><span class="n">settings</span><span class="o">/</span><span class="n">server</span><span class="o">.</span><span class="n">py</span>
+<p>Next you need to create a file called copy the <code class="docutils literal notranslate"><span class="pre">APIS_directory/apis-core/apis/settings/dummysettings.py</span></code> file to another name.
+We suggest <code class="docutils literal notranslate"><span class="pre">server.py</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cp</span> <span class="n">APIS_directory</span><span class="o">/</span><span class="n">apis</span><span class="o">-</span><span class="n">core</span><span class="o">/</span><span class="n">apis</span><span class="o">/</span><span class="n">settings</span><span class="o">/</span><span class="n">dummysettings</span><span class="o">.</span><span class="n">py</span> <span class="n">APIS_directory</span><span class="o">/</span><span class="n">apis</span><span class="o">-</span><span class="n">core</span><span class="o">/</span><span class="n">apis</span><span class="o">/</span><span class="n">settings</span><span class="o">/</span><span class="n">server</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
-<p>Edit <code class="docutils literal"><span class="pre">server.py</span></code> to your needs. E.g. if you intend to use Mysql it should look something like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="o">*</span>
+<p>Edit <code class="docutils literal notranslate"><span class="pre">server.py</span></code> to your needs. E.g. if you intend to use Mysql it should look something like:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="o">*</span>
 
 <span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="s1">&#39;asdaaserffsdfi&#39;</span>
 <span class="c1"># SECURITY WARNING: don&#39;t run with debug turned on in production!</span>
@@ -244,42 +250,42 @@ We suggest <code class="docutils literal"><span class="pre">server.py</span></co
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Dont forget to set <code class="docutils literal"><span class="pre">DEBUG</span> <span class="pre">=</span> <span class="pre">False</span></code> once you are in production.</p>
+<p>Dont forget to set <code class="docutils literal notranslate"><span class="pre">DEBUG</span> <span class="pre">=</span> <span class="pre">False</span></code> once you are in production.</p>
 <p>Once the database connection is set run:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">python manage.py migrate --settings=apis.settings.server</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python manage.py migrate --settings=apis.settings.server</span>
 </pre></div>
 </div>
-<p>For convenience we suggest you alter <code class="docutils literal"><span class="pre">manage.py</span></code> to:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<p>For convenience we suggest you alter <code class="docutils literal notranslate"><span class="pre">manage.py</span></code> to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;DJANGO_SETTINGS_MODULE&quot;</span><span class="p">,</span> <span class="s2">&quot;apis.settings.server&quot;</span><span class="p">)</span>
 
-    <span class="kn">from</span> <span class="nn">django.core.management</span> <span class="k">import</span> <span class="n">execute_from_command_line</span>
+    <span class="kn">from</span> <span class="nn">django.core.management</span> <span class="kn">import</span> <span class="n">execute_from_command_line</span>
 
     <span class="n">execute_from_command_line</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Once that is done you dont have to include <code class="docutils literal"><span class="pre">--settings=apis.settings.server</span></code> in your commands anymore.</p>
+<p>Once that is done you dont have to include <code class="docutils literal notranslate"><span class="pre">--settings=apis.settings.server</span></code> in your commands anymore.</p>
 <p>Next we migrate the APIS internal tables:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">python manage.py makemigrations metainfo entities relations vocabularies highlighter labels webpage</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python manage.py makemigrations metainfo entities relations vocabularies highlighter labels webpage</span>
 <span class="go">python manage.py migrate</span>
 </pre></div>
 </div>
 <p>and create a superuser:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">python manage.py createsuperuser</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python manage.py createsuperuser</span>
 </pre></div>
 </div>
 <p>answer the questions and change to the static directory to download javascript libraries:</p>
 <p>If you havent installed NPM and bower yet you need to run:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">sudo apt-get install npm</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">sudo apt-get install npm</span>
 <span class="go">npm install -g bower</span>
 </pre></div>
 </div>
 <p>If you have already installed bower you can proceed with installing the javascript libraries directly:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">cd webpage/static/webpage/libraries</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cd webpage/static/webpage/libraries</span>
 <span class="go">bower install</span>
 </pre></div>
 </div>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">python manage.py runserver</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python manage.py runserver</span>
 </pre></div>
 </div>
 <p>should bring up a development server window with your new apis instance.</p>
@@ -288,25 +294,25 @@ We suggest <code class="docutils literal"><span class="pre">server.py</span></co
 <h2>Installation on Windows<a class="headerlink" href="#installation-on-windows" title="Permalink to this headline">¶</a></h2>
 <p>Change to the directory you have downloaded APIS to and install the needed Python packages
 In the command prompt that pops up after the activation of the virtualenv, change directory to where you have downloaded apis (eg. to apis-core) and install the modules in requirements.txt</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">pip install -r requirements.txt</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install -r requirements.txt</span>
 </pre></div>
 </div>
 <p>If you encounter problems while installing the packages in the requirements.txt file, remove the ones that cause the problem (from the requirements.txt file), and download the .whl file of the problematic module from the following site: <a class="reference external" href="http://www.lfd.uci.edu/~gohlke/pythonlibs/">http://www.lfd.uci.edu/~gohlke/pythonlibs/</a> (choosing the correct version: your python version must be equal to the number after cp in the name of the .whl file, and your operating system 32-bit/64-bit with the end of the file name.)</p>
 <p>Install the missing module by running the following command in the prompt from where your .whl file resides:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">pip install name_of_the_whl_file</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install name_of_the_whl_file</span>
 </pre></div>
 </div>
 <p>Install numpy+mkl, download the wheel file from the link above and install with the command:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">pip install name_of_the_whl_file</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">pip install name_of_the_whl_file</span>
 </pre></div>
 </div>
 <p>Download and install SQLite (www.sqlite.org).</p>
 <p>Next copy the dummpysettings.py file and rename it to server.py with the following command:
 copy apisappapissettingsdummysettings.py apisappapissettingsserver.py
-Now edit <code class="docutils literal"><span class="pre">server.py</span></code> to your needs.</p>
+Now edit <code class="docutils literal notranslate"><span class="pre">server.py</span></code> to your needs.</p>
 <p>If you installed sqlite, it should look like below:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="o">*</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="o">*</span>
 
 <span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="s1">&#39;d3j@zlckxkw73c3*ud2-11$)d6i)^my(60*o1psh*&amp;-u35#ayi&#39;</span>
 <span class="c1"># SECURITY WARNING: don&#39;t run with debug turned on in production!</span>
@@ -321,8 +327,8 @@ Now edit <code class="docutils literal"><span class="pre">server.py</span></code
 </pre></div>
 </div>
 <p>If you intend to use Mysql it should look something like:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="o">*</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="o">*</span>
 
 <span class="n">SECRET_KEY</span> <span class="o">=</span> <span class="s1">&#39;asdaaserffsdfi&#39;</span>
 <span class="c1"># SECURITY WARNING: don&#39;t run with debug turned on in production!</span>
@@ -340,50 +346,50 @@ Now edit <code class="docutils literal"><span class="pre">server.py</span></code
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>Dont forget to set <code class="docutils literal"><span class="pre">DEBUG</span> <span class="pre">=</span> <span class="pre">False</span></code> once you are in production.</p>
+<p>Dont forget to set <code class="docutils literal notranslate"><span class="pre">DEBUG</span> <span class="pre">=</span> <span class="pre">False</span></code> once you are in production.</p>
 <p>Once the database connection is set, run:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">python manage.py migrate --settings=apis.settings.server</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python manage.py migrate --settings=apis.settings.server</span>
 </pre></div>
 </div>
-<p>For convenience we suggest you alter <code class="docutils literal"><span class="pre">manage.py</span></code> to:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<p>For convenience we suggest you alter <code class="docutils literal notranslate"><span class="pre">manage.py</span></code> to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;DJANGO_SETTINGS_MODULE&quot;</span><span class="p">,</span> <span class="s2">&quot;apis.settings.server&quot;</span><span class="p">)</span>
 
-    <span class="kn">from</span> <span class="nn">django.core.management</span> <span class="k">import</span> <span class="n">execute_from_command_line</span>
+    <span class="kn">from</span> <span class="nn">django.core.management</span> <span class="kn">import</span> <span class="n">execute_from_command_line</span>
 
     <span class="n">execute_from_command_line</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Once that is done you dont have to include <code class="docutils literal"><span class="pre">--settings=apis.settings.server</span></code> in your commands anymore.</p>
+<p>Once that is done you dont have to include <code class="docutils literal notranslate"><span class="pre">--settings=apis.settings.server</span></code> in your commands anymore.</p>
 <p>Next we migrate the APIS internal tables:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">python manage.py makemigrations metainfo entities relations vocabularies highlighter labels webpage</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python manage.py makemigrations metainfo entities relations vocabularies highlighter labels webpage</span>
 <span class="go">python manage.py migrate</span>
 </pre></div>
 </div>
 <p>and create a superuser:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">python manage.py createsuperuser</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python manage.py createsuperuser</span>
 </pre></div>
 </div>
 <p>answer the questions and change to the static directory to download javascript libraries:</p>
 <p>If you havent installed NPM and bower yet, install NodeJS, and bower with npm. Bower depends on Node.js and NPM, download the installation package from the Node.js site and click through it. You can now install Bower with npm. You might need to restart Windows to get all the path variables setup.
 Open the Git Bash or Command Prompt and install bower with the following command.</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">npm install -g bower</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">npm install -g bower</span>
 </pre></div>
 </div>
 <p>If you have already installed bower you can proceed with installing the javascript libraries directly. In the command line or git bash go to the directory apis-webpagestaticwebpagelibraries and run:</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">bower install</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">bower install</span>
 </pre></div>
 </div>
 <p>Finally the below command brings up a development server window with your new apis instance.</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="go">python manage.py runserver</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python manage.py runserver</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="serving-apis-via-apache-wsgi">
 <h2>Serving APIS via Apache WSGI<a class="headerlink" href="#serving-apis-via-apache-wsgi" title="Permalink to this headline">¶</a></h2>
-<p>If you plan to use APIS in production you should deploy it via a proper webserver. We use <a class="reference external" href="https://httpd.apache.org/">Apache</a> and <code class="docutils literal"><span class="pre">mod_wsgi</span></code> to
+<p>If you plan to use APIS in production you should deploy it via a proper webserver. We use <a class="reference external" href="https://httpd.apache.org/">Apache</a> and <code class="docutils literal notranslate"><span class="pre">mod_wsgi</span></code> to
 do so. Our apche virtualhost config looks something like:</p>
-<div class="highlight-aconf"><div class="highlight"><pre><span></span><span class="nt">&lt;VirtualHost</span> <span class="s">*:80</span><span class="nt">&gt;</span>
+<div class="highlight-aconf notranslate"><div class="highlight"><pre><span></span><span class="nt">&lt;VirtualHost</span> <span class="s">*:80</span><span class="nt">&gt;</span>
    <span class="nb">ServerName</span> server_name
    <span class="nb">ServerAlias</span> server_alias #alias names if needed
    <span class="nb">DocumentRoot</span> <span class="sx">/var/www/html</span> #document root of your installation
@@ -401,7 +407,7 @@ do so. Our apche virtualhost config looks something like:</p>
 </pre></div>
 </div>
 <p>If the database is connected and the virtualhost is configured you are good to go:</p>
-<div class="highlight-bash"><div class="highlight"><pre><span></span>service apache2 reload
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>service apache2 reload
 </pre></div>
 </div>
 </div>
@@ -409,34 +415,32 @@ do so. Our apche virtualhost config looks something like:</p>
 
 
            </div>
-           <div class="articleComments">
-            
-           </div>
+           
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="data_model.html" class="btn btn-neutral float-right" title="Data Model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral" title="Welcome to APIS’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="data_model.html" class="btn btn-neutral float-right" title="Data Model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to APIS’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2017, Matthias Schlögl.
+        &#169; Copyright 2017, Matthias Schlögl.
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -445,37 +449,15 @@ do so. Our apche virtualhost config looks something like:</p>
   </div>
   
 
-
-  
-
-    <script type="text/javascript">
-        var DOCUMENTATION_OPTIONS = {
-            URL_ROOT:'./',
-            VERSION:'0.1',
-            COLLAPSE_INDEX:false,
-            FILE_SUFFIX:'.html',
-            HAS_SOURCE:  true,
-            SOURCELINK_SUFFIX: '.txt'
-        };
-    </script>
-      <script type="text/javascript" src="_static/jquery.js"></script>
-      <script type="text/javascript" src="_static/underscore.js"></script>
-      <script type="text/javascript" src="_static/doctools.js"></script>
-
-  
-
-  
-  
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-  
-
-  
-  
   <script type="text/javascript">
       jQuery(function () {
-          SphinxRtdTheme.StickyNav.enable();
+          SphinxRtdTheme.Navigation.enable(true);
       });
   </script>
+
+  
+  
+    
    
 
 </body>

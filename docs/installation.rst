@@ -4,66 +4,33 @@ Installation
 Prerequisites
 -------------
 
-APIS webapp needs Python 3.5+ and several python packages that can be easily installed by using pip.
+APIS webapp needs Python 3.6+ and several python packages that can be easily installed by using `pip <https://pip.pypa.io/en/stable/>`, 
+`pipenv <https://github.com/pypa/pipenv>`, or `poetry <https://python-poetry.org/>`.
 
 Create a new virtualenv and activate it:
 
 .. code-block:: console
 
-   virtualenv -p pyton3.5 your_virtualenv_name
+   virtualenv -p pyton3 your_virtualenv_name
    source your_virtualenv_name/bin/activate
 
 To activate the virtualenv on Windows, go to the directory your_virtualenv_name/Scripts and run activate.bat from the command line.
 
-Git and submodules
-------------------
 
-We use the system in several different projects. To allow for high configurability while keeping it simple we decided
-to split the system in several git submodules:
+Installation on a linux box
+----------------------------
 
-* apis-core: the main application code (we refer to it in the Installation Documentation as apisapp)
-* apis-PROJECTNAME-settings (for the main system used in apis project we omit the PROJECTNAME in the repo names): The settings folder of the various projects. These contain not only the app settings (e.g.
-  db user, db password etc.) but also the settings for the autocompletes and the RDF parsers.
-* apis-PROJECTNAME-webpage: The webpage app of the respective project. Seperating these base templates and javascripts
-  from the rest of the app allows us to give every project its very own look.
+Change to the directory you have downloaded APIS to and install the needed Python packages:
 
-If you want to get a basic running system that you can work from, you can clone apis-apis and initialize the submodules::
-
-    git clone --recursive https://github.com/acdh-oeaw/apis.git
-
-And to update the submodules to the latest commit::
-
-    git submodule foreach git pull origin master
-
-After that you need to set two symlinks::
-
-    cd apis-core/apis
-    ln -s ../../apis-settings settings
-    cd ..
-    ln -s ../apis-webpage webpage
-
-To set the two symlinks in Windows, run the following commands (run cmd in admin mode):
-
-    cd apis-core\apis
-    mklink /D settings ..\..\apis-settings
-    cd ..
-    mklink /D webpage ..\apis-webpage
-
-
-Now you have the correct folder structure in place and are good to go on with installing
-
-Installation
-------------
-
-Change to the directory you have downloaded APIS to and install the needed Python packages::
+.. code-block:: console
 
     cd apis-core
     pip install -r requirements.txt
 
-Next you need to create a file called copy the ``APIS_directory/apis-core/apis/settings/dummysettings.py`` file to another name.
+Next you need to create a file called copy the ``APIS_directory/apis-core/apis/settings/settings_test_ci.py`` file to another name.
 We suggest ``server.py``::
 
-    cp APIS_directory/apis-core/apis/settings/dummysettings.py APIS_directory/apis-core/apis/settings/server.py
+    cp APIS_directory/apis-core/apis/settings/settings_test_ci.py APIS_directory/apis-core/apis/settings/server.py
 
 Edit ``server.py`` to your needs. E.g. if you intend to use Mysql it should look something like::
 
@@ -108,7 +75,6 @@ Next we migrate the APIS internal tables:
 
 .. code-block:: console
 
-    python manage.py makemigrations metainfo entities relations vocabularies highlighter labels webpage
     python manage.py migrate
 
 and create a superuser:
@@ -117,21 +83,8 @@ and create a superuser:
 
     python manage.py createsuperuser
 
-answer the questions and change to the static directory to download javascript libraries:
-
-If you havent installed NPM and bower yet you need to run:
-
-.. code-block:: console
-
-    sudo apt-get install npm
-    npm install -g bower
-
-If you have already installed bower you can proceed with installing the javascript libraries directly:
-
-.. code-block:: console
-
-    cd webpage/static/webpage/libraries
-    bower install
+answer the questions and hit enter.
+Now you can already proceed running the development server:
 
 .. code-block:: console
 

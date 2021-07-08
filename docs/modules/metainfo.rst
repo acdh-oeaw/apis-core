@@ -4,5 +4,5 @@ Metainfo
 Models
 ------
 
-.. automodule:: metainfo.models
+.. automodule:: apis_core.apis_metainfo.models
     :members:
