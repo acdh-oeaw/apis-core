@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Installation &mdash; APIS 0.1 documentation</title>
+  <title>Installation with Docker &mdash; APIS 0.1 documentation</title>
   
 
   
@@ -93,7 +93,12 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation with Docker</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#docker-image">Docker Image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#docker-compose">Docker Compose</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#installation-without-docker">Installation without Docker</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installation-on-a-linux-box">Installation on a linux box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installation-on-windows">Installation on Windows</a></li>
@@ -151,7 +156,7 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Installation</li>
+      <li>Installation with Docker</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -170,12 +175,93 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="installation-with-docker">
+<h1>Installation with Docker<a class="headerlink" href="#installation-with-docker" title="Permalink to this headline">¶</a></h1>
+<p>This is the recommendated way to install APIS on local machines as well as on server infrastructure.</p>
+<div class="section" id="docker-image">
+<h2>Docker Image<a class="headerlink" href="#docker-image" title="Permalink to this headline">¶</a></h2>
+<p>APIS docker images can be pulled from <a class="reference external" href="https://hub.docker.com/repository/docker/sennierer/apis">docker hub</a>. Images are tagged
+from v0.9.1 onwards. Latest image is tagged with :latest.
+The images are automatically built and tagged and should be up-to-date with altest versions of code.</p>
+</div>
+<div class="section" id="docker-compose">
+<h2>Docker Compose<a class="headerlink" href="#docker-compose" title="Permalink to this headline">¶</a></h2>
+<p>The following docker-compose file can be used as a starting point for deploying an APIS instance:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span> <span class="s">&#39;2&#39;</span>
+
+
+<span class="nt">services</span><span class="p">:</span>
+        <span class="nt">web</span><span class="p">:</span>
+            <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">sennierer/apis:latest</span>
+            <span class="nt">environment</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_PROJECT=apis_test</span> <span class="c1">#as used in the apis-settings repo</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_DB_NAME=testdb</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_DB_USER=testuser</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_DB_PASSWORD=testpwd</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_DB_HOST=database</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_DB_PORT=3306</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_AUTO_CREATE_DB=1</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">DJANGO_SUPERUSER_PASSWORD=adminpass123</span> <span class="c1">#change that to admin password</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">DJANGO_SUPERUSER_USERNAME=admin</span> <span class="c1">#change that to admin username</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">DJANGO_SUPERUSER_EMAIL=my_user@domain.com</span> <span class="c1">#change that to email</span>
+                <span class="c1"># and more e.g. APIS_DB_PORT &gt;&gt; apis-webpage-base/apis/settings/base.py</span>
+            <span class="nt">container_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">apis_core_apis_test</span> <span class="c1">#use apis_core_$APIS_PROJECT, e.g. apis_core_mpr</span>
+            <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">sh /start-apis/start-apis/start.sh</span>
+            <span class="nt">volumes</span><span class="p">:</span>
+                    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">config-volume:/config-apis</span>
+                    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">staticfiles-volume:/apis/apis-webpage-base/staticfiles</span>
+            <span class="nt">networks</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">backend</span>
+            <span class="nt">depends_on</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">database</span>
+
+        <span class="nt">database</span><span class="p">:</span>
+            <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">mysql:5.7</span>
+            <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">--default-authentication-plugin=mysql_native_password</span>
+            <span class="nt">restart</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">always</span>
+            <span class="nt">environment</span><span class="p">:</span>
+                    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">MYSQL_ROOT_PASSWORD=rootpwd</span>
+                    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">MYSQL_DATABASE=testdb</span>
+                    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">MYSQL_USER=testuser</span>
+                    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">MYSQL_PASSWORD=testpwd</span>
+            <span class="nt">networks</span><span class="p">:</span>
+                    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">backend</span>
+        <span class="nt">nginx</span><span class="p">:</span>
+            <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">nginx:latest</span>
+            <span class="nt">container_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ngx_apis_apis_test</span> <span class="c1">#use ngx_apis_$PROJECT_NAME, e.g, ngx_apis_mpr</span>
+            <span class="nt">environment</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_PROJECT=apis_test</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_SERVER_NAME=localhost</span> <span class="c1">#as used in the apis-settings repo &gt;&gt; needs to be present in both images</span>
+            <span class="nt">volumes</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">config-volume:/config-apis</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">staticfiles-volume:/staticfiles</span>
+            <span class="nt">ports</span><span class="p">:</span>
+                    <span class="p p-Indicator">-</span> <span class="s">&quot;8080:81&quot;</span>
+            <span class="nt">depends_on</span><span class="p">:</span>
+                    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">web</span>
+            <span class="nt">networks</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">backend</span>
+            <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/bin/bash -c &quot;envsubst &#39;$${APIS_PROJECT},$${APIS_SERVER_NAME}&#39; &lt; /config-apis/start-apis/nginx/nginx.template &gt; /etc/nginx/conf.d/default.conf &amp;&amp; exec nginx -g &#39;daemon off;&#39;&quot;</span>
+<span class="nt">networks</span><span class="p">:</span>
+<span class="nt">backend</span><span class="p">:</span>
+    <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">bridge</span>
+
+<span class="nt">volumes</span><span class="p">:</span>
+<span class="nt">config-volume</span><span class="p">:</span>
+        <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">local</span>
+<span class="nt">staticfiles-volume</span><span class="p">:</span>
+        <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">local</span>
+</pre></div>
+</div>
+<p>After <code class="docutils literal notranslate"><span class="pre">docker-compose</span> <span class="pre">up</span></code> you should now have a default APIS installation accessible under <a class="reference external" href="http://localhost:8080">http://localhost:8080</a>.</p>
+</div>
+</div>
+<div class="section" id="installation-without-docker">
+<h1>Installation without Docker<a class="headerlink" href="#installation-without-docker" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
-<p>APIS webapp needs Python 3.6+ and several python packages that can be easily installed by using <cite>pip &lt;https://pip.pypa.io/en/stable/&gt;</cite>,
-<cite>pipenv &lt;https://github.com/pypa/pipenv&gt;</cite>, or <cite>poetry &lt;https://python-poetry.org/&gt;</cite>.</p>
+<p>APIS webapp needs Python 3.6+ and several python packages that can be easily installed by using <a class="reference external" href="https://pip.pypa.io/en/stable/">pip</a>,
+<a class="reference external" href="https://github.com/pypa/pipenv">pipenv</a>, or <a class="reference external" href="https://python-poetry.org/">poetry</a>.</p>
 <p>Create a new virtualenv and activate it:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">virtualenv -p pyton3 your_virtualenv_name</span>
 <span class="go">source your_virtualenv_name/bin/activate</span>

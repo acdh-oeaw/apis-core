@@ -1,11 +1,97 @@
-Installation
-============
+Installation with Docker
+========================
+
+This is the recommendated way to install APIS on local machines as well as on server infrastructure.
+
+Docker Image
+------------
+APIS docker images can be pulled from `docker hub <https://hub.docker.com/repository/docker/sennierer/apis>`_. Images are tagged
+from v0.9.1 onwards. Latest image is tagged with :latest.
+The images are automatically built and tagged and should be up-to-date with altest versions of code.
+
+Docker Compose
+--------------
+
+The following docker-compose file can be used as a starting point for deploying an APIS instance:
+
+.. code-block:: yaml
+
+    version: '2'
+
+
+    services:
+            web:
+                image: sennierer/apis:latest
+                environment:
+                    - APIS_PROJECT=apis_test #as used in the apis-settings repo
+                    - APIS_DB_NAME=testdb 
+                    - APIS_DB_USER=testuser
+                    - APIS_DB_PASSWORD=testpwd
+                    - APIS_DB_HOST=database
+                    - APIS_DB_PORT=3306
+                    - APIS_AUTO_CREATE_DB=1
+                    - DJANGO_SUPERUSER_PASSWORD=adminpass123 #change that to admin password
+                    - DJANGO_SUPERUSER_USERNAME=admin #change that to admin username
+                    - DJANGO_SUPERUSER_EMAIL=my_user@domain.com #change that to email
+                    # and more e.g. APIS_DB_PORT >> apis-webpage-base/apis/settings/base.py
+                container_name: apis_core_apis_test #use apis_core_$APIS_PROJECT, e.g. apis_core_mpr
+                command: sh /start-apis/start-apis/start.sh 
+                volumes:           
+                        - config-volume:/config-apis    
+                        - staticfiles-volume:/apis/apis-webpage-base/staticfiles
+                networks:
+                - backend
+                depends_on:
+                - database
+            
+            database:
+                image: mysql:5.7
+                command: --default-authentication-plugin=mysql_native_password
+                restart: always
+                environment:
+                        - MYSQL_ROOT_PASSWORD=rootpwd
+                        - MYSQL_DATABASE=testdb
+                        - MYSQL_USER=testuser
+                        - MYSQL_PASSWORD=testpwd
+                networks:
+                        - backend
+            nginx:
+                image: nginx:latest
+                container_name: ngx_apis_apis_test #use ngx_apis_$PROJECT_NAME, e.g, ngx_apis_mpr
+                environment:
+                    - APIS_PROJECT=apis_test
+                    - APIS_SERVER_NAME=localhost #as used in the apis-settings repo >> needs to be present in both images
+                volumes:
+                    - config-volume:/config-apis    
+                    - staticfiles-volume:/staticfiles  
+                ports:
+                        - "8080:81"
+                depends_on:
+                        - web
+                networks:
+                    - backend
+                command: /bin/bash -c "envsubst '$${APIS_PROJECT},$${APIS_SERVER_NAME}' < /config-apis/start-apis/nginx/nginx.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
+    networks:
+    backend:
+        driver: bridge
+
+    volumes:
+    config-volume:
+            driver: local
+    staticfiles-volume:
+            driver: local
+
+After ``docker-compose up`` you should now have a default APIS installation accessible under http://localhost:8080.
+
+
+Installation without Docker
+===========================
 
 Prerequisites
 -------------
 
-APIS webapp needs Python 3.6+ and several python packages that can be easily installed by using `pip <https://pip.pypa.io/en/stable/>`, 
-`pipenv <https://github.com/pypa/pipenv>`, or `poetry <https://python-poetry.org/>`.
+APIS webapp needs Python 3.6+ and several python packages that can be easily installed by using `pip <https://pip.pypa.io/en/stable/>`_, 
+`pipenv <https://github.com/pypa/pipenv>`_, or `poetry <https://python-poetry.org/>`_.
 
 Create a new virtualenv and activate it:
 
