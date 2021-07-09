@@ -19,6 +19,12 @@ before_script:
   - poetry config pypi-token.pypi ${PYPI_TOKEN}
   - poetry install
 
+workflow:
+  rules:
+    - if: $CI_COMMIT_MESSAGE =~ /-doc$/
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+
 test:
   stage: test
   only:
