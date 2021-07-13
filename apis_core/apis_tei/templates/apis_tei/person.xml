@@ -1,0 +1,55 @@
+<person xml:id="person__{{ object.id }}">
+    <persName>
+      {% if object.first_name %}<forename>{{ object.first_name }}</forename>{% endif %}
+      {% if object.name %}<surname>{{ object.name }}</surname>{% endif %}
+    </persName>
+    {% if object.start_date_written %}
+      <birth>
+        <date
+          {% if object.start_start_date_written %}
+            not-before="{{ object.start_start_date|date:'Y-m-d' }}"
+          {% endif %}
+          {% if object.start_date %}
+            when-iso="{{ object.start_date|date:'Y-m-d' }}"
+          {% endif %}
+          {% if object.start_end_date %}
+            not-after="{{ object.start_end_date|date:'Y-m-d' }}"
+          {% endif %}
+          >{{ object.start_date_written }}</date>
+          {% for x in birth_rel %}
+          <settlement key="{{ x.related_place.id }}">
+            <placeName type="pref">{{ x.related_place.name }}</placeName>
+            {% for uri in x.related_place.uri_set.all %}
+            <idno type="URL" {% if uri.domain %} subtype="{{ uri.domain }}" {% endif %}>{{ uri }}</idno>
+            {% endfor %}
+          </settlement>
+          {% endfor %} 
+      </birth>  
+    {% endif %}
+    {% if object.end_date_written %}
+      <death>
+        <date
+          {% if object.start_start_date_written %}
+            not-before="{{ object.end_start_date|date:'Y-m-d' }}"
+          {% endif %}
+          {% if object.end_date %}
+            when-iso="{{ object.end_date|date:'Y-m-d' }}"
+          {% endif %}
+          {% if object.end_end_date %}
+            not-after="{{ object.end_end_date|date:'Y-m-d' }}"
+          {% endif %}
+          >{{ object.end_date_written }}</date>
+          {% for x in death_rel %}
+          <settlement key="{{ x.related_place.id }}">
+            <placeName type="pref">{{ x.related_place.name }}</placeName>
+            {% for uri in x.related_place.uri_set.all %}
+            <idno type="URL" {% if uri.domain %} subtype="{{ uri.domain }}" {% endif %}>{{ uri }}</idno>
+            {% endfor %}
+          </settlement>
+          {% endfor %}
+      </death>
+    {% endif %}
+    {% for x in object.uri_set.all %}
+      <idno type="URL" {% if x.domain %} subtype="{{ x.domain }}" {% endif %}>{{ x }}</idno>
+    {% endfor %}
+  </person>
