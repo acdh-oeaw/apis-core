@@ -1,7 +1,13 @@
-from apis.settings.local_pmb import BIRTH_REL
 import lxml.etree as ET
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.template.loader import get_template
+
+Person = ContentType.objects.get(
+    app_label='apis_entities', model='person'
+).model_class()
+
+TEMPLATE_PATH = 'apis_tei/person.xml'
 
 try:
     birth_rel = settings.BIRTH_REL
@@ -13,8 +19,6 @@ try:
 except ImportError:
     death_rel = False
 
-
-TEMPLATE_PERSON = get_template('apis_tei/person.xml')
 
 def get_context(res):
     context = {}
@@ -31,9 +35,24 @@ def get_context(res):
 
 
 def get_node_from_template(template_path, res, full=True):
-        template = get_template(template_path)
-        context = get_context(res)
-        context['FULL'] = full
-        temp_str = f"{template.render(context=context)}"
-        node = ET.fromstring(temp_str)
-        return node
+    template = get_template(template_path)
+    context = get_context(res)
+    context['FULL'] = full
+    temp_str = f"{template.render(context=context)}"
+    node = ET.fromstring(temp_str)
+    return node
+
+
+def tei_header(
+    title="ListPerson",
+    ent_type="<listPerson/>",
+    template_path='apis_tei/tei.xml'
+):
+    template = get_template(template_path)
+    context = {
+        "title": title,
+        "ent_type": ent_type
+    }
+    temp_str = f"{template.render(context=context)}"
+    node = ET.fromstring(temp_str)
+    return node
