@@ -79,6 +79,9 @@
       {% endfor %}
   </death>
 {% endif %}
+{% for x in object.profession.all %}
+  <occupation key="{{ x.id }}">{{ x }}</occupation>
+{% endfor %}
 {% for x in object.uri_set.all %}
   <idno type="URL" {% if x.domain %} subtype="{{ x.domain }}" {% endif %}>{{ x }}</idno>
 {% endfor %}
