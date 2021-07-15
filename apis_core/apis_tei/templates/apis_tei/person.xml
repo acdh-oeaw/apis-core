@@ -26,6 +26,9 @@
     {% for pl_label in x.related_place.label_set.all %}
       <placeName type="{{ pl_label.label_type }}">{{ pl_label }}</placeName>
     {% endfor %}
+    {% if x.related_place.lat %}
+      <location><geo>{{ x.related_place.lat }} {{ x.related_place.lng }}</geo></location>
+    {% endif %}
     {% for uri in x.related_place.uri_set.all %}
       <idno type="URL" {% if uri.domain %} subtype="{{ uri.domain }}" {% endif %}>{{ uri }}</idno>
       {% endfor %}
@@ -33,6 +36,9 @@
     {% else %}
       <settlement key="{{ x.related_place.id }}">
         <placeName type="pref">{{ x.related_place.name }}</placeName>
+      {% if x.related_place.lat %}
+        <location><geo>{{ x.related_place.lat }} {{ x.related_place.lng }}</geo></location>
+      {% endif %}
       </settlement>
       {% endif %}
       {% endfor %} 
@@ -58,10 +64,16 @@
         {% for uri in x.related_place.uri_set.all %}
         <idno type="URL" {% if uri.domain %} subtype="{{ uri.domain }}" {% endif %}>{{ uri }}</idno>
         {% endfor %}
+      {% if x.related_place.lat %}
+        <location><geo>{{ x.related_place.lat }} {{ x.related_place.lng }}</geo></location>
+      {% endif %}
       </settlement>
       {% else %}
       <settlement key="{{ x.related_place.id }}">
         <placeName type="pref">{{ x.related_place.name }}</placeName>
+        {% if x.related_place.lat %}
+        <location><geo>{{ x.related_place.lat }} {{ x.related_place.lng }}</geo></location>
+      {% endif %}
       </settlement>
       {% endif %}
       {% endfor %}

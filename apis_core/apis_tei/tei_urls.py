@@ -16,9 +16,9 @@ urlpatterns = [
         TeiCompleterAc.as_view(),
         name='tei_completer_autocomplete'
     ),
-    url(
-         r'^person/(?P<pk>[0-9]+)$',
-        person_as_tei,
-        name='person_as_tei'
-    )
+    # url(
+    #      r'^person/(?P<pk>[0-9]+)$',
+    #     person_as_tei,
+    #     name='person_as_tei'
+    # )
 ]
