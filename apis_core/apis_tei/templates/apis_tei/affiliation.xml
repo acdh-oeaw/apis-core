@@ -1,5 +1,15 @@
 {% for x in object.personinstitution_set.all %}
-<affiliation>
+<affiliation
+{% if x.start_start_date %}
+        notBefore-iso="{{ x.start_start_date|date:'Y-m-d' }}"
+      {% endif %}
+      {% if x.start_date %}
+        when-iso="{{ x.start_date|date:'Y-m-d' }}"
+      {% endif %}
+      {% if x.start_end_date %}
+        notAfter-iso="{{ x.start_end_date|date:'Y-m-d' }}"
+      {% endif %}
+>
     <term key="{{ x.relation_type.id }}">{{ x.relation_type }}</term>
     <orgName key="{{ x.related_institution.id }}">{{ x.related_institution.name }}</orgName>
     {% for uri in x.related_institution.uri_set.all %}
