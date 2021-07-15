@@ -85,4 +85,5 @@
 {% for x in object.uri_set.all %}
   <idno type="URL" {% if x.domain %} subtype="{{ x.domain }}" {% endif %}>{{ x }}</idno>
 {% endfor %}
+{% include 'apis_tei/affiliation.xml' %}
 </person>

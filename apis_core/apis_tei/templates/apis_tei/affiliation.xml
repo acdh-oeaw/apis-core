@@ -1,0 +1,9 @@
+{% for x in object.personinstitution_set.all %}
+<affiliation>
+    <term key="{{ x.relation_type.id }}">{{ x.relation_type }}</term>
+    <orgName key="{{ x.related_institution.id }}">{{ x.related_institution.name }}</orgName>
+    {% for uri in x.related_institution.uri_set.all %}
+    <idno type="URL" {% if uri.domain %} subtype="{{ uri.domain }}" {% endif %}>{{ uri }}</idno>
+    {% endfor %}
+</affiliation>
+{% endfor %}
