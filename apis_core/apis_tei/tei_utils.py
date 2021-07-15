@@ -9,7 +9,7 @@ except ImportError:
     birth_rel = False
 
 try:
-    death_rel = settings.BIRTH_REL
+    death_rel = settings.DEATH_REL
 except ImportError:
     death_rel = False
 
@@ -30,9 +30,10 @@ def get_context(res):
     return context
 
 
-def get_node_from_template(template_path, res):
+def get_node_from_template(template_path, res, full=True):
         template = get_template(template_path)
         context = get_context(res)
+        context['FULL'] = full
         temp_str = f"{template.render(context=context)}"
         node = ET.fromstring(temp_str)
         return node
