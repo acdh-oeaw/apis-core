@@ -22,4 +22,13 @@
 {% if object.personevent_set.all  %}
 {% include 'apis_tei/events.xml' %}
 {% endif %}
+{% if object.collection.all %}
+{% include 'apis_tei/collections.xml' %}
+{% endif %}
+{% if object.note %}
+  <note type="note">{{ object.note }}</note>
+{% endif %}
+{% if object.references %}
+  <note type="references">{{ object.references }}</note>
+{% endif %}
 </person>
