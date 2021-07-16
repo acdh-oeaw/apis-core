@@ -8,7 +8,15 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
+            '-l',
+            '--limit',
+            action='store_true',
+            help='should number of entities should be limited',
+        )
+        parser.add_argument(
+            '-f',
             '--full',
+            action='store_true',
             help='should related entities e.g. birth-places be fully serialized',
         )
         parser.add_argument(
@@ -16,28 +24,30 @@ class Command(BaseCommand):
             help='which collection?',
         )
     
-    def handle(self, *args, **options):
+    def handle(self, *args, **kwargs):
 
         tei_doc = tei_header()
         listperson = tei_doc.xpath("//*[local-name() = 'listPerson']")[0] 
 
-        if options['full']:
+        if kwargs['full']:
             print("full is set")
             full = True
         else:
             print("simple")
             full = False
         
-        if options['collection']:
+        if kwargs['collection']:
             try:
-                col_id = int(options['collection'])
+                col_id = int(kwargs['collection'])
             except ValueError:
-                print(f"collection needs to be an integer and not: {options['collection']}")
+                print(f"collection needs to be an integer and not: {kwargs['collection']}")
                 return False
         
             items = Person.objects.filter(collection=col_id)
         else:
             items = Person.objects.all()
+        if kwargs['limit']:
+            items = items[:25]
         print(f"serialize {items.count()} Persons")
         for res in items:
             item_node = get_node_from_template(

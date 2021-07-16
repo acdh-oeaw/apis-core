@@ -16,13 +16,13 @@
     <settlement key="{{ x.related_place.id }}">
       <placeName type="pref">{{ x.related_place.name }}</placeName>
     {% for pl_label in x.related_place.label_set.all %}
-      <placeName type="{{ pl_label.label_type }}">{{ pl_label }}</placeName>
+      <placeName type="{{ pl_label.label_type|slugify }}">{{ pl_label }}</placeName>
     {% endfor %}
     {% if x.related_place.lat %}
       <location><geo>{{ x.related_place.lat }} {{ x.related_place.lng }}</geo></location>
     {% endif %}
     {% for uri in x.related_place.uri_set.all %}
-      <idno type="URL" {% if uri.domain %} subtype="{{ uri.domain }}" {% endif %}>{{ uri }}</idno>
+      <idno type="URL" {% if uri.domain %} subtype="{{ uri.domain|slugify }}" {% endif %}>{{ uri }}</idno>
       {% endfor %}
     </settlement>
     {% else %}
@@ -54,7 +54,7 @@
       <settlement key="{{ x.related_place.id }}">
         <placeName type="pref">{{ x.related_place.name }}</placeName>
         {% for uri in x.related_place.uri_set.all %}
-        <idno type="URL" {% if uri.domain %} subtype="{{ uri.domain }}" {% endif %}>{{ uri }}</idno>
+        <idno type="URL" {% if uri.domain %} subtype="{{ uri.domain|slugify }}" {% endif %}>{{ uri }}</idno>
         {% endfor %}
       {% if x.related_place.lat %}
         <location><geo>{{ x.related_place.lat }} {{ x.related_place.lng }}</geo></location>

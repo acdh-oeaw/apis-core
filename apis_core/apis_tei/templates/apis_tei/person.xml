@@ -4,14 +4,19 @@
       {% if object.name %}<surname>{{ object.name }}</surname>{% endif %}
   </persName>
 {% for x in object.label_set.all %}
-  <persName type="{{ x.label_type }}">{{x}}</persName>
+  <persName type="{{ x.label_type|slugify }}">{{x}}</persName>
 {% endfor %}
 {% include 'apis_tei/birth_death.xml' %}
+{% if object.gender %}
+  <sex value="{{ object.gender }}"/>
+{% else %}
+  <sex value="not-set"/>
+{% endif %}
 {% for x in object.profession.all %}
-  <occupation key="{{ x.id }}">{{ x }}</occupation>
+  <occupation key="{{ x.id|slugify }}">{{ x }}</occupation>
 {% endfor %}
 {% for x in object.uri_set.all %}
-  <idno type="URL" {% if x.domain %} subtype="{{ x.domain }}" {% endif %}>{{ x }}</idno>
+  <idno type="URL" {% if x.domain %} subtype="{{ x.domain|slugify }}" {% endif %}>{{ x }}</idno>
 {% endfor %}
 {% include 'apis_tei/affiliation.xml' %}
 </person>

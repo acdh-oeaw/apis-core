@@ -6,4 +6,7 @@
 
 ## serialize all person full
 
-`python manage.py persons_to_tei --full=true --settings=apis.settings.local_pmb`
+`python manage.py persons_to_tei -f --settings=apis.settings.local_pmb`
+
+## serialize first 25 persons
+`python manage.py persons_to_tei -f -l --settings=apis.settings.local_pmb`
