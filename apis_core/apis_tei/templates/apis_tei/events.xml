@@ -15,7 +15,7 @@
         <label>{{ x.related_event.name }}</label>
         {% for uri in x.related_event.uri_set.all %}
         <idno type="URL" {% if uri.domain %} subtype="{{ uri.domain|slugify }}" {% endif %}>{{ uri }}</idno>
-        {% endfor %}
+        {% endfor %}    
     </event>
     {% endfor %}
 </listEvent>

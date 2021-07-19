@@ -1,11 +1,16 @@
 import lxml.etree as ET
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
+# from django.contrib.contenttypes.models import ContentType
+# from apis_core.helper_functions.ContentType import GetContentTypes
+from apis_core.apis_entities.models import Person
 from django.template.loader import get_template
 
-Person = ContentType.objects.get(
-    app_label='apis_entities', model='person'
-).model_class()
+# Person = ContentType.objects.get(
+#     app_label='apis_entities', model='person'
+# ).model_class()
+
+# Person = GetContentTypes(["Person",]).get_model_classes()
+
 
 TEMPLATE_PATH = 'apis_tei/person.xml'
 
