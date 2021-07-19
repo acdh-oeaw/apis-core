@@ -16,12 +16,12 @@ TEMPLATE_PATH = 'apis_tei/person.xml'
 
 try:
     birth_rel = settings.BIRTH_REL
-except ImportError:
+except AttributeError:
     birth_rel = False
 
 try:
     death_rel = settings.DEATH_REL
-except ImportError:
+except AttributeError:
     death_rel = False
 
 
