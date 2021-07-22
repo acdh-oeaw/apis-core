@@ -21,13 +21,14 @@ PL_B_LOCATED_IN = [971, ]
 
 ## TEI commands
 
-## serialize person from collection
+## serialize person/places from collection
 
 `python manage.py persons_to_tei --collection=5  --settings=apis.settings.local_pmb`
+`python manage.py places_to_tei --collection=5  --settings=apis.settings.local_pmb`
 
-## serialize all person full
+## serialize all persons/places full
 
 `python manage.py persons_to_tei -f --settings=apis.settings.local_pmb`
 
-## serialize first 25 persons
+## serialize first 25 persons/places
 `python manage.py persons_to_tei -f -l --settings=apis.settings.local_pmb`
