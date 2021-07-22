@@ -1,7 +1,8 @@
 from django.conf.urls import url
 
 from .tei_ac import TeiEntAc, TeiCompleterAc
-from .views import person_as_tei
+
+from apis_core.apis_tei import views
 
 app_name = 'apis_tei'
 
@@ -18,7 +19,12 @@ urlpatterns = [
     ),
     url(
          r'^person/(?P<pk>[0-9]+)$',
-        person_as_tei,
+        views.person_as_tei,
         name='person_as_tei'
-    )
+    ),
+    url(
+        r'^place/(?P<pk>[0-9]+)$',
+        views.place_as_tei,
+        name='place_as_tei'
+        )
 ]

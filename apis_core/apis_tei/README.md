@@ -1,4 +1,25 @@
-# TEI commands
+# custom TEI serialisation of Entities
+
+## endpoints
+
+* `/apis/tei/person/{id}`
+* `/apis/tei/place/{id}`
+
+## needed settings
+
+We need to define which e.g. PersonPlaceRelation holds information about a birth/death place. This is done via optional settings listing the ID(s) (several are possible) [# ToDo: check if actually all items are rendered or just the first one]
+
+```python
+BIRTH_REL = [88, ]
+DEATH_REL = [89, ]
+
+PL_A_PART_OF = [1106, 1136]
+PL_B_LOCATED_IN = [971, ]
+```
+
+
+
+## TEI commands
 
 ## serialize person from collection
 

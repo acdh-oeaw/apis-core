@@ -1,7 +1,8 @@
 import lxml.etree as ET
 from django.core.management.base import BaseCommand
 
-from apis_core.apis_tei.tei_utils import get_node_from_template, Person, TEMPLATE_PATH, tei_header
+from apis_core.apis_entities.models import Person
+from apis_core.apis_tei.tei_utils import get_node_from_template, tei_header
 
 class Command(BaseCommand):
     help = 'Command to serialize APIS Persons to XML/TEI persons.xml'
@@ -51,7 +52,7 @@ class Command(BaseCommand):
         print(f"serialize {items.count()} Persons")
         for res in items:
             item_node = get_node_from_template(
-                TEMPLATE_PATH, res, full=full
+                'apis_tei/person.xml', res, full=full
             )
             listperson.append(item_node)
         
