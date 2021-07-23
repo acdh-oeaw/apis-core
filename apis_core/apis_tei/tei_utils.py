@@ -15,11 +15,14 @@ try:
     pl_a_part_of = settings.PL_A_PART_OF
 except AttributeError:
     pl_a_part_of = False
-
 try:
     pl_b_located_in = settings.PL_B_LOCATED_IN
 except AttributeError:
     pl_b_located_in = False
+try:
+    org_located_in = settings.ORG_LOCATED_IN
+except AttributeError:
+    org_located_in = False
 
 def get_part_of_relation(res):
     items = []
@@ -32,21 +35,30 @@ def get_part_of_relation(res):
 def get_context(res):
     context = {}
     context['object'] = res
+    context['org_located_in'] = []
+    context['birth_rel'] = []
+    context['death_rel'] = []
+    context['pl_located_in'] = []
+    if org_located_in:
+        try:
+            context['org_located_in'] = res.institutionplace_set.filter(relation_type__in=org_located_in)
+        except AttributeError:
+            pass
     if birth_rel:
-        context['birth_rel'] = res.personplace_set.filter(relation_type__in=birth_rel)
-    else:
-        context['birth_rel'] = []
+        try:
+            context['birth_rel'] = res.personplace_set.filter(relation_type__in=birth_rel)
+        except AttributeError:
+            pass
     if death_rel:
-        context['death_rel'] = res.personplace_set.filter(relation_type=death_rel)
-    else:
-        context['death_rel'] = []
+        try:
+            context['death_rel'] = res.personplace_set.filter(relation_type=death_rel)
+        except AttributeError:
+            pass
     if pl_a_part_of and pl_b_located_in:
         try:
             context['pl_located_in'] = get_part_of_relation(res)
         except ValueError:
-            context['pl_located_in'] = []
-    else:
-        context['pl_located_in'] = []
+            pass
     return context
 
 

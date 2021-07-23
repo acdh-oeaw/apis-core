@@ -26,5 +26,15 @@ urlpatterns = [
         r'^place/(?P<pk>[0-9]+)$',
         views.place_as_tei,
         name='place_as_tei'
-        )
+    ),
+    url(
+        r'^org/(?P<pk>[0-9]+)$',
+        views.org_as_tei,
+        name='org_as_tei'
+    ),
+    url(
+        r'^institution/(?P<pk>[0-9]+)$',
+        views.org_as_tei,
+        name='org_as_tei'
+    ),
 ]
