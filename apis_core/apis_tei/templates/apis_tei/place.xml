@@ -11,9 +11,7 @@
 {% for x in pl_located_in %}
 <location type="located_in_place">
   <placeName key="place__{{ x.id }}">{{ x.name }}</placeName>
-  {% for y in x.uri_set.all %}
-  <note type="IDNO" {% if y.domain %} subtype="{{ y.domain|slugify }}" {% endif %}>{{ y }}</note>
-  {% endfor %}
+  {% if x.lat %}<geo>{{ x.lat }} {{ x.lng }}</geo>{% endif %}
 </location>
 {% endfor %}
 {% for x in object.uri_set.all %}
