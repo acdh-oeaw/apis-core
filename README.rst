@@ -44,7 +44,7 @@ All code unless otherwise noted is licensed under the terms of the MIT License (
 All documentation and images unless otherwise noted are licensed under the terms of Creative Commons Attribution-ShareAlike 4.0 International License. To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/4.0/
 
 
-.. _APIS: https://www.oeaw.ac.at/acdh/projects/apis/
+.. _APIS: https://www.oeaw.ac.at/acdh/projects/completed-projects/apis
 .. _apisdev: https://apis.acdh-dev.oeaw.ac.at
 .. _ÖBL: http://www.biographien.ac.at
 .. _SKOS: https://en.wikipedia.org/wiki/Simple_Knowledge_Organization_System
