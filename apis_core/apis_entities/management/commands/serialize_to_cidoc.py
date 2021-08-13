@@ -150,14 +150,13 @@ class Command(BaseCommand):
             named_graph = options["namedgraph"]
         else:
             named_graph = f"{base_uri}/entities#"
-        if options["include-vocabs"]:
-            if options["namedgraph-vocabs"]:
-                named_graph_vocabs = options["namedgraph-vocabs"]
+        if options["namedgraph-vocabs"]:
+            named_graph_vocabs = options["namedgraph-vocabs"]
+        else:
+            if named_graph[-1] == "#":
+                named_graph_vocabs = "/".join(named_graph.split("/")[:-1])+"/vocabs#"
             else:
-                if named_graph[-1] == "#":
-                    named_graph_vocabs = "/".join(named_graph.split("/")[:-1])+"/vocabs#"
-                else:
-                    named_graph_vocabs = named_graph + "/vocabs#"
+                named_graph_vocabs = named_graph + "/vocabs#"
         ent = AbstractEntity.get_entity_class_of_name(options['entity'])
         res = []
         objcts = ent.objects.filter(**json.loads(options['filter']))
@@ -185,29 +184,65 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f'serialized {len(res)} objects'))
         self.stdout.write(self.style.NOTICE('Starting to create the graph'))
         store = IOMemory()
-        if options['update-vocabs']:
-            self.stdout.write(self.style.NOTICE('Starting to create the SKOS vocabs.'))
-            if options['include-vocabs']:
-                graph2 = Graph(
-                store, identifier=URIRef(named_graph_vocabs)
-            )
-            else:
-                graph2 = Graph()
-            v_res_ser = []
-            for v in ContentType.objects.filter(app_label="apis_vocabularies").exclude(model__in=["vocabnames"]):
-                v_res = v.model_class().objects.all()
-                if v_res.count() > 0:
-                    v_res_ser.extend(GenericVocabsSerializer(v_res, many=True).data)
-            graph2, store = VocabToSkos().render(v_res_ser, g=graph2, store=store)
-            fin_vocab = graph2
+        self.stdout.write(self.style.NOTICE('Starting to create the SKOS vocabs.'))
+        graph2 = Graph(
+            store, identifier=URIRef(named_graph_vocabs)
+        )
+        v_res_ser = []
+        for v in ContentType.objects.filter(app_label="apis_vocabularies").exclude(model__in=["vocabnames"]):
+            v_res = v.model_class().objects.all()
+            if v_res.count() > 0:
+                v_res_ser.extend(GenericVocabsSerializer(v_res, many=True).data)
+        graph2, store = VocabToSkos().render(v_res_ser, g=graph2, store=store)
+        fin_vocab = graph2
         fin, store = EntityToCIDOC().render(res, format_1=options['format'], store=store, binary=True, named_graph=named_graph, provenance=options['provenance'])
         if options['output']:
             with open(options['output'], 'wb') as out:
                 out.write(fin.serialize(format=options['format']))
-            if options['update-vocabs']:
+            if fin_vocab:
                 with open(f"{options['output'].split('.')[0]+'_vocabs.'+options['output'].split('.')[1]}", 'wb') as out2:
                     out2.write(fin_vocab.serialize(format=options['format']))
             self.stdout.write(self.style.SUCCESS(f'Wrote file to {options["output"]}'))
+        if options['update-vocabs']:
+            vocabs_settings = getattr(settings, 'APIS_SKOSMOS', None)
+            if isinstance(vocabs_settings, dict):
+                if "triplestore" in vocabs_settings.keys():
+                    vocabs_ts_url = vocabs_settings['triplestore']['url']
+                    vocabs_ts_user = vocabs_settings['triplestore']['user']
+                    vocabs_ts_password = vocabs_settings['triplestore']['password']
+                    sparql_serv_skosmos = SPARQLWrapper(f"{vocabs_ts_url}/sparql")
+                    sparql_serv_skosmos.setHTTPAuth(BASIC)
+                    sparql_serv_skosmos.setCredentials(vocabs_ts_user, vocabs_ts_password)
+                    sparql_serv_skosmos.setMethod(POST)
+                    sparql_serv_skosmos.setReturnFormat(JSON)
+                    if options['delete']:
+                        sp_count = f"""
+                                SELECT (COUNT(*) AS ?triples)
+                                FROM <{named_graph_vocabs}>
+                                WHERE {{ ?s ?p ?o }}
+                                """
+                        sparql_serv_skosmos.setQuery(sp_count)
+                        res_count_1 = sparql_serv_skosmos.query().convert()
+                        count = int(res_count_1['results']['bindings'][0]['triples']['value'])
+                        if count > 0:
+                            self.stdout.write(self.style.NOTICE(f'Found {count} triples in skosmos named graph >> deleting'))
+                        params = {'graph': f'<{named_graph_vocabs}>'}
+                        res3 = requests.delete(f"{vocabs_ts_url}/graph", auth=(vocabs_ts_user, vocabs_ts_password), headers={'Accept': 'application/xml'}, params=params)
+                        self.stdout.write(self.style.NOTICE(f'Deleted the graph: {res3.text} {res3.status_code}')) 
+                    header = {'Content-Type': map_ct[options['format']][0]}
+                    res2 = requests.post(f"{vocabs_ts_url}/graph", headers=header, data=fin_vocab.serialize(format=options['format']), auth=(vocabs_ts_user, vocabs_ts_password))
+                    sparql_serv_skosmos.setQuery(sp_count)
+                    res_count_1 = sparql_serv_skosmos.query().convert()
+                    count = int(res_count_1['results']['bindings'][0]['triples']['value'])
+                    if count > 0:
+                        self.stdout.write(self.style.NOTICE(f'Found {count} triples after update in store'))
+                    if res2.status_code != 200:
+                        self.stdout.write(self.style.ERROR(f'Something went wrong when updating: {res2.text}'))
+                    else:
+                        self.stdout.write(self.style.SUCCESS('Updated the triplestore.'))
+                else:
+                    self.stdout.write(self.style.ERROR('You need to specify settings for the SKOSMOS triplestore'))
+        
         if options['update']:
             print(options['triplestore'])
             if not options['triplestore']:

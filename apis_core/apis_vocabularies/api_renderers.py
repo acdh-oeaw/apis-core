@@ -2,6 +2,7 @@ from django.conf import settings
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import SKOS, RDF, DC, RDFS
 from rest_framework import renderers
+import skosify
 
 try:
     from webpage.metadata import PROJECT_METADATA
@@ -68,6 +69,10 @@ class VocabToSkos(renderers.BaseRenderer):
             else:
                 g.add((conc, SKOS.topConceptOf, uri))
                 g.add((uri, SKOS.hasTopConcept, conc))
+        skosify.infer.skos_related(g)
+        skosify.infer.skos_topConcept(g)
+        skosify.infer.skos_hierarchical(g, narrower=True)
+        skosify.infer.skos_transitive(g, narrower=True)
         if format1:
             return g.serialize(format1)
         elif binary:
