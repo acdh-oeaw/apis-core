@@ -107,6 +107,7 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
             else:
                 print('no match')
 
+
     def get(self, request, *args, **kwargs):
         page_size = 20
         offset = (int(self.request.GET.get('page', 1))-1)*page_size
