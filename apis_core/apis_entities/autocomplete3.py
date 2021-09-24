@@ -112,6 +112,7 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
         offset = (int(self.request.GET.get('page', 1))-1)*page_size
         ac_type = self.kwargs['entity']
         db_include = self.kwargs.get('db_include', False)
+        ent_merge_pk = self.kwargs.get('ent_merge_pk', False)
         choices = []
         headers = {'Content-Type': 'application/json'}
         ent_model = AbstractEntity.get_entity_class_of_name(ac_type)
@@ -160,6 +161,9 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
         more = True
         if not db_include:
             for r in res[offset:offset+page_size]:
+                if int(r.pk) == int(ent_merge_pk):
+                    continue
+
                 f = dict()
                 dataclass = ""
                 try:
@@ -316,6 +320,7 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                     choices.extend(cust_auto.results)
         if not test_db and not test_stanbol and not cust_auto_more:
             more = False
+
         return http.HttpResponse(json.dumps({
             'results': choices + [],
             'pagination': {'more': more}
