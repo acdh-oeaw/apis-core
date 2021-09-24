@@ -24,7 +24,6 @@ from apis_core.apis_labels.models import Label
 from apis_core.apis_vocabularies.models import CollectionType, LabelType, TextType
 
 from django.contrib.contenttypes.fields import GenericRelation
-from apis_highlighter.models import Annotation
 # from helper_functions.highlighter import highlight_text
 from apis_core.default_settings.NER_settings import autocomp_settings
 from apis_core.helper_functions import DateParser
@@ -81,7 +80,6 @@ class TempEntityClass(models.Model):
     objects = models.Manager()
     objects_inheritance = InheritanceManager()
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Zuständiger User")
-    annotation_set = GenericRelation(Annotation)
 
     if "apis_highlighter" in settings.INSTALLED_APPS:
         from apis_highlighter.models import Annotation
