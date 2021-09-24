@@ -1,0 +1,284 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>RDFParser &mdash; APIS 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="User documentation" href="../user_documentation.html" />
+    <link rel="prev" title="Vocabularies" href="vocabularies.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> APIS
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_model.html">Data Model</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../internal_api.html">Internal API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="metainfo.html">Metainfo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="entities.html">Entities</a></li>
+<li class="toctree-l2"><a class="reference internal" href="relations.html">Relations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vocabularies.html">Vocabularies</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">RDFParser</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../user_documentation.html">User documentation</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">APIS</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../internal_api.html">Internal API</a> &raquo;</li>
+        
+      <li>RDFParser</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/modules/helper_functions.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="rdfparser">
+<h1>RDFParser<a class="headerlink" href="#rdfparser" title="Permalink to this headline">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="apis_core.helper_functions.RDFParser.RDFParser">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.helper_functions.RDFParser.</span></span><span class="sig-name descname"><span class="pre">RDFParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label_entities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'apis_entities'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label_relations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'apis_relations'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label_vocabularies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'apis_vocabularies'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rdf_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/workspace/apis-core/apis_core/helper_functions/../default_settings/RDF_default_settings.yml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uri_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/workspace/apis-core/apis_core/helper_functions/../default_settings/URI_replace_settings.yml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_uri_minutes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_preferred</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uri_check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/helper_functions/RDFParser.html#RDFParser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.helper_functions.RDFParser.RDFParser" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>uri</strong> – (url) Uri to parse the object from (<a class="reference external" href="http://test.at">http://test.at</a>). The uri must start with a base url mentioned in the RDF parser settings file.</p></li>
+<li><p><strong>kind</strong> – (string) Kind of entity (Person, Place, Institution, Work, Event)</p></li>
+<li><p><strong>app_label_entities</strong> – (string) Name of the Django app that contains the entities that we create.</p></li>
+<li><p><strong>app_label_relations</strong> – (string) Name of the Django app that contains the relations for the merging process.</p></li>
+<li><p><strong>app_label_vocabularies</strong> – (string) Name of the Django app that contains the vocabularies defining the entities and relations.</p></li>
+<li><p><strong>use_preferred</strong> – (boolean) if True forwards to preferred sources defined in sameAs</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.helper_functions.RDFParser.RDFParser.create_objct">
+<span class="sig-name descname"><span class="pre">create_objct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/helper_functions/RDFParser.html#RDFParser.create_objct"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.helper_functions.RDFParser.RDFParser.create_objct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses parsed attributes to create an object that is not yet persisted to the db.
+Stores the object in self.objct
+:param depth: (int) depth to follow</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.helper_functions.RDFParser.RDFParser.get_or_create">
+<span class="sig-name descname"><span class="pre">get_or_create</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">depth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/helper_functions/RDFParser.html#RDFParser.get_or_create"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.helper_functions.RDFParser.RDFParser.get_or_create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets or creates object with given URI and entity type.
+:param depth: (int) depth of related objects to be followed
+:return: (object) created object</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.helper_functions.RDFParser.RDFParser.merge">
+<span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label_relations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'apis_relations'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/helper_functions/RDFParser.html#RDFParser.merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.helper_functions.RDFParser.RDFParser.merge" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m_obj</strong> – the object to merge with (must be an django model object instance)</p></li>
+<li><p><strong>app_label_relations</strong> – (string) the label of the Django app that contains the relations</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>django object saved to db or False if nothing was saved</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.helper_functions.RDFParser.RDFParser.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/helper_functions/RDFParser.html#RDFParser.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.helper_functions.RDFParser.RDFParser.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves specified object to DB if it doesnt exist yet
+:return: django object saved to db or False if nothing was saved</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../user_documentation.html" class="btn btn-neutral float-right" title="User documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="vocabularies.html" class="btn btn-neutral float-left" title="Vocabularies" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2017, Matthias Schlögl.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

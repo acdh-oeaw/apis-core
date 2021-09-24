@@ -1,0 +1,73 @@
+{% if object.start_date_written %}
+  <birth>
+    <date
+      {% if object.start_start_date %}
+        notBefore-iso="{{ object.start_start_date|date:'Y-m-d' }}"
+      {% endif %}
+      {% if object.start_date %}
+        when-iso="{{ object.start_date|date:'Y-m-d' }}"
+      {% endif %}
+      {% if object.start_end_date %}
+        notAfter-iso="{{ object.start_end_date|date:'Y-m-d' }}"
+      {% endif %}
+    >{{ object.start_date_written }}</date>
+  {% for x in birth_rel %}
+  {% if FULL %}
+    <settlement key="{{ x.related_place.id }}">
+      <placeName type="pref">{{ x.related_place.name }}</placeName>
+    {% for pl_label in x.related_place.label_set.all %}
+      <placeName type="{{ pl_label.label_type|slugify }}">{{ pl_label }}</placeName>
+    {% endfor %}
+    {% if x.related_place.lat %}
+      <location><geo>{{ x.related_place.lat }} {{ x.related_place.lng }}</geo></location>
+    {% endif %}
+    {% for uri in x.related_place.uri_set.all %}
+      <idno type="URL" {% if uri.domain %} subtype="{{ uri.domain|slugify }}" {% endif %}>{{ uri }}</idno>
+      {% endfor %}
+    </settlement>
+    {% else %}
+      <settlement key="{{ x.related_place.id }}">
+        <placeName type="pref">{{ x.related_place.name }}</placeName>
+      {% if x.related_place.lat %}
+        <location><geo>{{ x.related_place.lat }} {{ x.related_place.lng }}</geo></location>
+      {% endif %}
+      </settlement>
+      {% endif %}
+      {% endfor %} 
+  </birth>  
+{% endif %}
+{% if object.end_date_written %}
+  <death>
+    <date
+      {% if object.start_start_date_written %}
+        notBefore-iso="{{ object.end_start_date|date:'Y-m-d' }}"
+      {% endif %}
+      {% if object.end_date %}
+        when-iso="{{ object.end_date|date:'Y-m-d' }}"
+      {% endif %}
+      {% if object.end_end_date %}
+        notAfter-iso="{{ object.end_end_date|date:'Y-m-d' }}"
+      {% endif %}
+      >{{ object.end_date_written }}</date>
+      {% for x in death_rel %}
+      {% if FULL %}
+      <settlement key="{{ x.related_place.id }}">
+        <placeName type="pref">{{ x.related_place.name }}</placeName>
+        {% for uri in x.related_place.uri_set.all %}
+        <idno type="URL" {% if uri.domain %} subtype="{{ uri.domain|slugify }}" {% endif %}>{{ uri }}</idno>
+        {% endfor %}
+      {% if x.related_place.lat %}
+        <location><geo>{{ x.related_place.lat }} {{ x.related_place.lng }}</geo></location>
+      {% endif %}
+      </settlement>
+      {% else %}
+      <settlement key="{{ x.related_place.id }}">
+        <placeName type="pref">{{ x.related_place.name }}</placeName>
+        {% if x.related_place.lat %}
+        <location><geo>{{ x.related_place.lat }} {{ x.related_place.lng }}</geo></location>
+      {% endif %}
+      </settlement>
+      {% endif %}
+      {% endfor %}
+  </death>
+{% endif %}

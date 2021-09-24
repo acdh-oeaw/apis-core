@@ -1,4 +1,3 @@
-import copy
 import re
 import unicodedata
 from difflib import SequenceMatcher
@@ -18,10 +17,12 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from math import inf
 from model_utils.managers import InheritanceManager
+import copy
 from django.contrib.auth.models import User
 from apis_core.apis_entities.serializers_generic import EntitySerializer
 from apis_core.apis_labels.models import Label
 from apis_core.apis_vocabularies.models import CollectionType, LabelType, TextType
+
 from django.contrib.contenttypes.fields import GenericRelation
 from apis_highlighter.models import Annotation
 # from helper_functions.highlighter import highlight_text
@@ -29,10 +30,6 @@ from apis_core.default_settings.NER_settings import autocomp_settings
 from apis_core.helper_functions import DateParser
 
 NEXT_PREV = getattr(settings, "APIS_NEXT_PREV", True)
-
-
-if "apis_highlighter" in settings.INSTALLED_APPS:
-    from apis_highlighter.models import Annotation
 
 
 @reversion.register()
@@ -45,6 +42,7 @@ class TempEntityClass(models.Model):
     from the written dates.
     A review boolean field to mark an object as reviewed
     """
+
     name = models.CharField(max_length=255, blank=True)
     review = models.BooleanField(
         default=False,
@@ -84,6 +82,10 @@ class TempEntityClass(models.Model):
     objects_inheritance = InheritanceManager()
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Zuständiger User")
     annotation_set = GenericRelation(Annotation)
+
+    if "apis_highlighter" in settings.INSTALLED_APPS:
+        from apis_highlighter.models import Annotation
+        annotation_set = GenericRelation(Annotation)
 
     def __str__(self):
         if self.name != "" and hasattr(
@@ -442,6 +444,8 @@ class Text(models.Model):
             return "ID: {}".format(self.id)
 
     def check_for_deleted_annotations(self):
+
+        from apis_highlighter.models import Annotation
         if self.pk is not None:
             deleted = []
             orig = Text.objects.get(pk=self.pk)
@@ -473,6 +477,7 @@ class Text(models.Model):
         if self.pk is not None:
             orig = Text.objects.get(pk=self.pk)
             if orig.text != self.text and "apis_highlighter" in settings.INSTALLED_APPS:
+                from apis_highlighter.models import Annotation
                 def calculate_context_weights(text, i_start, i_end):
 
                     def calculate_word_dict(text, direction):

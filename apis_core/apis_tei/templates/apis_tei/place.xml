@@ -1,0 +1,29 @@
+<place xml:id="place__{{ object.id }}">
+  <placeName>{{ object.name }}</placeName>
+{% for x in object.label_set.all %}
+  <placeName type="{{ x.label_type|slugify }}">{{ x }}</placeName>
+{% endfor %}
+{% if object.lat %}
+<location type="coords">
+  <geo>{{ object.lat }} {{ object.lng }}</geo>
+</location>
+{% endif %}
+{% for x in pl_located_in %}
+<location type="located_in_place">
+  <placeName key="place__{{ x.id }}">{{ x.name }}</placeName>
+  {% if x.lat %}<geo>{{ x.lat }} {{ x.lng }}</geo>{% endif %}
+</location>
+{% endfor %}
+{% for x in object.uri_set.all %}
+  <idno type="URL" {% if x.domain %} subtype="{{ x.domain|slugify }}" {% endif %}>{{ x }}</idno>
+{% endfor %}
+{% if object.collection.all %}
+{% include 'apis_tei/collections.xml' %}
+{% endif %}
+{% if object.note %}
+  <note type="note">{{ object.note }}</note>
+{% endif %}
+{% if object.references %}
+  <note type="references">{{ object.references }}</note>
+{% endif %}
+</place>

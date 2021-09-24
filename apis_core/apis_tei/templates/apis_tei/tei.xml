@@ -1,0 +1,25 @@
+<TEI xmlns="http://www.tei-c.org/ns/1.0">
+    <teiHeader>
+        <fileDesc>
+           <titleStmt>
+              <title>{{ title }}</title>
+           </titleStmt>
+           <publicationStmt>
+              <p>Publication Information</p>
+           </publicationStmt>
+           <sourceDesc>
+              <p>Information about the source</p>
+           </sourceDesc>
+        </fileDesc>
+       <revisionDesc>
+          <change when-iso="{% now 'Y-m-d' %}">serialized</change>
+       </revisionDesc>
+    </teiHeader>
+    <text>
+        <body>
+           <p>Some text here.</p>
+           {{ ent_type|safe }}
+        </body>
+    </text>
+</TEI>
+  
