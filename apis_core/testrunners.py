@@ -63,6 +63,7 @@ class APISTestRunner(DiscoverRunner):
                         "vocab_name",
                         "userAdded",
                         "groups_allowed",
+                        "assigned_user",
                     ]:
                         continue
                     if fld.__class__.__name__ in ["ForeignKey", "ManyToManyField"]:
@@ -103,6 +104,7 @@ class APISTestRunner(DiscoverRunner):
                     "vocab_name",
                     "id",
                     "vocabsuri",
+                    "assigned_user",
                 ]:
                     continue
                 elif "date_written" in fld.name:
