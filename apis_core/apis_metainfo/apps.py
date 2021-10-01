@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class MetainfoConfig(AppConfig):
-    name = 'apis_metainfo'
+    name = "apis_core.apis_metainfo"

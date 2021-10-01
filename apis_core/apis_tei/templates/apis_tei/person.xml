@@ -1,0 +1,34 @@
+<person xml:id="person__{{ object.id }}">
+  <persName>
+      {% if object.first_name %}<forename>{{ object.first_name }}</forename>{% endif %}
+      {% if object.name %}<surname>{{ object.name }}</surname>{% endif %}
+  </persName>
+{% for x in object.label_set.all %}
+  <persName type="{{ x.label_type|slugify }}">{{x}}</persName>
+{% endfor %}
+{% include 'apis_tei/birth_death.xml' %}
+{% if object.gender %}
+  <sex value="{{ object.gender }}"/>
+{% else %}
+  <sex value="not-set"/>
+{% endif %}
+{% for x in object.profession.all %}
+  <occupation key="{{ x.id|slugify }}">{{ x }}</occupation>
+{% endfor %}
+{% for x in object.uri_set.all %}
+  <idno type="URL" {% if x.domain %} subtype="{{ x.domain|slugify }}" {% endif %}>{{ x }}</idno>
+{% endfor %}
+{% include 'apis_tei/affiliation.xml' %}
+{% if object.personevent_set.all  %}
+{% include 'apis_tei/events.xml' %}
+{% endif %}
+{% if object.collection.all %}
+{% include 'apis_tei/collections.xml' %}
+{% endif %}
+{% if object.note %}
+  <note type="note">{{ object.note }}</note>
+{% endif %}
+{% if object.references %}
+  <note type="references">{{ object.references }}</note>
+{% endif %}
+</person>

@@ -54,17 +54,18 @@ class RelationPublishedQueryset(models.QuerySet):
             to an annotation at all.
         """
         qs = self
+
         users_show = None
         if request:
             ann_proj = request.session.get('annotation_project', False)
             if not ann_proj:
                 return qs
             users_show = request.session.get('users_show_highlighter', None)
-        query = Q(annotation__annotation_project_id=ann_proj)
+        query = Q(annotation_set__annotation_project_id=ann_proj)
         if users_show is not None:
-            query.add(Q(annotation__user_added_id__in=users_show), Q.AND)
+            query.add(Q(annotation_set__user_added_id__in=users_show), Q.AND)
         if include_all:
-            query.add(Q(annotation__annotation_project__isnull=True), Q.OR)
+            query.add(Q(annotation_set__annotation_project__isnull=True), Q.OR)
         return qs.filter(query)
 
 
@@ -550,10 +551,15 @@ class PassagePublication(AbstractRelation):
     # fields relating only to bible references, unfortunately it was not possible to subclass PassagePublication into
     # say PassageBible, because it broke APIS on too many other aspects. Hence the fields are attached here, and are
     # regarded to indiciate a passage<->bible relation if not null. Otherwise this stays an ordinary PassagePublication.
+
+    # TODO __sresch__ : these three bible references are left here for legacy purpose towards the frontend (maybe)
+    # Once the frontend would be changed to the new references system, these three fields should be removed
     bible_book_ref = models.CharField(max_length=3, blank=True, null=True)
     bible_chapter_ref = models.CharField(max_length=3, blank=True, null=True)
     bible_verse_ref = models.CharField(max_length=3, blank=True, null=True)
 
+    bible_ref_url = models.CharField(max_length=500, blank=True, null=True)
+    bible_ref_label = models.CharField(max_length=500, blank=True, null=True)
 
 
 #######################################################################

@@ -9,8 +9,8 @@ from reversion.models import Version
 
 from apis_core.apis_labels.serializers import LabelSerializerLegacy as LabelSerializer
 
-base_uri = getattr(settings, 'APIS_BASE_URI', 'http://apis.info')
-if base_uri.endswith('/'):
+base_uri = getattr(settings, "APIS_BASE_URI", "http://apis.info")
+if base_uri.endswith("/"):
     base_uri = base_uri[:-1]
 
 
@@ -50,15 +50,18 @@ class EntitySerializer(serializers.Serializer):
         ver = Version.objects.get_for_object(obj)
         res = []
         for v in ver:
-            usr_1 = getattr(v.revision, 'user', None)
+            usr_1 = getattr(v.revision, "user", None)
             if usr_1 is not None:
                 usr_1 = usr_1.username
             else:
                 usr_1 = "Not specified"
-            res.append({
-                "id": v.id,
-                "date_created": v.revision.date_created,
-                "user_created": usr_1}) 
+            res.append(
+                {
+                    "id": v.id,
+                    "date_created": v.revision.date_created,
+                    "user_created": usr_1,
+                }
+            )
         return res
 
     def add_relations(self, obj):
@@ -75,20 +78,28 @@ class EntitySerializer(serializers.Serializer):
             res["{}s".format(mk2.group(1))] = []
             if mk2.group(1).lower() != mk.lower():
                 if self._only_published:
-                    rel_qs = getattr(obj, "{}_set".format(rel.model)).all().filter_for_user()
+                    rel_qs = (
+                        getattr(obj, "{}_set".format(rel.model)).all().filter_for_user()
+                    )
                 else:
                     rel_qs = getattr(obj, "{}_set".format(rel.model)).all()
                 for rel2 in rel_qs:
                     res["{}s".format(mk2.group(1))].append(
                         RelationEntitySerializer(
-                            rel2, own_class=mk, read_only=True, context=self.context, reverse=reverse
+                            rel2,
+                            own_class=mk,
+                            read_only=True,
+                            context=self.context,
+                            reverse=reverse,
                         ).data
                     )
             else:
                 for t in ["A", "B"]:
-                    for rel2 in getattr(
-                        obj, "related_{}{}".format(mk.lower(), t)
-                    ).all().filter_for_user():
+                    for rel2 in (
+                        getattr(obj, "related_{}{}".format(mk.lower(), t))
+                        .all()
+                        .filter_for_user()
+                    ):
                         if t == "A":
                             ok = "{}B".format(mk.lower())
                             reverse = True
@@ -97,7 +108,11 @@ class EntitySerializer(serializers.Serializer):
                             reverse = False
                         res["{}s".format(mk2.group(1))].append(
                             RelationEntitySerializer(
-                                rel2, own_class=ok, read_only=True, context=self.context, reverse=reverse
+                                rel2,
+                                own_class=ok,
+                                read_only=True,
+                                context=self.context,
+                                reverse=reverse,
                             ).data
                         )
         return res
@@ -109,7 +124,9 @@ class EntitySerializer(serializers.Serializer):
         url = f"{base_uri}{reverse('GetEntityGenericRoot', kwargs={'pk': obj.pk})}"
         return url
 
-    def __init__(self, *args, depth_ent=1, only_published=True, add_texts=False, **kwargs):
+    def __init__(
+        self, *args, depth_ent=1, only_published=True, add_texts=False, **kwargs
+    ):
         super(EntitySerializer, self).__init__(*args, **kwargs)
         self._only_published = only_published
         if type(self.instance) == QuerySet:
@@ -128,18 +145,18 @@ class EntitySerializer(serializers.Serializer):
                 "FloatField",
             ]:
                 self.fields[f.name] = getattr(serializers, field_name)()
-            elif field_name in ['ForeignKey', 'ManyToMany']:
-                if str(f.related_model.__module__).endswith('apis_vocabularies.models'):
+            elif field_name in ["ForeignKey", "ManyToMany"]:
+                if str(f.related_model.__module__).endswith("apis_vocabularies.models"):
                     many = False
                     if f.many_to_many or f.one_to_many:
                         many = True
                     self.fields[f.name] = VocabsSerializer(many=many)
         for f in inst._meta.many_to_many:
-            if f.name.endswith('relationtype_set'):
+            if f.name.endswith("relationtype_set"):
                 continue
             elif f.name == "collection":
                 self.fields["collection"] = CollectionSerializer(many=True)
-            elif str(f.related_model.__module__).endswith('apis_vocabularies.models'):
+            elif str(f.related_model.__module__).endswith("apis_vocabularies.models"):
                 self.fields[f.name] = VocabsSerializer(many=True)
         self.fields["entity_type"] = serializers.SerializerMethodField(
             method_name="add_entity_type"
@@ -166,15 +183,18 @@ class RelationEntitySerializer(serializers.Serializer):
         ver = Version.objects.get_for_object(obj)
         res = []
         for v in ver:
-            usr_1 = getattr(v.revision, 'user', None)
+            usr_1 = getattr(v.revision, "user", None)
             if usr_1 is not None:
                 usr_1 = usr_1.username
             else:
                 usr_1 = "Not specified"
-            res.append({
-                "id": v.id,
-                "date_created": v.revision.date_created,
-                "user_created": usr_1})
+            res.append(
+                {
+                    "id": v.id,
+                    "date_created": v.revision.date_created,
+                    "user_created": usr_1,
+                }
+            )
         return res
 
     def add_annotations(self, obj):
@@ -196,12 +216,22 @@ class RelationEntitySerializer(serializers.Serializer):
                     e = len(text)
                 r1["annotation"] = text[an.start : an.end]
                 r1["text"] = text[s:e]
-                r1["text"] = "{}<annotation>{}</annotation>{}".format(r1["text"][:an.start-s], r1["text"][an.start-s:an.end-s], r1["text"][an.end-s:])
+                r1["text"] = "{}<annotation>{}</annotation>{}".format(
+                    r1["text"][: an.start - s],
+                    r1["text"][an.start - s : an.end - s],
+                    r1["text"][an.end - s :],
+                )
+                r1["text"] = r1["text"].replace("\r\n", "<br/>")
+                r1["text"] = r1["text"].replace("\r", "<br/>")
+                r1["text"] = r1["text"].replace("\n", "<br/>")
+
                 r1["string_offset"] = "{}-{}".format(an.start, an.end)
                 # r1["text_url"] = self.context["request"].build_absolute_uri(
                 #        reverse("apis_core:apis_api:text-detail", kwargs={"pk": an.text_id})
                 # )
-                r1["text_url"] = f"{base_uri}{reverse('apis_core:apis_api:text-detail', kwargs={'pk': an.text_id})}"
+                r1[
+                    "text_url"
+                ] = f"{base_uri}{reverse('apis_core:apis_api:text-detail', kwargs={'pk': an.text_id})}"
                 res.append(r1)
             return res
 
@@ -214,7 +244,9 @@ class RelationEntitySerializer(serializers.Serializer):
         cm = obj.__class__.__name__
         res_1 = dict()
         res_1["id"] = obj.relation_type.pk
-        res_1["url"] = f"{base_uri}{reverse('apis_core:apis_api:{}relation-detail'.format(cm).lower(), kwargs={'pk': obj.relation_type.pk},)}"
+        res_1[
+            "url"
+        ] = f"{base_uri}{reverse('apis_core:apis_api:{}relation-detail'.format(cm).lower(), kwargs={'pk': obj.relation_type.pk},)}"
         if self.reverse and len(obj.relation_type.label_reverse) > 0:
             res_1["label"] = obj.relation_type.label_reverse
         elif self.reverse:
@@ -234,6 +266,6 @@ class RelationEntitySerializer(serializers.Serializer):
 
                     if mk2.lower() != own_class.lower():
                         self.entity_type = mk2
-                        self.fields[
-                            "target"
-                        ] = serializers.SerializerMethodField(method_name="add_entity")
+                        self.fields["target"] = serializers.SerializerMethodField(
+                            method_name="add_entity"
+                        )

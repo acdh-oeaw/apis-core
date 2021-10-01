@@ -1,0 +1,21 @@
+<listEvent>
+    {% for x in object.personevent_set.all %}
+    <event  key="{{ x.related_event.id }}"
+    {% if x.start_start_date %}
+            notBefore-iso="{{ x.start_start_date|date:'Y-m-d' }}"
+        {% endif %}
+        {% if x.start_date %}
+            when-iso="{{ x.start_date|date:'Y-m-d' }}"
+        {% endif %}
+        {% if x.start_end_date %}
+            notAfter-iso="{{ x.start_end_date|date:'Y-m-d' }}"
+        {% endif %}
+    >
+        <desc n="{{ x.relation_type.id }}">{{ x.relation_type }}</desc>
+        <label>{{ x.related_event.name }}</label>
+        {% for uri in x.related_event.uri_set.all %}
+        <idno type="URL" {% if uri.domain %} subtype="{{ uri.domain|slugify }}" {% endif %}>{{ uri }}</idno>
+        {% endfor %}    
+    </event>
+    {% endfor %}
+</listEvent>

@@ -3,6 +3,7 @@ import unicodedata
 from difflib import SequenceMatcher
 import json
 import requests
+
 # from reversion import revisions as reversion
 import reversion
 from django.apps import apps
@@ -14,24 +15,25 @@ from django.db import models
 from django.db.models.query import QuerySet
 from django.urls import reverse
 from django.utils.functional import cached_property
+from math import inf
 from model_utils.managers import InheritanceManager
+import copy
 from django.contrib.auth.models import User
 from apis_core.apis_entities.serializers_generic import EntitySerializer
 from apis_core.apis_labels.models import Label
 from apis_core.apis_vocabularies.models import CollectionType, LabelType, TextType
+
+from django.contrib.contenttypes.fields import GenericRelation
 # from helper_functions.highlighter import highlight_text
 from apis_core.default_settings.NER_settings import autocomp_settings
 from apis_core.helper_functions import DateParser
 
 NEXT_PREV = getattr(settings, "APIS_NEXT_PREV", True)
 
-if "apis_highlighter" in settings.INSTALLED_APPS:
-    from apis_highlighter.models import Annotation
-
 
 @reversion.register()
 class TempEntityClass(models.Model):
-    """ Base class to bind common attributes to many classes.
+    """Base class to bind common attributes to many classes.
 
     The common attributes are:
     written start and enddates
@@ -79,15 +81,22 @@ class TempEntityClass(models.Model):
     objects_inheritance = InheritanceManager()
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Zuständiger User")
 
+    if "apis_highlighter" in settings.INSTALLED_APPS:
+        from apis_highlighter.models import Annotation
+        annotation_set = GenericRelation(Annotation)
+
     def __str__(self):
-        if self.name != "":
+        if self.name != "" and hasattr(
+            self, "first_name"
+        ):  # relation usually don´t have names
+            return "{}, {} (ID: {})".format(self.name, self.first_name, self.id)
+        elif self.name != "":
             return "{} (ID: {})".format(self.name, self.id)
         else:
             return "(ID: {})".format(self.id)
 
     def save(self, parse_dates=True, *args, **kwargs):
-        """Adaption of the save() method of the class to automatically parse string-dates into date objects
-        """
+        """Adaption of the save() method of the class to automatically parse string-dates into date objects"""
 
         if parse_dates:
 
@@ -104,14 +113,16 @@ class TempEntityClass(models.Model):
             if self.start_date_written:
                 # If some textual user input of a start date is there, then parse it
 
-                start_date, start_start_date, start_end_date, start_date_is_exact = \
-                    DateParser.parse_date(self.start_date_written)
+                start_date, start_start_date, start_end_date, start_date_is_exact = DateParser.parse_date(
+                    self.start_date_written
+                )
 
             if self.end_date_written:
                 # If some textual user input of an end date is there, then parse it
 
-                end_date, end_start_date, end_end_date, end_date_is_exact = \
-                    DateParser.parse_date(self.end_date_written)
+                end_date, end_start_date, end_end_date, end_date_is_exact = DateParser.parse_date(
+                    self.end_date_written
+                )
 
             primary_date = DateParser.get_primary_date(start_date=start_date, end_date=end_date)
 
@@ -128,92 +139,64 @@ class TempEntityClass(models.Model):
         if self.name:
             self.name = unicodedata.normalize("NFC", self.name)
 
-        # Check if the tempentity to be saved is a passage<->bible relation (special form of passage<->publication),
-        # if so parse the references field and save it into the relation
-
         def parse_bible_reference(unparsed_string):
             """
             function to parse the references field of a Passage<-> Publication relation to check if it contains
             bible references.
 
             :param unparsed_string: the raw string to be parsed
-            :return: either a dictionary if parsed succesfully or None if not
+            :return: a tuple with the parsed url and label
             """
-
-            def make_string_of_int(potential_int):
-                """
-                Since it's possible that the number of the chapter or verse reference has a leading zero, remove
-                it by temporarily turning the value into an integer and then back into a string (e.g "01" -> 1 -> "1").
-                Also checks if it's valid at all, since only numbers are accepted for chapters and verses.
-
-                :param potential_int : str : the chapter or verse the user has put in.
-                :return:
-                    if valid : str : the properly stringified chapter or verse without any potential leading zero
-                    if not valid : None
-                """
-
-                try:
-                    temp_int = int(potential_int)
-                    return str(temp_int)
-                except:
-                    return None
-
-            if unparsed_string:
-
+            url = None
+            label = None
+            if unparsed_string is not None:
                 # load the json file which contains all valid bible references, compare the user input against it
                 with open("./data/bible_refs.json") as json_file:
                     valid_bible_books = json.load(json_file)
+                    pattern = re.compile("([0-9a-zA-Z]+) +([0-9]+) *: *([0-9]+) *(- *([0-9]+))? *$")
+                    matches = pattern.match(unparsed_string)
+                    if matches is not None:
+                        parsed_elems = matches.groups()
+                        book = parsed_elems[0].lower()
+                        chapter = parsed_elems[1]
+                        verse_start = parsed_elems[2]
+                        verse_end = parsed_elems[-1]
 
-                    # User input of bible references must be separated either by whitespace or by double colon
-                    ref = re.split(" +|:", unparsed_string)
+                        if (
+                            book in valid_bible_books
+                            and chapter in valid_bible_books[book]
+                            and verse_start in valid_bible_books[book][chapter]
+                        ):
 
-                    if len(ref) == 3:
-
-                        book = ref[0].lower()
-                        chapter = make_string_of_int(ref[1])
-                        verse = make_string_of_int(ref[2])
-
-                        # compare the split values against the json bible dictionary
-                        if \
-                                chapter and verse and \
-                                book in valid_bible_books and \
-                                chapter in valid_bible_books[book] and \
-                                verse in valid_bible_books[book][chapter]:
-
-                            # if it exists, then it's valid. Return a dictionary of these values
-                            return {
-                                "book": book,
-                                "chapter": chapter,
-                                "verse": verse
-                            }
-
-            # if nothing was returned above, return None
-            return None
+                            if verse_end is not None:
+                                if verse_end in valid_bible_books[book][chapter]:
+                                    url = f"https://www.stepbible.org/?q=reference={book}.{chapter}:{verse_start}-{verse_end}"
+                                    label = f"Book: {book}, Chapter: {chapter}, Verses: {verse_start}-{verse_end}"
+                            else:
+                                url = f"https://www.stepbible.org/?q=reference={book}.{chapter}:{verse_start}"
+                                label = f"Book: {book}, Chapter: {chapter}, Verse: {verse_start}"
+            return (url, label)
 
         # TODO __sresch__ : check for best practice on local imports vs circularity problems.
         from apis_core.apis_relations.models import PassagePublication
 
-        if self.__class__ == PassagePublication and (self.relation_type.pk == 204 or self.relation_type.pk == 205):
-            # If class is passage<->publication and the relationtype is one of the two bible relations (204 or 205), then parse it.
-            # TODO __sresch__ : consider also checking for if the publication is the bible
-
-            parsed_bible_dict = parse_bible_reference(self.references)
-
-            if parsed_bible_dict:
-                self.bible_book_ref = parsed_bible_dict["book"]
-                self.bible_chapter_ref = parsed_bible_dict["chapter"]
-                self.bible_verse_ref = parsed_bible_dict["verse"]
-            else:
-                self.bible_book_ref = None
-                self.bible_chapter_ref = None
-                self.bible_verse_ref = None
-
+        # TODO __sresch__ : consider also checking for if the publication is the bible
+        if (
+            self.__class__ == PassagePublication
+            and (
+                # If class is passage<->publication and the relationtype is one of the two bible relations (204 or 205), then parse it.
+                self.relation_type.pk == 204
+                or self.relation_type.pk == 205
+            )
+        ):
+            url, label = parse_bible_reference(self.references)
+            self.bible_ref_url = url
+            self.bible_ref_label = label
         super(TempEntityClass, self).save(*args, **kwargs)
-
         return self
 
     def get_child_entity(self):
-        for x in [x for x in apps.all_models['apis_entities'].values()]:
+        for x in [x for x in apps.all_models["apis_entities"].values()]:
             if x.__name__ in list(settings.APIS_ENTITIES.keys()):
                 try:
                     my_ent = x.objects.get(id=self.id)
@@ -356,7 +339,7 @@ class TempEntityClass(models.Model):
                 if col2 not in col_list:
                     self.collection.add(col2)
             for f in ent._meta.local_many_to_many:
-                if not f.name.endswith('_set'):
+                if not f.name.endswith("_set"):
                     sl = list(getattr(self, f.name).all())
                     for s in getattr(ent, f.name).all():
                         if s not in sl:
@@ -370,7 +353,7 @@ class TempEntityClass(models.Model):
                 l.save()
             for r in rels.filter(model__icontains=e_b):
                 lst_ents_rel = str(r).split()
-                if lst_ents_rel[0] == lst_ents_rel[1]:
+                if lst_ents_rel[-1] == lst_ents_rel[-2]:
                     q_d = {"related_{}A".format(e_b.lower()): ent}
                     k = r.model_class().objects.filter(**q_d)
                     for t in k:
@@ -435,8 +418,8 @@ class Collection(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if hasattr(self, '_loaded_values'):
-            if self.published != self._loaded_values['published']:
+        if hasattr(self, "_loaded_values"):
+            if self.published != self._loaded_values["published"]:
                 for ent in self.tempentityclass_set.all():
                     ent.published = self.published
                     ent.save()
@@ -445,8 +428,8 @@ class Collection(models.Model):
 
 @reversion.register()
 class Text(models.Model):
-    """ Holds unstructured text associeted with
-    one ore many entities/relations. """
+    """Holds unstructured text associeted with
+    one ore many entities/relations."""
 
     kind = models.ForeignKey(TextType, blank=True, null=True, on_delete=models.SET_NULL)
     text = models.TextField(blank=True)
@@ -458,24 +441,129 @@ class Text(models.Model):
         else:
             return "ID: {}".format(self.id)
 
-    def save(self, *args, **kwargs):
+    def check_for_deleted_annotations(self):
+
+        from apis_highlighter.models import Annotation
         if self.pk is not None:
+            deleted = []
             orig = Text.objects.get(pk=self.pk)
             if orig.text != self.text and "apis_highlighter" in settings.INSTALLED_APPS:
                 ann = Annotation.objects.filter(text_id=self.pk).order_by("start")
-                seq = SequenceMatcher(None, orig.text, self.text)
+                min_ann_len = min([x.end-x.start for x in ann])
+                seq = SequenceMatcher(lambda x: len(x) > min_ann_len, orig.text, self.text)
                 for a in ann:
                     changed = False
                     count = 0
                     for s in seq.get_matching_blocks():
                         count += 1
                         if s.a <= a.start and (s.a + s.size) >= a.end:
-                            a.start += s.b - s.a
-                            a.end += s.b - s.a
-                            a.save()
-                            changed = True
+                            old_start = copy.deepcopy(a.start)
+                            old_end = copy.deepcopy(a.end)
+                            new_start = a.start + (s.b - s.a)
+                            new_end =  a.end + (s.b - s.a)
+                            if orig.text[old_start:old_end] == self.text[new_start:new_end]:
+                                changed = True
+                                break
                     if not changed:
-                        a.delete()  # TODO: we might want to delete relations as well.
+                        deleted.append(a.id)
+        else:
+            deleted = None
+        return deleted
+
+    def save(self, *args, **kwargs):
+
+        if self.pk is not None:
+            orig = Text.objects.get(pk=self.pk)
+            if orig.text != self.text and "apis_highlighter" in settings.INSTALLED_APPS:
+                from apis_highlighter.models import Annotation
+                def calculate_context_weights(text, i_start, i_end):
+
+                    def calculate_word_dict(text, direction):
+
+                        word_list = re.split(" |\\n", text)
+                        word_list = [w for w in word_list if w != ""]
+
+                        word_dict = {}
+
+                        if word_list != []:
+
+                            value_step = 1 / len(word_list)
+                            value_current = 1
+                            for word in word_list[::direction]:
+                                word_value = word_dict.get(word, 0)
+                                word_dict[word] = word_value + value_current
+                                value_current -= value_step
+
+                        return word_dict
+
+                    text_left = text[:i_start]
+                    text_right = text[i_end:]
+                    word_dict_left = calculate_word_dict(text=text_left, direction=-1)
+                    word_dict_right = calculate_word_dict(text=text_right, direction=1)
+
+                    return {
+                        "word_dict_left": word_dict_left,
+                        "word_dict_right": word_dict_right,
+                    }
+
+                def make_diff(word_dict_a, word_dict_b):
+
+                    words_all = set(word_dict_a.keys()).union(set(word_dict_b.keys()))
+                    diff_all = 0
+                    for word in words_all:
+                        word_value_a = word_dict_a.get(word, 0)
+                        word_value_b = word_dict_b.get(word, 0)
+                        diff_all += abs(word_value_a - word_value_b)
+
+                    return diff_all
+
+                def correlate_annotations(text_old, text_new, annotations_old):
+
+                    for ann in annotations_old:
+                        i_old_start = ann.start
+                        i_old_end = ann.end
+                        context_weights_dict_old = calculate_context_weights(
+                            text=text_old,
+                            i_start=i_old_start,
+                            i_end=i_old_end
+                        )
+                        ann_text = text_old[ann.start:ann.end]
+                        diff_min = inf
+                        i_new_start = None
+                        i_new_end = None
+                        for i in re.finditer(f"(?={re.escape(ann_text)})", text_new):
+                            i_candidate_start = i.start()
+                            i_candidate_end = i_candidate_start + len(ann_text)
+                            context_weights_dict_new = calculate_context_weights(
+                                text=text_new, i_start=i_candidate_start, i_end=i_candidate_end
+                            )
+                            diff_left = make_diff(
+                                context_weights_dict_new["word_dict_left"],
+                                context_weights_dict_old["word_dict_left"]
+                            )
+                            diff_right = make_diff(
+                                context_weights_dict_new["word_dict_right"],
+                                context_weights_dict_old["word_dict_right"]
+                            )
+                            diff_current = diff_left + diff_right
+                            if diff_current < diff_min:
+                                diff_min = diff_current
+                                i_new_start = i_candidate_start
+                                i_new_end = i_candidate_end
+
+                        if diff_min != inf:
+                            ann.start = i_new_start
+                            ann.end = i_new_end
+                            ann.save()
+                        else:
+                            ann.delete() # TODO: we might want to delete relations as well.
+
+                correlate_annotations(
+                    text_old=orig.text,
+                    text_new=self.text,
+                    annotations_old=Annotation.objects.filter(text_id=self.pk).order_by("start")
+                )
+
         super().save(*args, **kwargs)
 
 
@@ -512,22 +600,21 @@ class Uri(models.Model):
 
     @classmethod
     def get_createview_url(self):
-        return reverse('apis_core:apis_metainfo:uri_create')
+        return reverse("apis_core:apis_metainfo:uri_create")
 
     def get_absolute_url(self):
-        return reverse('apis_core:apis_metainfo:uri_detail', kwargs={'pk': self.id})
+        return reverse("apis_core:apis_metainfo:uri_detail", kwargs={"pk": self.id})
 
     def get_delete_url(self):
-        return reverse('apis_core:apis_metainfo:uri_delete', kwargs={'pk': self.id})
+        return reverse("apis_core:apis_metainfo:uri_delete", kwargs={"pk": self.id})
 
     def get_edit_url(self):
-        return reverse('apis_core:apis_metainfo:uri_edit', kwargs={'pk': self.id})
+        return reverse("apis_core:apis_metainfo:uri_edit", kwargs={"pk": self.id})
 
 
 @reversion.register()
 class UriCandidate(models.Model):
-    """Used to store the URI candidates for automatically generated entities.
-    """
+    """Used to store the URI candidates for automatically generated entities."""
 
     uri = models.URLField()
     confidence = models.FloatField(blank=True, null=True)
@@ -558,9 +645,8 @@ class UriCandidate(models.Model):
                 ]
                 return (label, desc)
 
+
 # @receiver(post_save, sender=Uri, dispatch_uid="remove_default_uri")
 # def remove_default_uri(sender, instance, **kwargs):
 #    if Uri.objects.filter(entity=instance.entity).count() > 1:
 #        Uri.objects.filter(entity=instance.entity, domain="apis default").delete()
-
-

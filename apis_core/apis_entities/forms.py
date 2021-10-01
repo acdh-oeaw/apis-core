@@ -12,7 +12,6 @@ from django.core.validators import URLValidator
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.forms import ModelMultipleChoiceField, ModelChoiceField
 from django.urls import reverse
-from django_summernote.fields import SummernoteTextFormField
 from apis_core.apis_metainfo.models import Text, Uri, Collection
 from apis_core.apis_vocabularies.models import TextType
 from apis_core.helper_functions import DateParser
@@ -53,7 +52,6 @@ def get_entities_form(entity):
                 "end_start_date",
                 "end_end_date",
                 "end_date_is_exact",
-                "primary_date",
                 "text",
                 "source",
                 "published",
@@ -175,16 +173,24 @@ def get_entities_form(entity):
                     # Make a check if all items of sort_preferences were used. If not, this indicates an out of sync setting
                     # if len(sort_preferences) > 0:
                     if len(sort_preferences_used) != len(sort_preferences):
+
+                        differences = []
+                        for p in sort_preferences_used:
+                            if p not in sort_preferences:
+                                differences.append(p)
+                        for p in sort_preferences:
+                            if p not in sort_preferences_used:
+                                differences.append(p)
+
                         raise Exception(
-                            "An item in 'form_order' was not used. \n"
+                            "An item of the entity setting 'form_order' list was not used. \n"
                             "This propably indicates that the 'form_order' settings is out of sync with the effective django models.\n"
                             f"The relevant entity is: {entity_label}\n"
-                            f"And the items of 'form_order' which were not used are: {sort_preferences}"
+                            f"And the differences between used list and settings list are: {differences}"
                         )
                     # sort the list according to the second element in each tuple
                     # and then take the first elements from it and return as list
                     return [ t[0] for t in sorted(field_rank_pair_list, key=lambda x: x[1]) ]
-
 
             # sort field list, iterate over it and append each element to the accordion group
             for f in sort_fields_list(fields_list_unsorted, entity):
@@ -328,11 +334,12 @@ class FullTextForm(forms.Form):
             else:
                 q = TextType.objects.filter(entity__iexact=entity)
             for txt in q:
-                self.fields['text_' + str(txt.pk)] = SummernoteTextFormField(
+                self.fields['text_' + str(txt.pk)] = forms.CharField(
                     label=txt.name,
                     help_text=txt.description,
                     required=False,
-                    widget=forms.Textarea)
+                    widget=forms.Textarea,
+                )
             if instance:
                 for t in instance.text.all():
                     if "text_" + str(t.kind.pk) in self.fields.keys():

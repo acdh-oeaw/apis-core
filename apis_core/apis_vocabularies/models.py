@@ -9,6 +9,7 @@ from django.db import models
 from django.utils.functional import cached_property
 from reversion import revisions as reversion
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
 
 
 @reversion.register()
@@ -51,6 +52,9 @@ class VocabsBaseClass(models.Model):
         VocabNames, blank=True, null=True,
         on_delete=models.SET_NULL
     )
+    if 'apis_highlighter' in settings.INSTALLED_APPS:
+        from apis_highlighter.models import Annotation
+        annotation_set = GenericRelation(Annotation)
 
     def __str__(self):
         return self.label
@@ -161,21 +165,25 @@ class Title(VocabsBaseClass):
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
 class PlaceType(VocabsBaseClass):
+    """Holds controlled vocabularies about place-types"""
     pass
 
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
 class InstitutionType(VocabsBaseClass):
+    """Holds controlled vocabularies about institution-types"""
     pass
 
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
 class EventType(VocabsBaseClass):
+    """Holds controlled vocabularies about event-types"""
     pass
 
 
 @reversion.register(follow=['vocabsbaseclass_ptr'])
 class LabelType(VocabsBaseClass):
+    """Holds controlled vocabularies about label-types"""
     pass
 
 
@@ -338,21 +346,25 @@ class AbstractRelationType(RelationBaseClass):
 
 @reversion.register(follow=['relationbaseclass_ptr'])
 class PersonPersonRelation(AbstractRelationType):
+    """Holds controlled vocabularies relation types of Persons and Persons"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
 class PersonPlaceRelation(AbstractRelationType):
+    """Holds controlled vocabularies relation types of Persons and Places"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
 class PersonInstitutionRelation(AbstractRelationType):
+    """Holds controlled vocabularies relation types of Persons and Persons"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
 class PersonEventRelation(AbstractRelationType):
+    """Holds controlled vocabularies relation types of Persons and Events"""
     pass
 
 
@@ -373,16 +385,19 @@ class PersonPublicationRelation(AbstractRelationType):
 
 @reversion.register(follow=['relationbaseclass_ptr'])
 class InstitutionEventRelation(AbstractRelationType):
+    """Holds controlled vocabularies relation types of Institutions and Events."""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
 class InstitutionPlaceRelation(AbstractRelationType):
+    """Holds controlled vocabularies relation types of Institutions and Places."""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
 class InstitutionInstitutionRelation(AbstractRelationType):
+    """Holds controlled vocabularies relation types of Institutions and Institutions."""
     pass
 
 
@@ -402,11 +417,13 @@ class InstitutionPublicationRelation(AbstractRelationType):
 
 @reversion.register(follow=['relationbaseclass_ptr'])
 class PlacePlaceRelation(AbstractRelationType):
+    """Holds controlled vocabularies relation types of Places and Places"""
     pass
 
 
 @reversion.register(follow=['relationbaseclass_ptr'])
 class PlaceEventRelation(AbstractRelationType):
+    """Holds controlled vocabularies relation types of Places and Events"""
     pass
 
 
@@ -427,6 +444,7 @@ class PlacePublicationRelation(AbstractRelationType):
 
 @reversion.register(follow=['relationbaseclass_ptr'])
 class EventEventRelation(AbstractRelationType):
+    """Holds controlled vocabularies relation types of Events and Events"""
     pass
 
 
@@ -441,7 +459,7 @@ class EventPublicationRelation(AbstractRelationType):
 
 
 #######################################################################
-# Passage-Relation-Types
+# Work-Relation-Types
 #######################################################################
 
 

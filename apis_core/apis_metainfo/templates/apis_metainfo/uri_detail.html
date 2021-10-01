@@ -1,5 +1,5 @@
 {% extends "webpage/base.html" %}
-{% load staticfiles %}
+{% load static %}
 {% load django_tables2 %}
 {% block title %} {{ object }} {% endblock %}
 {% block scriptHeader %}
@@ -60,7 +60,7 @@
             <table class="table table-bordered table-hover">
                 <tr>
                     <th>
-                        Enitity
+                        Entity
                     </th>
                     <td>
                         <a href="{{ object.entity.get_absolute_url }}">{{ object.entity }}</a>

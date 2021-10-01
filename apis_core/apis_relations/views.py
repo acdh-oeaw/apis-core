@@ -25,7 +25,7 @@ from .tables import LabelTableEdit
 form_module_list = [relation_form_module]
 
 if 'apis_highlighter' in settings.INSTALLED_APPS:
-    from apis_core.helper_functions.highlighter import highlight_text
+    from apis_highlighter.highlighter import highlight_text_new
     from apis_highlighter import forms as highlighter_form_module
     form_module_list.append(highlighter_form_module)
 
@@ -61,47 +61,45 @@ form_class_dict = turn_form_modules_into_dict(form_module_list)
 
 
 # Model-classes must be registered together with their ModelForm-classes
-registered_forms = {'PassagePassageForm': [PassagePassage, Passage, Passage],
-                    'PersonPlaceForm': [PersonPlace, Person, Place],
-                    'PersonPlaceHighlighterForm': [PersonPlace, Person, Place],
-                    'PersonPersonForm': [PersonPerson, Person, Person],
-                    'PersonPersonHighlighterForm': [PersonPerson, Person, Person],
-                    'PersonInstitutionForm': [PersonInstitution, Person, Institution],
-                    'PersonEventForm': [PersonEvent, Person, Event],
-                    'PersonPassageForm': [PersonPassage, Person, Passage],
-                    'PersonInstitutionHighlighterForm': [PersonInstitution, Person, Institution],
-                    'PersonPassageHighlighterForm': [PersonPassage, Person, Passage],
-                    'PlacePassageHighlighterForm': [PlacePassage, Place, Passage],
-                    'PassagePublicationHighlighterForm': [PassagePublication, Passage, Publication],
-                    'InstitutionPassageHighlighterForm': [InstitutionPassage, Institution, Passage],
-                    'InstitutionPlaceForm': [InstitutionPlace, Institution, Place],
-                    'InstitutionInstitutionForm': [
-                        InstitutionInstitution,
-                        Institution,
-                        Institution],
-                    'InstitutionPersonForm': [PersonInstitution, Institution, Person],
-                    'InstitutionEventForm': [InstitutionEvent, Institution, Event],
-                    'InstitutionPassageForm': [InstitutionPassage, Institution, Passage],
-                    'PlaceEventForm': [PlaceEvent, Place, Event],
-                    'PlacePassageForm': [PlacePassage, Place, Passage],
-                    'PlacePlaceForm': [PlacePlace, Place, Place],
-                    'EventPassageForm': [EventPassage, Event, Passage],
-                    'InstitutionLabelForm': [Label, Institution, Label],
-                    'PersonLabelForm': [Label, Person, Label],
-                    'EventLabelForm': [Label, Event, Label],
-                    'PersonResolveUriForm': [Uri, Person, Uri],
-                    'EventEventForm': [],
-                    'SundayHighlighterForm': [ ],
-                    'AddRelationHighlighterPersonForm': [],
-                    'PersonPublicationForm': [],
-                    'PlacePublicationForm': [],
-                    'InstitutionPublicationForm': [],
-                    'EventPublicationForm': [],
-                    'PassagePublicationForm': [],
-                    'PublicationPublicationForm': [],
-                    # 'PlaceHighlighterForm': [Annotation, ],
-                    # 'PersonHighlighterForm': [Annotation, ]
-                    }
+registered_forms = {
+    'PassagePassageForm': [PassagePassage, Passage, Passage],
+    'PersonPlaceForm': [PersonPlace, Person, Place],
+    'PersonPlaceHighlighterForm': [PersonPlace, Person, Place],
+    'PersonPersonForm': [PersonPerson, Person, Person],
+    'PersonPersonHighlighterForm': [PersonPerson, Person, Person],
+    'PersonInstitutionForm': [PersonInstitution, Person, Institution],
+    'PersonEventForm': [PersonEvent, Person, Event],
+    'PersonPassageForm': [PersonPassage, Person, Passage],
+    'PersonInstitutionHighlighterForm': [PersonInstitution, Person, Institution],
+    'PersonPassageHighlighterForm': [PersonPassage, Person, Passage],
+    'PlacePassageHighlighterForm': [PlacePassage, Place, Passage],
+    'PassagePublicationHighlighterForm': [PassagePublication, Passage, Publication],
+    'InstitutionPassageHighlighterForm': [InstitutionPassage, Institution, Passage],
+    'InstitutionPlaceForm': [InstitutionPlace, Institution, Place],
+    'InstitutionInstitutionForm': [InstitutionInstitution, Institution, Institution],
+    'InstitutionPersonForm': [PersonInstitution, Institution, Person],
+    'InstitutionEventForm': [InstitutionEvent, Institution, Event],
+    'InstitutionPassageForm': [InstitutionPassage, Institution, Passage],
+    'PlaceEventForm': [PlaceEvent, Place, Event],
+    'PlacePassageForm': [PlacePassage, Place, Passage],
+    'PlacePlaceForm': [PlacePlace, Place, Place],
+    'EventPassageForm': [EventPassage, Event, Passage],
+    'InstitutionLabelForm': [Label, Institution, Label],
+    'PersonLabelForm': [Label, Person, Label],
+    'EventLabelForm': [Label, Event, Label],
+    'PersonResolveUriForm': [Uri, Person, Uri],
+    'EventEventForm': [],
+    'SundayHighlighterForm': [ ],
+    'AddRelationHighlighterPersonForm': [],
+    'PersonPublicationForm': [],
+    'PlacePublicationForm': [],
+    'InstitutionPublicationForm': [],
+    'EventPublicationForm': [],
+    'PassagePublicationForm': [],
+    'PublicationPublicationForm': [],
+    # 'PlaceHighlighterForm': [Annotation, ],
+    # 'PersonHighlighterForm': [Annotation, ]
+}
 
 
 @login_required
@@ -215,10 +213,10 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
             table_html = form.get_html_table(entity_type_str, request, site_instance, form_match)
         if 'Highlighter' in tab or form_match.group(3) == 'Highlighter':
             hl_text = {
-                'text': highlight_text(form.get_text_id(),
+                'text': highlight_text_new(form.get_text_id(),
                                        users_show=users_show,
                                        set_ann_proj=set_ann_proj,
-                                       types=entity_types_highlighter).strip(),
+                                       types=entity_types_highlighter)[0].strip(),
                 'id': form.get_text_id()}
         if tab == 'PersonLabel':
             table_html = LabelTableEdit(

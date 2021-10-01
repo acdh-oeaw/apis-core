@@ -6,13 +6,26 @@ we develop(ed) this web-app. It is based on a 5 entities (person, place, institu
 All 5 entities are connected to each other. Entities, as well as relations between them, can be typed with vocabularies
 similar to the Simple Knowledge Organization System (SKOS_).
 
+While a default APIS installation uses the 5 entities data model described above, this data model can be rather easily adapted
+to whatever fits best to the project using it. Frontend and RestAPI automatically adapt to changes in the data model.
+
+In addition to this configurable import of data via RDF, there is also an configurable serialization of data. The generic RestAPI
+of APIS provides data either in the internal JSON format, TEI or RDF (serialized with `CIDOC CRM`_). 
+
 APIS comes with a built in system of autocompletes that allows researchers to import meta-data of entities with just a
 single click. Out of the box APIS supports Stanbol_ as a backend for the autocompletes, but the system is rather easy to
 adapt to any Restfull API. APIS also supports the parsing of RDFs_ describing entities into an entity. The parsing is
 configured in a settings file.
 
-APIS comes also with a built in highlighter. The highlighter is configured via the built in admin backend and allows
-to annotate texts with entities and/or relations between entities.
+APIS has a mnodular structure and its core functionalities (provided by this library) can be extended with further modules.
+Currently there are:
+    * apis-highlighter_: apis-highlighter provides offset annotation features to apis-core. It can be used to annotate any
+      text stored in APIS and link the annotations to any object in APIS (entities, relations, vocabularies...). The forms
+      used to create relations, entities etc. can be reused in the highlighter and annotators can create entities and annotations
+      in one step. The annotations can also be organized in so-called annotation projects and provided to frontends via the API.
+      Forms and context menus can be configured in the admin backend.
+    * apis-bibsonomy_: apis-bibsonomy provides the possibility to add bibliographic references to either whole objects or single
+      attributes of these objects. As a backend for managing these bibliographic references one can use either zotero_ or bibsonomy_.
 
 For a demo of the application please refer to apisdev_.
 
@@ -32,12 +45,15 @@ All documentation and images unless otherwise noted are licensed under the terms
 
 
 .. _APIS: https://www.oeaw.ac.at/acdh/projects/apis/
-.. _apisdev: https://apisdev.acdh.oeaw.ac.at
+.. _apisdev: https://apis.acdh-dev.oeaw.ac.at
 .. _ÖBL: http://www.biographien.ac.at
 .. _SKOS: https://en.wikipedia.org/wiki/Simple_Knowledge_Organization_System
 .. _Stanbol: https://stanbol.apache.org/
 .. _RDFs: https://en.wikipedia.org/wiki/Resource_Description_Framework
 .. _docs: https://acdh-oeaw.github.io/apis-core/
+.. _apis-highlighter: https://github.com/acdh-oeaw/apis_highlighter
+.. _apis-bibsonomy: https://github.com/acdh-oeaw/apis-bibsonomy
+.. _`CIDOC CRM`: http://www.cidoc-crm.org/
 
 
 Install the package
