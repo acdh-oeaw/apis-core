@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class EntitiesConfig(AppConfig):
-    name = 'apis_vis'
+    name = 'apis_core.apis_vis'

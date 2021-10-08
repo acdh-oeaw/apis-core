@@ -252,6 +252,7 @@ class GenericEntitiesStanbolForm(forms.Form):
         return entity
 
     def __init__(self, entity, *args, **kwargs):
+
         attrs = {
             "data-placeholder": "Type to get suggestions",
             "data-minimum-input-length": getattr(settings, "APIS_MIN_CHAR", 3),
@@ -273,7 +274,7 @@ class GenericEntitiesStanbolForm(forms.Form):
             form_kwargs["ent_merge_pk"] = ent_merge_pk
             url = reverse(
                 "apis:apis_entities:generic_entities_autocomplete",
-                args=[entity.title()],
+                args=[entity.title(), ent_merge_pk],
             )
             label = "Search for {0} in reference resources or db".format(entity.title())
             button_label = "Merge"

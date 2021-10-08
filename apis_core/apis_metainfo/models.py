@@ -251,6 +251,7 @@ class TempEntityClass(models.Model):
             return None
 
     def merge_with(self, entities):
+        e_a_pk = self.pk
         e_a = type(self).__name__
         self_model_class = ContentType.objects.get(
             app_label="apis_entities", model__iexact=e_a
@@ -266,8 +267,12 @@ class TempEntityClass(models.Model):
         rels = ContentType.objects.filter(
             app_label="apis_relations", model__icontains=e_a
         )
+        print(entities)
         for ent in entities:
             e_b = type(ent).__name__
+            e_b_pk = ent.pk
+            if e_b_pk == e_a_pk:
+                raise ValueError("You can not merge an entity with itself")
             if e_a != e_b:
                 continue
             lt, created = LabelType.objects.get_or_create(name="Legacy name (merge)")
@@ -307,6 +312,7 @@ class TempEntityClass(models.Model):
                     for t in k:
                         setattr(t, "related_{}".format(e_a.lower()), self)
                         t.save()
+
             ent.delete()
 
     def get_serialization(self):
