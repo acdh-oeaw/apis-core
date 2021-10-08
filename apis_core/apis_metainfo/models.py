@@ -271,7 +271,9 @@ class TempEntityClass(models.Model):
         for ent in entities:
             e_b = type(ent).__name__
             e_b_pk = ent.pk
-            if e_a != e_b or e_b_pk == e_a_pk:
+            if e_b_pk == e_a_pk:
+                raise ValueError("You can not merge an entity with itself")
+            if e_a != e_b:
                 continue
             lt, created = LabelType.objects.get_or_create(name="Legacy name (merge)")
             col_list = list(self.collection.all())
