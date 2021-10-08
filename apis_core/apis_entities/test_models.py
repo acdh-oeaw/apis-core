@@ -113,7 +113,9 @@ class PersonModelTestCase(TestCase):
         self.assertEqual(p1.collection.all().count(), 2)
         self.assertEqual(p1.profession.all().count(), 2)
 
-
+    def test_merge_entities_no_selfself(self):
+        p1 = Person.objects.first()
+        self.assertRaises(ValueError, p1.merge_with, [p1,])
 """
     def test_object_reversion(self):
         with reversion.create_revision():
