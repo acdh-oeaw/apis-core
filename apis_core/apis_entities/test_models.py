@@ -116,6 +116,7 @@ class PersonModelTestCase(TestCase):
     def test_merge_entities_no_selfself(self):
         p1 = Person.objects.first()
         self.assertRaises(ValueError, p1.merge_with, [p1,])
+ 
 """
     def test_object_reversion(self):
         with reversion.create_revision():
@@ -202,3 +203,4 @@ class PermissionsModelTestCase(TestCase):
         )
         print(f"permissions revoked, patch: {res.status_code}")
         self.assertEqual(res.status_code, 403)
+ 
