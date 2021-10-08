@@ -115,7 +115,8 @@ class PersonModelTestCase(TestCase):
 
     def test_merge_entities_no_selfself(self):
         p1 = Person.objects.first()
-        p1.merge_with([p1.id,])
+        self.assertRaises(p1.merge_with, [p1.id,])
+
 
 
 """
