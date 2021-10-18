@@ -448,7 +448,7 @@ def m_person(g, ns, data, drill_down=False):
     return g, k_uri
 
 
-def m_institution(g, ns, data):
+def m_institution(g, ns, data, drill_down=False):
     inst_uri = URIRef(f"{base_uri}/entity/{data['id']}")
     if (inst_uri, RDF.type, ns["cidoc"].E74_Group) in g:
         return g, inst_uri
