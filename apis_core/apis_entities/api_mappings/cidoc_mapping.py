@@ -107,7 +107,7 @@ def m_place_of_death(g, p, ns, data):
     return g
 
 
-def m_institutions_rel(g, p, ns, data):
+def m_institutions_rel(g, p, ns, data, drill_down=False):
     b_joining = URIRef(f"{base_uri}/events/joined/{data['id']}")
     g.add((b_joining, RDF.type, ns["cidoc"].E85_Joining))
     g.add((b_joining, ns["cidoc"].P143_joined, p))
