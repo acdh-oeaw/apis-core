@@ -23,6 +23,7 @@ before_script:
   - pip install poetry
   - poetry config virtualenvs.create false
   - poetry config pypi-token.pypi ${PYPI_TOKEN}
+  - poetry update
   - poetry install
 
 test:
