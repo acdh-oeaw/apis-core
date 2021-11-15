@@ -291,7 +291,10 @@ class RDFParser(object):
                     string = str(string[0][1])
             string = unicodedata.normalize("NFC", string)
         if data_type:
-            string = conv_mapping[data_type](string)
+            try:
+                string = conv_mapping[data_type](string)
+            except ValueError:
+                string = None
         return string
 
     def _normalize_uri(self, uri):
