@@ -158,9 +158,9 @@ Person:
     attributes:
       name:
         string: '{name}'
-      first_name:
-        identifier: name
-        string: '{first_name}'
+#      first_name:
+#        identifier: name
+#        string: '{first_name}'
       start_date_written:
         string: '{start_date_written}'
       end_date_written:
