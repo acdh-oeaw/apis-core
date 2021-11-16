@@ -177,6 +177,11 @@ class TempEntityClass(models.Model):
                             else:
                                 url = f"https://www.stepbible.org/?q=reference={book}.{chapter}:{verse_start}"
                                 label = f"Book: {book}, Chapter: {chapter}, Verse: {verse_start}"
+            if book is None or chapter is None or verse_start is None:
+                book = None
+                chapter = None
+                verse_start = None
+                verse_end = None
             return (url, label, book, chapter, verse_start)
 
         # TODO __sresch__ : check for best practice on local imports vs circularity problems.
