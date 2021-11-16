@@ -149,6 +149,10 @@ class TempEntityClass(models.Model):
             """
             url = None
             label = None
+            book = None
+            chapter = None
+            verse_start = None
+            verse_end = None
             if unparsed_string is not None:
                 # load the json file which contains all valid bible references, compare the user input against it
                 with open("./data/bible_refs.json") as json_file:
@@ -161,13 +165,11 @@ class TempEntityClass(models.Model):
                         chapter = parsed_elems[1]
                         verse_start = parsed_elems[2]
                         verse_end = parsed_elems[-1]
-
                         if (
                             book in valid_bible_books
                             and chapter in valid_bible_books[book]
                             and verse_start in valid_bible_books[book][chapter]
                         ):
-
                             if verse_end is not None:
                                 if verse_end in valid_bible_books[book][chapter]:
                                     url = f"https://www.stepbible.org/?q=reference={book}.{chapter}:{verse_start}-{verse_end}"
