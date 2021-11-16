@@ -175,7 +175,7 @@ class TempEntityClass(models.Model):
                             else:
                                 url = f"https://www.stepbible.org/?q=reference={book}.{chapter}:{verse_start}"
                                 label = f"Book: {book}, Chapter: {chapter}, Verse: {verse_start}"
-            return (url, label)
+            return (url, label, book, chapter, verse_start)
 
         # TODO __sresch__ : check for best practice on local imports vs circularity problems.
         from apis_core.apis_relations.models import PassagePublication
@@ -189,9 +189,12 @@ class TempEntityClass(models.Model):
                 or self.relation_type.pk == 205
             )
         ):
-            url, label = parse_bible_reference(self.references)
+            url, label, bible_book_ref, bible_chapter_ref, bible_verse_ref = parse_bible_reference(self.references)
             self.bible_ref_url = url
             self.bible_ref_label = label
+            self.bible_book_ref = bible_book_ref
+            self.bible_chapter_ref = bible_chapter_ref
+            self.bible_verse_ref = bible_verse_ref
         super(TempEntityClass, self).save(*args, **kwargs)
         return self
 
