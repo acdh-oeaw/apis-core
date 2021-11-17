@@ -554,9 +554,9 @@ class PassagePublication(AbstractRelation):
 
     # TODO __sresch__ : these three bible references are left here for legacy purpose towards the frontend (maybe)
     # Once the frontend would be changed to the new references system, these three fields should be removed
-    bible_book_ref = models.CharField(max_length=3, blank=True, null=True)
-    bible_chapter_ref = models.CharField(max_length=3, blank=True, null=True)
-    bible_verse_ref = models.CharField(max_length=3, blank=True, null=True)
+    bible_book_ref = models.CharField(max_length=10, blank=True, null=True)
+    bible_chapter_ref = models.CharField(max_length=10, blank=True, null=True)
+    bible_verse_ref = models.CharField(max_length=10, blank=True, null=True)
 
     bible_ref_url = models.CharField(max_length=500, blank=True, null=True)
     bible_ref_label = models.CharField(max_length=500, blank=True, null=True)
