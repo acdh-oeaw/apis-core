@@ -4,6 +4,8 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.urls import reverse
+import operator
+from functools import reduce
 
 from .models import AbstractRelation
 
@@ -14,18 +16,24 @@ def get_excluded_fields(model):
     modelname = model.__name__
     base_list = getattr(settings, "APIS_RELATIONS_FILTER_EXCLUDE", [])
     rel_model_conf = getattr(settings, "APIS_RELATIONS", {})
-    try:
-        additional_excludes = rel_model_conf[modelname]
-    except KeyError:
-        return set(base_list)
-    if additional_excludes:
-        try:
-            exclude = base_list + additional_excludes['exclude']
-            return set(exclude)
-        except KeyError:
-            return set(base_list)
+    if "exclude" in rel_model_conf.keys():
+        if isinstance(rel_model_conf["exclude"], list):
+            base_list.extend(rel_model_conf["exclude"])
+    if modelname in rel_model_conf.keys():
+        if "exclude" in rel_model_conf[modelname].keys():
+            if isinstance(rel_model_conf[modelname]["exclude"], list):
+                base_list.extend(rel_model_conf[modelname]["exclude"])
+    return set(base_list)
+
+
+def get_included_fields(model):
+    modelname = model.__name__
+    rel_model_conf = getattr(settings, "APIS_RELATIONS", {})
+    if modelname in rel_model_conf.keys():
+        return rel_model_conf[modelname].get("include", False)
     else:
-        return set(base_list)
+        return False
+
 
 
 FIELD_TO_FILTER = {
@@ -51,7 +59,7 @@ def get_field_dicts(model, include_parents=False):
     return fields
 
 
-def get_filters(model, exclude=[], include_parents=False):
+def get_filters(model, exclude=False, include=False, include_parents=False):
     filters = []
     field_dicts = get_field_dicts(model, include_parents=include_parents)
     for x in field_dicts:
@@ -64,15 +72,25 @@ def get_filters(model, exclude=[], include_parents=False):
                 else:
                     rel_field_name = "{}__{}".format(x['f_name'], y['f_name'])
                     filters.append(rel_field_name)
-    if exclude:
-        out = []
+    if include:
+        filters = [x for x in filters if x in include]
+    elif exclude:
         for x in exclude:
-            filters = [f for f in filters if x not in f]
+            if x.startswith("*") and not x.endswith("*"):
+                filters = [f for f in filters if not f.lower().endswith(x[1:].lower())]
+            elif x.startswith("*") and x.endswith("*"):
+                filters = [f for f in filters if not x[1:-1].lower() in f]
+            elif not x.startswith("*") and x.endswith("*"):
+                filters = [f for f in filters if not f.lower().startswith(x[:-1].lower())]
+            else:
+                filters = [f for f in filters if not x.lower() == f.lower()]
     return filters
 
 
 def get_generic_relation_filter(entity):
     class GenericListFilter(django_filters.FilterSet):
+        #search = django_filters.CharFilter(method='search_filter_method')
+
         def name_label_filter(self, queryset, name, value):
             """
             Filter for including the alternative names in the names search.\
@@ -130,11 +148,20 @@ def get_generic_relation_filter(entity):
                 f += 'exact'
             return queryset.filter(**{f: value})
 
+        def search_filter_method(self, queryset, name, value):
+            cls = queryset.model.__name__
+            sett_filters = getattr(settings, "APIS_RELATIONS", {})
+            if cls.lower() in sett_filters.keys():
+                filter_attr = sett_filters[cls.lower()].get("search", ["name"])
+                query = reduce(operator.or_, [ Q(**{attr: value}) for attr in filter_attr ] )
+
+
         class Meta:
             model = AbstractRelation.get_relation_class_of_name(entity)
             fields = get_filters(
                 model,
                 exclude=get_excluded_fields(model),
+                include=get_included_fields(model),
                 include_parents=True
             )
 
@@ -147,10 +174,7 @@ def get_generic_relation_filter(entity):
                 if type(self.filters[x].field).__name__ == "ModelChoiceField":
                     current_model_name = str(self.filters[x].queryset.model.__name__).lower()
                     current_qs = self.filters[x].queryset
-                    if ContentType.objects.get(app_label__in=[
-                        'apis_entities', 'apis_metainfo', 'apis_relations',
-                        'apis_vocabularies', 'apis_labels'
-                    ], model=current_model_name).app_label.lower() == 'apis_entities':
+                    if ContentType.objects.filter(app_label='apis_entities', model=current_model_name).count() > 0:
                         self.filters[x] = django_filters.ModelMultipleChoiceFilter(
                             field_name=x,
                             queryset=current_qs,
@@ -159,6 +183,20 @@ def get_generic_relation_filter(entity):
                                     'apis:apis_entities:generic_network_entities_autocomplete',
                                     kwargs={
                                         'entity': current_model_name
+                                    }
+                                ),
+                            )
+                        )
+                    elif ContentType.objects.filter(app_label='apis_vocabularies', model=current_model_name).count() > 0:
+                        self.filters[x] = django_filters.ModelMultipleChoiceFilter(
+                            field_name=x,
+                            queryset=current_qs,
+                            widget=autocomplete.ModelSelect2Multiple(
+                                url=reverse(
+                                    'apis:apis_vocabularies:generic_vocabularies_autocomplete',
+                                    kwargs={
+                                        'vocab': current_model_name,
+                                        'direct': 'normal'
                                     }
                                 ),
                             )
