@@ -1,0 +1,685 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>apis_core.helper_functions.RDFParser &mdash; APIS 1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> APIS
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation with Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#installation-without-docker">Installation without Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_documentation.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_model.html">Data Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../internal_api.html">Internal API</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">APIS</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>apis_core.helper_functions.RDFParser</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for apis_core.helper_functions.RDFParser</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">unicodedata</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">rdflib</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">from</span> <span class="nn">django.contrib.contenttypes.models</span> <span class="kn">import</span> <span class="n">ContentType</span>
+<span class="kn">from</span> <span class="nn">django.core.exceptions</span> <span class="kn">import</span> <span class="n">FieldError</span><span class="p">,</span> <span class="n">MultipleObjectsReturned</span>
+<span class="kn">from</span> <span class="nn">django.db.models.fields</span> <span class="kn">import</span> <span class="n">CharField</span> <span class="k">as</span> <span class="n">TCharField</span>
+<span class="kn">from</span> <span class="nn">django.db.models.fields</span> <span class="kn">import</span> <span class="n">FloatField</span> <span class="k">as</span> <span class="n">TFloatField</span>
+<span class="kn">from</span> <span class="nn">django.db.models.fields.related</span> <span class="kn">import</span> <span class="n">ForeignKey</span> <span class="k">as</span> <span class="n">TForeignKey</span>
+<span class="kn">from</span> <span class="nn">django.db.models.fields.related</span> <span class="kn">import</span> <span class="n">ManyToManyField</span> <span class="k">as</span> <span class="n">TManyToMany</span>
+<span class="kn">from</span> <span class="nn">rdflib</span> <span class="kn">import</span> <span class="n">URIRef</span><span class="p">,</span> <span class="n">RDFS</span>
+<span class="kn">from</span> <span class="nn">rdflib.namespace</span> <span class="kn">import</span> <span class="n">SKOS</span><span class="p">,</span> <span class="n">OWL</span>
+
+<span class="kn">from</span> <span class="nn">apis_core.apis_labels.models</span> <span class="kn">import</span> <span class="n">Label</span>
+<span class="kn">from</span> <span class="nn">apis_core.apis_metainfo.models</span> <span class="kn">import</span> <span class="n">Uri</span> <span class="k">as</span> <span class="n">genUri</span><span class="p">,</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">Uri</span>
+<span class="kn">from</span> <span class="nn">apis_core.apis_vocabularies.models</span> <span class="kn">import</span> <span class="n">LabelType</span>
+<span class="kn">from</span> <span class="nn">apis_core.default_settings.RDF_settings_new</span> <span class="kn">import</span> <span class="n">sameAs</span>
+
+<span class="n">APIS_RDF_YAML_SETTINGS</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+        <span class="n">settings</span><span class="p">,</span>
+        <span class="s1">&#39;APIS_RDF_YAML_SETTINGS&#39;</span><span class="p">,</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;../default_settings&#39;</span><span class="p">,</span> <span class="s1">&#39;RDF_default_settings.yml&#39;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="n">APIS_RDF_URI_SETTINGS</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+        <span class="n">settings</span><span class="p">,</span>
+        <span class="s1">&#39;APIS_RDF_URI_SETTINGS&#39;</span><span class="p">,</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s1">&#39;../default_settings&#39;</span><span class="p">,</span> <span class="s2">&quot;URI_replace_settings.yml&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">clean_uri</span><span class="p">(</span><span class="n">sett</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">dom</span> <span class="ow">in</span> <span class="n">sett</span><span class="p">[</span><span class="s1">&#39;mappings&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">dom</span><span class="p">[</span><span class="s1">&#39;domain&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">uri</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">dom</span><span class="p">[</span><span class="s1">&#39;regex&#39;</span><span class="p">],</span> <span class="n">uri</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                <span class="n">uri</span> <span class="o">=</span> <span class="n">dom</span><span class="p">[</span><span class="s1">&#39;replace&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">uri</span>
+
+
+<span class="k">class</span> <span class="nc">PartialFormatter</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">Formatter</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">missing</span><span class="o">=</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">bad_fmt</span><span class="o">=</span><span class="s1">&#39;!!&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">missing</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bad_fmt</span> <span class="o">=</span> <span class="n">missing</span><span class="p">,</span> <span class="n">bad_fmt</span>
+
+    <span class="k">def</span> <span class="nf">get_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_field</span><span class="p">(</span><span class="n">field_name</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">):</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">field_name</span>
+        <span class="k">return</span> <span class="n">val</span>
+
+    <span class="k">def</span> <span class="nf">format_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">missing</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">PartialFormatter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">format_field</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">spec</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bad_fmt</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bad_fmt</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span>
+
+
+<span class="n">fmt</span> <span class="o">=</span> <span class="n">PartialFormatter</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="RDFParser"><a class="viewcode-back" href="../../../modules/helper_functions.html#apis_core.helper_functions.RDFParser.RDFParser">[docs]</a><span class="k">class</span> <span class="nc">RDFParser</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="n">_reserved_uris</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_settings_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">sett</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdf_settings_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">sett</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads settings file and saves it</span>
+<span class="sd">        :return: (dict) dict of settings file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sett</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rdf_settings_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">))</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sett</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;base_url&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">:</span>
+                <span class="n">res</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="n">res</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sett</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="p">][</span><span class="s1">&#39;matching&#39;</span><span class="p">]</span>
+        <span class="n">res</span><span class="p">[</span><span class="s1">&#39;sameAs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sameAs</span>
+        <span class="k">return</span> <span class="n">res</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_clean_uri_store</span><span class="p">():</span>
+        <span class="n">del_items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">RDFParser</span><span class="o">.</span><span class="n">_reserved_uris</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="p">(</span><span class="mi">30</span> <span class="o">*</span> <span class="mi">60</span><span class="p">):</span>
+                <span class="n">del_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">del_items</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">RDFParser</span><span class="o">.</span><span class="n">_reserved_uris</span><span class="p">[</span><span class="n">d</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_exist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">uri_check</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">uri__uri</span><span class="o">=</span><span class="n">uri</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">uri__uri</span><span class="o">=</span><span class="n">uri</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">uri</span> <span class="ow">in</span> <span class="n">RDFParser</span><span class="o">.</span><span class="n">_reserved_uris</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="ow">and</span> <span class="n">uri_check</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">RDFParser</span><span class="o">.</span><span class="n">_reserved_uris</span><span class="p">[</span><span class="n">uri</span><span class="p">])</span> <span class="o">&lt;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_preserve_uri_minutes</span> <span class="o">*</span> <span class="mi">60</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;URI used by other instance&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">RDFParser</span><span class="o">.</span><span class="n">_reserved_uris</span><span class="p">[</span><span class="n">uri</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+            <span class="k">elif</span> <span class="n">uri_check</span><span class="p">:</span>
+                <span class="n">RDFParser</span><span class="o">.</span><span class="n">_reserved_uris</span><span class="p">[</span><span class="n">uri</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">_parse</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parses the URI with the definition in the settings file</span>
+<span class="sd">        :return: (dict) dict of Pandas DataFrames containing the variables obtained from SPARQL query</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">rdflib</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+        <span class="n">g</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_preferred</span><span class="p">:</span>
+            <span class="n">lst_pref</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">pref_fin</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings_complete</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="n">count</span><span class="p">][</span><span class="s1">&#39;base_url&#39;</span><span class="p">]</span>
+            <span class="k">while</span> <span class="n">u</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">u</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">:</span>
+                    <span class="n">lst_pref</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+                    <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings_complete</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="p">][</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="n">count</span><span class="p">][</span><span class="s1">&#39;base_url&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">u</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">g</span><span class="o">.</span><span class="n">objects</span><span class="p">(</span><span class="n">URIRef</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">),</span> <span class="n">OWL</span><span class="o">.</span><span class="n">sameAs</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">idx1</span><span class="p">,</span> <span class="n">o2</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lst_pref</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">o2</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+                        <span class="n">pref_fin</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">idx1</span><span class="p">,</span> <span class="n">o</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">pref_fin</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">pref_fin</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">tup</span><span class="p">:</span> <span class="n">tup</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_parse</span> <span class="o">=</span> <span class="n">g</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">pref_fin</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="n">pref_fin</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span> <span class="o">=</span> <span class="n">g</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">]:</span>
+            <span class="n">sp</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;sparql&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">sp</span><span class="p">:</span>
+                <span class="n">sp2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sparql_to_pandas</span><span class="p">(</span><span class="n">g</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="n">sp</span><span class="p">,</span> <span class="n">initBindings</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;subject&#39;</span><span class="p">:</span> <span class="n">URIRef</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)}))</span>
+                <span class="n">res</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="s1">&#39;no identifier provided&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">sp2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span> <span class="o">=</span> <span class="n">res</span>
+        <span class="k">return</span> <span class="n">res</span>
+
+    <span class="k">def</span> <span class="nf">_add_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        adds the same as links as defined in the settings to the entity</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">sa</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;sameAs&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">su</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graph</span><span class="o">.</span><span class="n">objects</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_subject</span><span class="p">,</span> <span class="n">URIRef</span><span class="p">(</span><span class="n">sa</span><span class="p">))):</span>
+                <span class="n">Uri</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">su</span><span class="p">,</span> <span class="n">entity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RDFParser.get_or_create"><a class="viewcode-back" href="../../../modules/helper_functions.html#apis_core.helper_functions.RDFParser.RDFParser.get_or_create">[docs]</a>    <span class="k">def</span> <span class="nf">get_or_create</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gets or creates object with given URI and entity type.</span>
+<span class="sd">        :param depth: (int) depth of related objects to be followed</span>
+<span class="sd">        :return: (object) created object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">created</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">saved</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">create_objct</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="n">depth</span><span class="p">)</span>
+                <span class="n">ob</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">ob</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span></div>
+
+<div class="viewcode-block" id="RDFParser.save"><a class="viewcode-back" href="../../../modules/helper_functions.html#apis_core.helper_functions.RDFParser.RDFParser.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Saves specified object to DB if it doesnt exist yet</span>
+<span class="sd">        :return: django object saved to db or False if nothing was saved</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">created</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">exist</span> <span class="o">=</span> <span class="n">genUri</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">exist</span><span class="o">.</span><span class="n">count</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">exist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">entity</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">exist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">entity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s1">&#39;distinct&#39;</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_foreign_keys</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">attr2</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="o">**</span><span class="n">obj</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="p">,</span> <span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">attr2</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">MultipleObjectsReturned</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">def_coll</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">Collection</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;Default import collection&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">def_coll</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saved</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_objct_uri</span><span class="o">.</span><span class="n">entity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_objct_uri</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add_same_as</span><span class="p">()</span>
+        <span class="n">lab_new</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">lab</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="p">:</span>
+            <span class="n">lt</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">LabelType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">lab</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+            <span class="n">l1</span> <span class="o">=</span> <span class="n">Label</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="n">lab</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">label_type</span><span class="o">=</span><span class="n">lt</span><span class="p">,</span> <span class="n">temp_entity</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="p">)</span>
+            <span class="n">lab_new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="n">lab_new</span>
+        <span class="n">rel_obj_new</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_m2m</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">attr2</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">obj</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="o">**</span><span class="n">obj</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="p">,</span> <span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">attr2</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">MultipleObjectsReturned</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">related_objcts</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">u3</span> <span class="ow">in</span> <span class="n">obj</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">ent1</span> <span class="o">=</span> <span class="n">RDFParser</span><span class="p">(</span><span class="n">u3</span><span class="p">,</span> <span class="n">obj</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">uri_check</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_uri_check</span><span class="p">,</span> <span class="n">preserve_uri_minutes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_preserve_uri_minutes</span><span class="p">)</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">depth</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">obj</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                    <span class="n">mod</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">model</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">*</span><span class="mi">2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">app_label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_label_relations</span><span class="p">)</span><span class="o">.</span><span class="n">model_class</span><span class="p">()()</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="s1">&#39;related_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;A_id&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="s1">&#39;related_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;B_id&#39;</span><span class="p">,</span> <span class="n">ent1</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">mod</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">model__icontains</span><span class="o">=</span><span class="n">obj</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">app_label</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_app_label_relations</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                        <span class="n">model__icontains</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="p">)</span><span class="o">.</span><span class="n">model_class</span><span class="p">()()</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="s1">&#39;related_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;_id&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="s1">&#39;related_&#39;</span> <span class="o">+</span> <span class="n">obj</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;_id&#39;</span><span class="p">,</span> <span class="n">ent1</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+                <span class="n">voc</span> <span class="o">=</span> <span class="n">mod</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">get_field</span><span class="p">(</span><span class="s1">&#39;relation_type&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">related_model</span>
+                <span class="n">voc1</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">voc</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">obj</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="s1">&#39;relation_type_id&#39;</span><span class="p">,</span> <span class="n">voc1</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+                <span class="n">mod</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="n">rel_obj_new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">related_objcts</span> <span class="o">=</span> <span class="n">rel_obj_new</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_sparql_to_pandas</span><span class="p">(</span><span class="n">sparql</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts a RDFlib SPARQL query to Pandas DataFrame</span>
+<span class="sd">        :param sparql: (object) RDFlib query object</span>
+<span class="sd">        :return: (DataFrame) Pandas DataFrame of return values</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sp2</span> <span class="o">=</span> <span class="n">sparql</span><span class="o">.</span><span class="n">_get_bindings</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">s2</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sp2</span><span class="p">):</span>
+            <span class="n">sp2</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">key</span><span class="p">):</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="ow">in</span> <span class="n">s2</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">return</span> <span class="n">sp2</span>
+
+    <span class="k">def</span> <span class="nf">_prep_string</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">string</span><span class="p">,</span> <span class="n">regex</span><span class="p">,</span> <span class="n">linked</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Function that converts SPARQL return value to string used in Django attributes</span>
+<span class="sd">        :param string: (str) Format string with values ingested from SPARQL query (via Pandas DF)</span>
+<span class="sd">        :param regex: (tuple) tuple of regex and group to use (regex, group)</span>
+<span class="sd">        :return: (str) converted string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">conv_mapping</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;str&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s1">&#39;string&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="s1">&#39;float&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+            <span class="s1">&#39;int&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+            <span class="s1">&#39;integer&#39;</span><span class="p">:</span> <span class="nb">int</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">string</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">regex</span><span class="p">:</span>
+                <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">regex</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">string</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+                    <span class="n">string</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="n">regex</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">string</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">255</span><span class="p">:</span>
+                <span class="n">string</span> <span class="o">=</span> <span class="n">string</span><span class="p">[:</span><span class="mi">250</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;...&#39;</span>
+            <span class="k">if</span> <span class="n">linked</span><span class="p">:</span>
+                <span class="n">g1</span> <span class="o">=</span> <span class="n">rdflib</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+                <span class="n">g1</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+                <span class="n">pref1</span> <span class="o">=</span> <span class="p">(</span><span class="n">SKOS</span><span class="o">.</span><span class="n">prefLabel</span><span class="p">,</span> <span class="n">RDFS</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+                <span class="n">pref1</span> <span class="o">+=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">URIRef</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;prefLabels&#39;</span><span class="p">]])</span>
+                <span class="n">string</span> <span class="o">=</span> <span class="n">g1</span><span class="o">.</span><span class="n">preferredLabel</span><span class="p">(</span><span class="n">URIRef</span><span class="p">(</span><span class="n">string</span><span class="p">),</span> <span class="n">labelProperties</span><span class="o">=</span><span class="n">pref1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">string</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">string</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">string</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">string</span> <span class="o">=</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s2">&quot;NFC&quot;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">data_type</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">string</span> <span class="o">=</span> <span class="n">conv_mapping</span><span class="p">[</span><span class="n">data_type</span><span class="p">](</span><span class="n">string</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">string</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="n">string</span>
+
+    <span class="k">def</span> <span class="nf">_normalize_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Normalizes URIs to canonical form</span>
+<span class="sd">        :param uri: (url) URI to normalize</span>
+<span class="sd">        :return: (url) converted URI</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sett</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_uri_settings_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">clean_uri</span><span class="p">(</span><span class="n">sett</span><span class="p">,</span> <span class="n">uri</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RDFParser.merge"><a class="viewcode-back" href="../../../modules/helper_functions.html#apis_core.helper_functions.RDFParser.RDFParser.merge">[docs]</a>    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m_obj</span><span class="p">,</span> <span class="n">app_label_relations</span><span class="o">=</span><span class="s1">&#39;apis_relations&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param m_obj: the object to merge with (must be an django model object instance)</span>
+<span class="sd">        :param app_label_relations: (string) the label of the Django app that contains the relations</span>
+<span class="sd">        :return: django object saved to db or False if nothing was saved</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">rel</span> <span class="ow">in</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">app_label</span><span class="o">=</span><span class="n">app_label_relations</span><span class="p">,</span> <span class="n">model__icontains</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">()):</span>
+            <span class="n">rel_q</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;related_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span> <span class="n">m_obj</span><span class="p">}</span>
+            <span class="n">rel2</span> <span class="o">=</span> <span class="n">rel</span><span class="o">.</span><span class="n">model_class</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">rel_exst</span> <span class="ow">in</span> <span class="n">rel2</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">rel_q</span><span class="p">):</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">rel_exst</span><span class="p">,</span> <span class="s1">&#39;related_&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">+</span><span class="s1">&#39;_id&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+                    <span class="n">rel_exst</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">except</span> <span class="n">FieldError</span><span class="p">:</span>  <span class="c1"># e.g. PlacePlace relations have different related_ fields</span>
+                <span class="n">rel_q</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;related_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">+</span><span class="s1">&#39;A&#39;</span><span class="p">:</span> <span class="n">m_obj</span><span class="p">}</span>
+                <span class="k">for</span> <span class="n">rel_exst</span> <span class="ow">in</span> <span class="n">rel2</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">rel_q</span><span class="p">):</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">rel_exst</span><span class="p">,</span> <span class="s1">&#39;related_&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">+</span><span class="s1">&#39;A_id&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+                    <span class="n">rel_exst</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                <span class="n">rel_q</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;related_&#39;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span> <span class="n">m_obj</span><span class="p">}</span>
+                <span class="k">for</span> <span class="n">rel_exst</span> <span class="ow">in</span> <span class="n">rel2</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="o">**</span><span class="n">rel_q</span><span class="p">):</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">rel_exst</span><span class="p">,</span> <span class="s1">&#39;related_&#39;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">kind</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">+</span><span class="s1">&#39;B_id&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
+                    <span class="n">rel_exst</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">genUri</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">entity</span><span class="o">=</span><span class="n">m_obj</span><span class="p">):</span>
+            <span class="n">z</span><span class="o">.</span><span class="n">entity_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">pk</span>
+            <span class="n">z</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">Label</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">temp_entity</span><span class="o">=</span><span class="n">m_obj</span><span class="p">):</span>
+            <span class="n">z</span><span class="o">.</span><span class="n">temp_entity_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">pk</span>
+            <span class="n">z</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">m_obj</span><span class="p">,</span> <span class="s1">&#39;first_name&#39;</span><span class="p">):</span>
+            <span class="n">legacy_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1">, </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">m_obj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">m_obj</span><span class="o">.</span><span class="n">first_name</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">legacy_name</span> <span class="o">=</span> <span class="n">m_obj</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">lt</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">LabelType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;legacy name&#39;</span><span class="p">)</span>
+        <span class="n">Label</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">temp_entity_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">pk</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">legacy_name</span><span class="p">,</span> <span class="n">label_type</span><span class="o">=</span><span class="n">lt</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">m_obj</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;apis_highlighter&#39;</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">INSTALLED_APPS</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">ann</span> <span class="ow">in</span> <span class="n">m_obj</span><span class="o">.</span><span class="n">annotation_set</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>  <span class="c1"># Todo: check if this works now with highlighter</span>
+                <span class="n">ann</span><span class="o">.</span><span class="n">entity_link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span>
+                <span class="n">ann</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">txt</span> <span class="ow">in</span> <span class="n">m_obj</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">txt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m_obj</span><span class="o">.</span><span class="n">source</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">m_obj</span><span class="o">.</span><span class="n">source</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="n">m_obj</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span></div>
+
+
+<div class="viewcode-block" id="RDFParser.create_objct"><a class="viewcode-back" href="../../../modules/helper_functions.html#apis_core.helper_functions.RDFParser.RDFParser.create_objct">[docs]</a>    <span class="k">def</span> <span class="nf">create_objct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">depth</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Uses parsed attributes to create an object that is not yet persisted to the db.</span>
+<span class="sd">        Stores the object in self.objct</span>
+<span class="sd">        :param depth: (int) depth to follow</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">c_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s1">&#39;domain&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="n">s</span><span class="p">][</span><span class="s1">&#39;domain&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;continue: </span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="n">s</span><span class="p">][</span><span class="s1">&#39;domain&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+            <span class="n">access</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;accessor&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">field_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;field name&#39;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+            <span class="n">fields_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">get_field</span><span class="p">(</span><span class="n">field_name</span><span class="p">)</span>
+            <span class="n">local_regex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;regex&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">local_linked</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;linked&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">local_data_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;data type&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">id_1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;identifier&#39;</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fields_1</span><span class="p">,</span> <span class="n">TCharField</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fields_1</span><span class="p">,</span> <span class="n">TFloatField</span><span class="p">):</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">id_1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">[</span><span class="n">id_1</span><span class="p">]</span>
+                    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;lang&#39;</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;data: </span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="s1">&#39;string&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="n">s</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">local_string</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="n">s</span><span class="p">][</span><span class="s1">&#39;string&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">data</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">local_string</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="o">+</span><span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="n">s</span><span class="p">][</span><span class="s1">&#39;identifier&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">data</span><span class="p">)</span>
+                    <span class="n">c_dict</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prep_string</span><span class="p">(</span><span class="n">local_string</span><span class="p">,</span> <span class="n">local_regex</span><span class="p">,</span> <span class="n">local_linked</span><span class="p">,</span> <span class="n">local_data_type</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fields_1</span><span class="p">,</span> <span class="n">TForeignKey</span><span class="p">):</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                <span class="n">c_dict_f</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">id_1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">[</span><span class="n">id_1</span><span class="p">]</span>
+                    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;lang&#39;</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="p">]</span>
+                    <span class="n">local_string</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="n">s</span><span class="p">][</span><span class="s1">&#39;string&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">data</span><span class="p">)</span>
+                    <span class="n">c_dict_f</span><span class="p">[</span><span class="n">access</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prep_string</span><span class="p">(</span><span class="n">local_string</span><span class="p">,</span> <span class="n">local_regex</span><span class="p">,</span> <span class="n">local_linked</span><span class="p">,</span> <span class="n">local_data_type</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_foreign_keys</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">field_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">get_field</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">related_model</span><span class="p">,</span> <span class="n">c_dict_f</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">fields_1</span><span class="p">,</span> <span class="n">TManyToMany</span><span class="p">):</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">[</span><span class="n">id_1</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">id_1</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">x</span> <span class="o">!=</span> <span class="s1">&#39;lang&#39;</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span><span class="p">:</span>
+                            <span class="n">data</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">c</span><span class="p">]</span>
+                        <span class="n">c_dict_f</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+                        <span class="n">local_string</span> <span class="o">=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;attributes&#39;</span><span class="p">][</span><span class="n">s</span><span class="p">][</span><span class="s1">&#39;string&#39;</span><span class="p">],</span> <span class="o">**</span><span class="n">data</span><span class="p">)</span>
+                        <span class="n">c_dict_f</span><span class="p">[</span><span class="n">access</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prep_string</span><span class="p">(</span><span class="n">local_string</span><span class="p">,</span> <span class="n">local_regex</span><span class="p">,</span> <span class="n">local_linked</span><span class="p">,</span> <span class="n">local_data_type</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_m2m</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">field_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">_meta</span><span class="o">.</span><span class="n">get_field</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">related_model</span><span class="p">,</span> <span class="n">c_dict_f</span><span class="p">))</span>
+        <span class="k">if</span> <span class="s1">&#39;labels&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">lab</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;labels&#39;</span><span class="p">]:</span>
+                <span class="n">at1</span> <span class="o">=</span> <span class="n">lab</span><span class="p">[</span><span class="s1">&#39;identifier&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">at1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">at1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">[</span><span class="n">at1</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;label_missing&#39;</span><span class="p">)</span>
+                        <span class="k">continue</span>
+                    <span class="k">if</span> <span class="s1">&#39;lang&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">[</span><span class="n">at1</span><span class="p">[</span><span class="mi">0</span><span class="p">]]:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">[</span><span class="n">at1</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;lang&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;deu&#39;</span>
+                    <span class="n">u2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">[</span><span class="n">at1</span><span class="p">[</span><span class="mi">0</span><span class="p">]][[</span><span class="n">at1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;lang&#39;</span><span class="p">]]</span>
+                    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">u2</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">row</span><span class="p">[</span><span class="n">at1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;lang&#39;</span><span class="p">],</span> <span class="n">lab</span><span class="p">[</span><span class="s1">&#39;label type&#39;</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="s1">&#39;linked objects&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_settings</span><span class="p">[</span><span class="s1">&#39;matching&#39;</span><span class="p">][</span><span class="s1">&#39;linked objects&#39;</span><span class="p">]:</span>
+                <span class="n">at1</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;identifier&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">at1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">at1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">[</span><span class="n">at1</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                        <span class="n">u2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attributes</span><span class="p">[</span><span class="n">at1</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">at1</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">related_objcts</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;kind&#39;</span><span class="p">],</span> <span class="n">u2</span><span class="p">,</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objct</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="p">(</span><span class="o">**</span><span class="n">c_dict</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">kind</span><span class="p">,</span> <span class="n">app_label_entities</span><span class="o">=</span><span class="s2">&quot;apis_entities&quot;</span><span class="p">,</span> <span class="n">app_label_relations</span><span class="o">=</span><span class="s2">&quot;apis_relations&quot;</span><span class="p">,</span>
+                 <span class="n">app_label_vocabularies</span><span class="o">=</span><span class="s2">&quot;apis_vocabularies&quot;</span><span class="p">,</span> <span class="n">rdf_settings</span><span class="o">=</span><span class="n">APIS_RDF_YAML_SETTINGS</span><span class="p">,</span>
+                 <span class="n">uri_settings</span><span class="o">=</span><span class="n">APIS_RDF_URI_SETTINGS</span><span class="p">,</span> <span class="n">preserve_uri_minutes</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">use_preferred</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">uri_check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param uri: (url) Uri to parse the object from (http://test.at). The uri must start with a base url mentioned in the RDF parser settings file.</span>
+<span class="sd">        :param kind: (string) Kind of entity (Person, Place, Institution, Work, Event)</span>
+<span class="sd">        :param app_label_entities: (string) Name of the Django app that contains the entities that we create.</span>
+<span class="sd">        :param app_label_relations: (string) Name of the Django app that contains the relations for the merging process.</span>
+<span class="sd">        :param app_label_vocabularies: (string) Name of the Django app that contains the vocabularies defining the entities and relations.</span>
+<span class="sd">        :param use_preferred: (boolean) if True forwards to preferred sources defined in sameAs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clean_uri_store</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rdf_settings_file</span> <span class="o">=</span> <span class="n">rdf_settings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_uri_settings_file</span> <span class="o">=</span> <span class="n">uri_settings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_preserve_uri_minutes</span> <span class="o">=</span> <span class="n">preserve_uri_minutes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_uri_check</span> <span class="o">=</span> <span class="n">uri_check</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_use_preferred</span> <span class="o">=</span> <span class="n">use_preferred</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">objct</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">app_label</span><span class="o">=</span><span class="n">app_label_entities</span><span class="p">,</span> <span class="n">model__iexact</span><span class="o">=</span><span class="n">kind</span><span class="p">)</span><span class="o">.</span><span class="n">model_class</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_app_label_relations</span> <span class="o">=</span> <span class="n">app_label_relations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kind</span> <span class="o">=</span> <span class="n">kind</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_foreign_keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_m2m</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_objct_uri</span> <span class="o">=</span> <span class="n">Uri</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_subject</span> <span class="o">=</span> <span class="n">URIRef</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">related_objcts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">force</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;force&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">related_objcts</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">saved</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">test</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exist</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="n">uri_check</span><span class="o">=</span><span class="n">uri_check</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">test</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">objct</span> <span class="o">=</span> <span class="n">test</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">created</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;not created&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">created</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">o</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse</span><span class="p">()</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Matthias Schlögl.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
