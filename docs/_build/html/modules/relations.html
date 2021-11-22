@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.18: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Relations &mdash; APIS 0.1 documentation</title>
+  <title>Relations &mdash; APIS 1.0 documentation</title>
   
 
   
@@ -66,7 +67,7 @@
             
             
               <div class="version">
-                0.1
+                1.0
               </div>
             
           
@@ -91,9 +92,10 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation with Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#installation-without-docker">Installation without Docker</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_model.html">Data Model</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../internal_api.html">Internal API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="metainfo.html">Metainfo</a></li>
@@ -104,8 +106,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="vocabularies.html">Vocabularies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="helper_functions.html">ResolveAbbreviations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="helper_functions.html#genericrdfparser">GenericRDFParser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="helper_functions.html">RDFParser</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../user_documentation.html">User documentation</a></li>
@@ -178,26 +179,26 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="relations">
-<h1>Relations<a class="headerlink" href="#relations" title="Permalink to this headline">¶</a></h1>
+  <section id="relations">
+<span id="relations-models"></span><h1>Relations<a class="headerlink" href="#relations" title="Permalink to this headline">¶</a></h1>
 <p>We already explained that every entity in can be related to every other entity. We have relation classes for all relation types.</p>
-<div class="section" id="module-apis_core.apis_relations.models">
+<section id="module-apis_core.apis_relations.models">
 <span id="models"></span><h2>Models<a class="headerlink" href="#module-apis_core.apis_relations.models" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.AbstractRelation">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">AbstractRelation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">AbstractRelation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Abstract super class which encapsulates common logic between the different relations and provides various methods
 relating to either all or specific relations.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.AbstractRelation.add_relation_class_of_entity_class">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">add_relation_class_of_entity_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entity_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.add_relation_class_of_entity_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.add_relation_class_of_entity_class" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_relation_class_of_entity_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entity_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.add_relation_class_of_entity_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.add_relation_class_of_entity_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds the given entity class to a list which is later retrieved via a dictionary, where the entity class and entity class name
 define the key and the list of related relation classes as their values.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>entity_class</strong> – the class for which the related relation (the current cls) will be saved into a respective list.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -205,14 +206,14 @@ define the key and the list of related relation classes as their values.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.AbstractRelation.add_relation_field_name_of_entity_class">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">add_relation_field_name_of_entity_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relation_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.add_relation_field_name_of_entity_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.add_relation_field_name_of_entity_class" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_relation_field_name_of_entity_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relation_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.add_relation_field_name_of_entity_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.add_relation_field_name_of_entity_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds the given entity class to a list which is later retrieved via a dictionary, where the entity class
 defines the key and the list of related relation classes as its values.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>entity_class</strong> – the class for which the related relation (the current cls) will be saved into a respective list.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
 </dd>
 </dl>
@@ -220,10 +221,10 @@ defines the key and the list of related relation classes as its values.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.AbstractRelation.get_all_relation_classes">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">get_all_relation_classes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_all_relation_classes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_all_relation_classes" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_all_relation_classes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_all_relation_classes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_all_relation_classes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instantiates both lists: ‘_all_relation_classes’ and ‘_all_relation_names’</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of all python classes of the relations defined within this models’ module</p>
 </dd>
 </dl>
@@ -231,9 +232,9 @@ defines the key and the list of related relation classes as its values.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.AbstractRelation.get_all_relation_names">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">get_all_relation_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_all_relation_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_all_relation_names" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_all_relation_names</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_all_relation_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_all_relation_names" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>list of all class names in lower case of the relations defined within this models’ module</p>
 </dd>
 </dl>
@@ -241,9 +242,9 @@ defines the key and the list of related relation classes as its values.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.AbstractRelation.get_related_entity_classA">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_related_entity_classA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_related_entity_classA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the python class of the A side of the current relation class or instance</p>
 </dd>
 </dl>
@@ -252,9 +253,9 @@ defines the key and the list of related relation classes as its values.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.AbstractRelation.get_related_entity_classB">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_related_entity_classB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_related_entity_classB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the python class of the B side of the current relation class or instance</p>
 </dd>
 </dl>
@@ -263,9 +264,9 @@ defines the key and the list of related relation classes as its values.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.AbstractRelation.get_related_entity_field_nameA">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_related_entity_field_nameA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_related_entity_field_nameA"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the name of the field of the A side of the current relation class or instance</p>
 </dd>
 </dl>
@@ -274,9 +275,9 @@ defines the key and the list of related relation classes as its values.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.AbstractRelation.get_related_entity_field_nameB">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_related_entity_field_nameB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_related_entity_field_nameB"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>the name of the field of the B side of the current relation class or instance</p>
 </dd>
 </dl>
@@ -292,7 +293,7 @@ There it returns the instance of an entity on the ‘A’ side of the given rela
 the method ‘get_related_entity_field_nameA()’ is only implemented and overridden at runtime in the
 function ‘generate_all_fields’ in the class ‘EntityRelationFieldGenerator’.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>An entity instance related to the current relation instance</p>
 </dd>
 </dl>
@@ -307,7 +308,7 @@ There it returns the instance of an entity on the ‘B’ side of the given rela
 the method ‘get_related_entity_field_nameB()’ is only implemented and overridden at runtime in the
 function ‘generate_all_fields’ in the class ‘EntityRelationFieldGenerator’.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>An entity instance related to the current relation instance</p>
 </dd>
 </dl>
@@ -315,12 +316,12 @@ function ‘generate_all_fields’ in the class ‘EntityRelationFieldGenerator�
 
 <dl class="py method">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.AbstractRelation.get_relation_class_of_name">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">get_relation_class_of_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relation_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_relation_class_of_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_relation_class_of_name" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_relation_class_of_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relation_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_relation_class_of_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_relation_class_of_name" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>entity_name</strong> – str : The name of an relation</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>The model class of the relation respective to the given name</p>
 </dd>
 </dl>
@@ -328,7 +329,7 @@ function ‘generate_all_fields’ in the class ‘EntityRelationFieldGenerator�
 
 <dl class="py method">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.AbstractRelation.get_relation_classes_of_entity_class">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">get_relation_classes_of_entity_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entity_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_relation_classes_of_entity_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_relation_classes_of_entity_class" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_relation_classes_of_entity_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entity_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_relation_classes_of_entity_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_relation_classes_of_entity_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>:param entity_class : class of an entity for which the related relations should be returned
 :return: a list of relation classes that are related to the entity class</p>
 <p>E.g. AbstractRelation.get_relation_classes_of_entity_class( Person )
@@ -337,7 +338,7 @@ function ‘generate_all_fields’ in the class ‘EntityRelationFieldGenerator�
 
 <dl class="py method">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.AbstractRelation.get_relation_classes_of_entity_name">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">get_relation_classes_of_entity_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entity_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_relation_classes_of_entity_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_relation_classes_of_entity_name" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_relation_classes_of_entity_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entity_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_relation_classes_of_entity_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_relation_classes_of_entity_name" title="Permalink to this definition">¶</a></dt>
 <dd><p>:param entity_name : class name of an entity for which the related relations should be returned
 :return: a list of relation classes that are related to the entity class</p>
 <p>E.g. AbstractRelation.get_relation_classes_of_entity_class( ‘person’ )
@@ -346,7 +347,7 @@ function ‘generate_all_fields’ in the class ‘EntityRelationFieldGenerator�
 
 <dl class="py method">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.AbstractRelation.get_relation_field_names_of_entity_class">
-<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">get_relation_field_names_of_entity_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entity_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_relation_field_names_of_entity_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_relation_field_names_of_entity_class" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_relation_field_names_of_entity_class</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entity_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_relation_field_names_of_entity_class"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_relation_field_names_of_entity_class" title="Permalink to this definition">¶</a></dt>
 <dd><p>:param entity_class : class of an entity for which the related relation class field names should be returned
 :return: a list of relation class field names that are related to the entity class</p>
 <p>E.g. AbstractRelation.get_relation_names_of_entity_class( Person )
@@ -358,11 +359,11 @@ function ‘generate_all_fields’ in the class ‘EntityRelationFieldGenerator�
 <span class="sig-name descname"><span class="pre">get_table_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#AbstractRelation.get_table_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.AbstractRelation.get_table_dict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dict for the tabels in the html view</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>entity</strong> – Object of type <code class="xref py py-class docutils literal notranslate"><span class="pre">entities.models.Place</span></code>; Used to determine which Place is the main antity
 and which one the related.</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p></p>
 </dd>
 </dl>
@@ -372,226 +373,842 @@ and which one the related.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.EventEvent">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">EventEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#EventEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.EventEvent" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">EventEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#EventEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.EventEvent" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.EventEvent.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.EventEvent.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.EventEvent.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.EventEvent.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.EventEvent.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.EventEvent.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.EventEvent.get_related_entity_classA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.EventEvent.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Person</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.EventEvent.get_related_entity_classB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.EventEvent.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Work</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.EventEvent.get_related_entity_field_nameA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.EventEvent.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_person”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.EventEvent.get_related_entity_field_nameB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.EventEvent.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_work”</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.EventWork">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">EventWork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#EventWork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.EventWork" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">EventWork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#EventWork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.EventWork" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.EventWork.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.EventWork.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.EventWork.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.EventWork.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.EventWork.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.EventWork.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.EventWork.get_related_entity_classA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.EventWork.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Person</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.EventWork.get_related_entity_classB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.EventWork.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Work</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.EventWork.get_related_entity_field_nameA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.EventWork.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_person”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.EventWork.get_related_entity_field_nameB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.EventWork.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_work”</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionEvent">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">InstitutionEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#InstitutionEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionEvent" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">InstitutionEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#InstitutionEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionEvent" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionEvent.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionEvent.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionEvent.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionEvent.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionEvent.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionEvent.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionEvent.get_related_entity_classA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionEvent.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Person</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionEvent.get_related_entity_classB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionEvent.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Work</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionEvent.get_related_entity_field_nameA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionEvent.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_person”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionEvent.get_related_entity_field_nameB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionEvent.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_work”</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionInstitution">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">InstitutionInstitution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#InstitutionInstitution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionInstitution" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">InstitutionInstitution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#InstitutionInstitution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionInstitution" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionInstitution.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionInstitution.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionInstitution.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionInstitution.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionInstitution.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionInstitution.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionInstitution.get_related_entity_classA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionInstitution.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Person</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionInstitution.get_related_entity_classB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionInstitution.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Work</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionInstitution.get_related_entity_field_nameA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionInstitution.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_person”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionInstitution.get_related_entity_field_nameB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionInstitution.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_work”</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionPlace">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">InstitutionPlace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#InstitutionPlace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionPlace" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">InstitutionPlace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#InstitutionPlace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionPlace" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionPlace.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionPlace.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionPlace.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionPlace.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionPlace.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionPlace.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionPlace.get_related_entity_classA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionPlace.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Person</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionPlace.get_related_entity_classB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionPlace.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Work</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionPlace.get_related_entity_field_nameA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionPlace.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_person”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionPlace.get_related_entity_field_nameB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionPlace.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_work”</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionWork">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">InstitutionWork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#InstitutionWork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionWork" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">InstitutionWork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#InstitutionWork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionWork" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionWork.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionWork.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionWork.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionWork.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionWork.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionWork.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionWork.get_related_entity_classA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionWork.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Person</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionWork.get_related_entity_classB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionWork.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Work</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionWork.get_related_entity_field_nameA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionWork.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_person”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.InstitutionWork.get_related_entity_field_nameB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.InstitutionWork.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_work”</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonEvent">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">PersonEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#PersonEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.PersonEvent" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">PersonEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#PersonEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.PersonEvent" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonEvent.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonEvent.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonEvent.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonEvent.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonEvent.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonEvent.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonEvent.get_related_entity_classA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonEvent.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Person</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonEvent.get_related_entity_classB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonEvent.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Work</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonEvent.get_related_entity_field_nameA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonEvent.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_person”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonEvent.get_related_entity_field_nameB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonEvent.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_work”</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonInstitution">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">PersonInstitution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#PersonInstitution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.PersonInstitution" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">PersonInstitution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#PersonInstitution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.PersonInstitution" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonInstitution.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonInstitution.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonInstitution.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonInstitution.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonInstitution.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonInstitution.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonInstitution.get_related_entity_classA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonInstitution.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Person</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonInstitution.get_related_entity_classB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonInstitution.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Work</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonInstitution.get_related_entity_field_nameA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonInstitution.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_person”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonInstitution.get_related_entity_field_nameB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonInstitution.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_work”</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonPerson">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">PersonPerson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#PersonPerson"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.PersonPerson" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">PersonPerson</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#PersonPerson"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.PersonPerson" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonPerson.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonPerson.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonPerson.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonPerson.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonPerson.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonPerson.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonPerson.get_related_entity_classA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonPerson.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Person</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonPerson.get_related_entity_classB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonPerson.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Work</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonPerson.get_related_entity_field_nameA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonPerson.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_person”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonPerson.get_related_entity_field_nameB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonPerson.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_work”</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonPlace">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">PersonPlace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#PersonPlace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.PersonPlace" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">PersonPlace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#PersonPlace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.PersonPlace" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonPlace.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonPlace.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonPlace.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonPlace.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonPlace.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonPlace.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonPlace.get_related_entity_classA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonPlace.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Person</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonPlace.get_related_entity_classB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonPlace.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Work</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonPlace.get_related_entity_field_nameA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonPlace.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_person”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonPlace.get_related_entity_field_nameB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonPlace.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_work”</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonWork">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">PersonWork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#PersonWork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.PersonWork" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">PersonWork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#PersonWork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.PersonWork" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonWork.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonWork.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonWork.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonWork.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonWork.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PersonWork.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonWork.get_related_entity_classA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonWork.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Person</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonWork.get_related_entity_classB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonWork.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Work</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonWork.get_related_entity_field_nameA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonWork.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_person”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PersonWork.get_related_entity_field_nameB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PersonWork.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_work”</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PlaceEvent">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">PlaceEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#PlaceEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.PlaceEvent" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">PlaceEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#PlaceEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.PlaceEvent" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PlaceEvent.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PlaceEvent.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PlaceEvent.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PlaceEvent.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PlaceEvent.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PlaceEvent.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PlaceEvent.get_related_entity_classA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PlaceEvent.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Person</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PlaceEvent.get_related_entity_classB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PlaceEvent.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Work</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PlaceEvent.get_related_entity_field_nameA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PlaceEvent.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_person”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PlaceEvent.get_related_entity_field_nameB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PlaceEvent.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_work”</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PlacePlace">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">PlacePlace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#PlacePlace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.PlacePlace" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">PlacePlace</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#PlacePlace"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.PlacePlace" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PlacePlace.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PlacePlace.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PlacePlace.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PlacePlace.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PlacePlace.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PlacePlace.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PlacePlace.get_related_entity_classA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PlacePlace.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Person</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PlacePlace.get_related_entity_classB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PlacePlace.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Work</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PlacePlace.get_related_entity_field_nameA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PlacePlace.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_person”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PlacePlace.get_related_entity_field_nameB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PlacePlace.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_work”</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PlaceWork">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">PlaceWork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#PlaceWork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.PlaceWork" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">PlaceWork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#PlaceWork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.PlaceWork" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PlaceWork.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PlaceWork.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PlaceWork.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.PlaceWork.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PlaceWork.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.PlaceWork.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PlaceWork.get_related_entity_classA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PlaceWork.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Person</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PlaceWork.get_related_entity_classB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PlaceWork.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Work</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PlaceWork.get_related_entity_field_nameA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PlaceWork.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_person”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.PlaceWork.get_related_entity_field_nameB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.PlaceWork.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_work”</p>
+</dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.RelationPublishedQueryset">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">RelationPublishedQueryset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#RelationPublishedQueryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.RelationPublishedQueryset" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">RelationPublishedQueryset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">query</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">using</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hints</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#RelationPublishedQueryset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.RelationPublishedQueryset" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py method">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.RelationPublishedQueryset.filter_ann_proj">
 <span class="sig-name descname"><span class="pre">filter_ann_proj</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ann_proj</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_all</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#RelationPublishedQueryset.filter_ann_proj"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.RelationPublishedQueryset.filter_ann_proj" title="Permalink to this definition">¶</a></dt>
 <dd><p>The filter function provided by the manager class.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>request</strong> – <cite>django.request</cite> object</p>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>queryset that contains only objects that are shown in the highlighted text or those not connected
 to an annotation at all.</p>
 </dd>
@@ -602,21 +1219,65 @@ to an annotation at all.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.WorkWork">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">WorkWork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#WorkWork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.WorkWork" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_relations.models.</span></span><span class="sig-name descname"><span class="pre">WorkWork</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">review</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_start_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_end_date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_date_written</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">references</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">published</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tempentityclass_ptr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_relations/models.html#WorkWork"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_relations.models.WorkWork" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.WorkWork.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.WorkWork.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_relations.models.WorkWork.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_relations.models.WorkWork.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.WorkWork.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_relations.models.WorkWork.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.WorkWork.get_related_entity_classA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.WorkWork.get_related_entity_classA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Person</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.WorkWork.get_related_entity_classB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_classB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.WorkWork.get_related_entity_classB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the python class of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; Work</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.WorkWork.get_related_entity_field_nameA">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameA</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.WorkWork.get_related_entity_field_nameA" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the A side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_person”</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="apis_core.apis_relations.models.WorkWork.get_related_entity_field_nameB">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_related_entity_field_nameB</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#apis_core.apis_relations.models.WorkWork.get_related_entity_field_nameB" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the name of the field of the B side of the current relation class or instance</p>
+</dd>
+</dl>
+<p>E.g. PersonWork -&gt; “related_work”</p>
+</dd></dl>
 
 </dd></dl>
 
-</div>
-<div class="section" id="module-apis_core.apis_relations.views">
+</section>
+<section id="module-apis_core.apis_relations.views">
 <span id="views"></span><h2>Views<a class="headerlink" href="#module-apis_core.apis_relations.views" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="apis_core.apis_relations.views.get_form_ajax">
@@ -638,8 +1299,8 @@ are imported and which not, it’s better to differentiate here which modules ar
 and then providing a dict for later extraction of the required form class.</p>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -655,7 +1316,7 @@ and then providing a dict for later extraction of the required form class.</p>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2017, Matthias Schlögl.
+        &#169; Copyright 2021, Matthias Schlögl.
 
     </p>
   </div>

@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.18: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Metainfo &mdash; APIS 0.1 documentation</title>
+  <title>Metainfo &mdash; APIS 1.0 documentation</title>
   
 
   
@@ -66,7 +67,7 @@
             
             
               <div class="version">
-                0.1
+                1.0
               </div>
             
           
@@ -91,9 +92,10 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation with Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#installation-without-docker">Installation without Docker</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_model.html">Data Model</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../internal_api.html">Internal API</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Metainfo</a><ul>
@@ -103,8 +105,7 @@
 <li class="toctree-l2"><a class="reference internal" href="entities.html">Entities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="relations.html">Relations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vocabularies.html">Vocabularies</a></li>
-<li class="toctree-l2"><a class="reference internal" href="helper_functions.html">ResolveAbbreviations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="helper_functions.html#genericrdfparser">GenericRDFParser</a></li>
+<li class="toctree-l2"><a class="reference internal" href="helper_functions.html">RDFParser</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../user_documentation.html">User documentation</a></li>
@@ -177,22 +178,22 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="metainfo">
+  <section id="metainfo">
 <h1>Metainfo<a class="headerlink" href="#metainfo" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="module-apis_core.apis_metainfo.models">
+<section id="module-apis_core.apis_metainfo.models">
 <span id="models"></span><h2>Models<a class="headerlink" href="#module-apis_core.apis_metainfo.models" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.Collection">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_metainfo.models.</span></span><span class="sig-name descname"><span class="pre">Collection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_metainfo/models.html#Collection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_metainfo.models.Collection" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_metainfo.models.</span></span><span class="sig-name descname"><span class="pre">Collection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_metainfo/models.html#Collection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_metainfo.models.Collection" title="Permalink to this definition">¶</a></dt>
 <dd><p>Allows to group entities and relation.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.Collection.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.Collection.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.Collection.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.Collection.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.Collection.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.Collection.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -209,23 +210,23 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.Source">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_metainfo.models.</span></span><span class="sig-name descname"><span class="pre">Source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_metainfo/models.html#Source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_metainfo.models.Source" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_metainfo.models.</span></span><span class="sig-name descname"><span class="pre">Source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_metainfo/models.html#Source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_metainfo.models.Source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Holds information about entities and their relations</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.Source.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.Source.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.Source.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.Source.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.Source.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.Source.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.TempEntityClass">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_metainfo.models.</span></span><span class="sig-name descname"><span class="pre">TempEntityClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_metainfo/models.html#TempEntityClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_metainfo.models.TempEntityClass" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_metainfo.models.</span></span><span class="sig-name descname"><span class="pre">TempEntityClass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_metainfo/models.html#TempEntityClass"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_metainfo.models.TempEntityClass" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class to bind common attributes to many classes.</p>
 <p>The common attributes are:
 written start and enddates
@@ -234,12 +235,12 @@ from the written dates.
 A review boolean field to mark an object as reviewed</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.TempEntityClass.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.TempEntityClass.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.TempEntityClass.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.TempEntityClass.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.TempEntityClass.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.TempEntityClass.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -252,17 +253,17 @@ A review boolean field to mark an object as reviewed</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.Text">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_metainfo.models.</span></span><span class="sig-name descname"><span class="pre">Text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_metainfo/models.html#Text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_metainfo.models.Text" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_metainfo.models.</span></span><span class="sig-name descname"><span class="pre">Text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_metainfo/models.html#Text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_metainfo.models.Text" title="Permalink to this definition">¶</a></dt>
 <dd><p>Holds unstructured text associeted with
 one ore many entities/relations.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.Text.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.Text.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.Text.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.Text.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.Text.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.Text.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -279,37 +280,37 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.Uri">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_metainfo.models.</span></span><span class="sig-name descname"><span class="pre">Uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uri</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rdf_link</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loaded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loaded_time</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_metainfo/models.html#Uri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_metainfo.models.Uri" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_metainfo.models.</span></span><span class="sig-name descname"><span class="pre">Uri</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uri</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rdf_link</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loaded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loaded_time</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_metainfo/models.html#Uri"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_metainfo.models.Uri" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.Uri.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.Uri.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.Uri.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.Uri.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.Uri.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.Uri.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.UriCandidate">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_metainfo.models.</span></span><span class="sig-name descname"><span class="pre">UriCandidate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_metainfo/models.html#UriCandidate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_metainfo.models.UriCandidate" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.apis_metainfo.models.</span></span><span class="sig-name descname"><span class="pre">UriCandidate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/apis_metainfo/models.html#UriCandidate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.apis_metainfo.models.UriCandidate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Used to store the URI candidates for automatically generated entities.</p>
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.UriCandidate.DoesNotExist">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.UriCandidate.DoesNotExist" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">DoesNotExist</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.UriCandidate.DoesNotExist" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py exception">
 <dt class="sig sig-object py" id="apis_core.apis_metainfo.models.UriCandidate.MultipleObjectsReturned">
-<em class="property"><span class="pre">exception</span> </em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.UriCandidate.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">MultipleObjectsReturned</span></span><a class="headerlink" href="#apis_core.apis_metainfo.models.UriCandidate.MultipleObjectsReturned" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -325,7 +326,7 @@ non-SQL backends), respectively. Normally, they should not be set.</p>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2017, Matthias Schlögl.
+        &#169; Copyright 2021, Matthias Schlögl.
 
     </p>
   </div>

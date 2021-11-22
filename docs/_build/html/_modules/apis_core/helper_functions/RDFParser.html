@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>apis_core.helper_functions.RDFParser &mdash; APIS 0.1 documentation</title>
+  <title>apis_core.helper_functions.RDFParser &mdash; APIS 1.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1
+                1.0
               </div>
             
           
@@ -89,9 +89,10 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation with Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#installation-without-docker">Installation without Docker</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_model.html">Data Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../internal_api.html">Internal API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../user_documentation.html">User documentation</a></li>
@@ -454,7 +455,10 @@
                     <span class="n">string</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">string</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">string</span> <span class="o">=</span> <span class="n">unicodedata</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="s2">&quot;NFC&quot;</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">data_type</span><span class="p">:</span>
-            <span class="n">string</span> <span class="o">=</span> <span class="n">conv_mapping</span><span class="p">[</span><span class="n">data_type</span><span class="p">](</span><span class="n">string</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">string</span> <span class="o">=</span> <span class="n">conv_mapping</span><span class="p">[</span><span class="n">data_type</span><span class="p">](</span><span class="n">string</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">string</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">string</span>
 
     <span class="k">def</span> <span class="nf">_normalize_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">):</span>
@@ -504,8 +508,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">collection</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;apis_highlighter&#39;</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">INSTALLED_APPS</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">ann</span> <span class="ow">in</span> <span class="n">m_obj</span><span class="o">.</span><span class="n">annotation_set</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>  <span class="c1"># Todo: check if this works now with highlighter</span>
-                <span class="n">ann</span><span class="o">.</span><span class="n">entity_link</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">m_obj</span><span class="p">)</span>
-                <span class="n">ann</span><span class="o">.</span><span class="n">entity_link</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="p">)</span>
+                <span class="n">ann</span><span class="o">.</span><span class="n">entity_link</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">objct</span>
+                <span class="n">ann</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">txt</span> <span class="ow">in</span> <span class="n">m_obj</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">objct</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">txt</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">m_obj</span><span class="o">.</span><span class="n">source</span><span class="p">:</span>
@@ -643,7 +647,7 @@
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2017, Matthias Schlögl.
+        &#169; Copyright 2021, Matthias Schlögl.
 
     </p>
   </div>

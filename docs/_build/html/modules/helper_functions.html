@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.18: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>GenericRDFParser &mdash; APIS 0.1 documentation</title>
+  <title>RDFParser &mdash; APIS 1.0 documentation</title>
   
 
   
@@ -66,7 +67,7 @@
             
             
               <div class="version">
-                0.1
+                1.0
               </div>
             
           
@@ -91,16 +92,17 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation with Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html#installation-without-docker">Installation without Docker</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../data_model.html">Data Model</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../internal_api.html">Internal API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="metainfo.html">Metainfo</a></li>
 <li class="toctree-l2"><a class="reference internal" href="entities.html">Entities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="relations.html">Relations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vocabularies.html">Vocabularies</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">GenericRDFParser</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">RDFParser</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../user_documentation.html">User documentation</a></li>
@@ -154,7 +156,7 @@
         
           <li><a href="../internal_api.html">Internal API</a> &raquo;</li>
         
-      <li>GenericRDFParser</li>
+      <li>RDFParser</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -173,13 +175,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="genericrdfparser">
-<h1>GenericRDFParser<a class="headerlink" href="#genericrdfparser" title="Permalink to this headline">¶</a></h1>
+  <section id="rdfparser">
+<h1>RDFParser<a class="headerlink" href="#rdfparser" title="Permalink to this headline">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="apis_core.helper_functions.RDFParser.RDFParser">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">apis_core.helper_functions.RDFParser.</span></span><span class="sig-name descname"><span class="pre">RDFParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label_entities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'apis_entities'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label_relations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'apis_relations'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label_vocabularies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'apis_vocabularies'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rdf_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/workspace/apis-core/apis_core/helper_functions/../default_settings/RDF_default_settings.yml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uri_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/workspace/apis-core/apis_core/helper_functions/../default_settings/URI_replace_settings.yml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_uri_minutes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_preferred</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uri_check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/helper_functions/RDFParser.html#RDFParser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.helper_functions.RDFParser.RDFParser" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">apis_core.helper_functions.RDFParser.</span></span><span class="sig-name descname"><span class="pre">RDFParser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kind</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label_entities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'apis_entities'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label_relations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'apis_relations'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label_vocabularies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'apis_vocabularies'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rdf_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/workspace/apis-core/apis_core/helper_functions/../default_settings/RDF_default_settings.yml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uri_settings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/workspace/apis-core/apis_core/helper_functions/../default_settings/URI_replace_settings.yml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_uri_minutes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_preferred</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">uri_check</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/helper_functions/RDFParser.html#RDFParser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.helper_functions.RDFParser.RDFParser" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>uri</strong> – (url) Uri to parse the object from (<a class="reference external" href="http://test.at">http://test.at</a>). The uri must start with a base url mentioned in the RDF parser settings file.</p></li>
 <li><p><strong>kind</strong> – (string) Kind of entity (Person, Place, Institution, Work, Event)</p></li>
@@ -210,13 +212,13 @@ Stores the object in self.objct
 <dt class="sig sig-object py" id="apis_core.helper_functions.RDFParser.RDFParser.merge">
 <span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m_obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">app_label_relations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'apis_relations'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/apis_core/helper_functions/RDFParser.html#RDFParser.merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#apis_core.helper_functions.RDFParser.RDFParser.merge" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>m_obj</strong> – the object to merge with (must be an django model object instance)</p></li>
 <li><p><strong>app_label_relations</strong> – (string) the label of the Django app that contains the relations</p></li>
 </ul>
 </dd>
-<dt class="field-even">Returns</dt>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>django object saved to db or False if nothing was saved</p>
 </dd>
 </dl>
@@ -231,7 +233,7 @@ Stores the object in self.objct
 
 </dd></dl>
 
-</div>
+</section>
 
 
            </div>
@@ -247,7 +249,7 @@ Stores the object in self.objct
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2017, Matthias Schlögl.
+        &#169; Copyright 2021, Matthias Schlögl.
 
     </p>
   </div>

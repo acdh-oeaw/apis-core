@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.18: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Installation &mdash; APIS 0.1 documentation</title>
+  <title>Installation with Docker &mdash; APIS 1.0 documentation</title>
   
 
   
@@ -66,7 +67,7 @@
             
             
               <div class="version">
-                0.1
+                1.0
               </div>
             
           
@@ -91,12 +92,16 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Installation with Docker</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#docker-image">Docker Image</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#docker-compose">Docker Compose</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#installation-without-docker">Installation without Docker</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#git-and-submodules">Git and submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#id1">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation-on-a-linux-box">Installation on a linux box</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installation-on-windows">Installation on Windows</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#serving-apis-via-apache-wsgi">Serving APIS via Apache WSGI</a></li>
 </ul>
@@ -152,7 +157,7 @@
     
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Installation</li>
+      <li>Installation with Docker</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -171,63 +176,110 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="prerequisites">
+  <section id="installation-with-docker">
+<h1>Installation with Docker<a class="headerlink" href="#installation-with-docker" title="Permalink to this headline">¶</a></h1>
+<p>This is the recommendated way to install APIS on local machines as well as on server infrastructure.</p>
+<section id="docker-image">
+<h2>Docker Image<a class="headerlink" href="#docker-image" title="Permalink to this headline">¶</a></h2>
+<p>APIS docker images can be pulled from <a class="reference external" href="https://hub.docker.com/repository/docker/sennierer/apis">docker hub</a>. Images are tagged
+from v0.9.1 onwards. Latest image is tagged with :latest.
+The images are automatically built and tagged and should be up-to-date with altest versions of code.</p>
+</section>
+<section id="docker-compose">
+<h2>Docker Compose<a class="headerlink" href="#docker-compose" title="Permalink to this headline">¶</a></h2>
+<p>The following docker-compose file can be used as a starting point for deploying an APIS instance:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">version</span><span class="p">:</span> <span class="s">&#39;2&#39;</span>
+
+
+<span class="nt">services</span><span class="p">:</span>
+        <span class="nt">web</span><span class="p">:</span>
+            <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">sennierer/apis:latest</span>
+            <span class="nt">environment</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_PROJECT=apis_test</span> <span class="c1">#as used in the apis-settings repo</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_DB_NAME=testdb</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_DB_USER=testuser</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_DB_PASSWORD=testpwd</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_DB_HOST=database</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_DB_PORT=3306</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_AUTO_CREATE_DB=1</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">DJANGO_SUPERUSER_PASSWORD=adminpass123</span> <span class="c1">#change that to admin password</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">DJANGO_SUPERUSER_USERNAME=admin</span> <span class="c1">#change that to admin username</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">DJANGO_SUPERUSER_EMAIL=my_user@domain.com</span> <span class="c1">#change that to email</span>
+                <span class="c1"># and more e.g. APIS_DB_PORT &gt;&gt; apis-webpage-base/apis/settings/base.py</span>
+            <span class="nt">container_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">apis_core_apis_test</span> <span class="c1">#use apis_core_$APIS_PROJECT, e.g. apis_core_mpr</span>
+            <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">sh /start-apis/start-apis/start.sh</span>
+            <span class="nt">volumes</span><span class="p">:</span>
+                    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">config-volume:/config-apis</span>
+                    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">staticfiles-volume:/apis/apis-webpage-base/staticfiles</span>
+            <span class="nt">networks</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">backend</span>
+            <span class="nt">depends_on</span><span class="p">:</span>
+            <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">database</span>
+
+        <span class="nt">database</span><span class="p">:</span>
+            <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">mysql:5.7</span>
+            <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">--default-authentication-plugin=mysql_native_password</span>
+            <span class="nt">restart</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">always</span>
+            <span class="nt">environment</span><span class="p">:</span>
+                    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">MYSQL_ROOT_PASSWORD=rootpwd</span>
+                    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">MYSQL_DATABASE=testdb</span>
+                    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">MYSQL_USER=testuser</span>
+                    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">MYSQL_PASSWORD=testpwd</span>
+            <span class="nt">networks</span><span class="p">:</span>
+                    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">backend</span>
+        <span class="nt">nginx</span><span class="p">:</span>
+            <span class="nt">image</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">nginx:latest</span>
+            <span class="nt">container_name</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">ngx_apis_apis_test</span> <span class="c1">#use ngx_apis_$PROJECT_NAME, e.g, ngx_apis_mpr</span>
+            <span class="nt">environment</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_PROJECT=apis_test</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">APIS_SERVER_NAME=localhost</span> <span class="c1">#as used in the apis-settings repo &gt;&gt; needs to be present in both images</span>
+            <span class="nt">volumes</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">config-volume:/config-apis</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">staticfiles-volume:/staticfiles</span>
+            <span class="nt">ports</span><span class="p">:</span>
+                    <span class="p p-Indicator">-</span> <span class="s">&quot;8080:81&quot;</span>
+            <span class="nt">depends_on</span><span class="p">:</span>
+                    <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">web</span>
+            <span class="nt">networks</span><span class="p">:</span>
+                <span class="p p-Indicator">-</span> <span class="l l-Scalar l-Scalar-Plain">backend</span>
+            <span class="nt">command</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">/bin/bash -c &quot;envsubst &#39;$${APIS_PROJECT},$${APIS_SERVER_NAME}&#39; &lt; /config-apis/start-apis/nginx/nginx.template &gt; /etc/nginx/conf.d/default.conf &amp;&amp; exec nginx -g &#39;daemon off;&#39;&quot;</span>
+<span class="nt">networks</span><span class="p">:</span>
+<span class="nt">backend</span><span class="p">:</span>
+    <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">bridge</span>
+
+<span class="nt">volumes</span><span class="p">:</span>
+<span class="nt">config-volume</span><span class="p">:</span>
+        <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">local</span>
+<span class="nt">staticfiles-volume</span><span class="p">:</span>
+        <span class="nt">driver</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">local</span>
+</pre></div>
+</div>
+<p>After <code class="docutils literal notranslate"><span class="pre">docker-compose</span> <span class="pre">up</span></code> you should now have a default APIS installation accessible under <a class="reference external" href="http://localhost:8080">http://localhost:8080</a>.</p>
+</section>
+</section>
+<section id="installation-without-docker">
+<h1>Installation without Docker<a class="headerlink" href="#installation-without-docker" title="Permalink to this headline">¶</a></h1>
+<section id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
-<p>APIS webapp needs Python 3.5+ and several python packages that can be easily installed by using pip.</p>
+<p>APIS webapp needs Python 3.6+ and several python packages that can be easily installed by using <a class="reference external" href="https://pip.pypa.io/en/stable/">pip</a>,
+<a class="reference external" href="https://github.com/pypa/pipenv">pipenv</a>, or <a class="reference external" href="https://python-poetry.org/">poetry</a>.</p>
 <p>Create a new virtualenv and activate it:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">virtualenv -p pyton3.5 your_virtualenv_name</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">virtualenv -p pyton3 your_virtualenv_name</span>
 <span class="go">source your_virtualenv_name/bin/activate</span>
 </pre></div>
 </div>
 <p>To activate the virtualenv on Windows, go to the directory your_virtualenv_name/Scripts and run activate.bat from the command line.</p>
-</div>
-<div class="section" id="git-and-submodules">
-<h2>Git and submodules<a class="headerlink" href="#git-and-submodules" title="Permalink to this headline">¶</a></h2>
-<p>We use the system in several different projects. To allow for high configurability while keeping it simple we decided
-to split the system in several git submodules:</p>
-<ul class="simple">
-<li><p>apis-core: the main application code (we refer to it in the Installation Documentation as apisapp)</p></li>
-<li><p>apis-PROJECTNAME-settings (for the main system used in apis project we omit the PROJECTNAME in the repo names): The settings folder of the various projects. These contain not only the app settings (e.g.
-db user, db password etc.) but also the settings for the autocompletes and the RDF parsers.</p></li>
-<li><p>apis-PROJECTNAME-webpage: The webpage app of the respective project. Seperating these base templates and javascripts
-from the rest of the app allows us to give every project its very own look.</p></li>
-</ul>
-<p>If you want to get a basic running system that you can work from, you can clone apis-apis and initialize the submodules:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="o">--</span><span class="n">recursive</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">acdh</span><span class="o">-</span><span class="n">oeaw</span><span class="o">/</span><span class="n">apis</span><span class="o">.</span><span class="n">git</span>
-</pre></div>
-</div>
-<p>And to update the submodules to the latest commit:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">submodule</span> <span class="n">foreach</span> <span class="n">git</span> <span class="n">pull</span> <span class="n">origin</span> <span class="n">master</span>
-</pre></div>
-</div>
-<p>After that you need to set two symlinks:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">apis</span><span class="o">-</span><span class="n">core</span><span class="o">/</span><span class="n">apis</span>
-<span class="n">ln</span> <span class="o">-</span><span class="n">s</span> <span class="o">../../</span><span class="n">apis</span><span class="o">-</span><span class="n">settings</span> <span class="n">settings</span>
-<span class="n">cd</span> <span class="o">..</span>
-<span class="n">ln</span> <span class="o">-</span><span class="n">s</span> <span class="o">../</span><span class="n">apis</span><span class="o">-</span><span class="n">webpage</span> <span class="n">webpage</span>
-</pre></div>
-</div>
-<p>To set the two symlinks in Windows, run the following commands (run cmd in admin mode):</p>
-<blockquote>
-<div><p>cd apis-coreapis
-mklink /D settings ....apis-settings
-cd ..
-mklink /D webpage ..apis-webpage</p>
-</div></blockquote>
-<p>Now you have the correct folder structure in place and are good to go on with installing</p>
-</div>
-<div class="section" id="id1">
-<h2>Installation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="installation-on-a-linux-box">
+<h2>Installation on a linux box<a class="headerlink" href="#installation-on-a-linux-box" title="Permalink to this headline">¶</a></h2>
 <p>Change to the directory you have downloaded APIS to and install the needed Python packages:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">apis</span><span class="o">-</span><span class="n">core</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">r</span> <span class="n">requirements</span><span class="o">.</span><span class="n">txt</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cd apis-core</span>
+<span class="go">pip install -r requirements.txt</span>
 </pre></div>
 </div>
-<p>Next you need to create a file called copy the <code class="docutils literal notranslate"><span class="pre">APIS_directory/apis-core/apis/settings/dummysettings.py</span></code> file to another name.
+<p>Next you need to create a file called copy the <code class="docutils literal notranslate"><span class="pre">APIS_directory/apis-core/apis/settings/settings_test_ci.py</span></code> file to another name.
 We suggest <code class="docutils literal notranslate"><span class="pre">server.py</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cp</span> <span class="n">APIS_directory</span><span class="o">/</span><span class="n">apis</span><span class="o">-</span><span class="n">core</span><span class="o">/</span><span class="n">apis</span><span class="o">/</span><span class="n">settings</span><span class="o">/</span><span class="n">dummysettings</span><span class="o">.</span><span class="n">py</span> <span class="n">APIS_directory</span><span class="o">/</span><span class="n">apis</span><span class="o">-</span><span class="n">core</span><span class="o">/</span><span class="n">apis</span><span class="o">/</span><span class="n">settings</span><span class="o">/</span><span class="n">server</span><span class="o">.</span><span class="n">py</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cp</span> <span class="n">APIS_directory</span><span class="o">/</span><span class="n">apis</span><span class="o">-</span><span class="n">core</span><span class="o">/</span><span class="n">apis</span><span class="o">/</span><span class="n">settings</span><span class="o">/</span><span class="n">settings_test_ci</span><span class="o">.</span><span class="n">py</span> <span class="n">APIS_directory</span><span class="o">/</span><span class="n">apis</span><span class="o">-</span><span class="n">core</span><span class="o">/</span><span class="n">apis</span><span class="o">/</span><span class="n">settings</span><span class="o">/</span><span class="n">server</span><span class="o">.</span><span class="n">py</span>
 </pre></div>
 </div>
 <p>Edit <code class="docutils literal notranslate"><span class="pre">server.py</span></code> to your needs. E.g. if you intend to use Mysql it should look something like:</p>
@@ -266,31 +318,21 @@ We suggest <code class="docutils literal notranslate"><span class="pre">server.p
 </div>
 <p>Once that is done you dont have to include <code class="docutils literal notranslate"><span class="pre">--settings=apis.settings.server</span></code> in your commands anymore.</p>
 <p>Next we migrate the APIS internal tables:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python manage.py makemigrations metainfo entities relations vocabularies highlighter labels webpage</span>
-<span class="go">python manage.py migrate</span>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python manage.py migrate</span>
 </pre></div>
 </div>
 <p>and create a superuser:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python manage.py createsuperuser</span>
 </pre></div>
 </div>
-<p>answer the questions and change to the static directory to download javascript libraries:</p>
-<p>If you havent installed NPM and bower yet you need to run:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">sudo apt-get install npm</span>
-<span class="go">npm install -g bower</span>
-</pre></div>
-</div>
-<p>If you have already installed bower you can proceed with installing the javascript libraries directly:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">cd webpage/static/webpage/libraries</span>
-<span class="go">bower install</span>
-</pre></div>
-</div>
+<p>answer the questions and hit enter.
+Now you can already proceed running the development server:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python manage.py runserver</span>
 </pre></div>
 </div>
 <p>should bring up a development server window with your new apis instance.</p>
-</div>
-<div class="section" id="installation-on-windows">
+</section>
+<section id="installation-on-windows">
 <h2>Installation on Windows<a class="headerlink" href="#installation-on-windows" title="Permalink to this headline">¶</a></h2>
 <p>Change to the directory you have downloaded APIS to and install the needed Python packages
 In the command prompt that pops up after the activation of the virtualenv, change directory to where you have downloaded apis (eg. to apis-core) and install the modules in requirements.txt</p>
@@ -384,8 +426,8 @@ Open the Git Bash or Command Prompt and install bower with the following command
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">python manage.py runserver</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="serving-apis-via-apache-wsgi">
+</section>
+<section id="serving-apis-via-apache-wsgi">
 <h2>Serving APIS via Apache WSGI<a class="headerlink" href="#serving-apis-via-apache-wsgi" title="Permalink to this headline">¶</a></h2>
 <p>If you plan to use APIS in production you should deploy it via a proper webserver. We use <a class="reference external" href="https://httpd.apache.org/">Apache</a> and <code class="docutils literal notranslate"><span class="pre">mod_wsgi</span></code> to
 do so. Our apche virtualhost config looks something like:</p>
@@ -410,8 +452,8 @@ do so. Our apche virtualhost config looks something like:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>service apache2 reload
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -427,7 +469,7 @@ do so. Our apche virtualhost config looks something like:</p>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2017, Matthias Schlögl.
+        &#169; Copyright 2021, Matthias Schlögl.
 
     </p>
   </div>

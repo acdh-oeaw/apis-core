@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.18: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Data Model &mdash; APIS 0.1 documentation</title>
+  <title>Data Model &mdash; APIS 1.0 documentation</title>
   
 
   
@@ -42,7 +43,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Internal API" href="internal_api.html" />
-    <link rel="prev" title="Installation" href="installation.html" /> 
+    <link rel="prev" title="Installation with Docker" href="installation.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -66,7 +67,7 @@
             
             
               <div class="version">
-                0.1
+                1.0
               </div>
             
           
@@ -91,9 +92,10 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation with Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html#installation-without-docker">Installation without Docker</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Data Model</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#entities">Entities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#relations">Relations</a></li>
@@ -170,16 +172,18 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="data-model">
+  <section id="data-model">
 <h1>Data Model<a class="headerlink" href="#data-model" title="Permalink to this headline">¶</a></h1>
 <p>Our internal data model consists of entities, relations, vocabularies and some meta-classes (e.g. annotations,
 revisions etc.)</p>
-<div class="figure align-default" id="id1">
+<figure class="align-default" id="id1">
 <span id="fig-data-model"></span><img alt="Data model APIS" src="_images/data_model_apis.png" />
-<p class="caption"><span class="caption-text">Simplified data-model of the APIS webapp</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
-</div>
+<figcaption>
+<p><span class="caption-text">Simplified data-model of the APIS webapp</span><a class="headerlink" href="#id1" title="Permalink to this image">¶</a></p>
+</figcaption>
+</figure>
 <p>Please note that in the data-model schema in order to make the figure not too complex some arrows have been removed.</p>
-<div class="section" id="entities">
+<section id="entities">
 <h2>Entities<a class="headerlink" href="#entities" title="Permalink to this headline">¶</a></h2>
 <p>The entities build the core of the internal APIS data-model:</p>
 <ul class="simple">
@@ -193,20 +197,20 @@ the date of birth) and relations to other entities (e.g. the mother). It include
 would need a lot of entities to relate to each other.</p></li>
 <li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">entities.models.Work</span></code>: Basically anything that human beings produce: letters and books, paintings, buildings and cars.</p></li>
 </ul>
-</div>
-<div class="section" id="relations">
+</section>
+<section id="relations">
 <h2>Relations<a class="headerlink" href="#relations" title="Permalink to this headline">¶</a></h2>
 <p>Every entity in the APIS data model can be related to any other entity. Relations consist of:</p>
 <ul class="simple">
-<li><p>a start entity (e.g. a person for a personPlace relation)</p></li>
-<li><p>a target entity (e.g. a place for a personPlace relation)</p></li>
+<li><p>a start entity (e.g. a person for a PersonPlace relation)</p></li>
+<li><p>a target entity (e.g. a place for a PersonPlace relation)</p></li>
 <li><p>start and end dates of the relation</p></li>
 <li><p>a vocabulary entry to define the kind of relation</p></li>
 <li><p>reference- and notes fields. These are full-text fields to further define the relation.</p></li>
 </ul>
 <p>There are</p>
-</div>
-<div class="section" id="vocabularies">
+</section>
+<section id="vocabularies">
 <h2>Vocabularies<a class="headerlink" href="#vocabularies" title="Permalink to this headline">¶</a></h2>
 <p>As we already mentioned we use <a class="reference external" href="https://en.wikipedia.org/wiki/Simple_Knowledge_Organization_System">SKOS</a> like vocabularies to define entities and relations. These vocabulary entries
 use following attributes:</p>
@@ -218,8 +222,8 @@ relation needs a vocabulary entry describing the relation from the <em>Person</e
 by setting the parent class.</p></li>
 <li><p><em>description</em>: Can be used to further define the entry.</p></li>
 </ul>
-</div>
-<div class="section" id="annotations">
+</section>
+<section id="annotations">
 <h2>Annotations<a class="headerlink" href="#annotations" title="Permalink to this headline">¶</a></h2>
 <p>The third important part of the data model are annotations. We store annotations as character offset with start and end
 character (please see <code class="xref py py-class docutils literal notranslate"><span class="pre">highlighter.models.Annotation</span></code> for details). Every <code class="xref py py-class docutils literal notranslate"><span class="pre">highlighter.models.Annotation</span></code>
@@ -230,10 +234,10 @@ is associated with:</p>
 </dd>
 </dl>
 </li>
-<li><p>an entity or relation (optional): anything within <span class="xref std std-ref">entities-models</span> or <span class="xref std std-ref">relations-models</span>.</p></li>
+<li><p>an entity or relation (optional): anything within <a class="reference internal" href="modules/entities.html#entities-models"><span class="std std-ref">Entities</span></a> or <a class="reference internal" href="modules/relations.html#relations-models"><span class="std std-ref">Relations</span></a>.</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -242,14 +246,14 @@ is associated with:</p>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
         <a href="internal_api.html" class="btn btn-neutral float-right" title="Internal API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation with Docker" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2017, Matthias Schlögl.
+        &#169; Copyright 2021, Matthias Schlögl.
 
     </p>
   </div>

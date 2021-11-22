@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>apis_core.apis_relations.models &mdash; APIS 0.1 documentation</title>
+  <title>apis_core.apis_relations.models &mdash; APIS 1.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1
+                1.0
               </div>
             
           
@@ -89,9 +89,10 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation with Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#installation-without-docker">Installation without Docker</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_model.html">Data Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../internal_api.html">Internal API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../user_documentation.html">User documentation</a></li>
@@ -223,11 +224,11 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">ann_proj</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">qs</span>
             <span class="n">users_show</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;users_show_highlighter&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">query</span> <span class="o">=</span> <span class="n">Q</span><span class="p">(</span><span class="n">annotation__annotation_project_id</span><span class="o">=</span><span class="n">ann_proj</span><span class="p">)</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="n">Q</span><span class="p">(</span><span class="n">annotation_set__annotation_project_id</span><span class="o">=</span><span class="n">ann_proj</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">users_show</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">query</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">annotation__user_added_id__in</span><span class="o">=</span><span class="n">users_show</span><span class="p">),</span> <span class="n">Q</span><span class="o">.</span><span class="n">AND</span><span class="p">)</span>
+            <span class="n">query</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">annotation_set__user_added_id__in</span><span class="o">=</span><span class="n">users_show</span><span class="p">),</span> <span class="n">Q</span><span class="o">.</span><span class="n">AND</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">include_all</span><span class="p">:</span>
-            <span class="n">query</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">annotation__annotation_project__isnull</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">Q</span><span class="o">.</span><span class="n">OR</span><span class="p">)</span>
+            <span class="n">query</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">annotation_set__annotation_project__isnull</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">Q</span><span class="o">.</span><span class="n">OR</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">qs</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">query</span><span class="p">)</span></div></div>
 
 
@@ -730,7 +731,7 @@
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2017, Matthias Schlögl.
+        &#169; Copyright 2021, Matthias Schlögl.
 
     </p>
   </div>

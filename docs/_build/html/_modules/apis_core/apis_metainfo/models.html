@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>apis_core.apis_metainfo.models &mdash; APIS 0.1 documentation</title>
+  <title>apis_core.apis_metainfo.models &mdash; APIS 1.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1
+                1.0
               </div>
             
           
@@ -89,9 +89,10 @@
               
             
             
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation with Docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html#installation-without-docker">Installation without Docker</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../data_model.html">Data Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../internal_api.html">Internal API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../user_documentation.html">User documentation</a></li>
@@ -178,6 +179,7 @@
 <span class="kn">from</span> <span class="nn">django.db.models.query</span> <span class="kn">import</span> <span class="n">QuerySet</span>
 <span class="kn">from</span> <span class="nn">django.urls</span> <span class="kn">import</span> <span class="n">reverse</span>
 <span class="kn">from</span> <span class="nn">django.utils.functional</span> <span class="kn">import</span> <span class="n">cached_property</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">inf</span>
 <span class="kn">from</span> <span class="nn">model_utils.managers</span> <span class="kn">import</span> <span class="n">InheritanceManager</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 
@@ -185,15 +187,12 @@
 <span class="kn">from</span> <span class="nn">apis_core.apis_labels.models</span> <span class="kn">import</span> <span class="n">Label</span>
 <span class="kn">from</span> <span class="nn">apis_core.apis_vocabularies.models</span> <span class="kn">import</span> <span class="n">CollectionType</span><span class="p">,</span> <span class="n">LabelType</span><span class="p">,</span> <span class="n">TextType</span>
 
+<span class="kn">from</span> <span class="nn">django.contrib.contenttypes.fields</span> <span class="kn">import</span> <span class="n">GenericRelation</span>
 <span class="c1"># from helper_functions.highlighter import highlight_text</span>
 <span class="kn">from</span> <span class="nn">apis_core.default_settings.NER_settings</span> <span class="kn">import</span> <span class="n">autocomp_settings</span>
 <span class="kn">from</span> <span class="nn">apis_core.helper_functions</span> <span class="kn">import</span> <span class="n">DateParser</span>
 
 <span class="n">NEXT_PREV</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">settings</span><span class="p">,</span> <span class="s2">&quot;APIS_NEXT_PREV&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-
-
-<span class="k">if</span> <span class="s2">&quot;apis_highlighter&quot;</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">INSTALLED_APPS</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">apis_highlighter.models</span> <span class="kn">import</span> <span class="n">Annotation</span>
 
 
 <div class="viewcode-block" id="TempEntityClass"><a class="viewcode-back" href="../../../modules/metainfo.html#apis_core.apis_metainfo.models.TempEntityClass">[docs]</a><span class="nd">@reversion</span><span class="o">.</span><span class="n">register</span><span class="p">()</span>
@@ -241,6 +240,10 @@
     <span class="n">published</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="n">objects</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">Manager</span><span class="p">()</span>
     <span class="n">objects_inheritance</span> <span class="o">=</span> <span class="n">InheritanceManager</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="s2">&quot;apis_highlighter&quot;</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">INSTALLED_APPS</span><span class="p">:</span>
+        <span class="kn">from</span> <span class="nn">apis_highlighter.models</span> <span class="kn">import</span> <span class="n">Annotation</span>
+        <span class="n">annotation_set</span> <span class="o">=</span> <span class="n">GenericRelation</span><span class="p">(</span><span class="n">Annotation</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span>
@@ -412,6 +415,7 @@
             <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">merge_with</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entities</span><span class="p">):</span>
+        <span class="n">e_a_pk</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span>
         <span class="n">e_a</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
         <span class="n">self_model_class</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
             <span class="n">app_label</span><span class="o">=</span><span class="s2">&quot;apis_entities&quot;</span><span class="p">,</span> <span class="n">model__iexact</span><span class="o">=</span><span class="n">e_a</span>
@@ -427,8 +431,12 @@
         <span class="n">rels</span> <span class="o">=</span> <span class="n">ContentType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
             <span class="n">app_label</span><span class="o">=</span><span class="s2">&quot;apis_relations&quot;</span><span class="p">,</span> <span class="n">model__icontains</span><span class="o">=</span><span class="n">e_a</span>
         <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">entities</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">ent</span> <span class="ow">in</span> <span class="n">entities</span><span class="p">:</span>
             <span class="n">e_b</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">ent</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="n">e_b_pk</span> <span class="o">=</span> <span class="n">ent</span><span class="o">.</span><span class="n">pk</span>
+            <span class="k">if</span> <span class="n">e_b_pk</span> <span class="o">==</span> <span class="n">e_a_pk</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You can not merge an entity with itself&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">e_a</span> <span class="o">!=</span> <span class="n">e_b</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="n">lt</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">LabelType</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;Legacy name (merge)&quot;</span><span class="p">)</span>
@@ -468,6 +476,7 @@
                     <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">k</span><span class="p">:</span>
                         <span class="nb">setattr</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="s2">&quot;related_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">e_a</span><span class="o">.</span><span class="n">lower</span><span class="p">()),</span> <span class="bp">self</span><span class="p">)</span>
                         <span class="n">t</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
             <span class="n">ent</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">get_serialization</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -540,6 +549,8 @@
             <span class="k">return</span> <span class="s2">&quot;ID: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">check_for_deleted_annotations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+        <span class="kn">from</span> <span class="nn">apis_highlighter.models</span> <span class="kn">import</span> <span class="n">Annotation</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">deleted</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">orig</span> <span class="o">=</span> <span class="n">Text</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
@@ -567,30 +578,99 @@
         <span class="k">return</span> <span class="n">deleted</span>
 
 <div class="viewcode-block" id="Text.save"><a class="viewcode-back" href="../../../modules/metainfo.html#apis_core.apis_metainfo.models.Text.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pk</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">orig</span> <span class="o">=</span> <span class="n">Text</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">orig</span><span class="o">.</span><span class="n">text</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="ow">and</span> <span class="s2">&quot;apis_highlighter&quot;</span> <span class="ow">in</span> <span class="n">settings</span><span class="o">.</span><span class="n">INSTALLED_APPS</span><span class="p">:</span>
-                <span class="n">ann</span> <span class="o">=</span> <span class="n">Annotation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">text_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">)</span>
-                <span class="n">seq</span> <span class="o">=</span> <span class="n">SequenceMatcher</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">orig</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">ann</span><span class="p">:</span>
-                    <span class="n">changed</span> <span class="o">=</span> <span class="kc">False</span>
-                    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
-                    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">seq</span><span class="o">.</span><span class="n">get_matching_blocks</span><span class="p">():</span>
-                        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
-                        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">a</span> <span class="o">&lt;=</span> <span class="n">a</span><span class="o">.</span><span class="n">start</span> <span class="ow">and</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">a</span> <span class="o">+</span> <span class="n">s</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">a</span><span class="o">.</span><span class="n">end</span><span class="p">:</span>
-                            <span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-                            <span class="n">old_start</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
-                            <span class="n">old_end</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
-                            <span class="n">new_start</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">start</span> <span class="o">+</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="n">s</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
-                            <span class="n">new_end</span> <span class="o">=</span>  <span class="n">a</span><span class="o">.</span><span class="n">end</span> <span class="o">+</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">b</span> <span class="o">-</span> <span class="n">s</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
-                            <span class="k">if</span> <span class="n">orig</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="n">old_start</span><span class="p">:</span><span class="n">old_end</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">[</span><span class="n">new_start</span><span class="p">:</span><span class="n">new_end</span><span class="p">]:</span>
-                                <span class="n">a</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">new_start</span>
-                                <span class="n">a</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">new_end</span>
-                                <span class="n">a</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
-                                <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
-                                <span class="k">break</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="n">changed</span><span class="p">:</span>
-                        <span class="n">a</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>  <span class="c1"># TODO: we might want to delete relations as well.</span>
+                <span class="kn">from</span> <span class="nn">apis_highlighter.models</span> <span class="kn">import</span> <span class="n">Annotation</span>
+                <span class="k">def</span> <span class="nf">calculate_context_weights</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">i_start</span><span class="p">,</span> <span class="n">i_end</span><span class="p">):</span>
+
+                    <span class="k">def</span> <span class="nf">calculate_word_dict</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">direction</span><span class="p">):</span>
+
+                        <span class="n">word_list</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; |</span><span class="se">\\</span><span class="s2">n&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+                        <span class="n">word_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">word_list</span> <span class="k">if</span> <span class="n">w</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">]</span>
+
+                        <span class="n">word_dict</span> <span class="o">=</span> <span class="p">{}</span>
+
+                        <span class="k">if</span> <span class="n">word_list</span> <span class="o">!=</span> <span class="p">[]:</span>
+
+                            <span class="n">value_step</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">word_list</span><span class="p">)</span>
+                            <span class="n">value_current</span> <span class="o">=</span> <span class="mi">1</span>
+                            <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">word_list</span><span class="p">[::</span><span class="n">direction</span><span class="p">]:</span>
+                                <span class="n">word_value</span> <span class="o">=</span> <span class="n">word_dict</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                                <span class="n">word_dict</span><span class="p">[</span><span class="n">word</span><span class="p">]</span> <span class="o">=</span> <span class="n">word_value</span> <span class="o">+</span> <span class="n">value_current</span>
+                                <span class="n">value_current</span> <span class="o">-=</span> <span class="n">value_step</span>
+
+                        <span class="k">return</span> <span class="n">word_dict</span>
+
+                    <span class="n">text_left</span> <span class="o">=</span> <span class="n">text</span><span class="p">[:</span><span class="n">i_start</span><span class="p">]</span>
+                    <span class="n">text_right</span> <span class="o">=</span> <span class="n">text</span><span class="p">[</span><span class="n">i_end</span><span class="p">:]</span>
+                    <span class="n">word_dict_left</span> <span class="o">=</span> <span class="n">calculate_word_dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">text_left</span><span class="p">,</span> <span class="n">direction</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="n">word_dict_right</span> <span class="o">=</span> <span class="n">calculate_word_dict</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="n">text_right</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+                    <span class="k">return</span> <span class="p">{</span>
+                        <span class="s2">&quot;word_dict_left&quot;</span><span class="p">:</span> <span class="n">word_dict_left</span><span class="p">,</span>
+                        <span class="s2">&quot;word_dict_right&quot;</span><span class="p">:</span> <span class="n">word_dict_right</span><span class="p">,</span>
+                    <span class="p">}</span>
+
+                <span class="k">def</span> <span class="nf">make_diff</span><span class="p">(</span><span class="n">word_dict_a</span><span class="p">,</span> <span class="n">word_dict_b</span><span class="p">):</span>
+
+                    <span class="n">words_all</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">word_dict_a</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">word_dict_b</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+                    <span class="n">diff_all</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words_all</span><span class="p">:</span>
+                        <span class="n">word_value_a</span> <span class="o">=</span> <span class="n">word_dict_a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                        <span class="n">word_value_b</span> <span class="o">=</span> <span class="n">word_dict_b</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                        <span class="n">diff_all</span> <span class="o">+=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">word_value_a</span> <span class="o">-</span> <span class="n">word_value_b</span><span class="p">)</span>
+
+                    <span class="k">return</span> <span class="n">diff_all</span>
+
+                <span class="k">def</span> <span class="nf">correlate_annotations</span><span class="p">(</span><span class="n">text_old</span><span class="p">,</span> <span class="n">text_new</span><span class="p">,</span> <span class="n">annotations_old</span><span class="p">):</span>
+
+                    <span class="k">for</span> <span class="n">ann</span> <span class="ow">in</span> <span class="n">annotations_old</span><span class="p">:</span>
+                        <span class="n">i_old_start</span> <span class="o">=</span> <span class="n">ann</span><span class="o">.</span><span class="n">start</span>
+                        <span class="n">i_old_end</span> <span class="o">=</span> <span class="n">ann</span><span class="o">.</span><span class="n">end</span>
+                        <span class="n">context_weights_dict_old</span> <span class="o">=</span> <span class="n">calculate_context_weights</span><span class="p">(</span>
+                            <span class="n">text</span><span class="o">=</span><span class="n">text_old</span><span class="p">,</span>
+                            <span class="n">i_start</span><span class="o">=</span><span class="n">i_old_start</span><span class="p">,</span>
+                            <span class="n">i_end</span><span class="o">=</span><span class="n">i_old_end</span>
+                        <span class="p">)</span>
+                        <span class="n">ann_text</span> <span class="o">=</span> <span class="n">text_old</span><span class="p">[</span><span class="n">ann</span><span class="o">.</span><span class="n">start</span><span class="p">:</span><span class="n">ann</span><span class="o">.</span><span class="n">end</span><span class="p">]</span>
+                        <span class="n">diff_min</span> <span class="o">=</span> <span class="n">inf</span>
+                        <span class="n">i_new_start</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="n">i_new_end</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">finditer</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(?=</span><span class="si">{</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">ann_text</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">text_new</span><span class="p">):</span>
+                            <span class="n">i_candidate_start</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+                            <span class="n">i_candidate_end</span> <span class="o">=</span> <span class="n">i_candidate_start</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">ann_text</span><span class="p">)</span>
+                            <span class="n">context_weights_dict_new</span> <span class="o">=</span> <span class="n">calculate_context_weights</span><span class="p">(</span>
+                                <span class="n">text</span><span class="o">=</span><span class="n">text_new</span><span class="p">,</span> <span class="n">i_start</span><span class="o">=</span><span class="n">i_candidate_start</span><span class="p">,</span> <span class="n">i_end</span><span class="o">=</span><span class="n">i_candidate_end</span>
+                            <span class="p">)</span>
+                            <span class="n">diff_left</span> <span class="o">=</span> <span class="n">make_diff</span><span class="p">(</span>
+                                <span class="n">context_weights_dict_new</span><span class="p">[</span><span class="s2">&quot;word_dict_left&quot;</span><span class="p">],</span>
+                                <span class="n">context_weights_dict_old</span><span class="p">[</span><span class="s2">&quot;word_dict_left&quot;</span><span class="p">]</span>
+                            <span class="p">)</span>
+                            <span class="n">diff_right</span> <span class="o">=</span> <span class="n">make_diff</span><span class="p">(</span>
+                                <span class="n">context_weights_dict_new</span><span class="p">[</span><span class="s2">&quot;word_dict_right&quot;</span><span class="p">],</span>
+                                <span class="n">context_weights_dict_old</span><span class="p">[</span><span class="s2">&quot;word_dict_right&quot;</span><span class="p">]</span>
+                            <span class="p">)</span>
+                            <span class="n">diff_current</span> <span class="o">=</span> <span class="n">diff_left</span> <span class="o">+</span> <span class="n">diff_right</span>
+                            <span class="k">if</span> <span class="n">diff_current</span> <span class="o">&lt;</span> <span class="n">diff_min</span><span class="p">:</span>
+                                <span class="n">diff_min</span> <span class="o">=</span> <span class="n">diff_current</span>
+                                <span class="n">i_new_start</span> <span class="o">=</span> <span class="n">i_candidate_start</span>
+                                <span class="n">i_new_end</span> <span class="o">=</span> <span class="n">i_candidate_end</span>
+
+                        <span class="k">if</span> <span class="n">diff_min</span> <span class="o">!=</span> <span class="n">inf</span><span class="p">:</span>
+                            <span class="n">ann</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">i_new_start</span>
+                            <span class="n">ann</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">i_new_end</span>
+                            <span class="n">ann</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ann</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span> <span class="c1"># TODO: we might want to delete relations as well.</span>
+
+                <span class="n">correlate_annotations</span><span class="p">(</span>
+                    <span class="n">text_old</span><span class="o">=</span><span class="n">orig</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                    <span class="n">text_new</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                    <span class="n">annotations_old</span><span class="o">=</span><span class="n">Annotation</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">text_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">pk</span><span class="p">)</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
 
 
@@ -688,7 +768,7 @@
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2017, Matthias Schlögl.
+        &#169; Copyright 2021, Matthias Schlögl.
 
     </p>
   </div>
