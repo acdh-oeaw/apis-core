@@ -189,7 +189,7 @@ class WorkTypeSerializer(VocabsBaseSerializer):
         model = WorkType
 
 
-class LabelTypeSerializer(serializers.ModelSerializer):
+class LabelTypeMinimalSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = ('id', 'name')
