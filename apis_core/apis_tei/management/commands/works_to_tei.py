@@ -1,11 +1,11 @@
 import lxml.etree as ET
 from django.core.management.base import BaseCommand
 
-from apis_core.apis_entities.models import Institution
+from apis_core.apis_entities.models import Work
 from apis_core.apis_tei.tei_utils import get_node_from_template, tei_header
 
 class Command(BaseCommand):
-    help = 'Command to serialize APIS Institutions to XML/TEI places.xml'
+    help = 'Command to serialize APIS Works to XML/TEI places.xml'
 
     def add_arguments(self, parser):
         parser.add_argument(
@@ -27,8 +27,8 @@ class Command(BaseCommand):
     
     def handle(self, *args, **kwargs):
 
-        tei_doc = tei_header(title="ListOrg", ent_type="<listOrg/>")
-        entity_list = tei_doc.xpath("//*[local-name() = 'listOrg']")[0] 
+        tei_doc = tei_header(title="ListBibl", ent_type="<listBibl/>")
+        entity_list = tei_doc.xpath("//*[local-name() = 'listBibl']")[0] 
 
         if kwargs['full']:
             print("full is set")
@@ -44,18 +44,18 @@ class Command(BaseCommand):
                 print(f"collection needs to be an integer and not: {kwargs['collection']}")
                 return False
         
-            items = Institution.objects.filter(collection=col_id)
+            items = Work.objects.filter(collection=col_id)
         else:
-            items = Institution.objects.all()
+            items = Work.objects.all()
         if kwargs['limit']:
             items = items[:25]
-        print(f"serialize {items.count()} Orgs")
+        print(f"serialize {items.count()} Works")
         for res in items:
             item_node = get_node_from_template(
-                'apis_tei/org.xml', res, full=full
+                'apis_tei/work.xml', res, full=full
             )
             entity_list.append(item_node)
         
-        with open('listorg.xml', 'w') as f:
+        with open('listwork.xml', 'w') as f:
             print(ET.tostring(tei_doc).decode('utf-8'), file=f)
         print("done")

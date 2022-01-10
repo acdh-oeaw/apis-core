@@ -1,0 +1,47 @@
+<bibl xml:id="work__{{ object.id }}">
+  <title type="main">{{ object.name }}</title>
+{% for x in object.label_set.all %}
+  <title type="{{ x.label_type|slugify }}">{{ x }}</title>
+{% endfor %}
+{% for x in item_located_in %}
+<pubPlace >
+  <placeName key="place__{{ x.related_place.id }}">{{ x.related_place.name }}</placeName>
+  {% if x.related_place.lat %}<geo>{{ x.related_place.lat }} {{ x.related_place.lng }}</geo>{% endif %}
+  {% for y in x.related_place.uri_set.all %}
+  <note type="IDNO" {% if y.domain %} subtype="{{ y.domain|slugify }}" {% endif %}>{{ y }}</note>
+  {% endfor %}
+</pubPlace>
+{% endfor %}
+{% if object.start_date_written %}
+<date
+      {% if object.start_start_date %}
+        notBefore-iso="{{ object.start_start_date|date:'Y-m-d' }}"
+      {% endif %}
+      {% if object.start_date %}
+        when-iso="{{ object.start_date|date:'Y-m-d' }}"
+      {% endif %}
+      {% if object.start_end_date %}
+        notAfter-iso="{{ object.start_end_date|date:'Y-m-d' }}"
+      {% endif %}
+    >{{ object.start_date_written }}</date>
+{% endif %}
+{% for x in object.uri_set.all %}
+  <idno type="URL" {% if x.domain %} subtype="{{ x.domain|slugify }}" {% endif %}>{{ x }}</idno>
+{% endfor %}
+{% if object.collection.all %}
+<note type="collections">
+  {% for x in object.collection.all %}
+  <bibl type="collections" n="{{ x.id }}">{{ x.name }}</bibl>
+  {% endfor %}
+</note>
+{% endif %}
+{% if object.note %}
+  <note type="note">{{ object.note }}</note>
+{% endif %}
+{% if object.kind %}
+  <note type="work_kind">{{ object.kind }}</note>
+{% endif %}
+{% if object.references %}
+  <note type="references">{{ object.references }}</note>
+{% endif %}
+</bibl>
