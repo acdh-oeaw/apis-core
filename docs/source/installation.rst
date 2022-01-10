@@ -1,7 +1,7 @@
 Installation with Docker
 ========================
 
-This is the recommendated way to install APIS on local machines as well as on server infrastructure.
+This is the recommended way to install APIS on local machines as well as on server infrastructure.
 
 Docker Image
 ------------

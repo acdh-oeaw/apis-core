@@ -48,6 +48,11 @@ urlpatterns = [
         name="generic_entities_stanbol_create",
     ),
     url(
+        r"^autocomplete/(?P<entity>[a-zA-Z0-9-]+)/(?P<ent_merge_pk>[0-9]+)/$",
+        GenericEntitiesAutocomplete.as_view(),
+        name="generic_entities_autocomplete",
+    ),
+    url(
         r"^autocomplete/(?P<entity>[a-zA-Z0-9-]+)/$",
         GenericEntitiesAutocomplete.as_view(),
         name="generic_entities_autocomplete",

@@ -34,8 +34,8 @@ Relations
 
 Every entity in the APIS data model can be related to any other entity. Relations consist of:
 
-* a start entity (e.g. a person for a personPlace relation)
-* a target entity (e.g. a place for a personPlace relation)
+* a start entity (e.g. a person for a PersonPlace relation)
+* a target entity (e.g. a place for a PersonPlace relation)
 * start and end dates of the relation
 * a vocabulary entry to define the kind of relation
 * reference- and notes fields. These are full-text fields to further define the relation.

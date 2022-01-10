@@ -6,16 +6,17 @@
 Welcome to APIS's documentation!
 ================================
 
-.. include:: ../README.rst
+.. include:: ../../README.rst
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
 
    installation
+   configuration
+   user_documentation
    data_model
    internal_api
-   user_documentation
 
 
 Indices and tables

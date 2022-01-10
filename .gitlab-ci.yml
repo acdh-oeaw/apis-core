@@ -2,7 +2,8 @@ workflow:
   rules:
     - if: $CI_COMMIT_MESSAGE =~ /-doc$/
       when: never
-    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
 
 variables:
   DOCKER_HOST: tcp://docker:2375/
@@ -23,6 +24,7 @@ before_script:
   - pip install poetry
   - poetry config virtualenvs.create false
   - poetry config pypi-token.pypi ${PYPI_TOKEN}
+  - poetry update
   - poetry install
 
 test:

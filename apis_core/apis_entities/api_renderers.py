@@ -8,7 +8,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.utils import timezone
 from rdflib import XSD, Graph, Literal, Namespace, URIRef, ConjunctiveGraph, OWL
 from rdflib.namespace import DCTERMS, VOID
-from rdflib.plugins.memory import IOMemory
+from rdflib import plugin
 from rdflib.void import generateVoID
 from rest_framework import renderers
 
@@ -70,7 +70,7 @@ class EntityToCIDOC(renderers.BaseRenderer):
         geo = Namespace("http://www.opengis.net/ont/geosparql#")
         frbroo = Namespace("http://iflastandards.info/ns/fr/frbr/frbroo#")
         if not store:
-            store = IOMemory()
+            store = plugin.get("Memory", Store)()
         if named_graph:
             uri_entities = URIRef(named_graph)
         else:

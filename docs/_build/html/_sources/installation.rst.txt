@@ -1,69 +1,122 @@
-Installation
-============
+Installation with Docker
+========================
+
+This is the recommended way to install APIS on local machines as well as on server infrastructure.
+
+Docker Image
+------------
+APIS docker images can be pulled from `docker hub <https://hub.docker.com/repository/docker/sennierer/apis>`_. Images are tagged
+from v0.9.1 onwards. Latest image is tagged with :latest.
+The images are automatically built and tagged and should be up-to-date with altest versions of code.
+
+Docker Compose
+--------------
+
+The following docker-compose file can be used as a starting point for deploying an APIS instance:
+
+.. code-block:: yaml
+
+    version: '2'
+
+
+    services:
+            web:
+                image: sennierer/apis:latest
+                environment:
+                    - APIS_PROJECT=apis_test #as used in the apis-settings repo
+                    - APIS_DB_NAME=testdb 
+                    - APIS_DB_USER=testuser
+                    - APIS_DB_PASSWORD=testpwd
+                    - APIS_DB_HOST=database
+                    - APIS_DB_PORT=3306
+                    - APIS_AUTO_CREATE_DB=1
+                    - DJANGO_SUPERUSER_PASSWORD=adminpass123 #change that to admin password
+                    - DJANGO_SUPERUSER_USERNAME=admin #change that to admin username
+                    - DJANGO_SUPERUSER_EMAIL=my_user@domain.com #change that to email
+                    # and more e.g. APIS_DB_PORT >> apis-webpage-base/apis/settings/base.py
+                container_name: apis_core_apis_test #use apis_core_$APIS_PROJECT, e.g. apis_core_mpr
+                command: sh /start-apis/start-apis/start.sh 
+                volumes:           
+                        - config-volume:/config-apis    
+                        - staticfiles-volume:/apis/apis-webpage-base/staticfiles
+                networks:
+                - backend
+                depends_on:
+                - database
+            
+            database:
+                image: mysql:5.7
+                command: --default-authentication-plugin=mysql_native_password
+                restart: always
+                environment:
+                        - MYSQL_ROOT_PASSWORD=rootpwd
+                        - MYSQL_DATABASE=testdb
+                        - MYSQL_USER=testuser
+                        - MYSQL_PASSWORD=testpwd
+                networks:
+                        - backend
+            nginx:
+                image: nginx:latest
+                container_name: ngx_apis_apis_test #use ngx_apis_$PROJECT_NAME, e.g, ngx_apis_mpr
+                environment:
+                    - APIS_PROJECT=apis_test
+                    - APIS_SERVER_NAME=localhost #as used in the apis-settings repo >> needs to be present in both images
+                volumes:
+                    - config-volume:/config-apis    
+                    - staticfiles-volume:/staticfiles  
+                ports:
+                        - "8080:81"
+                depends_on:
+                        - web
+                networks:
+                    - backend
+                command: /bin/bash -c "envsubst '$${APIS_PROJECT},$${APIS_SERVER_NAME}' < /config-apis/start-apis/nginx/nginx.template > /etc/nginx/conf.d/default.conf && exec nginx -g 'daemon off;'"
+    networks:
+    backend:
+        driver: bridge
+
+    volumes:
+    config-volume:
+            driver: local
+    staticfiles-volume:
+            driver: local
+
+After ``docker-compose up`` you should now have a default APIS installation accessible under http://localhost:8080.
+
+
+Installation without Docker
+===========================
 
 Prerequisites
 -------------
 
-APIS webapp needs Python 3.5+ and several python packages that can be easily installed by using pip.
+APIS webapp needs Python 3.6+ and several python packages that can be easily installed by using `pip <https://pip.pypa.io/en/stable/>`_, 
+`pipenv <https://github.com/pypa/pipenv>`_, or `poetry <https://python-poetry.org/>`_.
 
 Create a new virtualenv and activate it:
 
 .. code-block:: console
 
-   virtualenv -p pyton3.5 your_virtualenv_name
+   virtualenv -p pyton3 your_virtualenv_name
    source your_virtualenv_name/bin/activate
 
 To activate the virtualenv on Windows, go to the directory your_virtualenv_name/Scripts and run activate.bat from the command line.
 
-Git and submodules
-------------------
 
-We use the system in several different projects. To allow for high configurability while keeping it simple we decided
-to split the system in several git submodules:
+Installation on a linux box
+----------------------------
 
-* apis-core: the main application code (we refer to it in the Installation Documentation as apisapp)
-* apis-PROJECTNAME-settings (for the main system used in apis project we omit the PROJECTNAME in the repo names): The settings folder of the various projects. These contain not only the app settings (e.g.
-  db user, db password etc.) but also the settings for the autocompletes and the RDF parsers.
-* apis-PROJECTNAME-webpage: The webpage app of the respective project. Seperating these base templates and javascripts
-  from the rest of the app allows us to give every project its very own look.
+Change to the directory you have downloaded APIS to and install the needed Python packages:
 
-If you want to get a basic running system that you can work from, you can clone apis-apis and initialize the submodules::
-
-    git clone --recursive https://github.com/acdh-oeaw/apis.git
-
-And to update the submodules to the latest commit::
-
-    git submodule foreach git pull origin master
-
-After that you need to set two symlinks::
-
-    cd apis-core/apis
-    ln -s ../../apis-settings settings
-    cd ..
-    ln -s ../apis-webpage webpage
-
-To set the two symlinks in Windows, run the following commands (run cmd in admin mode):
-
-    cd apis-core\apis
-    mklink /D settings ..\..\apis-settings
-    cd ..
-    mklink /D webpage ..\apis-webpage
-
-
-Now you have the correct folder structure in place and are good to go on with installing
-
-Installation
-------------
-
-Change to the directory you have downloaded APIS to and install the needed Python packages::
+.. code-block:: console
 
     cd apis-core
     pip install -r requirements.txt
 
-Next you need to create a file called copy the ``APIS_directory/apis-core/apis/settings/dummysettings.py`` file to another name.
+Next you need to create a file called copy the ``APIS_directory/apis-core/apis/settings/settings_test_ci.py`` file to another name.
 We suggest ``server.py``::
 
-    cp APIS_directory/apis-core/apis/settings/dummysettings.py APIS_directory/apis-core/apis/settings/server.py
+    cp APIS_directory/apis-core/apis/settings/settings_test_ci.py APIS_directory/apis-core/apis/settings/server.py
 
 Edit ``server.py`` to your needs. E.g. if you intend to use Mysql it should look something like::
 
@@ -108,7 +161,6 @@ Next we migrate the APIS internal tables:
 
 .. code-block:: console
 
-    python manage.py makemigrations metainfo entities relations vocabularies highlighter labels webpage
     python manage.py migrate
 
 and create a superuser:
@@ -117,21 +169,8 @@ and create a superuser:
 
     python manage.py createsuperuser
 
-answer the questions and change to the static directory to download javascript libraries:
-
-If you havent installed NPM and bower yet you need to run:
-
-.. code-block:: console
-
-    sudo apt-get install npm
-    npm install -g bower
-
-If you have already installed bower you can proceed with installing the javascript libraries directly:
-
-.. code-block:: console
-
-    cd webpage/static/webpage/libraries
-    bower install
+answer the questions and hit enter.
+Now you can already proceed running the development server:
 
 .. code-block:: console
 

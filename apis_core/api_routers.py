@@ -211,9 +211,13 @@ def generic_serializer_creation_factory():
             set_prem = getattr(settings, cont.__module__.split(".")[1].upper(), {})
             exclude_lst = deep_get(set_prem, "exclude", [])
             exclude_lst.extend(deep_get(set_prem, "{}.exclude".format(entity_str), []))
-        exclude_lst_fin = [
-            x for x in exclude_lst if x in [x.name for x in entity._meta.get_fields()]
-        ]
+        entity_field_name_list = []
+        for x in entity._meta.get_fields():
+            entity_field_name_list.append(x.name)
+        exclude_lst_fin = []
+        for x in exclude_lst:
+            if x in entity_field_name_list:
+                exclude_lst_fin.append(x)
         if entity_str.lower() == "text":
             exclude_lst_fin.extend(["kind", "source"])
         if app_label == "apis_relations":
