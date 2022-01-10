@@ -37,4 +37,9 @@ urlpatterns = [
         views.org_as_tei,
         name='org_as_tei'
     ),
+    url(
+        r'^work/(?P<pk>[0-9]+)$',
+        views.work_as_tei,
+        name='work_as_tei'
+    ),
 ]

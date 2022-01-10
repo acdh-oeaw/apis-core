@@ -2,9 +2,7 @@
 
 ## endpoints
 
-* `/apis/tei/person/{id}`
-* `/apis/tei/place/{id}`
-* `/apis/tei/ort|institution/{id}`
+* `/apis/tei/ort|institution|work|person/{id}`
 
 ## needed settings
 
