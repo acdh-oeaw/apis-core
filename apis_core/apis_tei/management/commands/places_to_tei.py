@@ -1,5 +1,6 @@
 import lxml.etree as ET
 from django.core.management.base import BaseCommand
+from tqdm import tqdm
 
 from apis_core.apis_entities.models import Place
 from apis_core.apis_tei.tei_utils import get_node_from_template, tei_header
@@ -12,7 +13,7 @@ class Command(BaseCommand):
             '-l',
             '--limit',
             action='store_true',
-            help='should number of entities should be limited',
+            help='number of entities should be limited',
         )
         parser.add_argument(
             '-f',
@@ -50,7 +51,7 @@ class Command(BaseCommand):
         if kwargs['limit']:
             items = items[:25]
         print(f"serialize {items.count()} Places")
-        for res in items:
+        for res in tqdm(items, total=len(items)):
             item_node = get_node_from_template(
                 'apis_tei/place.xml', res, full=full
             )

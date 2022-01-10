@@ -3,6 +3,11 @@
 {% for x in object.label_set.all %}
   <title type="{{ x.label_type|slugify }}">{{ x }}</title>
 {% endfor %}
+{% if author_rels %}
+{% for x in author_rels %}
+  <author key="person__{{ x.related_person.id }}">{{ x.related_person }}</author>
+{% endfor %}
+{% endif %}
 {% for x in item_located_in %}
 <pubPlace >
   <placeName key="place__{{ x.related_place.id }}">{{ x.related_place.name }}</placeName>
