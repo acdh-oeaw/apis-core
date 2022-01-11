@@ -22,15 +22,19 @@ from apis_core.helper_functions.ContentType import GetContentTypes
 app_name = "apis_core"
 
 router = routers.DefaultRouter()
-for app_label, ent in GetContentTypes().get_names():
+for app_label, model_str in GetContentTypes().get_names():
+    if "_" in app_label:
+        route_prefix = app_label.split("_")[1]
+    else:
+        route_prefix = app_label
     try:
         router.register(
-            r"{}/{}".format(app_label.split("_")[1], ent.lower()),
-            views[ent.lower()],
-            ent.lower(),
+            r"{}/{}".format(route_prefix, model_str.lower()),
+            views[model_str.lower()],
+            model_str.lower(),
         )
     except Exception as e:
-        print("{} not found, skipping".format(ent.lower()))
+        print("{} not found, skipping".format(model_str.lower()))
 
 
 if "apis_highlighter" in settings.INSTALLED_APPS:
