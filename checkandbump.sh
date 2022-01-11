@@ -7,7 +7,7 @@ echo $LASTVER_PIP
 echo $CURRENTLY_BUILT_VER
 LASTVER=$(lastversion ${CURRENTLY_BUILT_VER} -gt ${LASTVER_PIP})
 echo $LASTVER
-if [ "$CURRENTLY_BUILT_VER" == "$LASTVER" ]; then
+if [ "$CURRENTLY_BUILT_VER" == "$LASTVER" ] && [ "$LASTVER_PIP" != "$CURRENTLY_BUILT_VER" ]; then
     echo "version already newer"; else
     echo "patching version"
     sed -i "3s/\".*$/\"${LASTVER_PIP}\"/" pyproject.toml
