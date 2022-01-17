@@ -120,7 +120,7 @@ class GenericListViewNew(UserPassesTestMixin, ExportMixin, SingleTableView):
     template_name = getattr(
         settings, "APIS_LIST_VIEW_TEMPLATE", "apis:apis_entities/generic_list.html"
     )
-    login_url = "/accounts/login/"
+    #login_url = "/accounts/login/"
 
     def get_model(self):
         model = ContentType.objects.get(

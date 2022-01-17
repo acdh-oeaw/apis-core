@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404
 from django.template.loader import select_template
 from django.views import View
 from django_tables2 import RequestConfig
+from django.urls import reverse
 
 from apis_core.apis_labels.models import Label
 from apis_core.apis_metainfo.models import Uri
@@ -18,7 +19,7 @@ from .views import get_highlighted_texts
 
 class GenericEntitiesDetailView(UserPassesTestMixin, View):
 
-    login_url = '/accounts/login/'
+    #login_url = '/accounts/login/'
 
     def test_func(self):
         access = access_for_all(self, viewtype="detail")

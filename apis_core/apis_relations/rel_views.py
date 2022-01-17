@@ -17,7 +17,7 @@ class GenericRelationView(GenericListViewNew):
         'APIS_LIST_VIEW_TEMPLATE',
         'apis_entities/generic_list.html'
     )
-    login_url = '/accounts/login/'
+    #login_url = '/accounts/login/'
 
     def get_queryset(self, **kwargs):
         self.entity = self.kwargs.get('entity')
