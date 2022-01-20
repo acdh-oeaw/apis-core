@@ -553,7 +553,7 @@ def generic_serializer_creation_factory():
 
         TemplateViewSet.__name__ = TemplateViewSet.__qualname__ = f"Generic{entity_str.title().replace(' ', '')}ViewSet"
 
-        serializers_dict[TemplateSerializer] = TemplateSerializer
+        serializers_dict[TemplateSerializer.__name__] = TemplateSerializer
         views[f"{entity_str.lower().replace(' ', '')}"] = TemplateViewSet
 
 serializers_dict = dict()
