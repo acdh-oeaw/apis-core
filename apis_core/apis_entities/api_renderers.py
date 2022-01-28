@@ -9,6 +9,7 @@ from django.utils import timezone
 from rdflib import XSD, Graph, Literal, Namespace, URIRef, ConjunctiveGraph, OWL
 from rdflib.namespace import DCTERMS, VOID
 from rdflib import plugin
+from rdflib.store import Store
 from rdflib.void import generateVoID
 from rest_framework import renderers
 
