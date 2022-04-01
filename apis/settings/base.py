@@ -116,7 +116,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_FILTER_BACKENDS': (
     'django_filters.rest_framework.DjangoFilterBackend',
-    'drf_spectacular.contrib.django_filters.DjangoFilterBackend'
+    #'drf_spectacular.contrib.django_filters.DjangoFilterBackend'
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
