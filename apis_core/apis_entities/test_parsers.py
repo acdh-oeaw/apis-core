@@ -9,9 +9,9 @@ from apis_core.helper_functions.RDFParser import RDFParser
 class RDFPlaceParserNewTestCase(TestCase):
 
     def test_parse_place(self):
-        plc = [("http://www.geonames.org/6951114/bad-zell.html", "Bad Zell", 48.34906, "http://sws.geonames.org/2782113/", "https://www.geonames.org/ontology#P.PPL"),
-               ("http://sws.geonames.org/2779275/", "Freistadt", 48.51103, "http://sws.geonames.org/2782113/", "https://www.geonames.org/ontology#P.PPL"),
-               ("http://sws.geonames.org/2761369", "Vienna", 48.20849, "http://sws.geonames.org/2782113/", "https://www.geonames.org/ontology#P.PPLC")
+        plc = [("https://www.geonames.org/6951114/bad-zell.html", "Bad Zell", 48.34906, "https://sws.geonames.org/2782113/", "https://www.geonames.org/ontology#P.PPL"),
+               ("https://sws.geonames.org/2779275/", "Freistadt", 48.51103, "https://sws.geonames.org/2782113/", "https://www.geonames.org/ontology#P.PPL"),
+               ("https://sws.geonames.org/2761369", "Vienna", 48.20849, "https://sws.geonames.org/2782113/", "https://www.geonames.org/ontology#P.PPLC")
                ]
         for p in plc:
             print(p)
@@ -51,22 +51,22 @@ class RDFPlaceParserNewTestCase(TestCase):
        # print(o4.start_date)
 
     def test_merge(self):
-        o = RDFParser('http://d-nb.info/gnd/118566512', 'Person', uri_check=False)
+        o = RDFParser('https://d-nb.info/gnd/118566512', 'Person', uri_check=False)
         o.create_objct()
         o.save()
-        o2 = RDFParser('http://d-nb.info/gnd/170686299', 'Person', uri_check=False).get_or_create()
+        o2 = RDFParser('https://d-nb.info/gnd/170686299', 'Person', uri_check=False).get_or_create()
         o.merge(o2)
         print(o.objct.uri_set.all())
 
     def test_place_of_birth(self):
-        o = RDFParser('http://d-nb.info/gnd/118566512', 'Person', uri_check=False)
+        o = RDFParser('https://d-nb.info/gnd/118566512', 'Person', uri_check=False)
         o.create_objct()
         o.save()
         for p in PersonPlace.objects.all():
             print(p.related_place.name, p.related_place.uri_set.all(), p.related_place.lat)
 
     def test_institution(self):
-        o = RDFParser('http://d-nb.info/gnd/1001454-8', 'Institution', uri_check=False)
+        o = RDFParser('https://d-nb.info/gnd/1001454-8', 'Institution', uri_check=False)
         o.create_objct()
         o2 = o.save()
         print(o2.pk, o2.start_date, o2.start_date_written)
@@ -74,7 +74,7 @@ class RDFPlaceParserNewTestCase(TestCase):
         print(o2.label_set.all().values_list('label'))
         
     def test_use_uri_twice(self):
-        self.assertRaises(ValueError, RDFParser, "http://www.geonames.org/6951114/bad-zell.html", "Place")
+        self.assertRaises(ValueError, RDFParser, "https://www.geonames.org/6951114/bad-zell.html", "Place")
 
     def test_uri_twice_later(self):
         o = RDFParser('https://sws.geonames.org/2778843', 'Place', preserve_uri_minutes=0.5)

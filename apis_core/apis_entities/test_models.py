@@ -32,6 +32,12 @@ class PersonModelTestCase(TestCase):
         cls.col2 = Collection.objects.create(name=cls.col_name2)
         cls.prof1 = ProfessionType.objects.create(name=cls.prof1)
         cls.prof2 = ProfessionType.objects.create(name=cls.prof2)
+        cls.pers1 = Person.objects.create(
+            name=cls.name,
+            first_name=cls.first_name,
+            start_date_written="1880<1880-02-01>",
+            end_date_written="1890<1890-05-01>",
+        )
 
     def test_init(self):
         Person()
