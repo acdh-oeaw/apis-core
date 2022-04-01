@@ -10,9 +10,9 @@ from django.urls import reverse
 from rest_framework import pagination, serializers, viewsets
 from rest_framework import renderers
 from rest_framework.response import Response
-from drf_spectacular.contrib.django_filters import (
-    DjangoFilterBackend as DjangoFilterbackendSpectacular,
-)
+#from drf_spectacular.contrib.django_filters import (
+#    DjangoFilterBackend as DjangoFilterbackendSpectacular,
+#)
 from drf_spectacular.utils import (
     extend_schema,
     extend_schema_field,
@@ -466,7 +466,8 @@ def generic_serializer_creation_factory():
             _prefetch_rel = prefetch_rel
             pagination_class = CustomPagination
             model = entity
-            filter_backends = (DjangoFilterbackendSpectacular,)
+            #filter_backends = (DjangoFilterbackendSpectacular,)
+            filter_backends = (filters.DjangoFilterBackend, )
             filterset_fields = filter_fields
             depth = 2
             renderer_classes = (
