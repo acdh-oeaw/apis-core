@@ -80,7 +80,7 @@ class GenericRDFParser(object):
 
     def merge(self, m_obj, app_label_relations='apis_relations'):
         """
-        :param m_obj: the object to merge with (must be an django model object instance)
+        :param m_obj: the object to merge into (must be an django model object instance)
         :param app_label_relations: (string) the label of the Django app that contains the relations
         :return: django object saved to db or False if nothing was saved
         """
