@@ -356,29 +356,14 @@ class GenericVocabulariesAutocomplete(autocomplete.Select2ListView):
 
 class GenericNetworkEntitiesAutocomplete(autocomplete.Select2ListView):
     def get(self, request, *args, **kwargs):
+        page_size = 20
+        offset = (int(self.request.GET.get('page', 1))-1)*page_size
+        more = False
         entity = self.kwargs['entity']
         q = self.q
         if q.startswith('cl:'):
             res = Collection.objects.filter(name__icontains=q[3:])
             results = [{'id': 'cl:'+str(x.pk), 'text': x.name} for x in res]
-        elif q.startswith('reg:'):
-            results = []
-            if entity.lower() == 'person':
-                filen = 'reg_persons.json'
-            elif entity.lower() == 'place':
-                filen = 'reg_places.json'
-            with open(filen, 'r') as reg:
-                r1 = json.load(reg)
-                r_dict = dict()
-                for r2 in r1:
-                    if q[4:].lower() in r2[1].lower():
-                        if r2[1] in r_dict.keys():
-                            r_dict[r2[1]] += "|{}".format(r2[0])
-                        else:
-                            r_dict[r2[1]] = r2[0]
-            for k in r_dict.keys():
-                results.append({'id': 'reg:'+r_dict[k], 'text': k})
-
         else:
             ent_model = ContentType.objects.get(
                 app_label__startswith='apis_', model=entity
@@ -396,15 +381,18 @@ class GenericNetworkEntitiesAutocomplete(autocomplete.Select2ListView):
                     ) for x in ['name']
                 ]
             try:
-                res = ent_model.objects.filter(reduce(operator.or_, arg_list)).distinct()
+                res = ent_model.objects.filter(reduce(operator.or_, arg_list)).distinct()[offset:offset+page_size]
             except FieldError:
                 arg_list = [
                     Q(
                         **{x + '__icontains': q}
                     ) for x in ['text']
                 ]
-                res = ent_model.objects.filter(reduce(operator.or_, arg_list)).distinct()
+                res = ent_model.objects.filter(reduce(operator.or_, arg_list)).distinct()[offset:offset+page_size]
             results = [{'id': x.pk, 'text': str(x)} for x in res]
+        if len(results) == page_size:
+            more = True
         return http.HttpResponse(json.dumps({
-            'results': results
+            'results': results,
+            'pagination': {'more': more}
         }), content_type='application/json')
