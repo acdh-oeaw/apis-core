@@ -42,6 +42,10 @@ class NetJsonRenderer(renderers.JSONRenderer):
                         for k, v in d.items()
                     ]
                 )
+                target_type = d2["target"]["url"].split("/")[-3].title()
+                source_type = d2["source"]["url"].split("/")[-3].title()
+                d2["target"]["type"] = target_type
+                d2["source"]["type"] = source_type
                 results2.append(d2)
             data["results"] = results2
             res3 = super().render(data, accepted_media_type=media_type, renderer_context=renderer_context)
