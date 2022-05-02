@@ -364,8 +364,15 @@ class LabelTableBase(tables.Table):
         # add class="paleblue" to <table> tag
         attrs = {
             "class": "table table-hover table-striped table-condensed",
-            "id": "PL_conn"
+            "id": "PL_conn",
+            "style": "table-layout: fixed;"
         }
+    
+    def __init__(self, **kwargs):
+        self.base_columns["start_date_written"].attrs = {"th": {"class": "d-none d-lg-table-cell"},"td": {"class": "d-none d-lg-table-cell"}}
+        self.base_columns["end_date_written"].attrs = {"th": {"class": "d-none d-lg-table-cell"},"td": {"class": "d-none d-lg-table-cell"}}
+        self.base_columns["isoCode_639_3"].attrs = {"th": {"class": "d-none d-lg-table-cell"},"td": {"class": "d-none d-lg-table-cell"}}
+        super().__init__(**kwargs)
 
 
 
