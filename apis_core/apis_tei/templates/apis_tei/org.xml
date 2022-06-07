@@ -3,6 +3,9 @@
 {% for x in object.label_set.all %}
   <orgName type="{{ x.label_type|slugify }}">{{ x }}</orgName>
 {% endfor %}
+{% if object.kind %}
+  <desc type="entity_type">{{ object.kind }}</desc>
+  <desc type="entity_type_id">{{ object.kind.id }}</desc>{% endif %}
 {% if object.lat %}
 <location type="coords">
   <geo>{{ object.lat }} {{ object.lng }}</geo>
