@@ -88,6 +88,7 @@
                                         </svg>
                                     </small>
                                 </a>
+                                {% if entity_type != 'event' %}| <a href="/apis/entities/tei/{{ entity_type }}/{{ object.id }}"><small title="link to a project specific TEI-serialisation of this entity">TEI</small></a>{% endif %}
                             </h3>
                         </div>
                         <div class="card-body">
