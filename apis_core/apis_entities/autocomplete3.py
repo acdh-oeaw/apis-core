@@ -117,6 +117,8 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
         choices = []
         headers = {'Content-Type': 'application/json'}
         ent_model = AbstractEntity.get_entity_class_of_name(ac_type)
+        if not self.q:
+            q3 = False
         if self.q.startswith('http'):
             res = ent_model.objects.filter(uri__uri=self.q.strip())
         elif len(self.q) > 0:
