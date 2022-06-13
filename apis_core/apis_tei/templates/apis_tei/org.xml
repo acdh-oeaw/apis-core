@@ -32,4 +32,10 @@
 {% if object.references %}
   <note type="references">{{ object.references }}</note>
 {% endif %}
+
+{% if object.start_date_written or object.end_date_written %}
+<note type="apis_dates">
+  {% include 'apis_tei/date.xml' %}
+</note>
+{% endif %}
 </org>

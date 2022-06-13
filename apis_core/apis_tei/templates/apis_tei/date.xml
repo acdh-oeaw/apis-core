@@ -1,0 +1,29 @@
+{% if object.start_date_written and object.end_date_written %}
+<date
+      {% if object.start_start_date %}
+        from-iso="{{ object.start_start_date|date:'Y-m-d' }}"
+      {% endif %}
+      {% if object.start_end_date %}
+        to-iso="{{ object.start_end_date|date:'Y-m-d' }}"
+      {% endif %}
+    >{{ object.start_date_written }}  – {{ object.end_date_written }}</date>
+{% elif object.start_date_written %}
+<date
+      {% if object.start_start_date %}
+        notBefore-iso="{{ object.start_start_date|date:'Y-m-d' }}"
+      {% endif %}
+      {% if object.start_date %}
+        when-iso="{{ object.start_date|date:'Y-m-d' }}"
+      {% endif %}
+    >{{ object.start_date_written }}</date>
+{% elif object.end_date_written %}
+<date
+      {% if object.end_date %}
+        when-iso="{{ object.end_date|date:'Y-m-d' }}"
+      {% endif %}
+      {% if object.end_end_date %}
+        notAfter-iso="{{ object.end_end_date|date:'Y-m-d' }}"
+      {% endif %}
+    >{{ object.end_date_written }}</date>
+{% else %}
+{% endif %}

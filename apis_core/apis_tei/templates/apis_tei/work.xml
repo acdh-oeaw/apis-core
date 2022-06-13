@@ -18,19 +18,7 @@
   {% endfor %}
 </pubPlace>
 {% endfor %}
-{% if object.start_date_written %}
-<date
-      {% if object.start_start_date %}
-        notBefore-iso="{{ object.start_start_date|date:'Y-m-d' }}"
-      {% endif %}
-      {% if object.start_date %}
-        when-iso="{{ object.start_date|date:'Y-m-d' }}"
-      {% endif %}
-      {% if object.start_end_date %}
-        notAfter-iso="{{ object.start_end_date|date:'Y-m-d' }}"
-      {% endif %}
-    >{{ object.start_date_written }}</date>
-{% endif %}
+{% include 'apis_tei/date.xml' %}
 {% for x in object.uri_set.all %}
   <idno type="URL" {% if x.domain %} subtype="{{ x.domain|slugify }}" {% endif %}>{{ x }}</idno>
 {% endfor %}
