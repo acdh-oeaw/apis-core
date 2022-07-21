@@ -15,6 +15,10 @@ class RelationsTestCase(TestCase):
             start_date_written="1880<1880-02-01>",
             end_date_written="1890<1890-05-01>",
         )
+        cls.pers2 = Person.objects.create(
+            name="Müller",
+            first_name="Franz"
+        )
         cls.place1 = Place.objects.create(name="place1")
         cls.reltype = PersonPlaceRelation.objects.create(name="Rel1", name_reverse="Rel1 reverse")
         cls.rel = PersonPlace.objects.create(
@@ -33,3 +37,9 @@ class RelationsTestCase(TestCase):
         self.assertIsInstance(self.rel, PersonPlace)
         self.reltype.delete()
         self.assertIs(PersonPlace.objects.filter(id=self.id_rel).count(), 1)
+
+    def test_merge_of_entities(self):
+        # if entities get merged relations should be rewritten to the new entity
+        self.assertIsInstance(self.rel, PersonPlace)
+        self.pers2.merge_with([self.pers1])
+        self.assertEqual(PersonPlace.objects.get(id=self.id_rel).related_person, self.pers2)
