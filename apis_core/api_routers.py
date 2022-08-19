@@ -359,6 +359,9 @@ def generic_serializer_creation_factory():
                     super().__init__(*args, **kwargs)
                     entity_str = self._entity.__name__
                     app_label = self._app_label
+                    self._include_relations = self.context["request"].query_params.get("include_relations", True)
+                    if self._include_relations in ["false", "False", "0"]:
+                        self._include_relations = False
                     lst_labels_set = deep_get(
                         getattr(settings, app_label.upper(), {}),
                         "{}.labels".format(entity_str),
@@ -394,7 +397,7 @@ def generic_serializer_creation_factory():
                         if x.__module__ == "apis_core.apis_relations.models"
                         and entity_str.lower() in x.__name__.lower()
                     ]
-                    if len(include) > 0 and len(args) > 0:
+                    if len(include) > 0 and len(args) > 0 and self._include_relations:
                         inst_pk2 = args[0].pk
                         self.fields["relations"] = RelationObjectSerializer2(
                             read_only=True,
@@ -547,6 +550,19 @@ def generic_serializer_creation_factory():
                         ),
                     ],
                     responses={200: TemplateSerializerRetrieve},
+                )
+                def retrieve(self, request, pk=None):
+                    res = super(self.__class__, self).retrieve(request, pk=pk)
+                    return res
+            else:
+                @extend_schema(
+                    parameters=[
+                        OpenApiParameter(
+                            name="include_relations",
+                            description="Whether to include serialization of relations or not. Usefull to avoid timeouts on big objects. Defaults to true",
+                            type=OpenApiTypes.BOOL
+                        )
+                    ]
                 )
                 def retrieve(self, request, pk=None):
                     res = super(self.__class__, self).retrieve(request, pk=pk)
