@@ -101,6 +101,16 @@ class AbstractRelation(TempEntityClass):
         abstract = True
         default_manager_name = 'objects'
 
+    def save(self, *args, **kwargs):
+
+        if (
+            getattr(self, self.get_related_entity_field_nameA()) is None
+            or getattr(self, self.get_related_entity_field_nameB()) is None
+            or self.relation_type is None
+        ):
+            raise Exception("One or more of the necessary related models are None")
+
+        super().save(*args, **kwargs)
 
 
     # Methods dealing with individual data retrievals of instances

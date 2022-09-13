@@ -2,6 +2,7 @@ from functools import reduce
 import copy
 import importlib
 import inspect
+import typing
 
 from django.conf import settings
 
@@ -123,12 +124,19 @@ class ApisBaseSerializer(serializers.ModelSerializer):
 
 class EntitySerializer(ApisBaseSerializer):
     type = serializers.SerializerMethodField(method_name="add_type")
+    sameAs = serializers.SerializerMethodField(method_name="add_sameas")
 
     def add_type(self, instance):
         return instance.__class__.__name__
 
+    def add_sameas(self, instance):
+        res = []
+        for uri in instance.uri_set.all():
+            res.append(uri.uri)
+        return res
+
     class Meta(ApisBaseSerializer.Meta):
-        fields = ApisBaseSerializer.Meta.fields + ["type"]
+        fields = ApisBaseSerializer.Meta.fields + ["type", "sameAs"]
 
 
 class LabelSerializer(ApisBaseSerializer):
@@ -230,6 +238,7 @@ def generic_serializer_creation_factory():
 
             id = serializers.ReadOnlyField()
             url = serializers.HyperlinkedIdentityField(view_name=f"apis:apis_api:{entity_str.lower()}-detail")
+            #sameAs = UriSerializer(source="uri_set", many=True)
             _entity = entity
             _exclude_lst = exclude_lst_fin
             _app_label = app_label
@@ -241,7 +250,13 @@ def generic_serializer_creation_factory():
 
             def add_labels(self, obj):
                 return {"id": obj.pk, "label": str(obj)}
-
+            
+            def add_sameas(self, instance):
+                res = []
+                for uri in instance.uri_set.all():
+                    res.append(uri.uri)
+                return res
+            
             if entity_str.lower() == "text":
 
                 def __init__(self, *args, **kwargs):
@@ -260,6 +275,7 @@ def generic_serializer_creation_factory():
                         "{}.labels".format(entity_str),
                         [],
                     )
+                    self.fields["sameAs"] = serializers.SerializerMethodField("add_sameas")
                     for f in self._entity._meta.get_fields():
                         if getattr(settings, "APIS_API_EXCLUDE_SETS", False) and str(
                             f.name
@@ -359,6 +375,9 @@ def generic_serializer_creation_factory():
                     super().__init__(*args, **kwargs)
                     entity_str = self._entity.__name__
                     app_label = self._app_label
+                    self._include_relations = self.context["request"].query_params.get("include_relations", True)
+                    if self._include_relations in ["false", "False", "0"]:
+                        self._include_relations = False
                     lst_labels_set = deep_get(
                         getattr(settings, app_label.upper(), {}),
                         "{}.labels".format(entity_str),
@@ -394,7 +413,7 @@ def generic_serializer_creation_factory():
                         if x.__module__ == "apis_core.apis_relations.models"
                         and entity_str.lower() in x.__name__.lower()
                     ]
-                    if len(include) > 0 and len(args) > 0:
+                    if len(include) > 0 and len(args) > 0 and self._include_relations:
                         inst_pk2 = args[0].pk
                         self.fields["relations"] = RelationObjectSerializer2(
                             read_only=True,
@@ -547,6 +566,19 @@ def generic_serializer_creation_factory():
                         ),
                     ],
                     responses={200: TemplateSerializerRetrieve},
+                )
+                def retrieve(self, request, pk=None):
+                    res = super(self.__class__, self).retrieve(request, pk=pk)
+                    return res
+            else:
+                @extend_schema(
+                    parameters=[
+                        OpenApiParameter(
+                            name="include_relations",
+                            description="Whether to include serialization of relations or not. Usefull to avoid timeouts on big objects. Defaults to true",
+                            type=OpenApiTypes.BOOL
+                        )
+                    ]
                 )
                 def retrieve(self, request, pk=None):
                     res = super(self.__class__, self).retrieve(request, pk=pk)

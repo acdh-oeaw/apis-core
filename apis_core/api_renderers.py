@@ -42,6 +42,8 @@ class NetJsonRenderer(renderers.JSONRenderer):
                         for k, v in d.items()
                     ]
                 )
+                if d2["source"] is None or d2["target"] is None:    #fix needed to not get 500s if relations without source or target exist in the data
+                    continue
                 target_type = d2["target"]["url"].split("/")[-3].title()
                 source_type = d2["source"]["url"].split("/")[-3].title()
                 d2["target"]["type"] = target_type
