@@ -11,9 +11,10 @@ from django.urls import reverse
 from rest_framework import pagination, serializers, viewsets
 from rest_framework import renderers
 from rest_framework.response import Response
-#from drf_spectacular.contrib.django_filters import (
+
+# from drf_spectacular.contrib.django_filters import (
 #    DjangoFilterBackend as DjangoFilterbackendSpectacular,
-#)
+# )
 from drf_spectacular.utils import (
     extend_schema,
     extend_schema_field,
@@ -23,6 +24,7 @@ from drf_spectacular.utils import (
 from drf_spectacular.types import OpenApiTypes
 from django import forms
 from django_filters import rest_framework as filters
+from rest_framework.filters import OrderingFilter
 from .apis_metainfo.models import TempEntityClass
 from .api_renderers import NetJsonRenderer
 from .apis_relations.models import AbstractRelation
@@ -94,11 +96,7 @@ class ApisBaseSerializer(serializers.ModelSerializer):
     @extend_schema_field(OpenApiTypes.OBJECT)
     def add_type(self, obj):
         lst_type = ["kind", "type", "collection_type", "relation_type"]
-        lst_kind = [
-            x
-            for x in obj._meta.fields
-            if x.name in lst_type and "apis_vocabularies" in str(x.related_model)
-        ]
+        lst_kind = [x for x in obj._meta.fields if x.name in lst_type and "apis_vocabularies" in str(x.related_model)]
         if len(lst_kind):
             pk_obj = getattr(obj, f"{lst_kind[0].name}_id")
             if pk_obj is not None:
@@ -140,9 +138,7 @@ class EntitySerializer(ApisBaseSerializer):
 
 
 class LabelSerializer(ApisBaseSerializer):
-    parent_id = serializers.PrimaryKeyRelatedField(
-        many=False, source="parent_class_id", read_only=True
-    )
+    parent_id = serializers.PrimaryKeyRelatedField(many=False, source="parent_class_id", read_only=True)
 
     @extend_schema_field(OpenApiTypes.INT)
     def add_parent_id(self, obj):
@@ -165,14 +161,8 @@ class RelationObjectSerializer2(ApisBaseSerializer):
     @extend_schema_field(EntitySerializer)
     def add_related_entity(self, instance):
         for at in dir(instance):
-            if (
-                at.startswith("related_")
-                and at.endswith("_id")
-                and getattr(instance, at) != self._pk_instance
-            ):
-                return EntitySerializer(
-                    getattr(instance, at[:-3]), context=self.context
-                ).data
+            if at.startswith("related_") and at.endswith("_id") and getattr(instance, at) != self._pk_instance:
+                return EntitySerializer(getattr(instance, at[:-3]), context=self.context).data
 
     class Meta(ApisBaseSerializer.Meta):
         fields = ApisBaseSerializer.Meta.fields + ["relation_type", "related_entity"]
@@ -185,13 +175,12 @@ class RelationObjectSerializer2(ApisBaseSerializer):
 if "apis_highlighter" in getattr(settings, "INSTALLED_APPS"):
 
     class AnnotationSerializer(serializers.ModelSerializer):
-        related_object = VocabsBaseSerializer(
-            source="get_related_entity", read_only=True, many=False
-        )
+        related_object = VocabsBaseSerializer(source="get_related_entity", read_only=True, many=False)
 
         class Meta:
             model = Annotation
             fields = ["id", "start", "end", "related_object"]
+
 
 def generic_serializer_creation_factory():
     lst_cont = GetContentTypes().get_model_classes()
@@ -238,7 +227,7 @@ def generic_serializer_creation_factory():
 
             id = serializers.ReadOnlyField()
             url = serializers.HyperlinkedIdentityField(view_name=f"apis:apis_api:{entity_str.lower()}-detail")
-            #sameAs = UriSerializer(source="uri_set", many=True)
+            # sameAs = UriSerializer(source="uri_set", many=True)
             _entity = entity
             _exclude_lst = exclude_lst_fin
             _app_label = app_label
@@ -250,13 +239,13 @@ def generic_serializer_creation_factory():
 
             def add_labels(self, obj):
                 return {"id": obj.pk, "label": str(obj)}
-            
+
             def add_sameas(self, instance):
                 res = []
                 for uri in instance.uri_set.all():
                     res.append(uri.uri)
                 return res
-            
+
             if entity_str.lower() == "text":
 
                 def __init__(self, *args, **kwargs):
@@ -277,30 +266,24 @@ def generic_serializer_creation_factory():
                     )
                     self.fields["sameAs"] = serializers.SerializerMethodField("add_sameas")
                     for f in self._entity._meta.get_fields():
-                        if getattr(settings, "APIS_API_EXCLUDE_SETS", False) and str(
-                            f.name
-                        ).endswith("_set"):
+                        if getattr(settings, "APIS_API_EXCLUDE_SETS", False) and str(f.name).endswith("_set"):
                             if f.name in self.fields.keys():
                                 self.fields.pop(f.name)
                             continue
                         ck_many = f.__class__.__name__ == "ManyToManyField"
                         if f.name in self._exclude_lst:
                             continue
-                        elif (
-                            f.__class__.__name__
-                            in [
-                                "ManyToManyField",
-                                "ForeignKey",
-                            ]
-                            and "apis_vocabularies" not in str(f.related_model)
-                        ):
-                            self.fields[f.name] = ApisBaseSerializer(
-                                many=ck_many, read_only=True
-                            )
+                        elif f.__class__.__name__ in [
+                            "ManyToManyField",
+                            "ForeignKey",
+                        ] and "apis_vocabularies" not in str(f.related_model):
+                            self.fields[f.name] = ApisBaseSerializer(many=ck_many, read_only=True)
                         elif f.__class__.__name__ in ["ManyToManyField", "ForeignKey"]:
                             self.fields[f.name] = LabelSerializer(many=ck_many, read_only=True)
 
-        TemplateSerializer.__name__ = TemplateSerializer.__qualname__ = f"{entity_str.title().replace(' ', '')}Serializer"
+        TemplateSerializer.__name__ = (
+            TemplateSerializer.__qualname__
+        ) = f"{entity_str.title().replace(' ', '')}Serializer"
 
         class TemplateSerializerRetrieve(TemplateSerializer):
 
@@ -312,9 +295,7 @@ def generic_serializer_creation_factory():
                     @extend_schema_field(AnnotationSerializer(many=True))
                     def txt_serializer_add_annotations(self, instance):
                         if self._highlight:
-                            return AnnotationSerializer(
-                                self._annotations, context=self.context, many=True
-                            ).data
+                            return AnnotationSerializer(self._annotations, context=self.context, many=True).data
                         else:
                             return None
 
@@ -322,9 +303,7 @@ def generic_serializer_creation_factory():
                     super().__init__(*args, **kwargs)
                     highlight = self.context.get("highlight", True)
                     self._inline_annotations = False
-                    if highlight is not None and "apis_highlighter" in getattr(
-                        settings, "INSTALLED_APPS"
-                    ):
+                    if highlight is not None and "apis_highlighter" in getattr(settings, "INSTALLED_APPS"):
                         self._highlight = highlight
                         if self._highlight == "":
                             self._highlight = True
@@ -353,9 +332,9 @@ def generic_serializer_creation_factory():
                                 qs_an["users_added__in"] = self._users_show
                             if self._ann_proj_pk is not None:
                                 qs_an["annotation_project_id"] = self._ann_proj_pk
-                            #self._annotations = Annotation.objects.filter(
+                            # self._annotations = Annotation.objects.filter(
                             #    **qs_an
-                            #)  # FIXME: Currently this QS is called twice (highlight_text_new)
+                            # )  # FIXME: Currently this QS is called twice (highlight_text_new)
                         except Exception as e:
                             self._txt_html = ""
                             self._annotations = []
@@ -384,26 +363,18 @@ def generic_serializer_creation_factory():
                         [],
                     )
                     for f in self._entity._meta.get_fields():
-                        if getattr(settings, "APIS_API_EXCLUDE_SETS", False) and str(
-                            f.name
-                        ).endswith("_set"):
+                        if getattr(settings, "APIS_API_EXCLUDE_SETS", False) and str(f.name).endswith("_set"):
                             if f.name in self.fields.keys():
                                 self.fields.pop(f.name)
                             continue
                         ck_many = f.__class__.__name__ == "ManyToManyField"
                         if f.name in self._exclude_lst:
                             continue
-                        elif (
-                            f.__class__.__name__
-                            in [
-                                "ManyToManyField",
-                                "ForeignKey",
-                            ]
-                            and "apis_vocabularies" not in str(f.related_model)
-                        ):
-                            self.fields[f.name] = ApisBaseSerializer(
-                                many=ck_many, read_only=True
-                            )
+                        elif f.__class__.__name__ in [
+                            "ManyToManyField",
+                            "ForeignKey",
+                        ] and "apis_vocabularies" not in str(f.related_model):
+                            self.fields[f.name] = ApisBaseSerializer(many=ck_many, read_only=True)
                         elif f.__class__.__name__ in ["ManyToManyField", "ForeignKey"]:
                             self.fields[f.name] = LabelSerializer(many=ck_many, read_only=True)
                     # include = list(ContentType.objects.filter(app_label="apis_relations", model__icontains=entity_str).values_list('model', flat=True))
@@ -422,7 +393,9 @@ def generic_serializer_creation_factory():
                             pk_instance=inst_pk2,
                         )
 
-        TemplateSerializerRetrieve.__name__ = TemplateSerializerRetrieve.__qualname__ = f"{entity_str.title().replace(' ', '')}DetailSerializer"
+        TemplateSerializerRetrieve.__name__ = (
+            TemplateSerializerRetrieve.__qualname__
+        ) = f"{entity_str.title().replace(' ', '')}DetailSerializer"
 
         allowed_fields_filter = {
             "IntegerField": ["in", "range", "exact"],
@@ -435,14 +408,9 @@ def generic_serializer_creation_factory():
         filter_fields = {}
 
         for field in entity._meta.fields + entity._meta.many_to_many:
-            if getattr(settings, "APIS_API_EXCLUDE_SETS", False) and "_set" in str(
-                field.name.lower()
-            ):
+            if getattr(settings, "APIS_API_EXCLUDE_SETS", False) and "_set" in str(field.name.lower()):
                 continue
-            if (
-                field.name.lower() in not_allowed_filter_fields
-                or field.name == "tempentityclass_ptr"
-            ):
+            if field.name.lower() in not_allowed_filter_fields or field.name == "tempentityclass_ptr":
                 continue
             elif field.__class__.__name__ in ["ForeignKey", "ManyToManyField"]:
                 filter_fields[field.name] = ["exact"]
@@ -455,14 +423,10 @@ def generic_serializer_creation_factory():
                         "IntegerField",
                         "AutoField",
                     ]:
-                        filter_fields[
-                            f"{field.name}__{f2.name}"
-                        ] = allowed_fields_filter[f2.__class__.__name__]
+                        filter_fields[f"{field.name}__{f2.name}"] = allowed_fields_filter[f2.__class__.__name__]
                 continue
             if field.__class__.__name__ in allowed_fields_filter.keys():
-                filter_fields[field.name] = allowed_fields_filter[
-                    field.__class__.__name__
-                ]
+                filter_fields[field.name] = allowed_fields_filter[field.__class__.__name__]
             else:
                 filter_fields[field.name] = ["exact"]
         additional_filters = getattr(settings, "APIS_API_ADDITIONAL_FILTERS", False)
@@ -485,8 +449,8 @@ def generic_serializer_creation_factory():
             _prefetch_rel = prefetch_rel
             pagination_class = CustomPagination
             model = entity
-            #filter_backends = (DjangoFilterbackendSpectacular,)
-            filter_backends = (filters.DjangoFilterBackend, )
+            # filter_backends = (DjangoFilterbackendSpectacular,)
+            filter_backends = (filters.DjangoFilterBackend, OrderingFilter)
             filterset_fields = filter_fields
             depth = 2
             renderer_classes = (
@@ -511,9 +475,7 @@ def generic_serializer_creation_factory():
                     cont["ann_proj_pk"] = self.request.query_params.get("ann_proj_pk", None)
                     cont["types"] = self.request.query_params.get("types", None)
                     cont["users_show"] = self.request.query_params.get("users_show", None)
-                    cont["inline_annotations"] = self.request.query_params.get(
-                        "inline_annotations", True
-                    )
+                    cont["inline_annotations"] = self.request.query_params.get("inline_annotations", True)
                     context.update(cont)
                 return context
 
@@ -537,6 +499,7 @@ def generic_serializer_creation_factory():
                 return super(self.__class__, self).dispatch(request, *args, **kwargs)
 
             if entity_str.lower() == "text":
+
                 @extend_schema(
                     parameters=[
                         OpenApiParameter(
@@ -570,13 +533,15 @@ def generic_serializer_creation_factory():
                 def retrieve(self, request, pk=None):
                     res = super(self.__class__, self).retrieve(request, pk=pk)
                     return res
+
             else:
+
                 @extend_schema(
                     parameters=[
                         OpenApiParameter(
                             name="include_relations",
                             description="Whether to include serialization of relations or not. Usefull to avoid timeouts on big objects. Defaults to true",
-                            type=OpenApiTypes.BOOL
+                            type=OpenApiTypes.BOOL,
                         )
                     ]
                 )
@@ -588,6 +553,7 @@ def generic_serializer_creation_factory():
 
         serializers_dict[TemplateSerializer.__name__] = TemplateSerializer
         views[f"{entity_str.lower().replace(' ', '')}"] = TemplateViewSet
+
 
 serializers_dict = dict()
 views = dict()
