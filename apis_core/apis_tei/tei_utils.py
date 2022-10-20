@@ -54,7 +54,7 @@ def get_context(res):
     context['pl_located_in'] = []
     context['author_rels'] = []
     if isinstance(res, Work):
-        person_work_ids = get_child_classes(author_rels, PersonWorkRelation, labels=False)
+        person_work_ids = author_rels
         try:
             context['author_rels'] = PersonWork.objects.filter(relation_type__in=person_work_ids, related_work=res)
         except ValueError:
