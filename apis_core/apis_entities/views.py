@@ -544,14 +544,14 @@ def resolve_ambigue_place(request, pk, uri):
         uri = "http://" + uri
         entity = Place.objects.get(pk=pk)
         pl_n = RDFParser(uri, kind="Place")
-        pl_n.create_objct()
-        pl_n_1 = pl_n.save()
+        pl_n.get_or_create()
+        #pl_n_1 = pl_n.save()
         pl_n_1 = pl_n.merge(entity)
         url = pl_n_1.get_absolute_url()
         if pl_n.created:
             pl_n_1.status = "distinct (manually resolved)"
             pl_n_1.save()
-        UriCandidate.objects.filter(entity=entity).delete()
+        #UriCandidate.objects.filter(entity=entity).delete()
         reversion.set_user(request.user)
 
     return HttpResponseRedirect(url)
