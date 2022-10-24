@@ -264,7 +264,8 @@ def generic_serializer_creation_factory():
                         "{}.labels".format(entity_str),
                         [],
                     )
-                    self.fields["sameAs"] = serializers.SerializerMethodField("add_sameas")
+                    if app_label == "apis_entities":
+                        self.fields["sameAs"] = serializers.SerializerMethodField("add_sameas")
                     for f in self._entity._meta.get_fields():
                         if getattr(settings, "APIS_API_EXCLUDE_SETS", False) and str(f.name).endswith("_set"):
                             if f.name in self.fields.keys():
