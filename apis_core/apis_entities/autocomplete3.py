@@ -168,9 +168,6 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                 f = dict()
                 dataclass = ""
                 try:
-                    # The URI returned should be the APIS id, not e.g. GND
-                    # Added uri__contains filter to find APIS URI
-                    # (it *should* contain the "/entity/<id>/", unlike e.g. imported GND URI)
                     f["id"] = Uri.objects.filter(entity=r, uri__contains=f"/entity/{r.id}")[0].uri
                 except:
                     continue
