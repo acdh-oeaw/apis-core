@@ -27,6 +27,7 @@ from apis_core.apis_vocabularies.models import (
 from apis_core.helper_functions import EntityRelationFieldGenerator
 
 BASE_URI = getattr(settings, "APIS_BASE_URI", "http://apis.info/")
+DOMAIN_DEFAULT = getattr(settings, "APIS_DEFAULT_DOMAIN", "apis default")
 
 
 class AbstractEntity(TempEntityClass):
@@ -613,7 +614,7 @@ def create_default_uri(sender, instance, **kwargs):
         uri_c = "{}{}".format(
             base1, reverse("GetEntityGenericRoot", kwargs={"pk": instance.pk}),
         )
-        uri2 = Uri(uri=uri_c, domain="apis default", entity=instance)
+        uri2 = Uri(uri=uri_c, domain=DOMAIN_DEFAULT, entity=instance)
         uri2.save()
 
 

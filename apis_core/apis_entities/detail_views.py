@@ -1,20 +1,46 @@
 from django.conf import settings
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.template.loader import select_template
 from django.views import View
 from django_tables2 import RequestConfig
 from django.urls import reverse
+from django.shortcuts import redirect
 
 from apis_core.apis_labels.models import Label
 from apis_core.apis_metainfo.models import Uri
 from apis_core.apis_relations.models import AbstractRelation
 from apis_core.apis_relations.tables import get_generic_relations_table, LabelTableBase  # , EntityDetailViewLabelTable
 from apis_core.helper_functions.utils import access_for_all
-from .models import AbstractEntity
+from .models import TempEntityClass, BASE_URI
 from .views import get_highlighted_texts
+
+
+def get_object_from_pk_or_uri(request, pk):
+    """ checks if the given pk exists, if not checks if a matching apis-default uri exists
+    and returns its entity"""
+    try:
+        instance = TempEntityClass.objects_inheritance.get_subclass(pk=pk)
+        return instance
+    except TempEntityClass.DoesNotExist:
+        domain = BASE_URI
+        new_uri = f"{domain}entity/{pk}/"
+        uri2 = Uri.objects.filter(uri=new_uri)
+        if uri2.count() == 1:
+            instance = TempEntityClass.objects_inheritance.get_subclass(
+                pk=uri2[0].entity_id
+            )
+        elif uri2.count() == 0:
+            temp_obj = get_object_or_404(Uri, uri=new_uri[:-1])
+            instance = TempEntityClass.objects_inheritance.get_subclass(
+                pk=temp_obj.entity_id
+            )
+        else:
+            raise Http404
+        return instance
+
 
 
 class GenericEntitiesDetailView(UserPassesTestMixin, View):
@@ -29,8 +55,12 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
 
         entity = kwargs['entity'].lower()
         pk = kwargs['pk']
-        entity_model = AbstractEntity.get_entity_class_of_name(entity)
-        instance = get_object_or_404(entity_model, pk=pk)
+        instance = get_object_from_pk_or_uri(request, pk)
+        # print(instance.id, pk)
+        if f"{instance.id}" == f"{pk}":
+            pass
+        else:
+            return redirect(instance)
         relations = AbstractRelation.get_relation_classes_of_entity_name(entity_name=entity)
         side_bar = []
         for rel in relations:
