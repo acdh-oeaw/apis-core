@@ -1,10 +1,12 @@
-{% if object.start_date_written and object.end_date_written %}
+{% if object.start_date_written == object.end_date_written %}
+<date>{{ object.start_date_written }}</date>
+{% elif object.start_date_written and object.end_date_written %}
 <date
       {% if object.start_start_date %}
         from-iso="{{ object.start_start_date|date:'Y-m-d' }}"
       {% endif %}
-      {% if object.start_end_date %}
-        to-iso="{{ object.start_end_date|date:'Y-m-d' }}"
+      {% if object.end_date %}
+        to-iso="{{ object.end_date|date:'Y-m-d' }}"
       {% endif %}
     >{{ object.start_date_written }}  – {{ object.end_date_written }}</date>
 {% elif object.start_date_written %}
