@@ -1,0 +1,37 @@
+
+# This workflows will upload a Python Package using Twine when a release is created
+# For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
+
+name: release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Publish to pypi.org? (will not work from forks!)"
+        required: false
+        default: "false"
+
+jobs:
+  release-to-pypi:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup python 3.10
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+
+      - name: Publish to pypi
+        uses: coveooss/pypi-publish-with-poetry@v2
+        with:
+          project-name: apis-core
+          pypi-token: ${{ secrets.PYPI_TOKEN }}
+          pre-release: ${{ github.ref != 'refs/heads/main' }}
+          dry-run: ${{ github.ref != 'refs/heads/main' && github.event.inputs.publish != 'true' }}
