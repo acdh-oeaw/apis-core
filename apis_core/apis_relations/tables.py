@@ -268,11 +268,12 @@ def get_generic_relations_table(relation_class, entity_instance, detail=None):
                     verbose_name="Related " + other_related_entity_class_name.title()
                 )
 
-                if "apis_ampel" in settings.INSTALLED_APPS:
-                    from apis_ampel.helper_functions import is_ampel_active
+                # __g.pirgie__ deactivated as it caused problems with the ajax forms
+                # if "apis_ampel" in settings.INSTALLED_APPS:
+                #     from apis_ampel.helper_functions import is_ampel_active
                
-                    if is_ampel_active(relation_class.__name__):
-                        self.base_columns['ampel'] = tables.TemplateColumn(template_name = "ampel/edit_inline_table_column.html", verbose_name="Ampel")
+                #     if is_ampel_active(relation_class.__name__):
+                #         self.base_columns['ampel'] = tables.TemplateColumn(template_name = "ampel/edit_inline_table_column.html", verbose_name="Ampel")
 
 
 
