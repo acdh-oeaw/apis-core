@@ -165,6 +165,12 @@ def get_generic_relation_filter(entity):
                 include_parents=True
             )
 
+
+        if "apis_ampel" in settings.INSTALLED_APPS:
+            from apis_ampel.models import AmpelTemp
+            ampel = django_filters.ChoiceFilter(choices=AmpelTemp.ampel_choices, field_name="ampel__status", label="Ampel", null_label="default")
+
+        
         def __init__(self, *args, **kwargs):
             attrs = {'data-placeholder': 'Type to get suggestions',
                      'data-minimum-input-length': getattr(settings, "APIS_MIN_CHAR", 3),

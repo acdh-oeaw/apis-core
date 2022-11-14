@@ -28,6 +28,8 @@ from ..apis_vocabularies.models import TextType
 if 'apis_highlighter' in settings.INSTALLED_APPS:
     from apis_highlighter.forms import SelectAnnotatorAgreement
 
+if 'apis_ampel' in settings.INSTALLED_APPS:
+    from apis_ampel.helper_functions import is_ampel_active
 
 @method_decorator(login_required, name='dispatch')
 class GenericEntitiesEditView(View):
@@ -117,6 +119,8 @@ class GenericEntitiesEditView(View):
             'permissions': permissions}
         form_merge_with = GenericEntitiesStanbolForm(entity, ent_merge_pk=pk)
         context['form_merge_with'] = form_merge_with
+        if "apis_ampel" in settings.INSTALLED_APPS:
+            context["show_ampel"] = is_ampel_active(entity)
         return HttpResponse(template.render(request=request, context=context))
 
     def post(self, request, *args, **kwargs):
@@ -146,6 +150,8 @@ class GenericEntitiesEditView(View):
                 'form_text': form_text,
                 'instance': instance,
                 'permissions': permissions}
+            if "apis_ampel" in settings.INSTALLED_APPS:
+                context["show_ampel"] = is_ampel_active(entity)
             if entity.lower() != 'place':
                 form_merge_with = GenericEntitiesStanbolForm(entity, ent_merge_pk=pk)
                 context['form_merge_with'] = form_merge_with
