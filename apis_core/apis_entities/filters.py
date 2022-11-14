@@ -51,7 +51,17 @@ class GenericListFilter(django_filters.FilterSet):
     related_entity_name = django_filters.CharFilter(method="related_entity_name_filter", label="related entity")
     related_relationtype_name = django_filters.CharFilter(method="related_relationtype_name_filter", label="relationtype")
 
+    if "apis_ampel" in settings.INSTALLED_APPS:
+        from apis_ampel.models import AmpelTemp
+        ampel = django_filters.ChoiceFilter(choices=AmpelTemp.ampel_choices, field_name="ampel__status", label="Ampel", null_label="default")
+        ampel_note = django_filters.CharFilter(
+                        lookup_expr='icontains',
+                        field_name="ampel__note",
+                        label="Ampel note"
+                    )
 
+    
+    
     def __init__(self, *args, **kwargs):
 
         # call super init foremost to create dictionary of filters which will be processed further below
@@ -70,6 +80,12 @@ class GenericListFilter(django_filters.FilterSet):
             """
 
             enabled_filters = settings.APIS_ENTITIES[self.Meta.model.__name__]["list_filters"]
+            if "apis_ampel" in settings.INSTALLED_APPS:
+                from apis_ampel.helper_functions import is_ampel_active
+                from apis_ampel.models import AmpelTemp
+                if is_ampel_active(self.Meta.model.__name__):
+                    enabled_filters = ["ampel", "ampel_note"] + enabled_filters
+
 
             filter_dict_tmp = {}
 
@@ -348,6 +364,8 @@ class PersonListFilter(GenericListFilter):
     profession = django_filters.CharFilter(method="related_arbitrary_model_name")
     title = django_filters.CharFilter(method="related_arbitrary_model_name")
     name = django_filters.CharFilter(method="person_name_filter", label="Name or Label of person")
+  
+
 
     def person_name_filter(self, queryset, name, value):
 
