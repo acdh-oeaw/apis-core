@@ -333,11 +333,12 @@ def get_generic_relations_table(relation_class, entity_instance, detail=None):
                         template_name='apis_relations/references_button_generic_ajax_form.html'
                     )
 
-                if "apis_ampel" in settings.INSTALLED_APPS:
-                        from apis_ampel.helper_functions import is_ampel_active
+                # __g.pirgie__ deactivated for now as it broke ajax forms
+                # if "apis_ampel" in settings.INSTALLED_APPS:
+                #         from apis_ampel.helper_functions import is_ampel_active
                
-                        if is_ampel_active(relation_class.__name__):
-                            self.base_columns['ampel'] = tables.TemplateColumn(template_name = "ampel/ampel_edit_template_column.html", verbose_name="Ampel")
+                #         if is_ampel_active(relation_class.__name__):
+                #             self.base_columns['ampel'] = tables.TemplateColumn(template_name = "ampel/ampel_edit_template_column.html", verbose_name="Ampel")
 
 
 
