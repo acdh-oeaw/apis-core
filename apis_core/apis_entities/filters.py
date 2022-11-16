@@ -59,6 +59,16 @@ class GenericListFilter(django_filters.FilterSet):
                         field_name="ampel__note",
                         label="Ampel note"
                     )
+        ampel_notes_field = django_filters.CharFilter(
+                        lookup_expr='icontains',
+                        field_name="notes",
+                        label="notes"
+                    )
+        ampel_references_field = django_filters.CharFilter(
+                        lookup_expr='icontains',
+                        field_name="references",
+                        label="references"
+                    )
 
     
     
@@ -84,7 +94,7 @@ class GenericListFilter(django_filters.FilterSet):
                 from apis_ampel.helper_functions import is_ampel_active
                 from apis_ampel.models import AmpelTemp
                 if is_ampel_active(self.Meta.model.__name__):
-                    enabled_filters = ["ampel", "ampel_note"] + enabled_filters
+                    enabled_filters = ["ampel", "ampel_note", "ampel_notes_field", "ampel_references_field"] + enabled_filters
 
 
             filter_dict_tmp = {}
