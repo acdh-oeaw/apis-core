@@ -170,7 +170,7 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                 try:
                     f["id"] = Uri.objects.filter(entity=r, uri__contains=f"/entity/{r.id}")[0].uri
                 except:
-                    continue
+                    raise ValueError(f'No APIS URI for <{ent_model.__name__} "{r}" id="{r.id}">')
                 if hasattr(r, "lng"):
                     if r.lng and r.lat:
                         dataclass = 'data-vis-tooltip="{}" data-lat="{}" \
