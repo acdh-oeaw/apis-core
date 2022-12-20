@@ -107,9 +107,9 @@ class GetEntityGeneric(GenericAPIView):
         data_view = request.GET.get('data-view', False)
         format_param = request.GET.get('format', False)
         requested_format = request.META.get('HTTP_ACCEPT')
-        
-        if requested_format.startswith('text/html') and not data_view and not format_param:
-            return redirect(ent)
+        if requested_format is not None:
+            if requested_format.startswith('text/html') and not data_view and not format_param:
+                return redirect(ent)
         res = EntitySerializer(ent, context={"request": request})
         return Response(res.data)
 
