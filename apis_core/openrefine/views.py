@@ -1,6 +1,8 @@
 import json
+from django.db.models import Q
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+
 
 from apis_core.apis_entities.models import Person
 from .utils import get_service_mainfest, get_properties
@@ -14,7 +16,14 @@ def reconcile(request):
         response = {}
         for key, value in data_dict.items():
             query_string = value["query"]
-            persons = Person.objects.filter(name__icontains=query_string)
+            persons = Person.objects.filter(name=query_string)
+            properties = value.get("properties")
+            if properties:
+                filters = Q()
+                for x in properties:
+                    filters.add(Q(**{f"{x['pid']}": x['v']}), Q.AND)
+                persons = persons.filter(filters)
+            persons = persons.distinct()
             match_count = persons.count()
             score = 0
             if match_count == 1:
