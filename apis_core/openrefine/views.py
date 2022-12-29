@@ -1,8 +1,9 @@
+import json
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from apis_core.apis_entities.models import Person
 from .utils import get_service_mainfest, get_properties
-import json
 
 
 @csrf_exempt
@@ -10,11 +11,22 @@ def reconcile(request):
     if request.method == "POST":
         data = request.POST
         data_dict = json.loads(data.get("queries"))
-        print(type(data_dict))
+        response = {}
         for key, value in data_dict.items():
-            print(key, value)
-
-        return HttpResponse(data)
+            query_string = value["query"]
+            persons = Person.objects.filter(name__icontains=query_string)
+            match_count = persons.count()
+            score = 0
+            if match_count == 1:
+                score = 1
+                match = True
+            if match_count > 1:
+                score = 1 / match_count
+                match = False
+            matches = [{"id": x.id, "name": f"{x}", "score": score, "match": match} for x in persons]
+            item = {"result": matches}
+            response[key] = item
+        return JsonResponse(response)
     else:
         result = get_service_mainfest(request)
     return JsonResponse(result)

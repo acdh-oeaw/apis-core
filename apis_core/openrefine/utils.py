@@ -26,7 +26,7 @@ def get_service_mainfest(request, base_uri=APIS_BASE_URI, project_name=PROJECT_N
         "defaultTypes": [
             {"id": f"{schema_uri}person", "name": "person"},
         ],
-        "preview": {"height": 200, "url": f"{domain}entity/" + "{{id}}/", "width": 350},
+        "preview": {"height": 600, "url": f"{domain}entity/" + "{{id}}/", "width": 800},
         "batchSize": 25,
         "suggest": {"type": {"service_url": f"{openrefine_uri}suggest", "service_path": "/type"}},
         "extend": {"propose_properties": {"service_url": f"{openrefine_uri}properties", "service_path": ""}},
