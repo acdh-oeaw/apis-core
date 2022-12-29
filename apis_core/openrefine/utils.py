@@ -12,6 +12,8 @@ def get_properties():
         {"id": "first_name__icontains", "name": "given name (partial match)"},
         {"id": "profession__name__icontains", "name": "profession/occupation (partial string match)"},
         {"id": "profession__name", "name": "profession/occupation (exact string match)"},
+        {"id": "entid", "name": "ID"},
+        {"id": "uri", "name": "URIS"}
     ]
     return data
 
@@ -29,9 +31,26 @@ def get_service_mainfest(request, base_uri=APIS_BASE_URI, project_name=PROJECT_N
         "defaultTypes": [
             {"id": f"{schema_uri}person", "name": "person"},
         ],
-        "preview": {"height": 600, "url": f"{domain}entity/" + "{{id}}/", "width": 800},
+        "view": {
+            "url": f"{domain}entity/" + "{{id}}/",
+        },
+        "preview": {
+            "url": f"{domain}entity/" + "{{id}}/",
+            "width": 600,
+            "height": 400,
+        },
         "batchSize": 50,
         "suggest": {"type": {"service_url": f"{openrefine_uri}suggest", "service_path": "/type"}},
-        "extend": {"propose_properties": {"service_url": f"{openrefine_uri}properties", "service_path": ""}},
+        "extend": {
+            "propose_properties": {"service_url": f"{openrefine_uri}properties", "service_path": ""},
+            "property_settings": [
+                {
+                    "name": "entid",
+                    "label": "entity id",
+                    "type": "text",
+                    "help_text": "entity id"
+                }
+            ],
+        },
     }
     return data
