@@ -6,14 +6,7 @@ PROJECT_NAME = settings.PROJECT_NAME
 
 def get_properties():
     data = [
-        {"id": "name", "name": "last name (exact string match)"},
-        {"id": "name__icontains", "name": "last name (partial string match)"},
-        {"id": "first_name", "name": "given name"},
-        {"id": "first_name__icontains", "name": "given name (partial match)"},
-        {"id": "profession__name__icontains", "name": "profession/occupation (partial string match)"},
-        {"id": "profession__name", "name": "profession/occupation (exact string match)"},
         {"id": "entid", "name": "ID"},
-        {"id": "uri", "name": "URIS"}
     ]
     return data
 
