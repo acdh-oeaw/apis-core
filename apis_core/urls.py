@@ -145,6 +145,7 @@ urlpatterns = [
         r"entities/", include("apis_core.apis_entities.urls", namespace="apis_entities")
     ),
     url(r"visuals/", include("apis_core.apis_vis.urls", namespace="apis_visuals")),
+    path('openrefine/', include('apis_core.openrefine.urls', namespace='openrefine')),
     url(
         r"relations/",
         include("apis_core.apis_relations.urls", namespace="apis_relations"),
