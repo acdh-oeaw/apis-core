@@ -18,6 +18,7 @@ from apis_core.apis_entities.api_views import (
 )
 from apis_core.apis_vocabularies.api_views import UserViewSet
 from apis_core.helper_functions.ContentType import GetContentTypes
+from apis_core.apis_metainfo.views import beacon
 
 app_name = "apis_core"
 
@@ -124,6 +125,7 @@ def build_apis_mock_request(method, path, view, original_request, **kwargs):
 
 urlpatterns = [
     url(r"^admin/", admin.site.urls),
+    path('beacon/', beacon, name="beacon"),
     # url(r'^swagger(?P<format>\.json|\.yaml)$', SchemaViewSwagger.without_ui(cache_timeout=-1), name='schema-json'),
     # url(r'^swagger/$', SchemaViewSwagger.with_ui('swagger', cache_timeout=-1), name='schema-swagger-ui'),
     # url(r'^redoc/$', SchemaViewSwagger.with_ui('redoc', cache_timeout=-1), name='schema-redoc'),
