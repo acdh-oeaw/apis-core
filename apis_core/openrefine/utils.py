@@ -23,6 +23,10 @@ def get_service_mainfest(request, base_uri=APIS_BASE_URI, project_name=PROJECT_N
         "schemaSpace": schema_uri,
         "defaultTypes": [
             {"id": f"{schema_uri}person", "name": "person"},
+            {"id": f"{schema_uri}place", "name": "place"},
+            {"id": f"{schema_uri}institution", "name": "institution"},
+            {"id": f"{schema_uri}event", "name": "event"},
+            {"id": f"{schema_uri}work", "name": "work"},
         ],
         "view": {
             "url": f"{domain}entity/" + "{{id}}/",
