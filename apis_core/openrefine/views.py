@@ -4,29 +4,43 @@ from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 
-from apis_core.apis_entities.models import Person
+from apis_core.apis_entities.models import Person, Place, Institution, Work, Event, TempEntityClass
 from .utils import get_service_mainfest, get_properties
 
 
 @csrf_exempt
 def reconcile(request):
+    model_dict = {
+        "person": Person,
+        "place": Place,
+        "work": Work,
+        "institution": Institution,
+        "event": Event
+    }
     if request.method == "POST":
         response = {}
         data = request.POST
+        print(data)
         if "queries" in data.keys():
             data_dict = json.loads(data.get("queries"))
             response = {}
             for key, value in data_dict.items():
                 query_string = value["query"]
-                persons = Person.objects.filter(name=query_string)
+                try:
+                    query_type = value["type"]
+                except:
+                    query_type = "/person"
+                model_name = query_type.split('/')[-1]
+                cur_model = model_dict[model_name]
+                items = cur_model.objects.filter(name=query_string)
                 properties = value.get("properties")
                 if properties:
                     filters = Q()
                     for x in properties:
                         filters.add(Q(**{f"{x['pid']}": x["v"]}), Q.AND)
-                    persons = persons.filter(filters)
-                persons = persons.distinct()
-                match_count = persons.count()
+                    items = items.filter(filters)
+                items = items.distinct()
+                match_count = items.count()
                 score = 0
                 if match_count == 1:
                     score = 1
@@ -34,7 +48,7 @@ def reconcile(request):
                 if match_count > 1:
                     score = 1 / match_count
                     match = False
-                matches = [{"id": x.id, "name": f"{x}", "score": score, "match": match} for x in persons]
+                matches = [{"id": x.id, "name": f"{x}", "score": score, "match": match} for x in items]
                 item = {"result": matches}
                 response[key] = item
         elif "extend" in data.keys():
@@ -44,7 +58,7 @@ def reconcile(request):
             result = {}
             result["meta"] = [{"id": x["id"], "name": x["id"].upper()} for x in props]
             rows = {}
-            for x in Person.objects.filter(id__in=ids):
+            for x in TempEntityClass.objects.filter(id__in=ids):
                 rows[f"{x.id}"] = {
                     "entid": [{"str": f"{x.id}"}],
                 }
@@ -63,7 +77,15 @@ def reconcile(request):
 
 def suggest_types(request):
     data = {}
-    data["result"] = get_service_mainfest(request)["defaultTypes"]
+    prefix = request.GET.get("prefix", "")
+    suggestions = get_service_mainfest(request)["defaultTypes"]
+    print(suggestions)
+    filtered_results = []
+    for x in suggestions:
+        if x['name'].startswith(prefix):
+            filtered_results.append(x)
+    data["result"] = filtered_results
+    print(data)
     return JsonResponse(data, safe=False)
 
 
