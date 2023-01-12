@@ -13,6 +13,11 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 from typing import Dict, Any
 
+# We fall back to a DEFAULT_SECRET_KEY, but you should
+# override this using an environment variable!
+DEFAULT_SECRET_KEY = "a+nkut46lzzg_=ul)zrs29$u_6^*)2by2mjmwn)tqlgw)_at&l"
+SECRET_KEY = os.environ.get('SECRET_KEY', DEFAULT_SECRET_KEY)
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(
     os.path.dirname(os.path.abspath(os.path.join(__file__, "../")))
