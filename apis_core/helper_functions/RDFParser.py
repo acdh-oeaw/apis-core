@@ -78,7 +78,7 @@ class RDFParser(object):
 
     @property
     def _settings_complete(self):
-        sett = yaml.load(open(self._rdf_settings_file, 'r'))
+        sett = yaml.load(open(self._rdf_settings_file, 'r'), Loader=yaml.FullLoader)
         return sett
 
     @property
@@ -87,7 +87,7 @@ class RDFParser(object):
         Reads settings file and saves it
         :return: (dict) dict of settings file
         """
-        sett = yaml.load(open(self._rdf_settings_file, 'r'))
+        sett = yaml.load(open(self._rdf_settings_file, 'r'), Loader=yaml.FullLoader)
         res = {'data': []}
         for v in sett[self.kind]['data']:
             if v['base_url'] in self.uri:
@@ -303,7 +303,7 @@ class RDFParser(object):
         :param uri: (url) URI to normalize
         :return: (url) converted URI
         """
-        sett = yaml.load(open(self._uri_settings_file, 'r'))
+        sett = yaml.load(open(self._uri_settings_file, 'r'), Loader=yaml.FullLoader)
         return clean_uri(sett, uri)
 
     def merge(self, m_obj, app_label_relations='apis_relations'):
@@ -365,7 +365,8 @@ class RDFParser(object):
         for s in self._settings['matching']['attributes'].keys():
             if 'domain' in self._settings['matching']['attributes'][s].keys():
                 if self._settings['matching']['attributes'][s]['domain'] not in self.uri:
-                    print(f"continue: {s} / {self.uri} / {self._settings['matching']['attributes'][s]['domain']}")
+                    if self.print_info:
+                        print(f"continue: {s} / {self.uri} / {self._settings['matching']['attributes'][s]['domain']}")
                     continue
             access = self._settings['matching']['attributes'][s].get('accessor', None)
             field_name = self._settings['matching']['attributes'][s].get('field name', s)
@@ -381,7 +382,8 @@ class RDFParser(object):
                     cols = [x for x in df.columns if x != 'lang']
                     for c in cols:
                         data[c] = df.at[0, c]
-                    print(f"data: {data}")
+                    if self.print_info:
+                        print(f"data: {data}")
                     if 'string' in self._settings['matching']['attributes'][s].keys():
                         local_string = fmt.format(self._settings['matching']['attributes'][s]['string'], **data)
                     else:
@@ -415,7 +417,8 @@ class RDFParser(object):
                 at1 = lab['identifier'].split('.')
                 if at1[0] in self._attributes.keys():
                     if at1[-1] not in self._attributes[at1[0]].columns:
-                        print('label_missing')
+                        if self.print_info:
+                            print('label_missing')
                         continue
                     if 'lang' not in self._attributes[at1[0]]:
                         self._attributes[at1[0]]['lang'] = 'deu'
@@ -434,7 +437,7 @@ class RDFParser(object):
 
     def __init__(self, uri, kind, app_label_entities="apis_entities", app_label_relations="apis_relations",
                  app_label_vocabularies="apis_vocabularies", rdf_settings=APIS_RDF_YAML_SETTINGS,
-                 uri_settings=APIS_RDF_URI_SETTINGS, preserve_uri_minutes=5, use_preferred=False, uri_check=True, **kwargs):
+                 uri_settings=APIS_RDF_URI_SETTINGS, preserve_uri_minutes=5, use_preferred=False, uri_check=True, print_info=False, **kwargs):
         """
         :param uri: (url) Uri to parse the object from (http://test.at). The uri must start with a base url mentioned in the RDF parser settings file.
         :param kind: (string) Kind of entity (Person, Place, Institution, Work, Event)
@@ -461,6 +464,7 @@ class RDFParser(object):
         self.related_objcts = []
         force = kwargs.get('force', None)
         self.labels = []
+        self.print_info = print_info
         self.related_objcts = []
 
         self.saved = False
@@ -468,7 +472,9 @@ class RDFParser(object):
         if test[0] and not force:
             self.objct = test[1]
             self.created = False
-            print('not created')
+            if print_info:
+                print('not created')
         else:
             self.created = True
             o = self._parse()
+

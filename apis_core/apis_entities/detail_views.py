@@ -17,6 +17,10 @@ from apis_core.helper_functions.utils import access_for_all
 from .models import TempEntityClass, BASE_URI
 from .views import get_highlighted_texts
 
+if "apis_ampel" in settings.INSTALLED_APPS:
+    from apis_ampel.helper_functions import is_ampel_active
+
+
 
 def get_object_from_pk_or_uri(request, pk):
     """ checks if the given pk exists, if not checks if a matching apis-default uri exists
@@ -137,8 +141,7 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
             ]
         except AttributeError:
             no_merge_labels = []
-        return HttpResponse(template.render(
-            request=request, context={
+        context={
                 'entity_type': entity,
                 'object': instance,
                 'right_card': side_bar,
@@ -156,7 +159,12 @@ class GenericEntitiesDetailView(UserPassesTestMixin, View):
                 'iiif_info_json': iiif_info_json,
                 'iiif_server': iiif_server,
                 }
+        if "apis_ampel" in settings.INSTALLED_APPS:
+            context["show_ampel"] = is_ampel_active(entity)
+        return HttpResponse(template.render(
+            request=request, context=context
             ))
+
 
 
 # TODO __sresch__ : This seems unused. Remove it once sure

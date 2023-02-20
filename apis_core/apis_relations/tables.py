@@ -12,7 +12,6 @@ from apis_core.apis_metainfo.tables import (
     generic_render_end_date_written
 )
 from apis_core.apis_relations.models import AbstractRelation
-
 empty_text_default = 'There are currently no relations'
 
 
@@ -84,6 +83,12 @@ def get_generic_relation_listview_table(relation_name):
                     A(related_entity_field_name_b + ".pk")
                 ]
             )
+
+            if "apis_ampel" in settings.INSTALLED_APPS:
+                from apis_ampel.helper_functions import is_ampel_active
+                if is_ampel_active(relation_name):
+                    self.base_columns['ampel'] = tables.TemplateColumn(template_name = "ampel/ampel_template_column.html", verbose_name="Ampel")
+
 
             super().__init__(*args, **kwargs)
 
@@ -238,7 +243,7 @@ def get_generic_relations_table(relation_class, entity_instance, detail=None):
                 else:
                     an.other_relation_type = getattr(an.relation_type, "label_reverse")
 
-
+ 
             super().__init__(data, *args, **kwargs)
 
 
@@ -261,6 +266,16 @@ def get_generic_relations_table(relation_class, entity_instance, detail=None):
                     ],
                     verbose_name="Related " + other_related_entity_class_name.title()
                 )
+
+                if "apis_ampel" in settings.INSTALLED_APPS:
+                    from apis_ampel.helper_functions import is_ampel_active
+               
+                    if is_ampel_active(relation_class.__name__):
+                        self.base_columns['ampel'] = tables.TemplateColumn(template_name = "ampel/edit_inline_table_column.html", verbose_name="Ampel")
+
+
+
+
 
                 super().__init__(data=data, *args, **kwargs)
 
@@ -316,6 +331,15 @@ def get_generic_relations_table(relation_class, entity_instance, detail=None):
                     self.base_columns['ref'] = tables.TemplateColumn(
                         template_name='apis_relations/references_button_generic_ajax_form.html'
                     )
+
+                # __g.pirgie__ deactivated for now as it broke ajax forms
+                # if "apis_ampel" in settings.INSTALLED_APPS:
+                #         from apis_ampel.helper_functions import is_ampel_active
+               
+                #         if is_ampel_active(relation_class.__name__):
+                #             self.base_columns['ampel'] = tables.TemplateColumn(template_name = "ampel/ampel_edit_template_column.html", verbose_name="Ampel")
+
+
 
                 super().__init__(*args, **kwargs)
 

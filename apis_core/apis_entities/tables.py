@@ -1,6 +1,7 @@
 import django_tables2 as tables
 from django.utils.safestring import mark_safe
 from django_tables2.utils import A
+from django.conf import settings
 
 from apis_core.apis_entities.models import AbstractEntity
 from apis_core.apis_metainfo.tables import (
@@ -87,6 +88,17 @@ def get_entities_table(entity, edit_v, default_cols):
                     )
 
         def __init__(self, *args, **kwargs):
+            if "apis_ampel" in settings.INSTALLED_APPS:
+                from apis_ampel.helper_functions import is_ampel_active
+                #as_instance = AmpelSettings.objects.get(content_type=ContentType.objects.get(model=entity))
+                if is_ampel_active(entity):
+                    self.base_columns['ampel'] = tables.TemplateColumn(template_name = "ampel/ampel_template_column.html", verbose_name="Ampel")#todo: make the verbose name configurable?
+
+                        #'<div class="ampel_dotted" style="background-color:'+ f"{get_ampel_color(entity, record.pk)}"+'></div>', verbose_name="Ampel"
+
+                    
+                        # template_name = "ampel/ampel_template_column.html", verbose_name="Ampel" #todo: make the verbose name configurable?
+
             super().__init__(*args, **kwargs)
 
     return GenericEntitiesTable
