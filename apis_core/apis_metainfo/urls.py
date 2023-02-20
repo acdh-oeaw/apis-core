@@ -1,31 +1,31 @@
-from django.conf.urls import url
+from django.urls import path, re_path
 
 from . import views
 
 app_name = 'apis_metainfo'
 
 urlpatterns = [
-    url(
-        r'^apis/metainfo/uri/$',
+    path(
+        r'apis/metainfo/uri/',
         views.UriListView.as_view(),
         name='uri_browse'
     ),
-    url(
+    re_path(
         r'^uri/detail/(?P<pk>[0-9]+)$',
         views.UriDetailView.as_view(),
         name='uri_detail'
     ),
-    url(
-        r'^uri/create/$',
+    path(
+        r'uri/create/',
         views.UriCreate.as_view(),
         name='uri_create'
     ),
-    url(
+    re_path(
         r'^uri/edit/(?P<pk>[0-9]+)$',
         views.UriUpdate.as_view(),
         name='uri_edit'
     ),
-    url(
+    re_path(
         r'^uri/delete/(?P<pk>[0-9]+)$',
         views.UriDelete.as_view(),
         name='uri_delete'),
