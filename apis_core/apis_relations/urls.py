@@ -6,7 +6,7 @@ from . import views
 app_name = "apis_relations"
 
 urlpatterns = [
-    path(r"^ajax/get/$", views.get_form_ajax, name="get_form_ajax"),
+    path(r"ajax/get/", views.get_form_ajax, name="get_form_ajax"),
     re_path(
         r"^ajax/save/(?P<entity_type>\w+)/(?P<kind_form>\w+)/(?P<SiteID>[0-9]+)(?:/(?P<ObjectID>[0-9]*))?/$",
         views.save_ajax_form,
