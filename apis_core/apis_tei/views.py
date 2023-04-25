@@ -4,14 +4,18 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 
 from .tei_utils import get_node_from_template
-from apis_core.apis_metainfo.models import Uri
 
+from apis_core.apis_metainfo.models import Uri
+from apis_core.apis_entities.models import Person, Place, Institution, Work
 from apis_core.apis_entities.detail_views import get_object_from_pk_or_uri
 
 
 def person_as_tei(request, pk):
     full = request.GET.get('full')
+    model = Person
     res = get_object_from_pk_or_uri(request, pk)
+    if not isinstance(res, model):
+        return HttpResponse(f"Requested object is not an instance of {model.__name__}", content_type="text/plain")
     doc = get_node_from_template('apis_tei/person.xml', res, full=full)
     tei = ET.tostring(doc, pretty_print=True, encoding='UTF-8')
     return HttpResponse(tei, content_type="application/xml")
@@ -19,7 +23,10 @@ def person_as_tei(request, pk):
 
 def place_as_tei(request, pk):
     full = request.GET.get('full')
+    model = Place
     res = get_object_from_pk_or_uri(request, pk)
+    if not isinstance(res, model):
+        return HttpResponse(f"Requested object is not an instance of {model.__name__}", content_type="text/plain")
     doc = get_node_from_template('apis_tei/place.xml', res, full=full)
     tei = ET.tostring(doc, pretty_print=True, encoding='UTF-8')
     return HttpResponse(tei, content_type="application/xml")
@@ -27,7 +34,10 @@ def place_as_tei(request, pk):
 
 def work_as_tei(request, pk):
     full = request.GET.get('full')
+    model = Work
     res = get_object_from_pk_or_uri(request, pk)
+    if not isinstance(res, model):
+        return HttpResponse(f"Requested object is not an instance of {model.__name__}", content_type="text/plain")
     doc = get_node_from_template('apis_tei/work.xml', res, full=full)
     tei = ET.tostring(doc, pretty_print=True, encoding='UTF-8')
     return HttpResponse(tei, content_type="application/xml")
@@ -35,7 +45,10 @@ def work_as_tei(request, pk):
 
 def org_as_tei(request, pk):
     full = request.GET.get('full')
+    model = Institution
     res = get_object_from_pk_or_uri(request, pk)
+    if not isinstance(res, model):
+        return HttpResponse(f"Requested object is not an instance of {model.__name__}", content_type="text/plain")
     doc = get_node_from_template('apis_tei/org.xml', res, full=full)
     tei = ET.tostring(doc, pretty_print=True, encoding='UTF-8')
     return HttpResponse(tei, content_type="application/xml")
