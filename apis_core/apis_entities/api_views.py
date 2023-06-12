@@ -96,19 +96,17 @@ class GetEntityGeneric(GenericAPIView):
         except TempEntityClass.DoesNotExist:
             uri2 = Uri.objects.filter(uri=request.build_absolute_uri())
             if uri2.count() == 1:
-                return TempEntityClass.objects_inheritance.get_subclass(
-                    pk=uri2[0].entity_id
-                )
+                return TempEntityClass.objects_inheritance.get_subclass(pk=uri2[0].entity_id)
             else:
                 raise Http404
 
     def get(self, request, pk):
         ent = self.get_object(pk, request)
-        data_view = request.GET.get('data-view', False)
-        format_param = request.GET.get('format', False)
-        requested_format = request.META.get('HTTP_ACCEPT')
+        data_view = request.GET.get("data-view", False)
+        format_param = request.GET.get("format", False)
+        requested_format = request.META.get("HTTP_ACCEPT")
         if requested_format is not None:
-            if requested_format.startswith('text/html') and not data_view and not format_param:
+            if requested_format.startswith("text/html") and not data_view and not format_param:
                 return redirect(ent)
         res = EntitySerializer(ent, context={"request": request})
         return Response(res.data)
@@ -130,9 +128,7 @@ def uri_resolver(request):
                 kwargs={"pk": uri.entity_id, "entity": c_name.lower()},
             )
         else:
-            url = reverse(
-                "apis_core:apis_api2:GetEntityGeneric", kwargs={"pk": uri.entity_id}
-            ) + "?format={}".format(f)
+            url = reverse("apis_core:apis_api2:GetEntityGeneric", kwargs={"pk": uri.entity_id}) + "?format={}".format(f)
         return redirect(url)
 
 
@@ -183,9 +179,7 @@ class PlaceViewSet(viewsets.ModelViewSet):
     depth = 2
     filter_fields = ("name", "kind__name", "collection__name")
     search_fields = ("name",)
-    renderer_classes = tuple(api_settings.DEFAULT_RENDERER_CLASSES) + (
-        PaginatedCSVRenderer,
-    )
+    renderer_classes = tuple(api_settings.DEFAULT_RENDERER_CLASSES) + (PaginatedCSVRenderer,)
 
 
 class EventViewSet(viewsets.ModelViewSet):
@@ -227,11 +221,7 @@ class PlaceGeoJsonViewSet(viewsets.ViewSet):
                 if "url" in u.keys():
                     site = re.search("site/([^/]+)/", u["url"])
                     if site:
-                        params = {
-                            "id": "http://sws.geonames.org/{}/".format(
-                                match_url.group(1)
-                            )
-                        }
+                        params = {"id": "http://sws.geonames.org/{}/".format(match_url.group(1))}
                         headers = {"Content-Type": "application/json"}
                         w = requests.get(
                             stb_base + site.group(1) + "/entity",
@@ -258,9 +248,7 @@ class PlaceGeoJsonViewSet(viewsets.ViewSet):
                 context={"p_pk": request.query_params.get("p_pk", None)},
             )
         else:
-            serializer = GeoJsonSerializer(
-                [], many=True, context={"p_pk": request.query_params.get("p_pk", None)}
-            )
+            serializer = GeoJsonSerializer([], many=True, context={"p_pk": request.query_params.get("p_pk", None)})
         return Response(serializer.data)
 
 
@@ -306,19 +294,13 @@ class NetJsonViewSet(viewsets.GenericViewSet):
                     q_dict[rel_a + "__collection__id"] = int(source[3:])
             else:
                 if q_list is not None:
-                    q_list.append(
-                        Q(**{rel_a + "_id": int(source)})
-                        | Q(**{rel_b + "_id": int(source)})
-                    )
+                    q_list.append(Q(**{rel_a + "_id": int(source)}) | Q(**{rel_b + "_id": int(source)}))
                 else:
                     q_dict[rel_a + "_id"] = int(source)
         elif "search_source-autocomplete" in request.data.keys():
             source = request.data["search_source-autocomplete"]
             if q_list is not None:
-                q_list.append(
-                    Q(**{rel_a + "__name__icontains": source})
-                    | Q(**{rel_b + "__name__icontains": source})
-                )
+                q_list.append(Q(**{rel_a + "__name__icontains": source}) | Q(**{rel_b + "__name__icontains": source}))
             else:
                 q_dict[rel_a + "__name__icontains"] = source
         if "search_target" in request.data.keys():
@@ -333,10 +315,7 @@ class NetJsonViewSet(viewsets.GenericViewSet):
                     q_dict[rel_b + "__collection__id"] = int(target[3:])
             else:
                 if q_list is not None:
-                    q_list.append(
-                        Q(**{rel_a + "_id": int(target)})
-                        | Q(**{rel_b + "_id": int(target)})
-                    )
+                    q_list.append(Q(**{rel_a + "_id": int(target)}) | Q(**{rel_b + "_id": int(target)}))
                 else:
                     q_dict[rel_b + "_id"] = target
         elif "search_target-autocomplete" in request.data.keys():
@@ -344,8 +323,7 @@ class NetJsonViewSet(viewsets.GenericViewSet):
                 target = request.data["search_target-autocomplete"]
                 if q_list is not None:
                     q_list.append(
-                        Q(**{rel_a + "__name__icontains": target})
-                        | Q(**{rel_b + "__name__icontains": target})
+                        Q(**{rel_a + "__name__icontains": target}) | Q(**{rel_b + "__name__icontains": target})
                     )
                 else:
                     q_dict[rel_b + "__name__icontains"] = target
@@ -354,9 +332,7 @@ class NetJsonViewSet(viewsets.GenericViewSet):
             kind_ids_res = [int(kind.strip())]
             while len(kind_ids) > 0:
                 id_a = kind_ids.pop()
-                ids_b = VocabsBaseClass.objects.filter(
-                    parent_class_id=id_a
-                ).values_list("pk", flat=True)
+                ids_b = VocabsBaseClass.objects.filter(parent_class_id=id_a).values_list("pk", flat=True)
                 kind_ids.extend(ids_b)
                 kind_ids_res.extend(ids_b)
             q_dict["relation_type_id__in"] = kind_ids_res
@@ -372,11 +348,7 @@ class NetJsonViewSet(viewsets.GenericViewSet):
             annProj_filter = {"ann_proj": annotation_proj}
             if not ann_include_all:
                 annProj_filter["include_all"] = False
-            sr1 = (
-                q.annotation_links.filter_ann_proj(**annProj_filter)
-                .filter(**q_dict)
-                .select_related(rel_a, rel_b)
-            )
+            sr1 = q.annotation_links.filter_ann_proj(**annProj_filter).filter(**q_dict).select_related(rel_a, rel_b)
         else:
             sr1 = q.objects.filter(**q_dict)
         if q_list is not None:
@@ -399,10 +371,7 @@ class SaveNetworkFiles(APIView):
         data = request.data["file"]
         nmb = False
         for file in os.listdir("downloads/"):
-            if (
-                fnmatch.fnmatch(file, file_name_list[0] + "_*." + file_name_list[1])
-                or file == file_name
-            ):
+            if fnmatch.fnmatch(file, file_name_list[0] + "_*." + file_name_list[1]) or file == file_name:
                 if nmb:
                     nmb += 1
                 else:
@@ -463,12 +432,8 @@ class GetRelatedPlaces(APIView):
     # }
 
     def get(self, request):
-        b_rel = PersonPlaceRelation.objects.get(
-            name=getattr(settings, "BIRTH_REL_NAME", "")
-        )
-        d_rel = PersonPlaceRelation.objects.get(
-            name=getattr(settings, "DEATH_REL_NAME", "")
-        )
+        b_rel = int(getattr(settings, "BIRTH_REL_ID", ""))
+        d_rel = int(getattr(settings, "DEATH_REL_ID", ""))
         person_pk = request.query_params.get("person_id", None)
         pers = Person.objects.get(pk=person_pk)
         relation_types = request.query_params.get("relation_types", None)
@@ -488,12 +453,8 @@ class GetRelatedPlaces(APIView):
                             (
                                 pp.relation_type,
                                 None,
-                                pers.start_date
-                                if b_rel.pk == pp.relation_type_id
-                                else pp.start_date,
-                                pers.end_date
-                                if d_rel.pk == pp.relation_type_id
-                                else pp.end_date,
+                                pers.start_date if b_rel == pp.relation_type_id else pp.start_date,
+                                pers.end_date if d_rel == pp.relation_type_id else pp.end_date,
                                 pp,
                             )
                         ],
@@ -505,18 +466,12 @@ class GetRelatedPlaces(APIView):
                     (
                         pp.relation_type,
                         None,
-                        pers.start_date
-                        if b_rel.pk == pp.relation_type_id
-                        else pp.start_date,
-                        pers.end_date
-                        if d_rel.pk == pp.relation_type_id
-                        else pp.end_date,
+                        pers.start_date if b_rel == pp.relation_type_id else pp.start_date,
+                        pers.end_date if d_rel == pp.relation_type_id else pp.end_date,
                         pp,
                     )
                 )
-        for pi in PersonInstitution.objects.filter(
-            related_person_id=person_pk
-        ).filter_for_user():
+        for pi in PersonInstitution.objects.filter(related_person_id=person_pk).filter_for_user():
             inst = pi.related_institution
             rel_type = getattr(
                 settings,
@@ -525,12 +480,8 @@ class GetRelatedPlaces(APIView):
                     "situated in",
                 ],
             )
-            ipl_rel = InstitutionPlaceRelation.objects.filter(
-                name__in=rel_type
-            ).values_list("pk", flat=True)
-            plc = InstitutionPlace.objects.filter(
-                relation_type_id__in=ipl_rel, related_institution=inst
-            )
+            ipl_rel = InstitutionPlaceRelation.objects.filter(name__in=rel_type).values_list("pk", flat=True)
+            plc = InstitutionPlace.objects.filter(relation_type_id__in=ipl_rel, related_institution=inst)
             if plc.count() == 1:
                 if plc[0].related_place_id not in place_pk:
                     res.append(
@@ -564,13 +515,9 @@ class GetRelatedPlaces(APIView):
 
 class LifePathViewset(APIView):
     def get(self, request, pk):
-        b_rel = PersonPlaceRelation.objects.get(
-            name=getattr(settings, "BIRTH_REL_NAME", "")
-        )
-        d_rel = PersonPlaceRelation.objects.get(
-            name=getattr(settings, "DEATH_REL_NAME", "")
-        )
-        pb_pd = [b_rel.pk, d_rel.pk]
+        b_rel = int(getattr(settings, "BIRTH_REL_ID", ""))
+        d_rel = int(getattr(settings, "DEATH_REL_ID", ""))
+        pb_pd = [b_rel, d_rel]
         lst_inst = list(
             PersonInstitution.objects.filter(
                 Q(related_person_id=pk),
@@ -580,20 +527,18 @@ class LifePathViewset(APIView):
         lst_place = list(
             PersonPlace.objects.filter(
                 Q(related_person_id=pk),
-                Q(start_date__isnull=False)
-                | Q(end_date__isnull=False)
-                | Q(relation_type_id__in=pb_pd),
+                Q(start_date__isnull=False) | Q(end_date__isnull=False) | Q(relation_type_id__in=pb_pd),
             ).filter_for_user()
         )
         comb_lst = lst_inst + lst_place
         p1 = Person.objects.get(pk=pk)
         if p1.start_date:
             for e in comb_lst:
-                if e.relation_type_id == b_rel.pk:
+                if e.relation_type_id == b_rel:
                     e.start_date = p1.start_date
         if p1.end_date:
             for e in comb_lst:
-                if e.relation_type_id == d_rel.pk:
+                if e.relation_type_id == d_rel:
                     e.start_date = p1.end_date
         data = LifePathSerializer(comb_lst, many=True).data
         data = [d for d in data if d is not None]
