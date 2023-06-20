@@ -31,7 +31,7 @@ exclude = ["apis/", "manage.py", "__pycache__"]
 
 [tool.poetry.dependencies]
 python = ">=3.11.2, <3.12"
-Django = "^4.1"
+Django = ">=4.1, <4.2"
 djangorestframework = "^3.14.0"
 django-filter = "^22.1"
 django-autocomplete-light = "~3.9.4"
