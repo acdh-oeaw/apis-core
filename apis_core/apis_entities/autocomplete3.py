@@ -170,7 +170,12 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                     if r.lng and r.lat:
                         dataclass = 'data-vis-tooltip="{}" data-lat="{}" \
                         data-long="{}"  class="apis-autocomplete-span"'.format(ac_type, r.lat, r.lng)
-                f['text'] = '<span {}><small>db</small> {}</span>'.format(dataclass, str(r))
+                # hack work-around: The autocomplete result is misused so that a label for humans
+                #  and an identifier for further machine processing is compressed into one string.
+                #  As I couldn't find a quick way of separating those internally without
+                #  interferring too much with other legacy code. It is then used in the function
+                #  'save_ajax_form'.
+                f["text"] = r.name + " ---- " + r.uri_set.all()[0].uri
                 choices.append(f)
             if len(choices) < page_size:
                 test_db = False
@@ -299,8 +304,7 @@ class GenericEntitiesAutocomplete(autocomplete.Select2ListView):
                         descr = x['descr'][0]['value']
                     else:
                         descr = None
-                    f['text'] = '<span {} class="apis-autocomplete-span"><small>{}</small> <b>{}</b>\
-                    ({}): {}</span>'.format(dataclass, source, name, score, descr)
+                    f["text"] = r.name + " ---- " + r.uri_set.all()[0].uri
                     choices.append(f)
             for k in test_stanbol_list.keys():
                 if test_stanbol_list[k]:
