@@ -169,31 +169,16 @@ def save_ajax_form(request, entity_type, kind_form, SiteID, ObjectID=False):
         raise Http404
 
     button_text = "create/modify"
-    # Because the relation form autocomplete returns lists of values, all with lengths of one, their
-    # individual single values are picked here.
-    data_dict = {}
-    for k,v in dict(request.POST).items():
-        if type(v) is not list and len(v) != 1:
-            raise Exception(
-                "Something went wrong. It is assumed, that this function receives lists with length"
-                " of 1, due to how autocomplete form fields generate and forward results."
-            )
-        else:
-            data_dict[k] = v[0]
+
     if not ObjectID:
         instance_id = ''
-        # hack work-around: The autocomplete logic presents results both for human in the UI and for
-        #  code by forwarding it to here. To differentiate between human and machine value, a
-        #  ' ---- ' substring was injected in the autocomplete result, to separate those two.
-        #  Here we split and cut away the data for humans and only use the identifier needed for
-        #  further processing.
-        data_dict["target"] = data_dict["target"].split(" ---- ")[1]
     else:
         instance_id = ObjectID
     entity_type_str = entity_type
     entity_type = AbstractEntity.get_entity_class_of_name(entity_type)
+
     form_match = re.match(r'([A-Z][a-z]+)([A-Z][a-z]+)?(Highlighter)?Form', kind_form)
-    form_dict = {'data': data_dict,
+    form_dict = {'data': request.POST,
                  'entity_type': entity_type,
                  'request': request}
 
