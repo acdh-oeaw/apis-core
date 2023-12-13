@@ -155,7 +155,7 @@ class TempEntityClass(models.Model):
             verse_end = None
             if unparsed_string is not None:
                 # load the json file which contains all valid bible references, compare the user input against it
-                with open("./data/bible_refs.json") as json_file:
+                with open("./assets/bible_refs.json") as json_file:
                     valid_bible_books = json.load(json_file)
                     pattern = re.compile("([0-9a-zA-Z]+) +([0-9]+) *: *([0-9]+) *(- *([0-9]+))? *$")
                     matches = pattern.match(unparsed_string)
