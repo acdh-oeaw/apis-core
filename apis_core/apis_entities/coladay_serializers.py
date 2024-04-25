@@ -1,12 +1,6 @@
 from rest_framework import serializers
 from apis_core.apis_entities.models import Passage, Publication
 
-class MinimalPublicationSerialiser(serializers.ModelSerializer):
-
-    class Meta:
-        model = Publication
-        fields = ["id", "name"]
-
 
 class MinimalPassageSerializer(serializers.ModelSerializer):
     entity_type = serializers.SerializerMethodField(method_name="add_entity_type")
@@ -16,9 +10,8 @@ class MinimalPassageSerializer(serializers.ModelSerializer):
         return "Passage"
 
     def add_publication(self, object):
-        rel = object.passagepublication_set.filter(relation_type_id=189)
-        if rel.count() == 1:
-            return MinimalPublicationSerialiser(rel[0].related_publication).data
+        if object.publication_json:
+            return object.publication_json
         return None   
 
     class Meta:
