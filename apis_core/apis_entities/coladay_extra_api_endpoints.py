@@ -1,9 +1,13 @@
+from apis_core.apis_relations.models import PassagePublication
 from rest_framework import mixins, viewsets
 from rest_framework import filters
 from apis_core.apis_entities.models import Passage
 from .coladay_serializers import MinimalPassageSerializer
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
+from django.db.models import Subquery, OuterRef
+from django.db.models.functions import JSONObject
+
 
 search_fields = {
     "person": ["personpassage_set__related_person__name"],
@@ -42,6 +46,6 @@ class SelectSearchFilter(filters.SearchFilter):
         )
 )
 class ColadaySearchViewset(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Passage.objects.all()
+    queryset = Passage.objects.all().annotate(publication_json=Subquery(PassagePublication.objects.filter(related_passage_id=OuterRef('pk'), relation_type_id=189).values(json=JSONObject(name='related_publication__name', id="related_publication_id"))[:1]))
     filter_backends = [SelectSearchFilter,]
     serializer_class = MinimalPassageSerializer
