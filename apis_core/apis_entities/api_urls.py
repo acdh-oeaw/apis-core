@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.conf.urls import url
 from django.urls import path
-from .coladay_extra_api_endpoints import ColadaySearchViewset
+from .coladay_extra_api_endpoints import ColadayEntityListViewset, ColadaySearchViewset
 
 from . import api_views
 
@@ -30,3 +30,4 @@ if 'apis_highlighter' in settings.INSTALLED_APPS:
                            name='ShowOverlappingHighlights')])
 
 urlpatterns.append(path(r'search/', ColadaySearchViewset.as_view({"get": "list"}), name="Lifepathviewset"))
+urlpatterns.append(path(r'entity_list/', ColadayEntityListViewset.as_view({"get": "list"}), name="SimpleEntityListView"))

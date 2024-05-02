@@ -1,9 +1,23 @@
+from apis_core.apis_metainfo.models import TempEntityClass
+from apis_core.apis_relations.models import PassagePublication
 from rest_framework import mixins, viewsets
 from rest_framework import filters
+from django_filters import rest_framework as filters2
 from apis_core.apis_entities.models import Passage
-from .coladay_serializers import MinimalPassageSerializer
+from apis_core.apis_vocabularies.models import PassageTopics
+from .coladay_serializers import MinimalPassageSerializer, MinimalEntitySerializer
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
+from django.db.models import Subquery, OuterRef
+from django.db.models.functions import JSONObject
+from django.db.models import Q
+from django.db.models import Count
+from django.db.models import JSONField
+from django.db.models import Q, Subquery, OuterRef
+from apis_core.apis_metainfo.models import TempEntityClass
+from apis_core.apis_vocabularies.models import PassageTopics
+from .coladay_serializers import MinimalEntitySerializer
+
 
 search_fields = {
     "person": ["personpassage_set__related_person__name"],
@@ -45,3 +59,34 @@ class ColadaySearchViewset(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Passage.objects.all()
     filter_backends = [SelectSearchFilter,]
     serializer_class = MinimalPassageSerializer
+
+search_fields_v2 = {
+    "person": ["personpassage__related_person__name"],
+    "place": ["placepassage__related_place__name", "placepassage__related_place__name_english",],
+    "event": ["eventpassage__related_event__name", "eventpassage__related_event__name_english",],
+    "publication": ["passagepublication__related_publication__name",],
+    "institution": ["institutionpassage__related_institution__name", "institutionpassage__related_institution__name_english",],
+    "text": ["text__text"],
+    # "topic": ["topic__name"],
+    # "type": ["kind__name"]
+}
+
+class SearchFilterV2(filters2.FilterSet):
+    search = filters2.CharFilter(method="search_filter")
+
+    def search_filter(self, queryset, name, value):
+        q_objects = Q() # Create an empty Q object to start with
+        q_objects |= Q(**{"name__icontains": value})
+        for filter in search_fields_v2.values():
+            for f in filter:
+                q_objects |= Q(**{f + "__icontains": value})
+        q_objects |= Q(**{"id__in": Subquery(Passage.objects.filter(Q(topic__name__icontains=value)|Q(kind__name__icontains=value)).values("id"))})
+        return queryset.filter(q_objects)
+
+class ColadayEntityListViewset(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = TempEntityClass.objects_inheritance.select_subclasses("place", "person", "passage", "institution", "event", "publication").filter(
+        Q(passage__isnull=False) | Q(person__isnull=False) | Q(place__isnull=False) | Q(institution__isnull=False) | Q(event__isnull=False) | Q(publication__isnull=False)
+    )
+    filter_backends = (filters2.DjangoFilterBackend,)
+    serializer_class = MinimalEntitySerializer
+    filterset_class = SearchFilterV2

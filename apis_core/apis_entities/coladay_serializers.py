@@ -24,3 +24,18 @@ class MinimalPassageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Passage
         fields = ["id", "entity_type", "name", "start_date_written", "start_date", "end_date_written", "end_date", "primary_date", "publication"]
+
+
+class MinimalEntitySerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    type = serializers.SerializerMethodField(method_name="add_entity_type")
+    name = serializers.CharField()
+    start_date_written = serializers.CharField(required=False)
+    end_date_written = serializers.CharField(required=False)
+    start_date = serializers.DateField(required=False)
+    end_date = serializers.DateField(required=False)
+    primary_date = serializers.DateField(required=False)
+
+
+    def add_entity_type(self, object):
+        return object.__class__.__name__
