@@ -1,5 +1,5 @@
 from apis_core.apis_metainfo.models import TempEntityClass
-from apis_core.apis_relations.models import PassagePublication
+from apis_core.apis_relations.models import PassagePublication, PersonPublication
 from rest_framework import mixins, viewsets
 from rest_framework import filters
 from django_filters import rest_framework as filters2
@@ -73,6 +73,11 @@ search_fields_v2 = {
 
 class SearchFilterV2(filters2.FilterSet):
     search = filters2.CharFilter(method="search_filter")
+    name__icontains = filters2.CharFilter(field_name="name", lookup_expr="icontains")
+    kind__id__in = filters2.CharFilter(method="id_in_filter", field_name="passage__kind__id")
+    topic__id__in = filters2.CharFilter(method="id_in_filter", field_name="passage__topic__id")
+    publication_set__id__in = filters2.CharFilter(method="id_in_filter", field_name="passage__publication_set")
+    publication_set__person_set__id__in = filters2.CharFilter(method="author_filter")
 
     def search_filter(self, queryset, name, value):
         q_objects = Q() # Create an empty Q object to start with
@@ -82,6 +87,15 @@ class SearchFilterV2(filters2.FilterSet):
                 q_objects |= Q(**{f + "__icontains": value})
         q_objects |= Q(**{"id__in": Subquery(Passage.objects.filter(Q(topic__name__icontains=value)|Q(kind__name__icontains=value)).values("id"))})
         return queryset.filter(q_objects)
+    
+    def id_in_filter(self, queryset, name, value):
+        filter = {name + "__in": [int(x) for x in value.split(",")]}
+        return queryset.filter(**filter)
+
+    def author_filter(self, queryset, name, value):
+        author_query = PersonPublication.objects.filter(related_person_id__in=[int(x) for x in value.split(",")], relation_type_id=187).values_list('related_publication_id', flat=True)
+        filter = {"passage__publication_set__in": list(author_query)}
+        return queryset.filter(**filter)
 
 class ColadayEntityListViewset(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = TempEntityClass.objects_inheritance.select_subclasses("place", "person", "passage", "institution", "event", "publication").filter(
