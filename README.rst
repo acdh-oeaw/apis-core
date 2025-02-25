@@ -1,3 +1,7 @@
+Archived
+========
+This library is deprecated and superseded by [apis-core-rdf](https://acdh-oeaw.github.io/apis-core-rdf/). This repo is archived as of 2025-02-25.
+
 Readme
 ======
 
