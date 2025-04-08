@@ -8,11 +8,9 @@ from django.db import IntegrityError
 from apis_core.apis_metainfo.models import Uri
 from apis_core.helper_functions.RDFParser import clean_uri
 
-uri_settings_file = os.path.join(
-    settings.BASE_DIR, 'apis_core', 'default_settings', "URI_replace_settings.yml"
-)
+uri_settings_file = os.path.join(settings.BASE_DIR, "apis_core", "default_settings", "URI_replace_settings.yml")
 
-sett = yaml.load(open(uri_settings_file, 'r'))
+sett = yaml.safe_load(open(uri_settings_file, "r"))
 
 
 class Command(BaseCommand):

@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
-from django.conf.urls import url
+from django.urls import path, re_path
 
 from . import views
 
-app_name = 'apis_labels'
+app_name = "apis_labels"
 
 urlpatterns = [
-url(r'^list/$', views.LabelListView.as_view(), name='label_list'),
-url(r'^create/$', views.label_create, name='label_create'),
-url(r'^edit/(?P<pk>[0-9]+)$', views.label_edit, name='label_edit'),
-url(r'^delete/(?P<pk>[0-9]+)$', views.LabelDelete.as_view(), name='label_delete'),
+    path("list/", views.LabelListView.as_view(), name="label_list"),
+    path("create/", views.label_create, name="label_create"),
+    re_path(r"^edit/(?P<pk>[0-9]+)$", views.label_edit, name="label_edit"),
+    re_path(
+        r"^delete/(?P<pk>[0-9]+)$", views.LabelDelete.as_view(), name="label_delete"
+    ),
 ]

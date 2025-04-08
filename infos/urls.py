@@ -1,89 +1,89 @@
-from django.conf.urls import url
 from . import views
 from . import special_views
+from django.urls import path
 
 app_name = 'infos'
 urlpatterns = [
-    url(
-        r'^project-team/$',
+    path(
+        "project-team/",
         special_views.TeamView.as_view(),
         name='project-team'
     ),
-    url(
-        r'^about-the-project/$',
+    path(
+        "about-the-project/",
         special_views.SpecialAboutView.as_view(),
         name='about-the-project'
     ),
-    url(
-        r'^about/$',
+    path(
+        "about/",
         views.AboutTheProjectListView.as_view(),
         name='about_browse'
     ),
-    url(
-        r'^about/detail/(?P<pk>[0-9]+)$',
+    path(
+        "about/detail/<int:pk>",
         views.AboutTheProjectDetailView.as_view(),
         name='about_detail'
     ),
-    url(
-        r'^about/create/$',
+    path(
+        "about/create/",
         views.AboutTheProjectCreate.as_view(),
         name='about_create'
     ),
-    url(
-        r'^about/edit/(?P<pk>[0-9]+)$',
+    path(
+        "about/edit/<int:pk>",
         views.AboutTheProjectUpdate.as_view(),
         name='about_edit'
     ),
-    url(
-        r'^about/delete/(?P<pk>[0-9]+)$',
+    path(
+        "about/delete/<int:pk>",
         views.AboutTheProjectDelete.as_view(),
         name='about_delete'),
-    url(
-        r'^teammember/$',
+    path(
+        "teammember/",
         views.TeamMemberListView.as_view(),
         name='teammember_browse'
     ),
-    url(
-        r'^teammember/detail/(?P<pk>[0-9]+)$',
+    path(
+        "teammember/detail/<int:pk>",
         views.TeamMemberDetailView.as_view(),
         name='teammember_detail'
     ),
-    url(
-        r'^teammember/create/$',
+    path(
+        "teammember/create/",
         views.TeamMemberCreate.as_view(),
         name='teammember_create'
     ),
-    url(
-        r'^teammember/edit/(?P<pk>[0-9]+)$',
+    path(
+        "teammember/edit/<int:pk>",
         views.TeamMemberUpdate.as_view(),
         name='teammember_edit'
     ),
-    url(
-        r'^teammember/delete/(?P<pk>[0-9]+)$',
+    path(
+        "teammember/delete/<int:pk>",
         views.TeamMemberDelete.as_view(),
         name='teammember_delete'),
-    url(
-        r'^projectinst/$',
+    path(
+        "projectinst/",
         views.ProjectInstListView.as_view(),
         name='projectinst_browse'
     ),
-    url(
-        r'^projectinst/detail/(?P<pk>[0-9]+)$',
+    path(
+        "projectinst/detail/<int:pk>",
         views.ProjectInstDetailView.as_view(),
         name='projectinst_detail'
     ),
-    url(
-        r'^projectinst/create/$',
+    path(
+        "projectinst/create/",
         views.ProjectInstCreate.as_view(),
         name='projectinst_create'
     ),
-    url(
-        r'^projectinst/edit/(?P<pk>[0-9]+)$',
+    path(
+        "projectinst/edit/<int:pk>",
         views.ProjectInstUpdate.as_view(),
         name='projectinst_edit'
     ),
-    url(
-        r'^projectinst/delete/(?P<pk>[0-9]+)$',
+    path(
+        "projectinst/delete/<int:pk>",
         views.ProjectInstDelete.as_view(),
         name='projectinst_delete'),
 ]

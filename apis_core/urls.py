@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.conf.urls import include, url
+from django.urls import include, path, re_path
 from django.contrib import admin
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
@@ -124,8 +124,8 @@ def build_apis_mock_request(method, path, view, original_request, **kwargs):
 
 
 urlpatterns = [
-    url(r"^admin/", admin.site.urls),
-    path('beacon/', beacon, name="beacon"),
+    path("admin/", admin.site.urls),
+    path("beacon/", beacon, name="beacon"),
     # url(r'^swagger(?P<format>\.json|\.yaml)$', SchemaViewSwagger.without_ui(cache_timeout=-1), name='schema-json'),
     # url(r'^swagger/$', SchemaViewSwagger.with_ui('swagger', cache_timeout=-1), name='schema-swagger-ui'),
     # url(r'^redoc/$', SchemaViewSwagger.with_ui('redoc', cache_timeout=-1), name='schema-redoc'),
@@ -141,32 +141,29 @@ urlpatterns = [
         SpectacularRedocView.as_view(url_name="apis_core:schema"),
         name="redoc",
     ),
-    url(r"labels/", include("apis_core.apis_labels.urls", namespace="apis_labels")),
-    url(r"tei/", include("apis_core.apis_tei.tei_urls", namespace="apis_tei")),
-    url(
-        r"entities/", include("apis_core.apis_entities.urls", namespace="apis_entities")
-    ),
-    url(r"visuals/", include("apis_core.apis_vis.urls", namespace="apis_visuals")),
-    path('openrefine/', include('apis_core.openrefine.urls', namespace='openrefine')),
-    url(
-        r"relations/",
+    path("labels/", include("apis_core.apis_labels.urls", namespace="apis_labels")),
+    path("tei/", include("apis_core.apis_tei.tei_urls", namespace="apis_tei")),
+    path("entities/", include("apis_core.apis_entities.urls", namespace="apis_entities")),
+    path("visuals/", include("apis_core.apis_vis.urls", namespace="apis_visuals")),
+    path(
+        "relations/",
         include("apis_core.apis_relations.urls", namespace="apis_relations"),
     ),
-    url(
-        r"vocabularies/",
+    path(
+        "vocabularies/",
         include("apis_core.apis_vocabularies.urls", namespace="apis_vocabularies"),
     ),
-    url(
-        r"metainfo/",
+    path(
+        "metainfo/",
         include("apis_core.apis_metainfo.urls", namespace="apis_metainfo"),
     ),
-    url(
-        r"metainfo-ac/",
+    path(
+        "metainfo-ac/",
         include("apis_core.apis_metainfo.dal_urls", namespace="apis_metainfo-ac"),
     ),
     # url(r'^autocomplete/', include('autocomplete_light.urls')),
-    url(
-        r"^api/", include((router.urls, "apis_core"), namespace="apis_api")
+    path(
+        "api/", include((router.urls, "apis_core"), namespace="apis_api")
     ),  # routers do not support namespaces out of the box
     # path('openapi-2', schema_view),
     # path('openapi-api', get_schema_view(
@@ -174,11 +171,11 @@ urlpatterns = [
     #    description="APIS API schema definition",
     #    urlconf='apis_core.apis_entities.api_urls',
     # ), name='openapi-schema-api'),
-    url(r"^api2/", include("apis_core.apis_entities.api_urls", namespace="apis_api2")),
-    url(r"^api-auth/", include("rest_framework.urls", namespace="rest_framework")),
+    path("api2/", include("apis_core.apis_entities.api_urls", namespace="apis_api2")),
+    path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     # url(r'^api-schema/', schema_view),
-    url(r"^apis-vis/", include("apis_core.apis_vis.urls", namespace="apis_vis")),
-    url(
+    path("apis-vis/", include("apis_core.apis_vis.urls", namespace="apis_vis")),
+    re_path(
         r"^docs/(?P<path>.*)$",
         login_required(serve),
         {"document_root": "apis-core/docs/_build/html"},
@@ -189,15 +186,12 @@ urlpatterns = [
 ]
 
 if "apis_highlighter" in settings.INSTALLED_APPS:
-    urlpatterns.append(
-        url(r"highlighter/", include("apis_highlighter.urls", namespace="highlighter"))
-    )
+    urlpatterns.append(path("highlighter/", include("apis_highlighter.urls", namespace="highlighter")))
 
 if "apis_fulltext_download" in settings.INSTALLED_APPS:
-
     urlpatterns.append(
-        url(
-            r"fulltext_download/",
+        path(
+            "fulltext_download/",
             include("apis_fulltext_download.urls", namespace="apis_fulltext_download"),
         )
     )
@@ -206,4 +200,4 @@ if settings.DEBUG:
     if "debug_toolbar" in settings.INSTALLED_APPS:
         import debug_toolbar
 
-        urlpatterns = [url(r"^__debug__/", include(debug_toolbar.urls))] + urlpatterns
+        urlpatterns = [re_path(r"^__debug__/", include(debug_toolbar.urls))] + urlpatterns
